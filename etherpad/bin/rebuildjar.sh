@@ -14,6 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+base=`dirname $0`
+
 if [ -z "$JAR" ]; then
     if [ ! -z `which fastjar` ]; then
         JAR=fastjar
@@ -22,14 +24,7 @@ if [ -z "$JAR" ]; then
     fi
 fi
 
-function notify {
-    if [ ! -z `which growlnotify` ]; then
-	echo $0 finished | growlnotify
-    fi   
-}
-trap notify EXIT
-
-source ../infrastructure/bin/compilecache.sh
+source $base/../../infrastructure/bin/compilecache.sh
 
 suffix="-dev";
 if [ "$1" == "prod" ]; then
@@ -38,7 +33,7 @@ if [ "$1" == "prod" ]; then
 fi
 
 OWD=`pwd`
-cd ../infrastructure
+cd $base/../../infrastructure
 JAR=$JAR bin/makejar.sh $@
 
 rm -rf build/etherpad-jars

@@ -20,7 +20,12 @@ else
     echo "using JAR $JAR..."
 fi
 
-cp ${MYSQL_CONNECTOR_JAR} lib/
+if [[ x"$PG_CONNECTOR_JAR"x == xx ]]; then
+  echo "You need PG_CONNECTOR_JAR in your environment."
+  exit 2
+else
+  cp ${PG_CONNECTOR_JAR} lib/
+fi
 
 source bin/compilecache.sh
 
