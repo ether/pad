@@ -22,7 +22,7 @@ function run() {
     return;
   }
   
-  var idColspec = "INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY";
+  var idColspec = "SERIAL PRIMARY KEY";
 
   sqlobj.createTable('checkout_purchase', {
     id: idColspec,
@@ -42,7 +42,7 @@ function run() {
     cents: "INT NOT NULL",
     referral: "VARCHAR(8)",
     receiptEmail: "TEXT",
-    purchaseType: "ENUM('creditcard', 'invoice', 'paypal') NOT NULL",
+    purchaseType: "VARCHAR(64)", // "ENUM('creditcard', 'invoice', 'paypal') NOT NULL",
     licenseKey: "VARCHAR(1024)"
   }, {
     email: true,
@@ -59,7 +59,7 @@ function run() {
   });
   
   // add a sample referral code.
-  sqlobj.insert('checkout_referral', {
+/*  sqlobj.insert('checkout_referral', {
     id: 'EPCO6128',
     productPctDiscount: 50,
     supportPctDiscount: 25,
@@ -77,6 +77,6 @@ function run() {
   sqlobj.insert('checkout_referral', {
     id: 'EPFREE68',
     totalPctDiscount: 100
-  });
+  }); */
   
 }

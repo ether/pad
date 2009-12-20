@@ -19,7 +19,7 @@ import("sqlbase.sqlobj");
 
 function run() {
 
-  var idColspec = 'INT NOT NULL '+sqlcommon.autoIncrementClause()+' PRIMARY KEY';
+  var idColspec = 'SERIAL PRIMARY KEY';
 
   sqlobj.createTable('persistent_vars', {
     id: idColspec,

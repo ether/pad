@@ -1,0 +1,7 @@
+syntax: glob
+*.class
+buildcache
+build/
+etherpad/data/
+postgresql*.jar
+appjet-eth-dev.jar

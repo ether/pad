@@ -42,7 +42,6 @@ var migrations = [
   "m0008_persistent_vars",
   "m0009_pad_tables",
   "m0010_pad_sqlmeta",
-  "m0011_pro_users_temppass",
   "m0012_pro_users_auto_signin",
   "m0013_pne_padv2_upgrade",
   "m0014_pne_globalpadids",
@@ -56,18 +55,14 @@ var migrations = [
   "m0022_create_userids_table",
   "m0023_create_usagestats_table",
   "m0024_statistics_table",
-  "m0025_rename_pro_users_table",
   "m0026_create_guests_table",
   "m0027_pro_config",
   "m0028_ondemand_beta_emails",
   "m0029_lowercase_subdomains",
-  "m0030_fix_statistics_values",
-  "m0031_deleted_pro_users",
   "m0032_reduce_topvalues_counts",
   "m0033_pro_account_usage",
   "m0034_create_recurring_billing_table",
   "m0035_add_email_to_paymentinfo",
-  "m0036_create_missing_subscription_records",
   "m0037_create_pro_referral_table",
   "m0038_pad_coarse_revs"
 ];
@@ -91,7 +86,7 @@ function onStartup() {
   if (!sqlcommon.doesTableExist("db_migrations")) {
     appjet.cache.db_migrations_print_debug = false;
     sqlobj.createTable('db_migrations', {
-      id: 'INT NOT NULL '+sqlcommon.autoIncrementClause()+' PRIMARY KEY',
+      id: 'SERIAL',
       name: 'VARCHAR(255) NOT NULL UNIQUE',
       completed: 'TIMESTAMP'
     });

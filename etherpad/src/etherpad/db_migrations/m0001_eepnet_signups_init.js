@@ -24,7 +24,7 @@ function run() {
   }
 
   sqlobj.createTable('eepnet_signups', {
-    id: 'INT NOT NULL '+sqlcommon.autoIncrementClause()+' PRIMARY KEY',
+    id: 'SERIAL PRIMARY KEY',
     email: 'VARCHAR(128) NOT NULL UNIQUE',
     date: 'TIMESTAMP',
     signupIp: 'VARCHAR(16)',

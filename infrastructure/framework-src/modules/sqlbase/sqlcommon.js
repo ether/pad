@@ -95,5 +95,6 @@ function btquote(x) { return _sqlbase().quoteIdentifier(x); }
 function getSqlBase() { return _sqlbase(); }
 
 function isMysql() { return _sqlbase().isMysql(); }
+function isPg() { return _sqlbase().isPg(); }
 function isDerby() { return _sqlbase().isDerby(); }
 

@@ -22,10 +22,10 @@ function run() {
     return;
   }
   
-  var idColspec = "INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY";
+  var idColspec = "SERIAL";
 
   sqlobj.createTable('billing_payment_info', {
-    customer: "INT(11) NOT NULL PRIMARY KEY",
+    customer: "INT NOT NULL PRIMARY KEY",
     fullname: "VARCHAR(128)",
     paymentsummary: "VARCHAR(128)",
     expiration: "VARCHAR(6)", // MMYYYY
@@ -37,6 +37,6 @@ function run() {
   });
   
   sqlobj.addColumns('billing_invoice', {
-    users: "INT(11)"
+    users: "INT"
   })
 }

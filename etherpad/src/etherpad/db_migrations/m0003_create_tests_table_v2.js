@@ -23,7 +23,7 @@ function run() {
     sqlobj.dropTable('just_a_test');
   }
   sqlobj.createTable('just_a_test', {
-    id: 'INT NOT NULL '+sqlcommon.autoIncrementClause()+' PRIMARY KEY',
+    id: 'SERIAL PRIMARY KEY',
     x: 'VARCHAR(128)'
   });
 }

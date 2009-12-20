@@ -22,18 +22,18 @@ function run() {
     return;
   }
   
-  var idColspec = "INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY";
+  var idColspec = "SERIAL PRIMARY KEY";
 
   sqlobj.createTable('billing_purchase', {
     id: idColspec,
-    type: "ENUM('onetimepurchase', 'subscription')",
-    customer: "INT(11) NOT NULL",
+    type: "VARCHAR(64)", //"ENUM('onetimepurchase', 'subscription')",
+    customer: "INT NOT NULL",
     product: "VARCHAR(128) NOT NULL",
-    cost: "INT(11) NOT NULL",
+    cost: "INT NOT NULL",
     coupon: "VARCHAR(128) NOT NULL",
-    time: "DATETIME",
-    paidThrough: "DATETIME",
-    status: "ENUM('active', 'inactive')"
+    time: "timestamp",
+    paidThrough: "timestamp",
+    status: "VARCHAR(64)" // "ENUM('active', 'inactive')"
   }, {
     type: true,
     customer: true,
@@ -42,22 +42,22 @@ function run() {
   
   sqlobj.createTable('billing_invoice', {
     id: idColspec,
-    time: "DATETIME",
-    purchase: "INT(11) NOT NULL",
-    amt: "INT(11) NOT NULL",
-    status: "ENUM('pending', 'paid', 'void', 'refunded')"
+    time: "timestamp",
+    purchase: "INT NOT NULL",
+    amt: "INT NOT NULL",
+    status: "VARCHAR(64)" // ENUM('pending', 'paid', 'void', 'refunded')"
   }, {
     status: true
   });
   
   sqlobj.createTable('billing_transaction', {
     id: idColspec,
-    customer: "INT(11)",
-    time: "DATETIME",
-    amt: "INT(11)",
+    customer: "INT",
+    time: "timestamp",
+    amt: "INT",
     payInfo: "VARCHAR(128)",
     txnId: "VARCHAR(128)", // depends on gateway used?
-    status: "ENUM('new', 'success', 'failure', 'pending')"
+    status: "VARCHAR(64)" // ENUM('new', 'success', 'failure', 'pending')"
   }, {
     customer: true,
     txnId: true
@@ -65,9 +65,9 @@ function run() {
   
   sqlobj.createTable('billing_adjustment', {
     id: idColspec,
-    transaction: "INT(11)",
-    invoice: "INT(11)",
-    time: "DATETIME",
-    amt: "INT(11)"
+    transaction: "INT",
+    invoice: "INT",
+    time: "timestamp",
+    amt: "INT"
   });
 }

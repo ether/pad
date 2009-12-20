@@ -18,13 +18,13 @@ import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 
 function run() {
-  sqlobj.createTable('pro_users_auto_signin', {
+  sqlobj.createTable('pro_accounts_auto_signin', {
     id: sqlobj.getIdColspec(),
     cookie: 'VARCHAR(128) UNIQUE NOT NULL',
-    userId: 'INT UNIQUE NOT NULL',
+    accountId: 'INT UNIQUE NOT NULL',
     expires: sqlobj.getDateColspec('NOT NULL')
   });
-  sqlobj.createIndex('pro_users_auto_signin', ['cookie']);
-  sqlobj.createIndex('pro_users_auto_signin', ['userId']);
+  sqlobj.createIndex('pro_accounts_auto_signin', ['cookie']);
+  sqlobj.createIndex('pro_accounts_auto_signin', ['accountId']);
 }
 

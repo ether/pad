@@ -24,7 +24,7 @@ function run() {
   }
 
   sqlobj.createTable('usage_stats', {
-    id: 'INT NOT NULL '+sqlcommon.autoIncrementClause()+' PRIMARY KEY',
+    id: 'SERIAL PRIMARY KEY',
     name: 'VARCHAR(128) NOT NULL',
     timestamp: 'INT NOT NULL',
     value: 'INT NOT NULL'

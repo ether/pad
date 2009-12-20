@@ -18,7 +18,7 @@ import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 
 function run() {
-  ['pro_domains', 'pro_users', 'pro_padmeta'].forEach(function(t) {
+  ['pro_domains', 'pro_accounts', 'pro_padmeta'].forEach(function(t) {
     if (sqlcommon.doesTableExist(t)) {
       sqlobj.dropTable(t);
     }
@@ -34,13 +34,15 @@ function run() {
   sqlobj.createIndex('pro_domains', ['subDomain']);
   sqlobj.createIndex('pro_domains', ['extDomain']);
 
-  sqlobj.createTable('pro_users', {
+  sqlobj.createTable('pro_accounts', {
     id: sqlobj.getIdColspec(),
     domainId: 'INT NOT NULL',
     fullName: 'VARCHAR(128) NOT NULL',
+    isDeleted: 'BOOLEAN NOT NULL DEFAULT FALSE',
     email: 'VARCHAR(128) NOT NULL',  // not unique because same
                                      // email can be on multiple domains.
-    passwordHash: 'VARCHAR(128) NOT NULL',
+    passwordHash: 'VARCHAR(128)',
+    tempPassHash: 'VARCHAR(128)',
     createdDate: sqlobj.getDateColspec("NOT NULL"),
     lastLoginDate: sqlobj.getDateColspec("DEFAULT NULL"),
     isAdmin: sqlobj.getBoolColspec("DEFAULT 0")

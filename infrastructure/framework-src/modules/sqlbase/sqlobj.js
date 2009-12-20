@@ -26,11 +26,11 @@ function _withCache(name, fn) {
 }
 
 function getIdColspec() {
-  return ('INT NOT NULL '+autoIncrementClause()+' PRIMARY KEY');
+  return "SERIAL";
 }
 
 function getLongtextColspec(extra) {
-  var spec = getSqlBase().longTextType();
+  var spec = "TEXT";
   if (extra) {
     spec = (spec + " " + extra);
   }
@@ -397,11 +397,13 @@ function createTable(tableName, colspec, indices) {
 
   var stmnt = "CREATE TABLE "+_bq(tableName)+ " (";
   stmnt += keys(colspec).map(function(k) { return (_bq(k) + ' ' + colspec[k]); }).join(', ');
-  if (indices) {
-    stmnt += ', ' + keys(indices).map(function(k) { return 'INDEX (' + _bq(k) + ')'; }).join(', ');
-  }
-  stmnt += ')'+createTableOptions();
+  stmnt += ')';
   _execute(stmnt);
+  if (indices) {
+    keys(indices).map(function(k) { 
+      _execute('CREATE INDEX ' + tableName + '_' + k + '_idx' + ' ON ' + tableName + ' (' + _bq(k) + ')');
+    });
+  }
 }
 
 function dropTable(tableName) {
@@ -417,7 +419,7 @@ function dropAndCreateTable(tableName, colspec, indices) {
 }
 
 function renameTable(oldName, newName) {
-  _executeUpdate("RENAME TABLE "+_bq(oldName)+" TO "+_bq(newName));
+  _executeUpdate("ALTER TABLE "+_bq(oldName)+" RENAME TO "+_bq(newName));
 }
 
 function modifyColumn(tableName, columnName, newSpec) {
@@ -429,9 +431,27 @@ function alterColumn(tableName, columnName, alteration) {
   _executeUpdate(q);
 }
 
+function renameColumn(tableName, columnName, newSpec) {
+  var q = ("ALTER TABLE "+_bq(tableName)+" RENAME COLUMN "+_bq(columnName)
+           +" TO "+_bq(newSpec));
+  _executeUpdate(q);
+}
+
 function changeColumn(tableName, columnName, newSpec) {
-  var q = ("ALTER TABLE "+_bq(tableName)+" CHANGE COLUMN "+_bq(columnName)
-           +" "+newSpec);
+  var q = ("ALTER TABLE "+_bq(tableName)+" ALTER COLUMN "+_bq(columnName)
+           +" TYPE "+newSpec);
+  _executeUpdate(q);
+}
+
+function addConstraintUnique(tableName, columnName) {
+  var q = ("ALTER TABLE "+_bq(tableName)+" ADD CONSTRAINT "+ columnName + '_constr' 
+           +" UNIQUE (" + columnName + ")");
+  _executeUpdate(q);
+}
+
+function addConstraintNotNull(tableName, columnName) {
+  var q = ("ALTER TABLE "+_bq(tableName)+" ALTER COLUMN "+_bq(columnName)
+           +" SET NOT NULL");
   _executeUpdate(q);
 }
 
@@ -496,7 +516,7 @@ function getTableEngine(tableName) {
 }
 
 function createIndex(tableName, columns) {
-  var indexName = "idx_"+(columns.join("_"));
+  var indexName = [tableName, columns.join("-"), "idx"].join('_');
   var stmnt = "CREATE INDEX "+_bq(indexName)+" on "+_bq(tableName)+" (";
   stmnt += columns.map(_bq).join(", ");
   stmnt += ")";
