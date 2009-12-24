@@ -32,7 +32,7 @@ if [ -z "$JAR" ]; then
 fi
 
 function notify {
-    if [ ! -z `which growlnotify` ]; then
+    if [ ! -z $(which growlnotify 2>/dev/null) ]; then
 	echo $0 finished | growlnotify
     fi   
 }
