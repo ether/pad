@@ -31,6 +31,32 @@ if [ -z "$JAR" ]; then
     fi
 fi
 
+function depscheck {
+    if [ ! -d "$JAVA_HOME" ]; then
+	echo "\$JAVA_HOME does not point to an existing dir; should be e.g. /usr/java/latest"
+	exit 1
+    fi
+    if [ ! -d "$SCALA_HOME" ]; then
+	echo "\$SCALA_HOME does not point to an existing dir; should be e.g. /usr/share/scala"
+	exit 1
+    fi
+    if [ ! -e "$SCALA" ]; then
+	echo "\$SCALA does not point to an existing file; should be e.g. /usr/bin/scala"
+	exit 1
+    fi
+    if [ ! -e "$JAVA" ]; then
+	echo "\$JAVA does not point to an existing file; should be e.g. /usr/bin/java"
+	exit 1
+    fi
+    if [ ! -e "$MYSQL_CONNECTOR_JAR" ]; then
+        echo "\$MYSQL_CONNECTOR_JAR does not point to an existing file; should be e.g. /usr/share/java/mysql-connector-java.jar"
+        exit 1
+    fi
+
+}
+
+depscheck
+
 function notify {
     if [ ! -z $(which growlnotify 2>/dev/null) ]; then
 	echo $0 finished | growlnotify
