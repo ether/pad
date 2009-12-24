@@ -53,6 +53,22 @@ function depscheck {
         exit 1
     fi
 
+    # Check for javac version.  Unfortunately, javac doesn't tell you whether
+    # it's Sun Java or OpenJDK, but the "java" binary that's in the same
+    # directory will.
+    if [ -e "$JAVA_HOME/bin/java" ]; then
+	($JAVA_HOME/bin/java -version 2>&1) | {
+	    while read file; do
+		javaver=$file
+	    done
+	    for word in $javaver; do
+		if [ $word != "Java" ]; then
+		    echo "$JAVA_HOME/bin/java is from a non-Sun compiler, and may not be able to compile etherpad.  If you get syntax errors, you should point \$JAVA_HOME at a Sun Java JDK installation instead."
+	        fi
+		break
+            done
+	}
+    fi
 }
 
 depscheck
