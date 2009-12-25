@@ -45,7 +45,7 @@ function run() {
     tempPassHash: 'VARCHAR(128)',
     createdDate: sqlobj.getDateColspec("NOT NULL"),
     lastLoginDate: sqlobj.getDateColspec("DEFAULT NULL"),
-    isAdmin: sqlobj.getBoolColspec("DEFAULT 0")
+    isAdmin: sqlobj.getBoolColspec("DEFAULT FALSE")
   });
 
   sqlobj.createTable('pro_padmeta', {
@@ -66,4 +66,3 @@ function run() {
     sqlobj.insert('pro_domains', {subDomain: pneDomain});
   }
 }
-

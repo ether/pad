@@ -18,8 +18,6 @@ import("sqlbase.sqlobj");
 
 function run() {
   sqlobj.addColumns('pro_padmeta', {
-    isArchived: sqlobj.getBoolColspec("NOT NULL DEFAULT 0")
+    isArchived: sqlobj.getBoolColspec("NOT NULL DEFAULT FALSE")
   });
 }
-
-

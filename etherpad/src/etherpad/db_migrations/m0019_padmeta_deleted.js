@@ -18,7 +18,6 @@ import("sqlbase.sqlobj");
 
 function run() {
   sqlobj.addColumns('pro_padmeta', {
-    isDeleted: sqlobj.getBoolColspec("NOT NULL DEFAULT 0")
+    isDeleted: sqlobj.getBoolColspec("NOT NULL DEFAULT FALSE")
   });
 }
-
