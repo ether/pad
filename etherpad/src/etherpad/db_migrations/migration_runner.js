@@ -35,7 +35,6 @@ var migrations = [
   "m0001_eepnet_signups_init",
   "m0002_eepnet_signups_2",
   "m0003_create_tests_table_v2",
-  "m0004_convert_all_tables_to_innodb",
   "m0005_create_billing_tables",
   "m0006_eepnet_signups_3",
   "m0007_create_pro_tables_v4",
@@ -138,5 +137,3 @@ function runMigrations() {
     }
   });
 }
-
-
