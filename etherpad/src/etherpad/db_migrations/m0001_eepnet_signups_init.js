@@ -35,4 +35,3 @@ function run() {
     licenseKey: 'VARCHAR(1024) NOT NULL'
   });
 }
-

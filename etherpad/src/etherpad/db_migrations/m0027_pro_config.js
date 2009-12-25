@@ -24,4 +24,3 @@ function run() {
     jsonVal: sqlobj.getLongtextColspec("")
   });
 }
-

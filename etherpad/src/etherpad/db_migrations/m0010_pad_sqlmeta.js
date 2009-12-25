@@ -68,4 +68,3 @@ function run() {
 
   progressBar.finish();
 }
-

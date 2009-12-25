@@ -31,5 +31,3 @@ function run() {
     value: 'VARCHAR(1024) NOT NULL'
   });
 }
-
-

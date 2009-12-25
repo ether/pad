@@ -27,4 +27,3 @@ function run() {
   sqlobj.createIndex('pro_accounts_auto_signin', ['cookie']);
   sqlobj.createIndex('pro_accounts_auto_signin', ['accountId']);
 }
-

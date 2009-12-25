@@ -53,5 +53,3 @@ function migrateRecord(r) {
 
   sqlobj.update('pro_padmeta', {id: r.id}, {proAttrsJson: proAttrsJson});
 }
-
-

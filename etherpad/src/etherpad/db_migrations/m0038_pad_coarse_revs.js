@@ -23,4 +23,3 @@ function run() {
   sqlbase.createStringArrayTable("PAD_REVS1000");
 
 }
-

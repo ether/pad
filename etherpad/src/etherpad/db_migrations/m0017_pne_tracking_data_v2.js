@@ -26,5 +26,3 @@ function run() {
     remoteIp: 'VARCHAR(128) NOT NULL'
   });
 }
-
-

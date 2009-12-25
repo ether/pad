@@ -21,5 +21,3 @@ function run() {
    password: 'VARCHAR(128) DEFAULT NULL'
   });
 }
-
-

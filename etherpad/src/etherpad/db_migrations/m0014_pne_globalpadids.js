@@ -99,4 +99,3 @@ function run() {
 
   progressBar.finish();
 }
-

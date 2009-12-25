@@ -34,4 +34,3 @@ function run() {
   sqlobj.createIndex('pad_guests', ['privateKey']);
   sqlobj.createIndex('pad_guests', ['userId']);
 }
-

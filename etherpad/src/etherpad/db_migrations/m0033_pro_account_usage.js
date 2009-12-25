@@ -26,5 +26,3 @@ function run() {
   });
   sqlobj.createIndex('pro_account_usage', ['domainId']);
 }
-
-

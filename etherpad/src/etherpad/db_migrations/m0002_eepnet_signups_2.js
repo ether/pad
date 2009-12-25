@@ -42,6 +42,3 @@ function run() {
   // drop column fullName
   sqlobj.dropColumn('eepnet_signups', 'fullName');
 }
-
-
-

@@ -26,4 +26,3 @@ function run() {
     activationDate: sqlobj.getDateColspec()
   });
 }
-

@@ -28,4 +28,3 @@ function run() {
   sqlbase.createStringArrayTable("PAD_AUTHORS");
   
 }
-
