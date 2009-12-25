@@ -1,0 +1,101 @@
+%%%----------------------------------------------------------------------
+%%% Installing Etherpad
+%%%----------------------------------------------------------------------
+
+etherpad-postgres is easy to install.
+
+You'll need:
+  * PostgreSQL: http://www.postgresql.org/download/
+  * PostgreSQL JDBC Driver: http://jdbc.postgresql.org/download.html
+  * Scala: http://www.scala-lang.org/downloads
+  * Java 1.6+: http://www.java.com/en/download/manual.jsp
+
+Assumptions:
+  * PostgreSQL is running on localhost and listening on port 5432
+  * You have properly set up PostgreSQL authentication
+  * You're allocating an entire domain name to Etherpad
+  * You have a SMTP server at localhost:25
+
+  If any of these assumptions are not valid, you will need to manually
+  edit the config file after you run setup.sh.  The config file is at:
+  etherpad/etc/etherpad.localdev-default.properties.
+
+Quick Steps:
+  useradd -u 1020 etherpad
+  createuser etherpad
+  createdb etherpad
+  ./setup.sh
+  ./run.sh
+
+Detailed Steps:
+  0. Make an etherpad user on your system:
+     - useradd -u 1020 etherpad
+  1. Make an etherpad postgres user with normal permissions:
+     - createuser etherpad
+  2. As your etherpad user, make your etherpad db:
+     - createdb etherpad
+  3. Copy env.sh.template to env.sh and fix paths to reflect
+     where things are installed on your system.
+  4. Run ./setup.sh and answer a few questions.
+     - a.) What domain name will you be running as?
+     - b.) On this machine, what IP:port do you want to bind to?
+     - c.) What admin password do you want to use?
+     * NB: Your settings file is at:
+       - etherpad/etc/etherpad.localdev-default.properties
+       Feel free to play around with other values there.
+       If you re-run setup, your config will be overridden.
+       If you want to re-run setup and forget your previous
+       answers, run ./setup.sh clean
+     * setup.sh does an initial run of ./etherpad/bin/rebuildjar.sh
+       If you modify any non-JavaScript files, you need to re-run
+       rebuildjar.sh.
+  5. At this point, with postgres working, env.sh edited, and 
+     after running setup.sh, run ./run.sh to start etherpad.
+     You'll see a bunch of DB migrations run and if all goes
+     well, you'lll be greeted with:
+     HTTP server listening on http://[your ip:port binding]/
+
+
+%%%----------------------------------------------------------------------
+%%% Configuration Notes
+%%%----------------------------------------------------------------------
+
+nginx setup
+===========
+If you want to run behind nginx, the only config you need in your virtual
+server is:
+  location / {
+    proxy_pass http://localhost:9000/   # <-- point to your etherpad listening URL
+    proxy_set_header Host $host;
+  }
+
+It's important you force the re-writing of the Host header or else all of
+the redirects Etherpad generates will be incorrect.
+
+multiple superdomains
+=====================
+The install process assumes *one* superdomain.  The single default superdomain
+is defined by fromDomain in etherpad/etc/etherpad.localdev-default.properties.
+
+If you want to use multiple superdomains, you need to manually add the domain
+to each of:
+  etherpad/src/static/crossdomain.xml
+  etherpad/src/etherpad/globals.js
+
+setup.sh will always override any changes to those files with fresh copies.
+Make sure to copy them out of the way if you have local changes and need
+to re-run setup.sh.
+
+DNS notes
+=========
+To get around browser limits of two to six connections per server, Etherpad
+likes to use made up subdomains that all resolve to the same host.  If your
+site doesn't have wildcard DNS under your Etherpad hostname, change this
+to false in etherpad/etc/etherpad.localdev-default.properties:
+transportUseWildcardSubdomains = true
+
+
+
+%%%----------------------------------------------------------------------
+%%% End of INSTALL (love, matt)
+%%%----------------------------------------------------------------------

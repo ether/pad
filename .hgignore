@@ -1,7 +1,17 @@
 syntax: glob
 *.class
-buildcache
+*.swp
+buildcache/
 build/
+data/
+local/
 etherpad/data/
+
 postgresql*.jar
 appjet-eth-dev.jar
+etherpad-pne-*.jar
+
+env.sh
+crossdomain.xml
+*.properties
+.config

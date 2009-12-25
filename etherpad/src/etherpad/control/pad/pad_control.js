@@ -661,7 +661,7 @@ function render_emailinvite_post() {
              {toEmails: toEmails, padId: padId, username: username,
               subject: subject, message: message});
 
-  var fromAddr = '"EtherPad" <noreply@etherpad.com>';
+  var fromAddr = pro_utils.getEmailFromAddr();
   // client enforces non-empty subject and message
   var subj = '[EtherPad] '+subject;
   var body = renderTemplateAsString('email/padinvite.ejs',

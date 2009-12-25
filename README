@@ -1,3 +1,40 @@
+%%%----------------------------------------------------------------------
+%%% Matt's README
+%%%----------------------------------------------------------------------
+
+This repository is EtherPad with a few goals:
+  * Add PostgreSQL support.  Remove all MySQL and Derby support.
+  * Make EtherPad easy to install and setup without having to modify
+    a dozen files by hand each time.
+  * Rip out all etherpad.com specific mentions (URLs, email addresses,
+    support links) and cleanup unused parts (like .gitignore files being put
+    in a mercurial repo).
+
+The original EtherPad repository on Google Code had a crappy directory layout
+so I fixed it in the initial commit of this repository.  As a consequence,
+you can't push or pull between the "official" EtherPad repository.  I don't
+see this as a major problem because the Google Code EtherPad repository is
+most likely dead.
+
+Potential future goals after learning the code further:
+  * Add git hooks to create a branchy revisioned live-editable pasteboard.
+
+%%%----------------------------------------------------------------------
+%%% Current Status: 2009/12/25
+%%%----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Project                                    | Status       | When
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Remove MySQL Support                       | Complete     | 2009/12/19-24
+PostgreSQL Support                         | Complete     | 2009/12/24
+Simplify install procedure                 | Complete     | 2009/12/24
+Remove etherpad.com specific parts         | In-progress  |
+Find missing parts of blog infrastructure  | Not Started  |
+
+%%%----------------------------------------------------------------------
+%%% The Original EtherPad README is below
+%%%----------------------------------------------------------------------
+
 EtherPad is a web-based realtime collaborative document editor.
 
 EtherPad currently lives at http://code.google.com/p/etherpad

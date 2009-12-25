@@ -252,6 +252,8 @@ function checkRequestIsWellFormed() {
 // checkHost()
 //----------------------------------------------------------------
 function checkHost() {
+  var fromDomain = appjet.config['fromDomain'];
+
   if (appjet.config['etherpad.skipHostnameCheck'] == "true") {
     return;
   }
@@ -261,6 +263,7 @@ function checkHost() {
   }
 
   // we require the domain to either be <superdomain> or a pro domain request.
+  var SUPERDOMAINS = GET_SUPERDOMAINS();
   if (SUPERDOMAINS[request.domain]) {
     return;
   }
@@ -269,7 +272,7 @@ function checkHost() {
   }
 
   // redirect to etherpad.com
-  var newurl = "http://etherpad.com"+request.path;
+  var newurl = fromDomain+request.path;
   if (request.query) { newurl += "?"+request.query; }
   response.redirect(newurl);
 }

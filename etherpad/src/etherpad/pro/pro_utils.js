@@ -69,6 +69,7 @@ function _computeIsProDomainRequest() {
 
   var domain = _stripComet(request.domain);
 
+  var SUPERDOMAINS = get_superdomains();
   if (SUPERDOMAINS[domain]) {
     return false;
   }
@@ -145,7 +146,7 @@ function getFullSuperdomainHost() {
 }
 
 function getEmailFromAddr() {
-  var fromDomain = 'etherpad.com';
+  var fromDomain = appjet.config['fromDomain'];
   if (pne_utils.isPNE()) {
     fromDomain = getFullProDomain();
   }

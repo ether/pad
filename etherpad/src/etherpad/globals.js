@@ -26,15 +26,17 @@ function isProduction() {
   return (appjet.config['etherpad.isProduction'] == "true");
 }
 
-var SUPERDOMAINS = {
-  'localbox.info': true,
-  'localhost': true,
-  'etherpad.com': true
-};
+var global_fromDomain = function() { return appjet.config['fromDomain'].toString() }
+var get_superdomains = function() {
+  var fromDomain = global_fromDomain();
+  var superdomains = {};
+  superdomains['localhost'] = true;
+  superdomains[fromDomain] = true;
+  return superdomains;
+}
 
 var PNE_RELEASE_VERSION = "1.1.3";
 var PNE_RELEASE_DATE = "June 15, 2009";
 
 var PRO_FREE_ACCOUNTS = 1e9;
-
 
