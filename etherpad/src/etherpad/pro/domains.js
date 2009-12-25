@@ -94,7 +94,7 @@ function getDomainRecordFromSubdomain(subDomain) {
 
 /** returns id of newly created subDomain */
 function createNewSubdomain(subDomain, orgName) {
-  var id = sqlobj.insert('pro_domains', {subDomain: subDomain, orgName: orgName});
+  var id = sqlobj.insert_return_id('pro_domains', {subDomain: subDomain, orgName: orgName}, "id");
   _updateCache({id: id});
   return id;
 }

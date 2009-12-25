@@ -114,7 +114,7 @@ function createNewAccount(domainId, fullName, email, password, isAdmin) {
       createdDate: now,
       isAdmin: isAdmin
     };
-    return sqlobj.insert('pro_accounts', account);
+    return sqlobj.insert_return_id('pro_accounts', account, "id");
   });
 
   _withCache('does-domain-admin-exist', function(cache) {

@@ -37,15 +37,6 @@ function init(driver, url, username, password) {
   } catch (ex) {
     println("Error establishing "+dbName+" connection:");
     println(ex.toString().split('\n')[0]);
-    if (_sqlbase().isMysql()) {
-      println("Perhaps mysql server is not running, or you did not specify "+
-	      "proper database credentials with --etherpad.SQL_PASSWORD "+
-	      "and --etherpad.SQL_USERNAME?");
-    }
-    if (_sqlbase().isDerby()) {
-      println("Perhaps database directory "+appjet.config.derbyHome+
-	      " is not writable?");
-    }
     println("Exiting...");
     Packages.java.lang.System.exit(1);
   }
@@ -93,8 +84,3 @@ function createTableOptions() {
 function btquote(x) { return _sqlbase().quoteIdentifier(x); }
 
 function getSqlBase() { return _sqlbase(); }
-
-function isMysql() { return _sqlbase().isMysql(); }
-function isPg() { return _sqlbase().isPg(); }
-function isDerby() { return _sqlbase().isDerby(); }
-

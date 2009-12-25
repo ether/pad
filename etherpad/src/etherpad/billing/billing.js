@@ -133,13 +133,13 @@ function createSubscription(customer, product, dollars, couponCode) {
 }
 
 function _newPurchase(customer, product, cents, couponCode) {
-  var purchaseId = sqlobj.insert('billing_purchase', {
+  var purchaseId = sqlobj.insert_return_id('billing_purchase', {
     customer: customer,
     product: product,
     cost: cents,
     coupon: couponCode,
     status: 'inactive'
-  });
+  }, "id");
   return purchaseId;  
 }
 
@@ -149,7 +149,7 @@ function _newInvoice() {
     purchase: -1,
     amt: 0,
     status: 'pending'
-  });
+  }, "id");
   return invoiceId;
 }
 
@@ -159,7 +159,7 @@ function _newTransaction(customer, cents) {
     time: new Date(),
     amt: cents,
     status: 'new'
-  });
+  }, "id");
   return transactionId;
 }
 
@@ -169,7 +169,7 @@ function _newAdjustment(transaction, invoice, cents) {
     invoice: invoice,
     time: new Date(),
     amt: cents
-  });  
+  });
 }
 
 function _transactionSuccess(transaction, txnId, payInfo) {

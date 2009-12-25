@@ -39,11 +39,7 @@ function getLongtextColspec(extra) {
 
 function getBoolColspec(extra) {
   var spec;
-  if (isMysql()) {
-    spec = 'TINYINT(1)';
-  } else {
-    spec = 'SMALLINT';
-  }
+  spec = 'BOOLEAN';
   if (extra) {
     spec = (spec + " " + extra);
   }
@@ -52,11 +48,7 @@ function getBoolColspec(extra) {
 
 function getDateColspec(extra) {
   var spec;
-  if (isMysql()) {
-    spec = 'DATETIME';
-  } else {
-    spec = 'TIMESTAMP';
-  }
+  spec = 'TIMESTAMP';
   if (extra) {
     spec = (spec + " " + extra);
   }
@@ -116,7 +108,7 @@ function _getJsValFromResultSet(rs, type, colName) {
              type == java.sql.Types.SMALLINT ||
              type == java.sql.Types.TINYINT) {
     r = rs.getInt(colName);
-  } else if (type == java.sql.Types.BIT) {
+  } else if (type == java.sql.Types.BIT || type == java.sql.Types.BOOLEAN) {
     r = rs.getBoolean(colName);
   } else {
     throw Error("Cannot fetch sql type ID "+type+" (columnName = "+colName+")");
@@ -204,22 +196,42 @@ function _resultRowToJsObj(resultSet) {
 /*
  * Inserts the object into the given table, and returns auto-incremented ID if any.
  */
-function insert(tableName, obj) {
-  var keyList = keys(obj);
 
+function generate_insert_stmt(tableName, keyList) {
   var stmnt = "INSERT INTO "+_bq(tableName)+" (";
   stmnt += keyList.map(function(k) { return _bq(k); }).join(', ');
   stmnt += ") VALUES (";
   stmnt += keyList.map(function(k) { return '?'; }).join(', ');
   stmnt += ")";
 
+  return stmnt;
+}
+
+function insert(tableName, obj) {
+  var keyList = keys(obj);
+
+  var stmnt = generate_insert_stmt(tableName, keyList);
   return withConnection(function(conn) {
-    var pstmnt = conn.prepareStatement(stmnt, Statement.RETURN_GENERATED_KEYS);
+    var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
       _setPreparedValues(tableName, pstmnt, keyList, obj, 0);
       _qdebug(stmnt);
       pstmnt.executeUpdate();
-      var rs = pstmnt.getGeneratedKeys();
+    });
+  });
+}
+
+function insert_return_id(tableName, obj, returnKey) {
+  var keyList = keys(obj);
+
+  var stmnt = generate_insert_stmt(tableName, keyList);
+  stmnt += " RETURNING " + _bq(returnKey);
+  return withConnection(function(conn) {
+    var pstmnt = conn.prepareStatement(stmnt);
+    return closing(pstmnt, function() {
+      _setPreparedValues(tableName, pstmnt, keyList, obj, 0);
+      _qdebug(stmnt);
+      var rs = pstmnt.executeQuery();
       if (rs != null) {
         return closing(rs, function() {
           if (rs.next()) {
@@ -245,9 +257,7 @@ function selectSingle(tableName, constraints) {
   var stmnt = "SELECT * FROM "+_bq(tableName)+" WHERE (";
   stmnt += keyList.map(function(k) { return '('+_bq(k)+' = '+'?)'; }).join(' AND ');
   stmnt += ')';
-  if (isMysql()) {
-    stmnt += ' LIMIT 1';
-  }
+  stmnt += ' LIMIT 1';
 
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
@@ -386,6 +396,9 @@ function deleteRows(tableName, constraints) {
 // table management
 //----------------------------------------------------------------
 
+function createIndexStmt(tableName, field) {
+  return 'CREATE INDEX ' + tableName + '_' + field + '_idx' + ' ON ' + tableName + ' (' + _bq(field) + ')';
+}
 /*
  * Create a SQL table, specifying column names and types with a
  * javascript object.
@@ -401,7 +414,7 @@ function createTable(tableName, colspec, indices) {
   _execute(stmnt);
   if (indices) {
     keys(indices).map(function(k) { 
-      _execute('CREATE INDEX ' + tableName + '_' + k + '_idx' + ' ON ' + tableName + ' (' + _bq(k) + ')');
+      _execute(createIndexStmt(tableName, k));
     });
   }
 }
@@ -487,32 +500,6 @@ function listTables() {
 function setTableEngine(tableName, engineName) {
   var stmnt = "ALTER TABLE "+_bq(tableName)+" ENGINE="+_bq(engineName);
   _executeUpdate(stmnt);
-}
-
-function getTableEngine(tableName) {
-  if (!isMysql()) {
-    throw Error("getTableEngine() only supported by MySQL database type.");
-  }
-
-  var tableEngines = {};
-
-  withConnection(function(conn) {
-    var stmnt = "show table status";
-    var pstmnt = conn.prepareStatement(stmnt);
-    closing(pstmnt, function() {
-      _qdebug(stmnt);
-      var resultSet = pstmnt.executeQuery();
-      closing(resultSet, function() {
-        while (resultSet.next()) {
-          var n = resultSet.getString("Name");
-          var eng = resultSet.getString("Engine");
-          tableEngines[n] = eng;
-        }
-      });
-    });
-  });
-
-  return tableEngines[tableName];
 }
 
 function createIndex(tableName, columns) {

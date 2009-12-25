@@ -71,15 +71,6 @@ function testGeneral() {
   });
   assertTruthy(found);
 
-  if (sqlcommon.isMysql()) {
-    for (var i = 0; i < 3; i++) {
-      ['MyISAM', 'InnoDB'].forEach(function(e) {
-        sqlobj.setTableEngine(tableName, e);
-        assertTruthy(e == sqlobj.getTableEngine(tableName));
-      });
-    }
-  }
-
   sqlobj.createIndex(tableName, ['a', 'b']);
   sqlobj.createIndex(tableName, ['int11', 'a', 'b']);
 
@@ -201,13 +192,8 @@ function testAlterColumn() {
     b: 'INT NOT NULL'
   });
 
-  if (sqlcommon.isMysql()) {
-    sqlobj.modifyColumn(tableName, 'a', 'INT');
-    sqlobj.modifyColumn(tableName, 'b', 'INT');
-  } else {
-    sqlobj.alterColumn(tableName, 'a', 'NULL');
-    sqlobj.alterColumn(tableName, 'b', 'NULL');
-  }
+  sqlobj.alterColumn(tableName, 'a', 'NULL');
+  sqlobj.alterColumn(tableName, 'b', 'NULL');
 
   sqlobj.insert(tableName, {a: 5});
 }

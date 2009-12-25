@@ -369,7 +369,7 @@ function cachedSqlTable(cacheName, tableName, keyColumns, processFetched) {
       removeFromCache(keyColumn, value);
     },
     insert: function(obj) {
-      var returnVal = sqlobj.insert(tableName, obj);
+      var returnVal = sqlobj.insert_return_id(tableName, obj, "id");
       // remove old object from caches but
       // don't put obj in the cache; it doesn't
       // have all values, e.g. for auto-generated ids
