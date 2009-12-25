@@ -540,7 +540,7 @@ table#otheruserstable { display: none; }
 
 #impexp-importlabel { position: absolute; top: 5px; left: 10px; width: 300px; }
 
-#importform { position: absolute; top: 24px; left: 5px; width: 300px; height: 60px; }
+#importform { display: none; position: absolute; top: 24px; left: 5px; width: 300px; height: 60px; }
 #importformsubmitdiv, #importformfilediv { padding: 5px 5px; }
 #importexport .importformenabled {
   background: #cfc;

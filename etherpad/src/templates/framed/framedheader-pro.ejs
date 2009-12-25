@@ -64,10 +64,8 @@ limitations under the License. */ %><% helpers.addBodyClass("pro-withtopbar"); %
 
 <div id="pro-topnav">
   <div id="pro-topnav-inner">
-    <% if (validLicense && account) { %>
-      <%= renderProTopNav() %>
-      <%= helpers.clearFloats() %>
-    <% } %>
+    <%= renderProTopNav() %>
+    <%= helpers.clearFloats() %>
   </div>
 </div>
 

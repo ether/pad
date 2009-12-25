@@ -115,7 +115,7 @@ limitations under the License. */ %>
 <% } /* isProAccountHolder */ %>
     <div id="docbaroptions-outer"><a href="javascript:void(0)" id="docbaroptions">Pad Options</a></div>
     <div id="docbarsavedrevs-outer"><a href="javascript:void(0)" id="docbarsavedrevs">Saved revisions</a></div>
-    <div id="docbarimpexp-outer"><a href="javascript:void(0)" id="docbarimpexp">Import/Export</a></div>
+    <div id="docbarimpexp-outer"><a href="javascript:void(0)" id="docbarimpexp">Export</a></div>
     <div id="docbarslider-outer"><a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider">Time Slider</a></div>
 <% if (isProAccountHolder) { %>          
     <div id="docbarrenamelink">
@@ -140,7 +140,7 @@ limitations under the License. */ %>
           <div class="dbpanel-bottom"><!-- --></div>
           <div id="importexport">
             <div id="impexp-import">
-              <div id="impexp-importlabel"><b>Import</b> from text file, HTML, Word, or RTF:</div>
+              <div id="impexp-importlabel"><b>Import</b> features need to be rewritten.</div>
  	      <form id="importform" method="post" action="/ep/pad/impexp/import"
                     target="importiframe" enctype="multipart/form-data">
 	        <div class="importformdiv" id="importformfilediv">
@@ -157,16 +157,18 @@ limitations under the License. */ %>
 		  </span>
 	        </div>
  	      </form>
-            </div><!-- /impexp-import -->
+            </div> --><!-- /impexp-import -->
             <div id="impexp-export">
               <div id="impexp-exportlabel"><b>Export</b> current pad as:</div>
               <div id="exportlinks">
                 <%= exportLink('html', 1, 'HTML', false) %>
                 <%= exportLink('txt', 2, 'Plain text', false) %>
                 <%= exportLink('link', 3, 'Bookmark file', false, '/ep/pad/linkfile?padId='+localPadId, 'This will save a file that, when opened, takes you to this pad.') %>
+<% if (hasOffice) { %>
                 <%= exportLink('doc', 4, 'Microsoft Word', true) %>
                 <%= exportLink('pdf', 5, 'PDF', true) %>
                 <%= exportLink('odt', 6, 'OpenDocument', true) %>
+<% } %>
               </div>
             </div><!-- /impexp-export -->
             <div id="impexp-divider"><!-- --></div>

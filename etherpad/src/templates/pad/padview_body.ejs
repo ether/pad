@@ -113,9 +113,10 @@ limitations under the License. */ %><%
 <h2>Download as</h2>
 <img src="/static/img/may09/html.gif"><a class="tlink" href="/ep/pad/export/<%= padId %>/<%= revisionId %>?format=html" thref="/ep/pad/export/<%= padId %>/rev.%revision%?format=html">HTML</a><br>
 <img src="/static/img/may09/txt.gif" ><a class="tlink" href="/ep/pad/export/<%= padId %>/<%= revisionId %>?format=html" thref="/ep/pad/export/<%= padId %>/rev.%revision%?format=txt" >Plain text</a><br>
+<% if (hasOffice) { %>
 <img src="/static/img/may09/doc.gif" ><a class="tlink" href="/ep/pad/export/<%= padId %>/<%= revisionId %>?format=html" thref="/ep/pad/export/<%= padId %>/rev.%revision%?format=doc" >Microsoft Word</a><br>
 <img src="/static/img/may09/pdf.gif" ><a class="tlink" href="/ep/pad/export/<%= padId %>/<%= revisionId %>?format=html" thref="/ep/pad/export/<%= padId %>/rev.%revision%?format=pdf" >PDF</a>
-
+<% } %>
 
 </div>
 <div id="legend">
