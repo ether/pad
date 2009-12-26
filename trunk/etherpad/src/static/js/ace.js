@@ -1,19 +1,3 @@
-/**
- * Copyright 2009 Google Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 Ace2Editor.registry={nextId:1};function Ace2Editor(){var K="Ace2Editor";var F=Ace2Editor;var B={};var A={editor:B,id:(F.registry.nextId++)};
 var D=false;var E=[];function C(R,Q){return function(){var T=this;var S=arguments;function U(){R.apply(T,S);
 }if(Q){Q.apply(T,S);}if(D){U();}else{E.push(U);}};}function I(){for(var Q=0;Q<E.length;Q++){E[Q]();}E=[];
