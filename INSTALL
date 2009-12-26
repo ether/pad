@@ -21,17 +21,20 @@ Assumptions:
   etherpad/etc/etherpad.localdev-default.properties.
 
 Quick Steps:
-  useradd -u 1020 etherpad
-  createuser etherpad
-  createdb etherpad
-  ./setup.sh
-  ./run.sh
+  as root:     useradd -u 1020 etherpad
+  as postgres: createuser etherpad
+  as etherpad: createdb etherpad
+              ./setup.sh
+              ./run.sh
 
 Detailed Steps:
+  [as user: root]
   0. Make an etherpad user on your system:
      - useradd -u 1020 etherpad
+  [as user: postgres]
   1. Make an etherpad postgres user with normal permissions:
      - createuser etherpad
+  [as user: etherpad]
   2. As your etherpad user, make your etherpad db:
      - createdb etherpad
   3. Copy env.sh.template to env.sh and fix paths to reflect
@@ -65,7 +68,7 @@ nginx setup
 If you want to run behind nginx, the only config you need in your virtual
 server is:
   location / {
-    proxy_pass http://localhost:9000/   # <-- point to your etherpad listening URL
+    proxy_pass http://localhost:9000;   # <-- point to your etherpad listening URL
     proxy_set_header Host $host;
   }
 
