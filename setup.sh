@@ -4,6 +4,8 @@ base=`dirname $0`
 ebase=$base/etherpad
 config=$base/.config
 config_version=7
+env=$base/env.sh
+
 
 if [[ $1 == clean ]]; then
   rm -f .config
@@ -48,7 +50,16 @@ admin_pass=$admin_pass
 saved_config_version=$config_version
 " > $base/.config
 
-./etherpad/bin/rebuildjar.sh
+if [[ ! -f $env ]]; then
+  echo "You need to copy $base/env.sh.template to $env and set proper values."
+  exit 2
+else
+  . $env
+fi
+
+pushd $base/etherpad >& /dev/null
+./bin/rebuildjar.sh
+popd >& /dev/null
 
 echo "Now use $base/run.sh to get things started."
 
