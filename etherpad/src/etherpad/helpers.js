@@ -193,11 +193,6 @@ function cssIncludes() {
   }
 }
 
-function oemail(username) {
-  return '&lt;<a class="obfuscemail" href="mailto:'+username+'@e***rp*d.com">'+
-    username+'@e***rp*d.com</a>&gt;';
-}
-
 function googleAnalytics() {
   // GA disabled always now.
   return '';

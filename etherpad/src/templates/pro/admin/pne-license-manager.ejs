@@ -20,9 +20,7 @@ limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad PNE Licens
 
     <div class="lm-error-msg">
       <p>Your evaluation license has expired!</p>
-      <p>Please contact <%= helpers.oemail("sales") %> or visit the <a
-      href="http://etherpad.com/ep/about/pricing-eepnet">pricing page on etherpad.com</a>
-      to purchase a license key.</p>
+      <p>Please contact sales</p>
     </div>
 
   <% } %>
@@ -31,9 +29,8 @@ limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad PNE Licens
 
     <div class="lm-notice-msg">
       <p>The version of EtherPad you are running (<%= runningVersionString %>) is too old.
-      Please update to version <%= licenseVersionString %> or newer by <a
-      href="http://etherpad.com/ep/store/eepnet-download">downloading the latest version on
-      etherpad.com</a>.</p>
+      Please update to version <%= licenseVersionString %> or newer.
+      </p>
     </div>
 
   <% } %>
@@ -97,9 +94,7 @@ limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad PNE Licens
 
     <% if (isUnlicensed) { %>
       <p>Before you can use this copy of EtherPad Private Network Edition, you must first
-        enter a valid license.  Free trial licenses can be obtained <a
-        target="_blank"
-        href="https://etherpad.com/ep/store/eepnet-eval-signup">obtained here</a>.
+        enter a valid license.
       </p>
     <% } %>
 

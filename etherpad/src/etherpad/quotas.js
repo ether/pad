@@ -29,7 +29,7 @@ function getMaxSimultaneousPadEditors(globalPadId) {
       return 1e6;
     }
   } else {
-    // etherpad.com public pads
+    // public pads
     if (globalPadId && stringutils.startsWith(globalPadId, "conf-")) {
       return 64;
     } else {
@@ -41,9 +41,9 @@ function getMaxSimultaneousPadEditors(globalPadId) {
 
 function getMaxSavedRevisionsPerPad() {
   if (isProDomainRequest()) {
-    return 1e3;
+    return 1e6;
   } else {
-    // free public etherpad.com
+    // free public pads
     return 100;
   }
 }

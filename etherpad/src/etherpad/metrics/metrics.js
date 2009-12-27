@@ -327,10 +327,11 @@ function getOrigins(startDate, endDate, useReferer, shouldAggregatePads) {
       }
     });
   });
-  
+
+  var fromBase = "http://" + appjet.config['fromDomain'];
   if (useReferer) {
-    flowFirsts = flowFirsts.filter(function(x) { return ! startsWith(x, "http://etherpad.com"); });
-    sessionKeyFirsts = sessionKeyFirsts.filter(function(x) { return ! startsWith(x, "http://etherpad.com"); });
+    flowFirsts = flowFirsts.filter(function(x) { return ! startsWith(x, fromBase); });
+    sessionKeyFirsts = sessionKeyFirsts.filter(function(x) { return ! startsWith(x, fromBase); });
   }
   
   return {

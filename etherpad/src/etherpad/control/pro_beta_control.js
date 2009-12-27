@@ -121,7 +121,7 @@ function sendInvite(recordId) {
       signupCode: code,
       activationUrl: "http://"+httpHost(request.host)+"/ep/pro-signup/?sc="+code
     });
-    sendEmail(record.email, "EtherPad <support@etherpad.com>",
+    sendEmail(record.email, appjet.config['etherpad.email.fromAddr'],
               "Your EtherPad Professional Beta Account", {}, body);
   });
 

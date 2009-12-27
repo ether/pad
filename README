@@ -9,6 +9,9 @@ This repository is EtherPad with a few goals:
   * Rip out all etherpad.com specific mentions (URLs, email addresses,
     support links) and cleanup unused parts (like .gitignore files being put
     in a mercurial repo).
+  * Investigate corporate legacy portions (payment infrastructure, recurring
+    billing queues, lead gen) and either remove or generalize portions
+    for greater uses.
 
 The original EtherPad repository on Google Code had a crappy directory layout
 so I fixed it in the initial commit of this repository.  As a consequence,
@@ -18,9 +21,10 @@ most likely dead.
 
 Potential future goals after learning the code further:
   * Add git hooks to create a branchy revisioned live-editable pasteboard.
+  * Add embeddable <textarea> and <input> zero-signup collaboration fields.
 
 %%%----------------------------------------------------------------------
-%%% Current Status: 2009/12/25
+%%% Current Status: 2009/12/27
 %%%----------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Project                                    | Status       | When
@@ -28,7 +32,8 @@ Project                                    | Status       | When
 Remove MySQL Support                       | Complete     | 2009/12/19-24
 PostgreSQL Support                         | Complete     | 2009/12/24
 Simplify install procedure                 | Complete     | 2009/12/24
-Remove etherpad.com specific parts         | In-progress  |
+Remove etherpad.com specific mentions      | Complete     | 2009/12/27
+Cleanup/generalize corporate legacy parts  | Not Started  |
 Find missing parts of blog infrastructure  | Not Started  |
 
 %%%----------------------------------------------------------------------

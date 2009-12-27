@@ -86,7 +86,7 @@ function _do_stat(padId) {
 
 function _censorText(text) {
   // may not change length of text
-  return text.replace(/(http:\/\/etherpad.com\/)(\w+)/g, function(url, u1, u2) {
+  return text.replace(/(http:\/\/.*?\/)(\w+)/g, function(url, u1, u2) {
     return u1 + u2.replace(/\w/g, '-');
   });
 }

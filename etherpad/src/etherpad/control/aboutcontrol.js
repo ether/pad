@@ -198,11 +198,11 @@ function render_eepnet_pricing_contact_post() {
     "This record has automatically been added to SalesForce.  See the salesforce lead page for more details.",
     "", "Session Referer: "+ref, ""
   ].join("\n");
-  var toAddr = 'sales@etherpad.com';
+  var toAddr = appjet.config['etherpad.email.toAddr'];
   if (isTestEmail(data.email)) {
-    toAddr = 'blackhole@appjet.com';
+    toAddr = 'blackhole';
   }
-  sendEmail(toAddr, 'sales@etherpad.com', subject, {}, body);
+  sendEmail(toAddr, appjet.config['etherpad.email.fromAddr'], subject, {}, body);
 
   // all done!
   response.write("OK");

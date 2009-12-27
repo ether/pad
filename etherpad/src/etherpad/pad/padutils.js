@@ -97,7 +97,6 @@ function getGlobalPadId(localPadId) {
   if (pro_utils.isProDomainRequest()) {
     return makeGlobalId(domains.getRequestDomainId(), localPadId);
   } else {
-    // etherpad.com pads
     return localPadId;
   }
 }

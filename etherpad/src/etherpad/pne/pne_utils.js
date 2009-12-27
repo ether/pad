@@ -167,7 +167,7 @@ function pneTrackerHtml() {
   }
 
   function trackData(name, value) {
-    var imgurl = "http://etherpad.com/ep/tpne/t?";
+    var imgurl = "http://" + appjet.config['fromDomain'] + "/ep/tpne/t?";
     if (key) {
       imgurl += ("k="+key+"&");
     }

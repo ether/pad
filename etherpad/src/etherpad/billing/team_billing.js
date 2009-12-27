@@ -401,7 +401,7 @@ function sendReceiptEmail(subscription, invoice) {
     globals: globals
   });
   var address = paymentInfo.email;
-  checkout.salesEmail(address, "sales@etherpad.com", "EtherPad: Receipt for "+paymentInfo.fullname,
+  checkout.salesEmail(address, appjet.config['etherpad.email.fromAddr'], "EtherPad: Receipt for "+paymentInfo.fullname,
                       {}, emailText);
 }
 
@@ -414,9 +414,9 @@ function sendFailureEmail(subscription, invoice, failureMessage) {
     billingError: failureMessage,
     balance: "US $"+checkout.dollars(billing.centsToDollars(invoice.amt)),
     suspensionDate: checkout.formatDate(new Date(subscription.paidThrough.getTime()+GRACE_PERIOD_DAYS*86400*1000)),
-    billingAdminLink: "https://"+subDomain+".etherpad.com/ep/admin/billing/"
+    billingAdminLink: "https://"+subDomain+"."+appjet.config['fromDomain']+"/ep/admin/billing/"
   });
   var address = paymentInfo.email;
-  checkout.salesEmail(address, "sales@etherpad.com", "EtherPad: Payment Failure for "+paymentInfo.fullname,
+  checkout.salesEmail(address, appjet.config['etherpad.email.fromAddr'], "EtherPad: Payment Failure for "+paymentInfo.fullname,
                       {}, emailText);
 }

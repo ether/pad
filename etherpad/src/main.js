@@ -271,7 +271,7 @@ function checkHost() {
     return;
   }
 
-  // redirect to etherpad.com
+  // redirect to the primary superdomain
   var newurl = fromDomain+request.path;
   if (request.query) { newurl += "?"+request.query; }
   response.redirect(newurl);
@@ -283,13 +283,9 @@ function checkHost() {
 
 // Check for HTTPS
 function checkHTTPS() {
-  /* Open-source note: this function used to check the protocol and make
-   * sure that pages that needed to be secure went over HTTPS, and pages
-   * that didn't go over HTTP.  However, when we open-sourced the code,
-   * we disabled HTTPS because we didn't want to ship the etherpad.com
-   * private crypto keys. --aiba */
-  return;
-
+  if (appjet.config['disableHttps'] === "true") {
+    return;
+  }
 
   if (stringutils.startsWith(request.path, "/static/")) { return; }
 
@@ -310,8 +306,8 @@ function checkHTTPS() {
   var _requiredHttpsPrefixes = [
     '/ep/admin',      // pro and etherpad
     '/ep/account',    // pro only
-    '/ep/store',      // etherpad.com only
-    '/ep/pro-account' // etherpad.com only
+    '/ep/store',      // etherpad main site only
+    '/ep/pro-account' // etherpad main site only
   ];
 
   var httpsRequired = false;
@@ -398,7 +394,7 @@ function handlePath() {
   ]);
 
   // dispatching logic: first try common, then dispatch to
-  // etherpad.com or pro.
+  // main site or pro.
 
   if (commonDispatcher.dispatch()) {
     return;

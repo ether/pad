@@ -13,6 +13,7 @@ etherpad.SQL_USERNAME = etherpad
 etherpad.SQL_PASSWORD = password
 etherpad.skipHostnameCheck = true
 etherpad.email.fromAddr = EMAIL_FROM_ADDR
+etherpad.email.toAddr = EMAIL_TO_ADDR
 #etherpad.soffice=/opt/openoffice.org3/program/soffice.bin
 #etherpad.sofficeConversionServer=localhost:8100
 debugSQL = false
@@ -23,3 +24,5 @@ modulePath = ./src
 transportPrefix = /comet
 transportUseWildcardSubdomains = true
 useVirtualFileRoot = ./src
+# Certain URLs will automatically reference https://.  You can turn it off:
+disableHttps = false

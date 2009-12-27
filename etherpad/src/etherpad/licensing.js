@@ -16,8 +16,8 @@
 
 
 /*
- * This file used to control access restrictions for various sites like
- * etherpad.com or on-prem installations of etherpad, or evaluation
+ * This file used to control access restrictions for various
+ * public sites or on-prem installations of etherpad, or evaluation
  * editions.  For the open-source effort, I have gutted out the
  * restrictions. --aiba
  */

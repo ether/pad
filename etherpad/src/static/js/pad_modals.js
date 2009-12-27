@@ -131,7 +131,7 @@ var padmodals = (function() {
       });
       $("#feedbackemails a").each(function() {
         var node = $(this);
-        node.attr('href', "mailto:"+node.attr('href')+"@etherpad.com");
+        node.attr('href', "mailto:"+node.attr('href')+ <= '"@' + appjet.config['fromDomain'] + '"' %>);
       });
     },
     initShareBox: function() {
@@ -280,7 +280,7 @@ var padmodals = (function() {
       }
       function error(e) {
         setSendingFeedback(false);
-        $("#feedbackbox-response").html("Could not send feedback.  Please email us at feedback"+"@"+"etherpad.com instead.").get(0).className = 'badresponse';
+        $("#feedbackbox-response").html("Could not send feedback.  Please email us at feedback instead.").get(0).className = 'badresponse';
         $("#feedbackbox-response").show();
       }
     },*/

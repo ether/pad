@@ -39,6 +39,7 @@ for in_file in $REPLACE_ME; do
   sed "s/FROM_DOMAIN/$domain/g;
        s/LISTEN_AT/$listen_at/g;
        s/EMAIL_FROM_ADDR/etherpad@$domain/g;
+       s/EMAIL_TO_ADDR/etherpad@$domain/g;
        s/ADMIN_PASS/$admin_pass/g;" $in_file > $in_file_out
 done
 

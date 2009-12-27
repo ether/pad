@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* legacy URLs only apply to the public etherpad.com site. (not Pro or PNE). */
+/* legacy URLs only apply to the public site. (not Pro or PNE). */
 
 var _legacyURLs = {
   '/ep/beta-signup': '/',

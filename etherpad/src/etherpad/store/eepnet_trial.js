@@ -38,7 +38,7 @@ function getTrialUserQuota() {
 function mailLicense(data, licenseKey, expiresDate) {
   var toAddr = data.email;
   if (isTestEmail(toAddr)) {
-    toAddr = "blackhole@appjet.com";
+    toAddr = "blackhole";
   }
   var subject = ('EtherPad: Trial License Information for '+
 		 data.firstName+' '+data.lastName+' ('+data.orgName+')');
@@ -52,7 +52,7 @@ function mailLicense(data, licenseKey, expiresDate) {
 
   sendEmail(
     toAddr,
-    'sales@etherpad.com',
+    appjet.config['etherpad.email.fromAddr'],
     subject,
     {},
     emailBody
@@ -157,7 +157,7 @@ function getWeb2LeadData(data, ip, ref) {
 
   if (!isProduction()) {
 //    w2ldata.debug = "1";
-//    w2ldata.debugEmail = "aaron@appjet.com";
+//    w2ldata.debugEmail = "aaron@something.com";
   }
 
   return w2ldata;
@@ -188,13 +188,13 @@ function _sendSalesNotification(data, ip, ref) {
     ""
   ].join("\n");
 
-  var toAddr = 'sales@etherpad.com';
+  var toAddr = appjet.config['etherpad.email.toAddr'];
   if (isTestEmail(data.email)) {
-    toAddr = 'blackhole@appjet.com';
+    toAddr = 'blackhole';
   }
   sendEmail(
     toAddr,
-    'sales@etherpad.com',
+    appjet.config['etherpad.email.fromAddr'],
     subject,
     {'Reply-To': data.email},
     body

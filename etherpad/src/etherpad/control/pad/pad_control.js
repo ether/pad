@@ -637,8 +637,8 @@ function render_feedback_post() {
     feedback: request.params.feedback});
 
   sendEmail(
-    'feedback@etherpad.com',
-    'feedback@etherpad.com',
+    appjet.config['etherpad.email.toAddr'],
+    appjet.config['etherpad.email.fromAddr'],
     subject,
     {},
     feedback

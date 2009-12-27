@@ -87,7 +87,7 @@ function licenseEmailText(userName, licenseKey) {
 function sendReceiptEmail(cart) {
   var receipt = cart.receiptEmail || receiptEmailText(cart);
   
-  salesEmail(cart.email, "sales@etherpad.com",
+  salesEmail(cart.email, appjet.config['etherpad.email.fromAddr'],
              "EtherPad: Receipt for "+cart.ownerName+" ("+cart.orgName+")",
              {}, receipt);
 }
@@ -95,7 +95,7 @@ function sendReceiptEmail(cart) {
 function sendLicenseEmail(cart) {
   var licenseEmail = licenseEmailText(cart.ownerName, cart.licenseKey);
   
-  salesEmail(cart.email, "sales@etherpad.com",
+  salesEmail(cart.email, appjet.config['etherpad.email.fromAddr'],
              "EtherPad: License Key for "+cart.ownerName+" ("+cart.orgName+")",
              {}, licenseEmail);
 }

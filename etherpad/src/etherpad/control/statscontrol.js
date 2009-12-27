@@ -101,7 +101,7 @@ var statDisplays = {
 
   // free pad usage
       { name: "free pad usage, 1 day",
-        description: "Free etherpad.com users, total over a %t period",
+        description: "Free etherpad users, total over a %t period",
         type: "compare",
         stats: [ {stat: "active_user_ids",
                   description: "All users",
@@ -113,7 +113,7 @@ var statDisplays = {
                   description: "Users returning after 30 days",
                   color: "FF0000"} ] }, 
       { name: "free pad usage, 7 day",
-        description: "Free etherpad.com users over the last 7 days",
+        description: "Free etherpad users over the last 7 days",
         type: "compare",
         options: { hideLive: true, latestUseHistorical: true},
         stats: [ {stat: "active_user_ids_7days",
@@ -126,7 +126,7 @@ var statDisplays = {
                   description: "Users returning after 30 days",
                   color: "FF0000"} ] },
       { name: "free pad usage, 30 day",
-        description: "Free etherpad.com users over the last 30 days",
+        description: "Free etherpad users over the last 30 days",
         type: "compare",
         options: { hideLive: true, latestUseHistorical: true},
         stats: [ {stat: "active_user_ids_30days",

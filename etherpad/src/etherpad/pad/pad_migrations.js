@@ -31,7 +31,6 @@ function onStartup() {
     appjet.cache.pad_migrations = {};
   }
 
-  // this part can be removed when all pads are migrated on etherpad.com
   //if (! pne_utils.isPNE()) {
   //  System.out.println("Building cache for live migrations...");
   //  initLiveMigration();
