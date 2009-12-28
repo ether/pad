@@ -2,10 +2,13 @@ syntax: glob
 *.class
 *.swp
 buildcache/
-build/
+infrastructure/build/
 data/
 local/
 etherpad/data/
+
+ace/build/ace2.js
+ace/build/ace2bare.js
 
 postgresql*.jar
 appjet-eth-dev.jar

@@ -129,10 +129,6 @@ var padmodals = (function() {
         self.hideModal();
         return true;
       });
-      $("#feedbackemails a").each(function() {
-        var node = $(this);
-        node.attr('href', "mailto:"+node.attr('href')+ <= '"@' + appjet.config['fromDomain'] + '"' %>);
-      });
     },
     initShareBox: function() {
       $("#sharebutton, #nootherusers a").click(function() {
