@@ -21,7 +21,7 @@ if [ -z "$JAR" ]; then
         # http://lists.gnu.org/archive/html/fastjar-dev/2009-12/msg00000.html
         version=`fastjar --version | grep fastjar | sed 's/.* //g'`
         if [[ "$version" = "0.97" || "$version" = "0.98" ]]; then
-            echo "fastjar version $version can't build etherpad.  Falling back to standard jar."
+            echo "fastjar version $version can't build EtherPad.  Falling back to standard jar."
             JAR=jar
         else
             JAR=fastjar
@@ -31,47 +31,82 @@ if [ -z "$JAR" ]; then
     fi
 fi
 
-function depscheck {
-    if [ ! -d "$JAVA_HOME" ]; then
-	echo "\$JAVA_HOME does not point to an existing dir; should be e.g. /usr/java/latest"
-	exit 1
-    fi
-    if [ ! -d "$SCALA_HOME" ]; then
-	echo "\$SCALA_HOME does not point to an existing dir; should be e.g. /usr/share/scala"
-	exit 1
-    fi
-    if [ ! -e "$SCALA" ]; then
-	echo "\$SCALA does not point to an existing file; should be e.g. /usr/bin/scala"
-	exit 1
-    fi
-    if [ ! -e "$JAVA" ]; then
-	echo "\$JAVA does not point to an existing file; should be e.g. /usr/bin/java"
-	exit 1
-    fi
-    if [ ! -e "$MYSQL_CONNECTOR_JAR" ]; then
-        echo "\$MYSQL_CONNECTOR_JAR does not point to an existing file; should be e.g. /usr/share/java/mysql-connector-java.jar"
-        exit 1
-    fi
+[ -z "$JAVA_HOME" ] && read -p "\$JAVA_HOME is not set, please enter the path to your Java installation: " JAVA_HOME
+if [ ! -e "$JAVA_HOME" ]; then
+    echo "The path to \$JAVA_HOME ($JAVA_HOME) does not exist, please check and try again."
+    exit 1
+else
+    export JAVA_HOME
+fi
 
-    # Check for javac version.  Unfortunately, javac doesn't tell you whether
-    # it's Sun Java or OpenJDK, but the "java" binary that's in the same
-    # directory will.
-    if [ -e "$JAVA_HOME/bin/java" ]; then
-	($JAVA_HOME/bin/java -version 2>&1) | {
-	    while read file; do
-		javaver=$file
-	    done
-	    for word in $javaver; do
-		if [ $word != "Java" ]; then
-		    echo "$JAVA_HOME/bin/java is from a non-Sun compiler, and may not be able to compile etherpad.  If you get syntax errors, you should point \$JAVA_HOME at a Sun Java JDK installation instead."
-	        fi
-		break
-            done
-	}
-    fi
-}
+[ -z "$SCALA_HOME" ] && read -p "\$SCALA_HOME is not set, please enter the path to your Scala installation: " SCALA_HOME
+if [ ! -e "$SCALA_HOME" ]; then
+    echo "The path to \$SCALA_HOME ($SCALA_HOME) does not exist, please check and try again."
+    exit 1
+else
+    export SCALA_HOME
+fi
 
-depscheck
+if [ -z "$SCALA" ]; then
+    if [ `which scala 2>/dev/null 1>/dev/null` ]; then
+        SCALA=`which scala`
+        echo "Using 'scala' binary found at $SCALA. Set \$SCALA to use another one."
+    elif [ -x "$SCALA_HOME/bin/scala" ]; then
+        SCALA="$SCALA_HOME/bin/scala"
+        echo "Using 'scala' binary found at $SCALA. Set \$SCALA to use another one."
+    else
+        read -p "\$SCALA is not set and the 'scala' binary could not be found, please enter the path to the file: " SCALA
+    fi
+fi
+if [ ! -x "$SCALA" ]; then
+    echo "The path to \$SCALA ($SCALA) is not an executable file, please check and try again."
+    exit 1
+else
+    export SCALA
+fi
+
+if [ -z "$JAVA" ]; then
+    if [ `which java 2>/dev/null 1>/dev/null` ]; then
+        JAVA=`which java`
+        echo "Using 'java' binary found at $JAVA. Set \$JAVA to use another one."
+    elif [ -x "$JAVA_HOME/bin/java" ]; then
+        JAVA="$JAVA_HOME/bin/java"
+        echo "Using 'java' binary found at $JAVA. Set \$JAVA to use another one."
+    else
+        read -p "\$JAVA is not set and the 'java' binary could not be found, please enter the path to the file: " JAVA
+    fi
+fi
+if [ ! -x "$JAVA" ]; then
+    echo "The path to \$JAVA ($JAVA) is not an executeable file, please check and try again."
+    exit 1
+else
+    export JAVA
+fi
+
+[ -z "$MYSQL_CONNECTOR_JAR" ] && read -p "\$MYSQL_CONNECTOR_JAR is not set, please enter the path to the MySQL JDBC driver .jar file: " MYSQL_CONNECTOR_JAR
+if [ ! -e "$MYSQL_CONNECTOR_JAR" ]; then
+    echo "The path to \$MYSQL_CONNECTOR_JAR ($MYSQL_CONNECTOR_JAR) does not exist, please check and try again."
+    exit 1
+else
+    export MYSQL_CONNECTOR_JAR
+fi
+
+# Check for javac version. Unfortunately, javac doesn't tell you whether
+# it's Sun Java or OpenJDK, but the "java" binary that's in the same
+# directory will.
+if [ -e "$JAVA_HOME/bin/java" ]; then
+    ($JAVA_HOME/bin/java -version 2>&1) | {
+        while read file; do
+            javaver=$file
+        done
+        for word in $javaver; do
+            if [ $word != "Java" ]; then
+                echo "$JAVA_HOME/bin/java is from a non-Sun compiler, and may not be able to compile EtherPad. If you get syntax errors, you should point \$JAVA_HOME at a Sun Java JDK installation instead."
+            fi
+            break
+        done
+    }
+fi
 
 function notify {
     if [ ! -z $(which growlnotify 2>/dev/null) ]; then
