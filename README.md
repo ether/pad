@@ -1,3 +1,4 @@
+# About Etherpad
 EtherPad is a web-based realtime collaborative document editor.
 
 EtherPad currently lives at http://etherpad.org
