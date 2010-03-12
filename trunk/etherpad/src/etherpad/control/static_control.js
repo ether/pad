@@ -19,11 +19,24 @@ import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 
 import("etherpad.utils.*");
 import("etherpad.globals.*");
+import("etherpad.admin.plugins");
 
 function onRequest() {
   var staticBase = '/static';
 
   var opts = {cache: isProduction()};
+
+  var disp = new Dispatcher();
+
+  /* FIXME: Is there a more effective way to do this? */
+  for (plugin in plugins.plugins) {
+    disp.addLocations([
+      [PrefixMatcher('/static/js/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/js/', opts)],
+      [PrefixMatcher('/static/css/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/css/', opts)],
+      [PrefixMatcher('/static/swf/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/swf/', opts)],
+      [PrefixMatcher('/static/html/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/html/', opts)],
+      [PrefixMatcher('/static/zip/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/zip/', opts)]]);
+  }
 
   var serveFavicon = faststatic.singleFileServer(staticBase + '/favicon.ico', opts);
   var serveCrossDomain = faststatic.singleFileServer(staticBase + '/crossdomain.xml', opts);
@@ -34,8 +47,6 @@ function onRequest() {
   var serveSwf = faststatic.directoryServer(staticBase+'/swf/', opts);
   var serveHtml = faststatic.directoryServer(staticBase+'/html/', opts);
   var serveZip = faststatic.directoryServer(staticBase+'/zip/', opts);
-
-  var disp = new Dispatcher();
 
   disp.addLocations([
     ['/favicon.ico', serveFavicon],
