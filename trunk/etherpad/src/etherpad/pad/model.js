@@ -259,7 +259,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 	  sqlbase.putJSON("PAD_META", padId, meta2);
 
           /* Update tags for the pad. Should maybe be in a separate function? */
-	  var new_tags = pad.text().match(new RegExp("#[^,# \t\n\r][^,# \t\n\r]*", "g"))
+	  var new_tags = pad.text().match(new RegExp("#[^,#!\\s][^,#!\\s]*", "g"));
           if (new_tags == null) new_tags = new Array();
           for (i = 0; i < new_tags.length; i++)
             new_tags[i] = new_tags[i].substring(1);

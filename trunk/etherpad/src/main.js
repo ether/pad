@@ -42,6 +42,7 @@ import("etherpad.control.historycontrol");
 import("etherpad.control.loadtestcontrol");
 import("etherpad.control.maincontrol");
 import("etherpad.control.pad.pad_control");
+import("etherpad.control.tag.tag_control");
 import("etherpad.control.pne_manual_control");
 import("etherpad.control.pne_tracker_control");
 import("etherpad.control.pro.admin.license_manager_control");
@@ -362,6 +363,7 @@ function handlePath() {
     [PrefixMatcher('/static/'), forward(static_control)],
     [PrefixMatcher('/ep/genimg/'), genimg.renderPath],
     [PrefixMatcher('/ep/pad/'), forward(pad_control)],
+    [PrefixMatcher('/ep/tag/'), forward(tag_control)],
     [PrefixMatcher('/ep/script/'), forward(scriptcontrol)],
     [/^\/([^\/]+)$/, pad_control.render_pad],
     [DirMatcher('/ep/unit-tests/'), forward(testcontrol)],

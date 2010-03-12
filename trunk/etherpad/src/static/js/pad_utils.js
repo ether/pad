@@ -106,6 +106,18 @@ var padutils = {
     var hourmin = d.getHours()+":"+("0"+d.getMinutes()).slice(-2);
     return dayOfWeek+' '+month+' '+dayOfMonth+' '+year+' '+hourmin;
   },
+  findTags: function(text) {
+    var tagExp = new RegExp("#[^,#!\\s][^,#!\\s]*", "g");
+    var tags = null;
+    var execResult;
+    while ((execResult = tagExp.exec(text))) {
+      tags = (tags || []);
+      var startIndex = execResult.index;
+      var url = execResult[0];
+      tags.push([startIndex, url]);
+    }
+    return tags;
+  },
   findURLs: function(text) {
     // copied from ACE
     var _REGEX_WORDCHAR = /[\u0030-\u0039\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u1FFF\u3040-\u9FFF\uF900-\uFDFF\uFE70-\uFEFE\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFDC]/;
@@ -133,6 +145,7 @@ var padutils = {
     var idx = 0;
     var pieces = [];
     var urls = padutils.findURLs(text);
+    var tags = padutils.findTags(text);
     function advanceTo(i) {
       if (i > idx) {
         pieces.push(padutils.escapeHtml(text.substring(idx, i)));
@@ -146,6 +159,17 @@ var padutils = {
         advanceTo(startIndex);
         pieces.push('<a ', (target?'target="'+target+'" ':''),
                     'href="', href.replace(/\"/g, '&quot;'), '">');
+        advanceTo(startIndex + href.length);
+        pieces.push('</a>');
+      }
+    }
+    if (tags) {
+      for(var j=0;j<tags.length;j++) {
+        var startIndex = tags[j][0];
+        var tag = tags[j][1];
+        advanceTo(startIndex);
+        pieces.push('<a ', (target?'target="'+target+'" ':''),
+                    'href="/ep/tag/?query=', tag, '">');
         advanceTo(startIndex + href.length);
         pieces.push('</a>');
       }

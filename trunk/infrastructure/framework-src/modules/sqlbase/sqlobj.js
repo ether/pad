@@ -17,6 +17,7 @@
 import("cache_utils.syncedWithCache");
 import("sqlbase.sqlcommon.*");
 import("jsutils.*");
+import("etherpad.log");
 
 jimport("java.lang.System.out.println");
 jimport("java.sql.Statement");
@@ -112,10 +113,13 @@ function _getJsValFromResultSet(rs, type, colName) {
     } else {
       r = null;
     }
-  } else if (type == java.sql.Types.INTEGER ||
+  } else if (type == java.sql.Types.BIGINT ||
+             type == java.sql.Types.INTEGER ||
              type == java.sql.Types.SMALLINT ||
              type == java.sql.Types.TINYINT) {
     r = rs.getInt(colName);
+  } else if (type == java.sql.Types.DECIMAL) {
+    r = rs.getFloat(colName);
   } else if (type == java.sql.Types.BIT) {
     r = rs.getBoolean(colName);
   } else {
@@ -192,8 +196,9 @@ function _resultRowToJsObj(resultSet) {
 
   var metaData = resultSet.getMetaData();
   var colCount = metaData.getColumnCount();
+
   for (var i = 1; i <= colCount; i++) {
-    var colName = metaData.getColumnName(i);
+    var colName = metaData.getColumnLabel(i);
     var type = metaData.getColumnType(i);
     resultObj[colName] = _getJsValFromResultSet(resultSet, type, colName);
   }
@@ -322,6 +327,47 @@ function selectMulti(tableName, constraints, options) {
       _setPreparedValues(
         tableName, pstmnt, constraintKeys, 
         _preparedValuesConstraints(constraints), 0);
+
+      _qdebug(stmnt);
+      var resultSet = pstmnt.executeQuery();
+      var resultArray = [];
+
+      return closing(resultSet, function() {
+        while (resultSet.next()) {
+          resultArray.push(_resultRowToJsObj(resultSet));
+        }
+
+        return resultArray;
+      });
+    });
+  });
+}
+
+function executeRaw(stmnt, params) {
+  return withConnection(function(conn) {
+    var pstmnt = conn.prepareStatement(stmnt);
+    return closing(pstmnt, function() {
+      for (var i = 0; i < params.length; i++) {
+	var v = params[i];
+
+	if (v === undefined) {
+	  throw Error("value is undefined for key "+i);
+	}
+
+	if (typeof(v) == 'object' && v.isnull) {
+	  pstmnt.setNull(i+1, v.type);
+	} else if (typeof(v) == 'string') {
+	  pstmnt.setString(i+1, v);
+	} else if (typeof(v) == 'number') {
+	  pstmnt.setInt(i+1, v);
+	} else if (typeof(v) == 'boolean') {
+	  pstmnt.setBoolean(i+1, v);
+	} else if (v.valueOf && v.getDate && v.getHours) {
+	  pstmnt.setTimestamp(i+1, new java.sql.Timestamp(+v));
+	} else {
+	  throw Error("Cannot insert this type of javascript object: "+typeof(v)+" (key="+i+", value = "+v+")");
+	}
+      }
 
       _qdebug(stmnt);
       var resultSet = pstmnt.executeQuery();
