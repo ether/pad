@@ -44,8 +44,11 @@ function fancyAssEval(initCode, mainCode) {
       1);
   }
   var runner = Packages.net.appjet.oui.ScopeReuseManager.getEmpty(scalaF1(init));
+  var requestWrapper = null;
+  if (request.underlying !== undefined)
+    requestWrapper = new Packages.net.appjet.oui.RequestWrapper(request.underlying);
   var ec = new Packages.net.appjet.oui.ExecutionContext(
-    new Packages.net.appjet.oui.RequestWrapper(request.underlying),
+    requestWrapper,
     null, runner);
   return Packages.net.appjet.oui.ExecutionContextUtils.withContext(ec,
     scalaF0(function() {

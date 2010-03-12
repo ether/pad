@@ -34,6 +34,7 @@ import("etherpad.importexport.importexport");
 import("etherpad.legacy_urls");
 
 import("etherpad.control.aboutcontrol");
+import("etherpad.control.admin.pluginmanager");
 import("etherpad.control.admincontrol");
 import("etherpad.control.blogcontrol");
 import("etherpad.control.connection_diagnostics_control");
@@ -68,6 +69,8 @@ import("etherpad.pad.dbwriter");
 import("etherpad.pad.pad_migrations");
 import("etherpad.pad.noprowatcher");
 
+import("etherpad.admin.plugins");
+
 jimport("java.lang.System.out.println");
 
 serverhandlers.startupHandler = function() {
@@ -92,6 +95,8 @@ serverhandlers.startupHandler = function() {
   team_billing.onStartup();
   collabroom_server.onStartup();
   readLatestSessionsFromDisk();
+
+  plugins.callHook('serverStartup');
 };
 
 serverhandlers.resetHandler = function() {
@@ -99,6 +104,8 @@ serverhandlers.resetHandler = function() {
 }
 
 serverhandlers.shutdownHandler = function() {
+  plugins.callHook('serverShutdown');
+
   appjet.cache.shutdownHandlerIsRunning = true;
 
   log.callCatchingExceptions(writeSessionsToDisk);
@@ -375,6 +382,7 @@ function handlePath() {
     [DirMatcher('/ep/beta-account/'), forward(pro_beta_control)],
     [DirMatcher('/ep/pro-signup/'), forward(pro_signup_control)],
     [DirMatcher('/ep/about/'), forward(aboutcontrol)],
+    [DirMatcher('/ep/admin/pluginmanager'), forward(pluginmanager)],
     [DirMatcher('/ep/admin/'), forward(admincontrol)],
     [DirMatcher('/ep/blog/posts/'), blogcontrol.render_post],
     [DirMatcher('/ep/blog/'), forward(blogcontrol)],
