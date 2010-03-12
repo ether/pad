@@ -76,7 +76,7 @@ function getQueryToSql(tags, antiTags, querySql) {
       '	      join TAG AS t%(n)s on ' +
       '	       t%(n)s.NAME = ? ' +
       '	       and t%(n)s.ID = pt%(n)s.TAG_ID) on ' +
-      ' pt%(n)s.PAD_ID = p.ID',
+      ' pt%(n)s.PAD_ID = p.ID ',
       info));
     whereArray.push(stringFormat('pt%(n)s.TAG_ID is null', info));
     exceptParamArray.push(tag);
@@ -96,9 +96,9 @@ function getQueryToSql(tags, antiTags, querySql) {
     info.n += 1;
   }
 
-  info["joins"] = joinArray.join("");
-  info["excepts"] = exceptArray.join("");
-  info["wheres"] = whereArray.length > 0 ? ' where ' + whereArray.join(' ') : '';
+  info["joins"] = joinArray.join(' ');
+  info["excepts"] = exceptArray.join(' ');
+  info["wheres"] = whereArray.length > 0 ? ' where ' + whereArray.join(' and ') : '';
  
   return {
    sql: stringFormat(
