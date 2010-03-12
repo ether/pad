@@ -18,6 +18,7 @@ import("faststatic");
 import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 
 import("etherpad.utils.*");
+import("etherpad.collab.server_utils");
 import("etherpad.globals.*");
 import("etherpad.log");
 import("etherpad.pad.padusers");
@@ -196,11 +197,16 @@ function onRequest() {
 
   var matchingPads;
   if (tags.length > 0 || antiTags.length > 0) {
-    var sql = "select p.ID from PAD_META as p, " + querySql.sql + " as q where p.ID = q.ID limit 10"
+    var sql = "select p.ID, p.TAGS from PAD_TAG_CACHE as p, " + querySql.sql + " as q where p.ID = q.ID limit 10"
     matchingPads = sqlobj.executeRaw(sql, querySql.params);
   } else {
     matchingPads = [];
   }
+
+  for (i = 0; i < matchingPads.length; i++) {
+    matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
+  }
+log.info({pads:matchingPads});
 
   var isPro = pro_utils.isProDomainRequest();
   var userId = padusers.getUserId();
@@ -221,6 +227,7 @@ function onRequest() {
   renderHtml("tag/tag_search.ejs",
    {
     tagsToQuery: tagsToQuery,
+    padIdToReadonly: server_utils.padIdToReadonly,
     tags: tags,
     antiTags: antiTags,
     newTags: newTags,

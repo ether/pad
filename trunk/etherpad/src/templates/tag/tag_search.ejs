@@ -21,6 +21,13 @@ limitations under the License. */ %>
  helpers.includeCometJs();
  helpers.includeJs("json2.js");
  helpers.addToHead('\n<style type="text/css" title="dynamicsyntax"></style>\n');
+
+ function inArray(item, arr) {
+   for (var i = 0; i < arr.length; i++)
+     if (arr[i] == item)
+       return true;
+   return false;
+ }
 %>
 
 <div id="padpage">
@@ -94,7 +101,17 @@ limitations under the License. */ %>
        <h1>Matching pads</h1>
        <ul>
         <% for (i = 0; i < matchingPads.length; i++) { %>
-         <li><a href="/<%= matchingPads[i].ID %>"><%= matchingPads[i].ID %></a></li>
+        <%
+             var matchingPadId = matchingPads[i].ID;
+             var matchingPadUrl = matchingPadId;
+             if (!inArray('writable', matchingPads[i].TAGS)) {
+               matchingPadId = padIdToReadonly(matchingPads[i].ID);
+               matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+             }
+        %>
+         <li>
+          <h2><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><h2>
+         </li>
         <% } %>
        </ul>
       </div>
