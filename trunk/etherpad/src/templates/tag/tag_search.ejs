@@ -87,6 +87,17 @@ limitations under the License. */ %>
     </div>
     <div style="height: 268px;" id="editorcontainerbox">
       <div id="editorcontainer" style="padding:5pt; height: 600pt;">
+       <h1>Current query</h1>
+       <% if (tags.length == 0 && antiTags.length == 0) { %>
+        &lt; No current query; please select some tags below to search for pads &gt;
+       <% } else { %>
+	<% for (i = 0; i < tags.length; i++) { %>
+	 <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags) %>" class="tag" title="<%= tags[i] %> matches"><%= tags[i] %></a>
+	<% } %>
+	<% for (i = 0; i < antiTags.length; i++) { %>
+	 <a href="/ep/tag/?query=<%= tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]})) %>" class="tag" title="<%= antiTags[i] %> matches">!<%= antiTags[i] %></a>
+	<% } %>
+       <% } %>
        <h1>Refine your query</h1>
        <h2>Search for pads that have a tag</h2>
        <% for (i = 0; i < newTags.length; i++) { %>

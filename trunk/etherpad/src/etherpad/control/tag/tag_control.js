@@ -180,7 +180,7 @@ function onRequest() {
   var tags = new Array();
   var antiTags = new Array();
 
-  if (request.params.query != undefined) {
+  if (request.params.query != undefined && request.params.query != '') {
     var query = request.params.query.split(',');
     for (i = 0; i < query.length; i++)
      if (query[i][0] == '!')
@@ -206,7 +206,6 @@ function onRequest() {
   for (i = 0; i < matchingPads.length; i++) {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
   }
-log.info({pads:matchingPads});
 
   var isPro = pro_utils.isProDomainRequest();
   var userId = padusers.getUserId();
