@@ -275,6 +275,19 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
   return spanHandler;
 };
 
+linestylefilter.getFilterStack = function(lineText, textAndClassFunc, browser) {
+  var func = linestylefilter.getURLFilter(lineText, textAndClassFunc);
+  func = linestylefilter.getPadTagFilter(lineText, func);
+  if (browser !== undefined && browser.msie) {
+    // IE7+ will take an e-mail address like <foo@bar.com> and linkify it to foo@bar.com.
+    // We then normalize it back to text with no angle brackets.  It's weird.  So always
+    // break spans at an "at" sign.
+    func = linestylefilter.getAtSignSplitterFilter(
+      lineText, func);
+  }
+  return func;
+};
+
 // domLineObj is like that returned by domline.createDomLine
 linestylefilter.populateDomLine = function(textLine, aline, apool,
                                            domLineObj) {
@@ -288,9 +301,7 @@ linestylefilter.populateDomLine = function(textLine, aline, apool,
     domLineObj.appendSpan(tokenText, tokenClass);
   }
 
-  var func = textAndClassFunc;
-  func = linestylefilter.getURLFilter(text, func);
-  func = linestylefilter.getPadTagFilter(text, func);
+  var func = linestylefilter.getFilterStack(text, textAndClassFunc);
   func = linestylefilter.getLineStyleFilter(text.length, aline,
                                             func, apool);
   func(text, '');
