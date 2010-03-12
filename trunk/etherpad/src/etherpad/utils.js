@@ -35,6 +35,7 @@ import("etherpad.pro.pro_config");
 import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.log");
+import("etherpad.admin.plugins");
 
 jimport("java.lang.System.out.print");
 jimport("java.lang.System.out.println");
@@ -92,6 +93,9 @@ function renderTemplate(filename, data, plugin) {
 
 function renderHtml(bodyFileName, data, plugin) {
   var bodyHtml = renderTemplateAsString(bodyFileName, data, plugin);
+  bodyHtml = plugins.callHookStr("renderPageBodyPre", {bodyFileName:bodyFileName, data:data, plugin:plugin}) +
+             bodyHtml +
+             plugins.callHookStr("renderPageBodyPost", {bodyFileName:bodyFileName, data:data, plugin:plugin});
   response.write(renderTemplateAsString("html.ejs", {bodyHtml: bodyHtml}));
   if (request.acceptsGzip) {
     response.setGzip(true);
