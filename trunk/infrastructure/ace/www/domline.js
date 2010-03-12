@@ -85,6 +85,12 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	return space+"url";
       });
     }
+    if (cls.indexOf('padtag') >= 0) {
+      cls = cls.replace(/(^| )padtag:(\S+)/g, function(x0, space, padtag) {
+	href = '/ep/tag/?query=' + padtag;
+	return space+"padtag padtag_"+padtag;
+      });
+    }
     if (cls.indexOf('tag') >= 0) {
       cls = cls.replace(/(^| )tag:(\S+)/g, function(x0, space, tag) {
 	if (! simpleTags) simpleTags = [];

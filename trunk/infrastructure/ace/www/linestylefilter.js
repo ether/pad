@@ -185,6 +185,55 @@ linestylefilter.getURLFilter = function(lineText, textAndClassFunc) {
                                                   splitPoints);
 };
 
+/* Copy of getURLFilter with slight modifications, should probably merge and just use different regexps */
+linestylefilter.REGEX_PADTAG = new RegExp("#[^,#!\\s][^,#!\\s]*", "g");
+
+linestylefilter.getPadTagFilter = function(lineText, textAndClassFunc) {
+  linestylefilter.REGEX_PADTAG.lastIndex = 0;
+  var padTags = null;
+  var splitPoints = null;
+  var execResult;
+  while ((execResult = linestylefilter.REGEX_PADTAG.exec(lineText))) {
+    if (! padTags) {
+      padTags = [];
+      splitPoints = [];
+    }
+    var startIndex = execResult.index;
+    var padTag = execResult[0];
+    padTags.push([startIndex, padTag]);
+    splitPoints.push(startIndex, startIndex + padTag.length);
+  }
+
+  if (! padTags) return textAndClassFunc;
+
+  function padTagForIndex(idx) {
+    for(var k=0; k<padTags.length; k++) {
+      var u = padTags[k];
+      if (idx >= u[0] && idx < u[0]+u[1].length) {
+	return u[1];
+      }
+    }
+    return false;
+  }
+
+  var handlePadTagsAfterSplit = (function() {
+    var curIndex = 0;
+    return function(txt, cls) {
+      var txtlen = txt.length;
+      var newCls = cls;
+      var padTag = padTagForIndex(curIndex);
+      if (padTag) {
+	newCls += " padtag:"+padTag.substring(1);
+      }
+      textAndClassFunc(txt, newCls);
+      curIndex += txtlen;
+    };
+  })();
+
+  return linestylefilter.textAndClassFuncSplitter(handlePadTagsAfterSplit,
+                                                  splitPoints);
+}
+
 linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
   var nextPointIndex = 0;
   var idx = 0;
@@ -241,6 +290,7 @@ linestylefilter.populateDomLine = function(textLine, aline, apool,
 
   var func = textAndClassFunc;
   func = linestylefilter.getURLFilter(text, func);
+  func = linestylefilter.getPadTagFilter(text, func);
   func = linestylefilter.getLineStyleFilter(text.length, aline,
                                             func, apool);
   func(text, '');

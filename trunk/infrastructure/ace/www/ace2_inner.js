@@ -1140,6 +1140,7 @@ function OUTER(gscope) {
     else {
       var offsetIntoLine = 0;
       var filteredFunc = textAndClassFunc;
+      filteredFunc =  linestylefilter.getPadTagFilter(text, filteredFunc);
       filteredFunc = linestylefilter.getURLFilter(text, filteredFunc);
       if (browser.msie) {
 	// IE7+ will take an e-mail address like <foo@bar.com> and linkify it to foo@bar.com.
