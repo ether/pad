@@ -1,1 +1,1 @@
-kafoo
+alert("KAFOOOOO");
