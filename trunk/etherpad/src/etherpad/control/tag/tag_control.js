@@ -225,6 +225,7 @@ function onRequest() {
 
   renderHtml("tag/tag_search.ejs",
    {
+    config: appjet.config,
     tagsToQuery: tagsToQuery,
     padIdToReadonly: server_utils.padIdToReadonly,
     tags: tags,
