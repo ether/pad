@@ -58,6 +58,7 @@ function getQueryToSql(tags, antiTags, querySql) {
 
   var exceptArray = [];
   var joinArray = [];
+  var whereArray = [];
   var exceptParamArray = [];
   var joinParamArray = [];
 
@@ -68,46 +69,47 @@ function getQueryToSql(tags, antiTags, querySql) {
 
   for (i = 0; i < antiTags.length; i++) {
     tag = antiTags[i];
-    exceptArray.push(stringFormat('' +
-     'except ' +
-     ' select ' +
-     '  pt%(n)s.PAD_ID ' +
-     ' from ' +
-     '  PAD_TAG as pt%(n)s, ' +
-     '  TAG as t%(n)s ' +
-     ' where ' +
-     '  t%(n)s.ID = pt%(n)s.TAG_ID ' +
-     '  and t%(n)s.NAME = ? ' +
-     '', info));
+    exceptArray.push(
+     stringFormat(
+      'left join (PAD_TAG as pt%(n)s ' +
+      '	      join TAG AS t%(n)s on ' +
+      '	       t%(n)s.NAME = ? ' +
+      '	       and t%(n)s.ID = pt%(n)s.TAG_ID) on ' +
+      ' pt%(n)s.PAD_ID = p.ID',
+      info));
+    whereArray.push(stringFormat('pt%(n)s.TAG_ID is null', info));
     exceptParamArray.push(tag);
     info.n += 1;
   }
   for (i = 0; i < tags.length; i++) {
     tag = tags[i];
-    joinArray.push(stringFormat('' +
-     'join PAD_TAG as pt%(n)s on ' +
-     ' pt%(n)s.PAD_ID = p.ID ' +
-     'join TAG as t%(n)s on ' +
-     ' t%(n)s.ID = pt%(n)s.TAG_ID ' +
-     ' and t%(n)s.NAME = ? ' +
-     '', info));
+    joinArray.push(
+     stringFormat(
+      'join PAD_TAG as pt%(n)s on ' +
+      ' pt%(n)s.PAD_ID = p.ID ' +
+      'join TAG as t%(n)s on ' +
+      ' t%(n)s.ID = pt%(n)s.TAG_ID ' +
+      ' and t%(n)s.NAME = ? ',
+      info));
     joinParamArray.push(tag);
     info.n += 1;
   }
 
   info["joins"] = joinArray.join("");
   info["excepts"] = exceptArray.join("");
-
+  info["wheres"] = whereArray.length > 0 ? ' where ' + whereArray.join(' ') : '';
+ 
   return {
-   sql: stringFormat('' +
+   sql: stringFormat(
     '(select ' +
     '  p.ID ' +
     ' from ' +
     '  %(queryTable)s as p ' +
     '  %(joins)s ' +
-    ' %(excepts)s ' +
-    ') ' +
-    '', info),
+    '  %(excepts)s ' +
+    ' %(wheres)s ' +
+    ') ',
+    info),
    params: queryParams.concat(joinParamArray).concat(exceptParamArray)};
 }
 
@@ -187,6 +189,7 @@ function onRequest() {
   }
 
   var querySql = getQueryToSql(tags.concat(['public']), antiTags);
+  log.info(querySql.sql);
 
   var queryNewTagsSql = newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
