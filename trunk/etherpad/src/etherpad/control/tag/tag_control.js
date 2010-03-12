@@ -102,7 +102,7 @@ function getQueryToSql(tags, antiTags, querySql) {
  
   return {
    sql: stringFormat(
-    '(select ' +
+    '(select distinct ' +
     '  p.ID ' +
     ' from ' +
     '  %(queryTable)s as p ' +
