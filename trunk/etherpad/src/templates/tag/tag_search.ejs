@@ -110,7 +110,7 @@ limitations under the License. */ %>
        <% } %>
 
        <h1>Matching pads</h1>
-       <ul>
+       <dl>
         <% for (i = 0; i < matchingPads.length; i++) { %>
         <%
              var matchingPadId = matchingPads[i].ID;
@@ -120,11 +120,14 @@ limitations under the License. */ %>
                matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
              }
         %>
-         <li>
-          <h2><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><h2>
-         </li>
+         <dt><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><dt>
+         <dd>
+	  <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
+	   <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != matchingPads[i].TAGS[j]}), antiTags) %>" class="tag" title="<%= matchingPads[i].TAGS[j] %> matches"><%= matchingPads[i].TAGS[j] %></a>
+	  <% } %>
+         </dd>
         <% } %>
-       </ul>
+       </dl>
       </div>
     </div>
   </div><!-- /padeditor -->
