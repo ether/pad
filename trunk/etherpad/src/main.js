@@ -363,7 +363,7 @@ function handlePath() {
     [PrefixMatcher('/static/'), forward(static_control)],
     [PrefixMatcher('/ep/genimg/'), genimg.renderPath],
     [PrefixMatcher('/ep/pad/'), forward(pad_control)],
-    [PrefixMatcher('/ep/tag/'), forward(tag_control)],
+    [PrefixMatcher('/ep/tag'), forward(tag_control)],
     [PrefixMatcher('/ep/script/'), forward(scriptcontrol)],
     [/^\/([^\/]+)$/, pad_control.render_pad],
     [DirMatcher('/ep/unit-tests/'), forward(testcontrol)],
@@ -373,7 +373,7 @@ function handlePath() {
 
   var etherpadDotComDispatcher = new Dispatcher();
   etherpadDotComDispatcher.addLocations([
-    ['/', maincontrol.render_main],
+    ['/', forward(tag_control)], // maincontrol.render_main],
     [DirMatcher('/ep/beta-account/'), forward(pro_beta_control)],
     [DirMatcher('/ep/pro-signup/'), forward(pro_signup_control)],
     [DirMatcher('/ep/about/'), forward(aboutcontrol)],
