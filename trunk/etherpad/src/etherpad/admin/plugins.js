@@ -157,26 +157,39 @@ function enablePlugin(pluginName) {
 
 function disablePlugin(pluginName) {
   loadPlugins();
-  pluginModules[pluginName].uninstall();
-  var pluginHooks = plugins[pluginName].map(function (x) { return x; }); // copy array
+  try 
+  {
+    pluginModules[pluginName].uninstall();
+  } catch (e) {
+    log.info({errorUninstallingPlugin:exceptionutils.getStackTracePlain(e)});
+  }
+  if (plugins[pluginName] != undefined) {
+    var pluginHooks = plugins[pluginName].map(function (x) { return x; }); // copy array
 
-  for (pluginHook in pluginHooks)
-    unregisterHook(pluginName, pluginHooks[pluginHook].hookName);
- delete plugins[pluginName];
- sqlobj.deleteRows("plugin", {name:pluginName});
+    for (pluginHook in pluginHooks)
+      unregisterHook(pluginName, pluginHooks[pluginHook].hookName);
+  }
+  delete plugins[pluginName];
+  sqlobj.deleteRows("plugin", {name:pluginName});
 }
 
 function callHook(hookName, args) {
   loadPlugins();
-log.info({XYZZZZ:hooks, NANANA:hookName});
   if (hooks[hookName] === undefined)
     return [];
-  return hooks[hookName].map(
-    function (plugin) {
-      return pluginModules[plugin.pluginName][plugin.originalHook || hookName](args);
-    });
+  var res = [];
+  for (i = 0; i < hooks[hookName].length; i++) {
+    var plugin = hooks[hookName][i];
+    var pluginRes = pluginModules[plugin.pluginName][plugin.originalHook || hookName](args);
+    if (pluginRes != undefined && pluginRes != null)
+      res = res.concat(pluginRes);
+  }
+  return res;
 }
 
 function callHookStr(hookName, args, sep, pre, post) {
+  if (sep == undefined) sep = '';
+  if (pre == undefined) pre = '';
+  if (post == undefined) post = '';
   return callHook(hookName, args).map(function (x) { return pre + x + post}).join(sep || "");
 }

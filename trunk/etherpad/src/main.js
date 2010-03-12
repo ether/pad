@@ -374,7 +374,7 @@ function handlePath() {
     [DirMatcher('/ep/unit-tests/'), forward(testcontrol)],
     [DirMatcher('/ep/pne-manual/'), forward(pne_manual_control)],
     [DirMatcher('/ep/pro-help/'), forward(pro_help_control)]
-  ]);
+  ].concat(plugins.callHook('handlePath')));
 
   var etherpadDotComDispatcher = new Dispatcher();
   etherpadDotComDispatcher.addLocations([

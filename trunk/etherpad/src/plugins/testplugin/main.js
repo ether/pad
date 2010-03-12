@@ -1,7 +1,9 @@
 import("etherpad.log");
 import("etherpad.admin.plugins");
+import("dispatch.{Dispatcher,PrefixMatcher,forward}");
+import("plugins.testplugin.controllers.testplugin");
 
-hooks = ['testhook', 'nahook', 'serverStartup', 'serverShutdown'];
+hooks = ['serverStartup', 'serverShutdown', 'handlePath'];
 description = 'Test Plugin';
 
 function install() {
@@ -12,16 +14,14 @@ function uninstall() {
  log.info("Uninstalling testplugin");
 }
 
-function testhook () {
-}
-
-function nahook() {
-}
-
 function serverStartup() {
  log.info("Server startup for testplugin");
 }
 
 function serverShutdown() {
  log.info("Server shutdown for testplugin");
+}
+
+function handlePath() {
+ return [[PrefixMatcher('/ep/testplugin/'), forward(testplugin)]];
 }

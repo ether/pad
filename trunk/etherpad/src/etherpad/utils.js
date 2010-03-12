@@ -34,6 +34,7 @@ import("etherpad.pro.pro_utils");
 import("etherpad.pro.pro_config");
 import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
+import("etherpad.log");
 
 jimport("java.lang.System.out.print");
 jimport("java.lang.System.out.println");
@@ -55,11 +56,18 @@ function randomUniquePadId() {
 // template rendering
 //----------------------------------------------------------------
 
-function renderTemplateAsString(filename, data) {
+function findTemplate(filename, plugin) {
+  if (plugin != undefined)
+   return '/plugins/' + plugin + '/templates/' + filename;
+  else
+   return '/templates/' + filename;
+}
+
+function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
 
-  var f = "/templates/"+filename;
+  var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
     appjet.scopeCache.ejs = {};
   }
@@ -75,22 +83,22 @@ function renderTemplateAsString(filename, data) {
   return html;
 }
 
-function renderTemplate(filename, data) {
-  response.write(renderTemplateAsString(filename, data));
+function renderTemplate(filename, data, plugin) {
+  response.write(renderTemplateAsString(filename, data, plugin));
   if (request.acceptsGzip) {
     response.setGzip(true);
   }
 }
 
-function renderHtml(bodyFileName, data) {
-  var bodyHtml = renderTemplateAsString(bodyFileName, data);
+function renderHtml(bodyFileName, data, plugin) {
+  var bodyHtml = renderTemplateAsString(bodyFileName, data, plugin);
   response.write(renderTemplateAsString("html.ejs", {bodyHtml: bodyHtml}));
   if (request.acceptsGzip) {
     response.setGzip(true);
   }
 }
 
-function renderFramedHtml(contentHtml) {
+function renderFramedHtml(contentHtml, plugin) {
   var getContentHtml;
   if (typeof(contentHtml) == 'function') {
     getContentHtml = contentHtml;
@@ -109,52 +117,52 @@ function renderFramedHtml(contentHtml) {
     getContentHtml: getContentHtml,
     isProDomainRequest: isProDomainRequest(),
     renderGlobalProNotice: pro_utils.renderGlobalProNotice
-  });
+  }, plugin);
 }
 
-function renderFramed(bodyFileName, data) {
+function renderFramed(bodyFileName, data, plugin) {
   function _getContentHtml() {
-    return renderTemplateAsString(bodyFileName, data);
+    return renderTemplateAsString(bodyFileName, data, plugin);
   }
   renderFramedHtml(_getContentHtml);
 }
 
-function renderFramedError(error) {
+function renderFramedError(error, plugin) {
   var content = DIV({className: 'fpcontent'},
                   DIV({style: "padding: 2em 1em;"},
                     DIV({style: "padding: 1em; border: 1px solid #faa; background: #fdd;"},
                         B("Error: "), error)));
-  renderFramedHtml(content);
+  renderFramedHtml(content, plugin);
 }
 
-function renderNotice(bodyFileName, data) {
-  renderNoticeString(renderTemplateAsString(bodyFileName, data));
+function renderNotice(bodyFileName, data, plugin) {
+  renderNoticeString(renderTemplateAsString(bodyFileName, data, plugin), plugin);
 }
 
-function renderNoticeString(contentHtml) {
-  renderFramed("notice.ejs", {content: contentHtml});
+function renderNoticeString(contentHtml, plugin) {
+  renderFramed("notice.ejs", {content: contentHtml}, plugin);
 }
 
-function render404(noStop) {
+function render404(noStop, plugin) {
   response.reset();
   response.setStatusCode(404);
   renderFramedHtml(DIV({className: "fpcontent"},
                     DIV({style: "padding: 2em 1em;"},
                        DIV({style: "border: 1px solid #aaf; background: #def; padding: 1em; font-size: 150%;"},
-                        "404 not found: "+request.path))));
+                        "404 not found: "+request.path))), plugin);
   if (! noStop) {
     response.stop();
   }
 }
 
-function render500(ex) {
+function render500(ex, plugin) {
   response.reset();
   response.setStatusCode(500);
   var trace = null;
   if (ex && (!isProduction())) {
     trace = exceptionutils.getStackTracePlain(ex);
   }
-  renderFramed("500_body.ejs", {trace: trace});
+  renderFramed("500_body.ejs", {trace: trace}, plugin);
 }
 
 function _renderEtherpadDotComHeader(data) {
