@@ -1,0 +1,24 @@
+Hooks that plugins can provide
+
+All hooks must return either undefined/null or a list of return values. This might be an empty list or a list of just one value.
+
+handlePath
+  Registers new urls to serve
+  Parameters: None
+  Returns: Parameter suitable for Dispatcher
+renderPageBodyPre
+  Adds extra html before the body of a page
+  Parameters: bodyFileName, data, plugin
+  Returns: String(s) of html
+renderPageBodyPost
+  Adds extra html after the body of a page
+  Parameters: bodyFileName, data, plugin
+  Returns: String(s) of html
+serverStartup
+  Run right after server startup
+  Parameters: None
+  Returns: None
+serverShutdown
+  Run before server shutdown
+  Parameters: None
+  Returns: None
