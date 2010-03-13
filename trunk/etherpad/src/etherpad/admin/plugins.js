@@ -123,22 +123,18 @@ function registerHook(pluginName, hookName, originalHook) {
   sqlobj.insert("plugin_hook", {plugin_id:plugin.id, hook_id:hook.id, original_name:originalHook});
 }
 
-function unregisterHook(pluginName, hookName) {
-  plugins[pluginName] = plugins[pluginName].filter(function (hook) { return hook.hookName != hookName; });
-  hooks[hookName] = hooks[hookName].filter(function (plugin) { return plugin.pluginName != pluginName; });
-  if (hooks[hookName].length == 0)
-    delete hooks[hookName];
+function unregisterHooks(pluginName) {
+  delete plugins[pluginName];
 
-  var conditions = {};
-  if (pluginName != undefined) {
-    var plugin = sqlobj.selectSingle('plugin', {name:pluginName});
-    conditions['plugin_id'] = plugin.id;
+  for (hookName in hooks) {
+    hooks[hookName] = hooks[hookName].filter(function (plugin) { return plugin.pluginName != pluginName; });
+    if (hooks[hookName].length == 0)
+      delete hooks[hookName];
   }
-  if (hookName != undefined) {
-    var hook = sqlobj.selectSingle('hook', {name:hookName});
-    conditions['hook_id'] = hook.id;
-  }
-  sqlobj.deleteRows('plugin_hook', conditions);
+
+  var plugin = sqlobj.selectSingle('plugin', {name:pluginName});
+  if (plugin != undefined)
+    sqlobj.deleteRows('plugin_hook', {plugin_id:plugin.id});
 }
 
 /* User API */
@@ -150,8 +146,10 @@ function enablePlugin(pluginName) {
     throw new Error ("Atempting to reenable the already enabled plugin " + pluginName);
   sqlobj.insert("plugin", {name:pluginName});
   plugins[pluginName] = [];
-  for (var i = 0; i < pluginModules[pluginName].hooks.length; i++)
-    registerHook(pluginName, pluginModules[pluginName].hooks[i]);
+  var pluginHooks = pluginModules[pluginName].hooks || [];
+  pluginHooks = pluginHooks.concat(pluginModules[pluginName].hooksShared || []);
+  for (var i = 0; i < pluginHooks.length; i++)
+    registerHook(pluginName, pluginHooks[i]);
   pluginModules[pluginName].install();
 }
 
@@ -163,12 +161,7 @@ function disablePlugin(pluginName) {
   } catch (e) {
     log.info({errorUninstallingPlugin:exceptionutils.getStackTracePlain(e)});
   }
-  if (plugins[pluginName] != undefined) {
-    var pluginHooks = plugins[pluginName].map(function (x) { return x; }); // copy array
-
-    for (pluginHook in pluginHooks)
-      unregisterHook(pluginName, pluginHooks[pluginHook].hookName);
-  }
+  unregisterHooks(pluginName);
   delete plugins[pluginName];
   sqlobj.deleteRows("plugin", {name:pluginName});
 }
