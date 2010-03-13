@@ -55,7 +55,9 @@ function loadAvailablePlugin(pluginName) {
     var pluginModulePath = pluginFile.getPath().replace(new RegExp("src/\(.*\)\.js"), "$1").replace("/", ".", "g");
     var importStmt = "import('" + pluginModulePath + "')";
     try {
-      return execution.fancyAssEval(importStmt, "main;");
+      var res = execution.fancyAssEval(importStmt, "main;");
+      res = new res.init();
+      return res;
     } catch (e) {
       log.info({errorLoadingPlugin:exceptionutils.getStackTracePlain(e)});
     }
