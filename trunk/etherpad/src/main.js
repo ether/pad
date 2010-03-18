@@ -360,6 +360,8 @@ function handlePath() {
   // Default.  Can be overridden in case of static files.
   response.neverCache();
 
+  plugins.registerClientHandlerJS();
+
   // these paths are handled identically on all sites/subdomains.
   var commonDispatcher = new Dispatcher();
   commonDispatcher.addLocations([

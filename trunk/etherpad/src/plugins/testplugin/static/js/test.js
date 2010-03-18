@@ -1,1 +1,1 @@
-alert("KAFOOOOO");
+callHook("kafoo");

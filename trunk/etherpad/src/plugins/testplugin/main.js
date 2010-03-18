@@ -1,8 +1,10 @@
 import("etherpad.log");
 import("plugins.testplugin.hooks");
+import("plugins.testplugin.static.js.main");
 
 function init() {
  this.hooks = ['serverStartup', 'serverShutdown', 'handlePath'];
+ this.client = new main.init();
  this.description = 'Test Plugin';
  this.serverStartup = hooks.serverStartup;
  this.serverShutdown = hooks.serverShutdown;
