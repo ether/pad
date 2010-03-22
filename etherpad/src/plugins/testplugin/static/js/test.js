@@ -1,1 +1,1 @@
-callHook("kafoo");
+plugins.callHook("kafoo");
