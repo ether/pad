@@ -30,6 +30,8 @@ import("etherpad.pad.pad_migrations");
 import("etherpad.pad.pad_security");
 import("etherpad.collab.collab_server");
 import("cache_utils.syncedWithCache");
+import("etherpad.admin.plugins");
+
 jimport("net.appjet.common.util.LimitedSizeMapping");
 
 jimport("java.lang.System.out.println");
@@ -257,6 +259,8 @@ function accessPadGlobal(padId, padFunc, rwMode) {
           for(var k in meta) meta2[k] = meta[k];
           delete meta2.status;
 	  sqlbase.putJSON("PAD_META", padId, meta2);
+
+	  plugins.callHook("padModelWriteToDB", {pad:pad, padId:padId});
 
 	  _getPadStringArray(padId, "revs").writeToDB();
 	  _getPadStringArray(padId, "revs10").writeToDB();
