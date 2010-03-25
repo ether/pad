@@ -21,7 +21,6 @@
 // requires: easysync2.Changeset
 // requires: top
 // requires: plugins
-// requires: plugins
 // requires: undefined
 
 var linestylefilter = {};
@@ -239,13 +238,11 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
 linestylefilter.getFilterStack = function(lineText, textAndClassFunc, browser) {
   var func = linestylefilter.getURLFilter(lineText, textAndClassFunc);  
 
-  /* Handle both client and server side situation */
-
-  var pluginModule = (top == undefined) ? plugins : top.plugins;
-
-  var hookFilters = pluginModule.callHook("aceGetFilterStack", {linestylefilter:linestylefilter, browser:browser});
-  for (var i = 0; i < hookFilters.length; i++)
-    func = hookFilters[i](lineText, func);
+  var hookFilters = ((top == undefined) ? plugins : top.plugins).callHook(
+    "aceGetFilterStack", {linestylefilter:linestylefilter, browser:browser});
+  hookFilters.map(function (hookFilter) {
+    func = hookFilter(lineText, func);
+  });
 
   if (browser !== undefined && browser.msie) {
     // IE7+ will take an e-mail address like <foo@bar.com> and linkify it to foo@bar.com.

@@ -1,4 +1,5 @@
 // THIS FILE IS ALSO AN APPJET MODULE: etherpad.collab.ace.domline
+// %APPJET%: import("etherpad.admin.plugins");
 
 /**
  * Copyright 2009 Google Inc.
@@ -15,6 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// requires: top
+// requires: plugins
+// requires: undefined
 
 var domline = {};
 domline.noop = function() {};
@@ -92,12 +97,22 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	return space+tag;
       });
     }
+
+    var extraOpenTags = "";
+    var extraCloseTags = "";
+
+    ((top == undefined) ? plugins : top.plugins).callHook(
+      "aceCreateDomLine", {domline:domline, cls:cls}
+    ).map(function (modifier) {
+      cls = modifier.cls;
+      extraOpenTags = extraOpenTags+modifier.extraOpenTags;
+      extraCloseTags = modifier.extraCloseTags+extraCloseTags;
+    });
+
     if ((! txt) && cls) {
       lineClass = domline.addToLineClass(lineClass, cls);
     }
     else if (txt) {
-      var extraOpenTags = "";
-      var extraCloseTags = "";
       if (href) {
 	extraOpenTags = extraOpenTags+'<a href="'+
 	  href.replace(/\"/g, '&quot;')+'">';
