@@ -29,8 +29,184 @@ import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 
+function tagsToQuery(tags, antiTags) {
+ var prefixed = [];
+ for (i = 0; i < antiTags.length; i++)
+  prefixed[i] = '!' + antiTags[i];
+ return tags.concat(prefixed).join(',');
+}
+
+function stringFormat(text, obj) {
+  var name;
+  for (name in obj) {
+    //iterate through the params and replace their placeholders from the original text
+    text = text.replace(new RegExp('%\\(' + name + '\\)s', 'gi' ), obj[name]);
+  }
+  return text;
+}
+
+function getQueryToSql(tags, antiTags, querySql) {
+  var queryTable;
+  var queryParams;
+
+  if (querySql == null) {
+    queryTable = 'PAD_META';
+    queryParams = [];
+  } else {
+    queryTable = querySql.sql;
+    queryParams = querySql.params;
+  }
+
+  var exceptArray = [];
+  var joinArray = [];
+  var whereArray = [];
+  var exceptParamArray = [];
+  var joinParamArray = [];
+
+  var info = new Object();
+  info.queryTable = queryTable;
+  info.n = 0;
+  var i;
+
+  for (i = 0; i < antiTags.length; i++) {
+    tag = antiTags[i];
+    exceptArray.push(
+     stringFormat(
+      'left join (PAD_TAG as pt%(n)s ' +
+      '	      join TAG AS t%(n)s on ' +
+      '	       t%(n)s.NAME = ? ' +
+      '	       and t%(n)s.ID = pt%(n)s.TAG_ID) on ' +
+      ' pt%(n)s.PAD_ID = p.ID ',
+      info));
+    whereArray.push(stringFormat('pt%(n)s.TAG_ID is null', info));
+    exceptParamArray.push(tag);
+    info.n += 1;
+  }
+  for (i = 0; i < tags.length; i++) {
+    tag = tags[i];
+    joinArray.push(
+     stringFormat(
+      'join PAD_TAG as pt%(n)s on ' +
+      ' pt%(n)s.PAD_ID = p.ID ' +
+      'join TAG as t%(n)s on ' +
+      ' t%(n)s.ID = pt%(n)s.TAG_ID ' +
+      ' and t%(n)s.NAME = ? ',
+      info));
+    joinParamArray.push(tag);
+    info.n += 1;
+  }
+
+  info["joins"] = joinArray.join(' ');
+  info["excepts"] = exceptArray.join(' ');
+  info["wheres"] = whereArray.length > 0 ? ' where ' + whereArray.join(' and ') : '';
+ 
+  return {
+   sql: stringFormat(
+    '(select distinct ' +
+    '  p.ID ' +
+    ' from ' +
+    '  %(queryTable)s as p ' +
+    '  %(joins)s ' +
+    '  %(excepts)s ' +
+    ' %(wheres)s ' +
+    ') ',
+    info),
+   params: queryParams.concat(joinParamArray).concat(exceptParamArray)};
+}
+
+function nrSql(querySql) {
+  var queryTable;
+  var queryParams;
+
+  if (querySql == null) {
+    queryTable = 'PAD_META';
+    queryParams = [];
+  } else {
+    queryTable = querySql.sql;
+    queryParams = querySql.params;
+  }
+
+  var info = [];
+  info['query_sql'] = queryTable
+  return {
+   sql: stringFormat('(select count(*) as total from %(query_sql)s as q)', info),
+   params: queryParams};
+}
+
+function newTagsSql(querySql) {
+  var queryTable;
+  var queryParams;
+
+  if (querySql == null) {
+    queryTable = 'PAD_META';
+    queryParams = [];
+  } else {
+    queryTable = querySql.sql;
+    queryParams = querySql.params;
+  }
+
+  var info = [];
+  info["query_post_table"] = queryTable;
+  var queryNrSql = nrSql(querySql);
+  info["query_nr_sql"] = queryNrSql.sql;
+  queryNrParams = queryNrSql.params;
+
+  return {
+   sql: stringFormat('' +
+    'select ' +
+    ' t.NAME tagname, ' +
+    ' count(tp.PAD_ID) as matches, ' +
+    ' tn.total - count(tp.PAD_ID) as antimatches, ' +
+    ' abs(count(tp.PAD_ID) - (tn.total / 2)) as weight ' +
+    'from ' +
+    ' TAG as t, ' +
+    ' PAD_TAG as tp, ' +
+    ' %(query_nr_sql)s as tn ' +
+    'where ' +
+    ' tp.TAG_ID = t.ID ' +
+    ' and tp.PAD_ID in %(query_post_table)s ' +
+    'group by t.NAME, tn.total ' +
+    'having ' +
+    ' count(tp.PAD_ID) > 0 and count(tp.PAD_ID) < tn.total ' +
+    'order by ' +
+    ' abs(count(tp.PAD_ID) - (tn.total / 2)) asc ' +
+    'limit 10 ' +
+    '', info),
+   params: queryNrParams.concat(queryParams)};
+}
+
 
 function onRequest() {  
+  var tags = new Array();
+  var antiTags = new Array();
+
+  if (request.params.query != undefined && request.params.query != '') {
+    var query = request.params.query.split(',');
+    for (i = 0; i < query.length; i++)
+     if (query[i][0] == '!')
+      antiTags.push(query[i].substring(1));
+     else
+      tags.push(query[i]);
+  }
+
+  var querySql = getQueryToSql(tags.concat(['public']), antiTags);
+  //log.info(querySql.sql);
+
+  var queryNewTagsSql = newTagsSql(querySql);
+  var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
+
+  var matchingPads;
+  if (tags.length > 0 || antiTags.length > 0) {
+    var sql = "select p.PAD_ID as ID, p.TAGS from PAD_TAG_CACHE as p, " + querySql.sql + " as q where p.PAD_ID = q.ID limit 10"
+    matchingPads = sqlobj.executeRaw(sql, querySql.params);
+  } else {
+    matchingPads = [];
+  }
+
+  for (i = 0; i < matchingPads.length; i++) {
+    matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
+  }
+
   var isPro = pro_utils.isProDomainRequest();
   var userId = padusers.getUserId();
 
@@ -49,6 +225,14 @@ function onRequest() {
 
   renderHtml("tagBrowser.ejs",
    {
+    config: appjet.config,
+    tagsToQuery: tagsToQuery,
+    padIdToReadonly: server_utils.padIdToReadonly,
+    tags: tags,
+    antiTags: antiTags,
+    newTags: newTags,
+    matchingPads: matchingPads,
+    bodyClass: 'nonpropad',
     isPro: isPro,
     isProAccountHolder: isProUser,
     account: getSessionProAccount(), // may be falsy

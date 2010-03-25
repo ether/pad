@@ -4,7 +4,7 @@ import("plugins.twitterStyleTags.controllers.tagBrowser");
 import("sqlbase.sqlobj");
 
 function handlePath() {
-  return [[PrefixMatcher('/ep/tags/'), forward(tagBrowser)]];
+  return [[PrefixMatcher('/ep/tag/'), forward(tagBrowser)]];
 }
 
 function padModelWriteToDB(args) {
