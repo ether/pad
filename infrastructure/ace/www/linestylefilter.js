@@ -140,55 +140,60 @@ linestylefilter.getAtSignSplitterFilter = function(lineText,
                                                   splitPoints);
 };
 
+linestylefilter.getRegexpFilter = function (regExp, tag) {
+  return function (lineText, textAndClassFunc) {
+    regExp.lastIndex = 0;
+    var regExpMatchs = null;
+    var splitPoints = null;
+    var execResult;
+    while ((execResult = regExp.exec(lineText))) {
+      if (! regExpMatchs) {
+	regExpMatchs = [];
+	splitPoints = [];
+      }
+      var startIndex = execResult.index;
+      var regExpMatch = execResult[0];
+      regExpMatchs.push([startIndex, regExpMatch]);
+      splitPoints.push(startIndex, startIndex + regExpMatch.length);
+    }
+
+    if (! regExpMatchs) return textAndClassFunc;
+
+    function regExpMatchForIndex(idx) {
+      for(var k=0; k<regExpMatchs.length; k++) {
+	var u = regExpMatchs[k];
+	if (idx >= u[0] && idx < u[0]+u[1].length) {
+	  return u[1];
+	}
+      }
+      return false;
+    }
+
+    var handleRegExpMatchsAfterSplit = (function() {
+      var curIndex = 0;
+      return function(txt, cls) {
+	var txtlen = txt.length;
+	var newCls = cls;
+	var regExpMatch = regExpMatchForIndex(curIndex);
+	if (regExpMatch) {
+	  newCls += " "+tag+":"+regExpMatch;
+	}
+	textAndClassFunc(txt, newCls);
+	curIndex += txtlen;
+      };
+    })();
+
+    return linestylefilter.textAndClassFuncSplitter(handleRegExpMatchsAfterSplit,
+						    splitPoints);
+  };
+};
+
+
 linestylefilter.REGEX_WORDCHAR = /[\u0030-\u0039\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u1FFF\u3040-\u9FFF\uF900-\uFDFF\uFE70-\uFEFE\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFDC]/;
 linestylefilter.REGEX_URLCHAR = new RegExp('('+/[-:@a-zA-Z0-9_.,~%+\/\\?=&#;()$]/.source+'|'+linestylefilter.REGEX_WORDCHAR.source+')');
 linestylefilter.REGEX_URL = new RegExp(/(?:(?:https?|s?ftp|ftps|file|smb|afp|nfs|(x-)?man|gopher|txmt):\/\/|mailto:)/.source+linestylefilter.REGEX_URLCHAR.source+'*(?![:.,;])'+linestylefilter.REGEX_URLCHAR.source, 'g');
-
-linestylefilter.getURLFilter = function(lineText, textAndClassFunc) {
-  linestylefilter.REGEX_URL.lastIndex = 0;
-  var urls = null;
-  var splitPoints = null;
-  var execResult;
-  while ((execResult = linestylefilter.REGEX_URL.exec(lineText))) {
-    if (! urls) {
-      urls = [];
-      splitPoints = [];
-    }
-    var startIndex = execResult.index;
-    var url = execResult[0];
-    urls.push([startIndex, url]);
-    splitPoints.push(startIndex, startIndex + url.length);
-  }
-
-  if (! urls) return textAndClassFunc;
-
-  function urlForIndex(idx) {
-    for(var k=0; k<urls.length; k++) {
-      var u = urls[k];
-      if (idx >= u[0] && idx < u[0]+u[1].length) {
-	return u[1];
-      }
-    }
-    return false;
-  }
-
-  var handleUrlsAfterSplit = (function() {
-    var curIndex = 0;
-    return function(txt, cls) {
-      var txtlen = txt.length;
-      var newCls = cls;
-      var url = urlForIndex(curIndex);
-      if (url) {
-	newCls += " url:"+url;
-      }
-      textAndClassFunc(txt, newCls);
-      curIndex += txtlen;
-    };
-  })();
-
-  return linestylefilter.textAndClassFuncSplitter(handleUrlsAfterSplit,
-                                                  splitPoints);
-};
+linestylefilter.getURLFilter = linestylefilter.getRegexpFilter(
+  linestylefilter.REGEX_URL, 'url');
 
 linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
   var nextPointIndex = 0;
