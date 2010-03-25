@@ -1,4 +1,6 @@
 #!/bin/sh
+mkdir -p ../../etherpad/src/etherpad/collab/ace
+mkdir -p ../../etherpad/src/static/js
 exec scala -classpath lib/yuicompressor-2.4-appjet.jar:lib/rhino-js-1.7r1.jar $0 $@
 !#
 
