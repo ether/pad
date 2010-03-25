@@ -1,1 +1,13 @@
 *~
+etherpad/src/etherpad/collab/ace/contentcollector.js
+etherpad/src/etherpad/collab/ace/domline.js
+etherpad/src/etherpad/collab/ace/easysync1.js
+etherpad/src/etherpad/collab/ace/easysync2.js
+etherpad/src/etherpad/collab/ace/easysync2_tests.js
+etherpad/src/etherpad/collab/ace/linestylefilter.js
+etherpad/src/static/js/ace.js
+etherpad/src/static/js/colorutils.js
+etherpad/src/static/js/cssmanager_client.js
+etherpad/src/static/js/domline_client.js
+etherpad/src/static/js/easysync2_client.js
+etherpad/src/static/js/linestylefilter_client.js
