@@ -1,5 +1,6 @@
 // THIS FILE IS ALSO AN APPJET MODULE: etherpad.collab.ace.linestylefilter
 // %APPJET%: import("etherpad.collab.ace.easysync2.Changeset");
+// %APPJET%: import("etherpad.admin.plugins");
 
 /**
  * Copyright 2009 Google Inc.
@@ -18,6 +19,10 @@
  */
 
 // requires: easysync2.Changeset
+// requires: top
+// requires: plugins
+// requires: plugins
+// requires: undefined
 
 var linestylefilter = {};
 
@@ -226,6 +231,27 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
   return spanHandler;
 };
 
+linestylefilter.getFilterStack = function(lineText, textAndClassFunc, browser) {
+  var func = linestylefilter.getURLFilter(lineText, textAndClassFunc);  
+
+  /* Handle both client and server side situation */
+
+  var pluginModule = (top == undefined) ? plugins : top.plugins;
+
+  var hookFilters = pluginModule.callHook("aceGetFilterStack", {linestylefilter:linestylefilter, browser:browser});
+  for (var i = 0; i < hookFilters.length; i++)
+    func = hookFilters[i](lineText, func);
+
+  if (browser !== undefined && browser.msie) {
+    // IE7+ will take an e-mail address like <foo@bar.com> and linkify it to foo@bar.com.
+    // We then normalize it back to text with no angle brackets.  It's weird.  So always
+    // break spans at an "at" sign.
+    func = linestylefilter.getAtSignSplitterFilter(
+      lineText, func);
+  }
+  return func;
+};
+
 // domLineObj is like that returned by domline.createDomLine
 linestylefilter.populateDomLine = function(textLine, aline, apool,
                                            domLineObj) {
@@ -239,8 +265,7 @@ linestylefilter.populateDomLine = function(textLine, aline, apool,
     domLineObj.appendSpan(tokenText, tokenClass);
   }
 
-  var func = textAndClassFunc;
-  func = linestylefilter.getURLFilter(text, func);
+  var func = linestylefilter.getFilterStack(text, textAndClassFunc);
   func = linestylefilter.getLineStyleFilter(text.length, aline,
                                             func, apool);
   func(text, '');
