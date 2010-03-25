@@ -175,8 +175,8 @@ function saveInstalledHooks(pluginName) {
 }
 
 
-function loadPlugins() {
-  if (pluginsLoaded) return;
+function loadPlugins(force) {
+  if (pluginsLoaded && force == undefined) return;
   pluginsLoaded = true;
   loadAvailablePlugins();
   loadInstalledHooks();

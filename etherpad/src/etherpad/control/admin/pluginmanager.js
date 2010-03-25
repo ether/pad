@@ -37,6 +37,7 @@ function onRequest() {
    plugins.disablePlugin(request.params.plugin);
   } else if (request.params.action == 'reinstall') {
    plugins.disablePlugin(request.params.plugin);
+   plugins.loadPlugins(1);
    plugins.enablePlugin(request.params.plugin);
   }
 
