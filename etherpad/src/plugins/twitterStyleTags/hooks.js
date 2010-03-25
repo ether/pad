@@ -16,7 +16,7 @@ function padModelWriteToDB(args) {
     new_tags[i] = new_tags[i].substring(1);
   var new_tags_str = new_tags.join('#')
 
-  var old_tags_row = sqlobj.selectSingle("PAD_TAG_CACHE", { id: args.padId });
+  var old_tags_row = sqlobj.selectSingle("PAD_TAG_CACHE", { PAD_ID: args.padId });
   var old_tags_str;
   if (old_tags_row !== null)
     old_tags_str = old_tags_row['TAGS'];
@@ -29,19 +29,19 @@ function padModelWriteToDB(args) {
     log.info({message: 'Updating tags', new_tags:new_tags, old_tags:old_tags});
 
     if (old_tags_row)
-      sqlobj.update("PAD_TAG_CACHE", { id: args.padId }, {tags: new_tags.join('#')});
+      sqlobj.update("PAD_TAG_CACHE", {PAD_ID: args.padId }, {TAGS: new_tags.join('#')});
     else
-      sqlobj.insert("PAD_TAG_CACHE", {id: args.padId, tags: new_tags.join('#')});
+      sqlobj.insert("PAD_TAG_CACHE", {PAD_ID: args.padId, TAGS: new_tags.join('#')});
 
-    sqlobj.deleteRows("PAD_TAG", {pad_id: args.padId});
+    sqlobj.deleteRows("PAD_TAG", {PAD_ID: args.padId});
 
     for (i = 0; i < new_tags.length; i++) {
-      var tag_row = sqlobj.selectSingle("TAG", { name: new_tags[i] });
+      var tag_row = sqlobj.selectSingle("TAG", { NAME: new_tags[i] });
       if (tag_row === null) {
-	sqlobj.insert("TAG", {name: new_tags[i]});
-	tag_row = sqlobj.selectSingle("TAG", { name: new_tags[i] });
+	sqlobj.insert("TAG", {NAME: new_tags[i]});
+	tag_row = sqlobj.selectSingle("TAG", { NAME: new_tags[i] });
       }
-      sqlobj.insert("PAD_TAG", {pad_id: args.padId, tag_id: tag_row['ID']});
+      sqlobj.insert("PAD_TAG", {PAD_ID: args.padId, TAG_ID: tag_row['ID']});
     }
   }
 }
