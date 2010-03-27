@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+// requires: top
+// requires: plugins
+// requires: undefined
+
 
 Ace2Editor.registry = { nextId: 1 };
 
@@ -163,6 +167,10 @@ function Ace2Editor() {
 	'"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
 
       var iframeHTML = ["'"+doctype+"<html><head>'"];
+
+      top.plugins.callHook(
+        "aceInitInnerdocbodyHead", {iframeHTML:iframeHTML});
+  
       // these lines must conform to a specific format because they are passed by the build script:
       iframeHTML.push($$INCLUDE_CSS_Q("editor.css syntax.css inner.css"));
       //iframeHTML.push(INCLUDE_JS_Q_DEV("ace2_common_dev.js"));
