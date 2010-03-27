@@ -10,7 +10,7 @@ function handlePath() {
 function padModelWriteToDB(args) {
   /* Update tags for the pad */
 
-  var new_tags = args.pad.text().match(new RegExp("#[^,#!\\s][^,#!\\s]*", "g"));
+  var new_tags = args.pad.text().match(new RegExp("#[^,#=!\\s][^,#=!\\s]*", "g"));
   if (new_tags == null) new_tags = new Array();
   for (i = 0; i < new_tags.length; i++)
     new_tags[i] = new_tags[i].substring(1);
