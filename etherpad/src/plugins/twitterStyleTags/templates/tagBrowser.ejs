@@ -76,47 +76,33 @@ limitations under the License. */ %>
       <div id="editbarright"><!-- --></div>      
       
       <div id="editbarinner">
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('bold'));" class="editbarbutton bold" title="Bold (ctrl-B)">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('italic'));" class="editbarbutton italic" title="Italics (ctrl-I)">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('underline'));" class="editbarbutton underline" title="Underline (ctrl-U)">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('strikethrough'));" class="editbarbutton strikethrough" title="Strikethrough">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('clearauthorship'));" class="editbarbutton clearauthorship" title="Clear Authorship Colors">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('undo'));" class="editbarbutton undo" title="Undo (ctrl-Z)">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('redo'));" class="editbarbutton redo" title="Redo (ctrl-Y)">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('insertunorderedlist'));" class="editbarbutton insertunorderedlist" title="Toggle Bullet List">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('indent'));" class="editbarbutton indent" title="Indent List">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('outdent'));" class="editbarbutton outdent" title="Unindent List">&nbsp;</a>
-        <a unselectable="on" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('save'));" class="editbarbutton save" title="Save Revision">&nbsp;</a>
+	Query:
+	<% if (tags.length == 0 && antiTags.length == 0) { %>
+	  Please select some tags below to browse for pads
+	<% } else { %>
+	  <% for (i = 0; i < tags.length; i++) { %>
+	    <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
+	  <% } %>
+	  <% for (i = 0; i < antiTags.length; i++) { %>
+	    <a href="/ep/tag/?query=<%= tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]})) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
+	  <% } %>
+	<% } %>
       </div>
     </div>
     <div style="height: 268px;" id="editorcontainerbox">
       <div id="editorcontainer" style="padding:5pt; height: 600pt;">
        <div class="query-refiner">
-	<h1>Refine your query</h1>
-	<h2>Search for pads that have the tag</h2>
+	<h1>Search for pads that have the tag</h1>
 	<% for (i = 0; i < newTags.length; i++) { %>
 	 <a href="/ep/tag/?query=<%= tagsToQuery(tags.concat([newTags[i].tagname]),antiTags) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
 	<% } %>
 
-	<h2>Search for pads that <em>don't</em> have the tag</h2>
+	<h1>Search for pads that <em>don't</em> have the tag</h1>
 	<% for (i = 0; i < newTags.length; i++) { %>
 	 <a href="/ep/tag/?query=<%= tagsToQuery(tags,antiTags.concat([newTags[i].tagname])) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
 	<% } %>
        </div>
 
-       <span class="label">Current query:</span>
-       <% if (tags.length == 0 && antiTags.length == 0) { %>
-        &lt; No current query; please select some tags below to search for pads &gt;
-       <% } else { %>
-	<% for (i = 0; i < tags.length; i++) { %>
-	 <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
-	<% } %>
-	<% for (i = 0; i < antiTags.length; i++) { %>
-	 <a href="/ep/tag/?query=<%= tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]})) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
-	<% } %>
-       <% } %>
-
-       <h1>Matching pads</h1>
        <dl>
         <% for (i = 0; i < matchingPads.length; i++) { %>
         <%
