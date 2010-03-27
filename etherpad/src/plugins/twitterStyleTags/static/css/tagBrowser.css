@@ -80,3 +80,7 @@ h1 {
 #editbarinner a {
  font-size: 12px;
 }
+
+#padchat iframe {
+ border: none;
+}
