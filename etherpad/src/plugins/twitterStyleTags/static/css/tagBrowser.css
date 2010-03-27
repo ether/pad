@@ -1,11 +1,9 @@
 dt {
-  padding-top: 2pt;
   padding-bottom: 2pt;
 }
 
 dd {
   padding-left: 20pt;
-  padding-top: 2pt;
   padding-bottom: 2pt;
 }
 
@@ -19,18 +17,52 @@ h2 {
  margin-top: 5pt;
 }
 
+.label {
+ font-size: 14pt;
+}
+
 #editorcontainer {
  overflow: auto;
 }
+
 
 .query-refiner {
  float: right;
  padding: 10pt;
  margin: 5pt;
  border: 1px solid #9C9C9C;
-
 }
 
 .query-refiner h1 {
  margin-top: 0;
+}
+
+.query-refiner h2 {
+ margin-bottom: 2pt;
+}
+
+#home-newpad {
+ display: block;
+ background-color: #a3bde0;
+ color: #555555;
+ border-style: solid;
+ border-width: 2px;
+ border-left-color: #d6e2f1;
+ border-right-color: #86aee1;
+ border-top-color: #d6e2f1;
+ border-bottom-color: #86aee1;
+ margin: 10pt;
+ text-align: center;
+ text-decoration: none;
+ padding-top: 50pt;
+ padding-bottom: 50pt;
+ font-size: 20pt;
+ -moz-border-radius-topleft: 3pt;
+ -moz-border-radius-topright: 3pt;
+ -moz-border-radius-bottomleft: 3pt;
+ -moz-border-radius-bottomright: 3pt;
+ -webkit-border-top-left-radius: 3pt;
+ -webkit-border-top-right-radius: 3pt;
+ -webkit-border-bottom-left-radius: 3pt;
+ -webkit-border-bottom-right-radius: 3pt;
 }

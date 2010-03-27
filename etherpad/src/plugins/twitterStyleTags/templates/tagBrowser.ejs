@@ -93,18 +93,18 @@ limitations under the License. */ %>
       <div id="editorcontainer" style="padding:5pt; height: 600pt;">
        <div class="query-refiner">
 	<h1>Refine your query</h1>
-	<h2>Search for pads that have a tag</h2>
+	<h2>Search for pads that have the tag</h2>
 	<% for (i = 0; i < newTags.length; i++) { %>
 	 <a href="/ep/tag/?query=<%= tagsToQuery(tags.concat([newTags[i].tagname]),antiTags) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
 	<% } %>
 
-	<h2>Search for pads that <em>doesn't</em> have a tag</h2>
+	<h2>Search for pads that <em>don't</em> have the tag</h2>
 	<% for (i = 0; i < newTags.length; i++) { %>
-	 <a href="/ep/tag/?query=<%= tagsToQuery(tags,antiTags.concat([newTags[i].tagname])) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">#<%= newTags[i].tagname %></a>
+	 <a href="/ep/tag/?query=<%= tagsToQuery(tags,antiTags.concat([newTags[i].tagname])) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
 	<% } %>
        </div>
 
-       <h1>Current query</h1>
+       <span class="label">Current query:</span>
        <% if (tags.length == 0 && antiTags.length == 0) { %>
         &lt; No current query; please select some tags below to search for pads &gt;
        <% } else { %>
@@ -130,7 +130,7 @@ limitations under the License. */ %>
          <dt><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><dt>
          <dd>
 	  <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
-	   <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != matchingPads[i].TAGS[j]}), antiTags) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
+	   <a href="/ep/tag/?query=<%= tagsToQuery(tags.concat([matchingPads[i].TAGS[j]]), antiTags) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
 	  <% } %>
          </dd>
         <% } %>
