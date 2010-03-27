@@ -26,8 +26,12 @@ h1 {
 }
 
 #editorcontainer {
- overflow: auto;
  padding: 5pt; 
+}
+
+#editorcontainerbox {
+ overflow: auto;
+ height: auto;
 }
 
 
