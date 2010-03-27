@@ -1,7 +1,12 @@
 function init() {
-  this.hooks = ['aceGetFilterStack', 'aceCreateDomLine'];
+  this.hooks = ['aceInitInnerdocbodyHead', 'aceGetFilterStack', 'aceCreateDomLine'];
+  this.aceInitInnerdocbodyHead = aceInitInnerdocbodyHead;
   this.aceGetFilterStack = aceGetFilterStack;
   this.aceCreateDomLine = aceCreateDomLine;
+}
+
+function aceInitInnerdocbodyHead(args) {
+  args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/twitterStyleTags/pad.css"/>\'');
 }
 
 function aceGetFilterStack(args) {
