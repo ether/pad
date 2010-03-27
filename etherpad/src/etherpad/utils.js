@@ -67,6 +67,7 @@ function findTemplate(filename, plugin) {
 function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
+  data.plugins = plugins; // Access callHook and the like...
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
