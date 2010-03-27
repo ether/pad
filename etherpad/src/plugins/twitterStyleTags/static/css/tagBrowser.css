@@ -27,13 +27,15 @@ h1 {
 
 #editorcontainer {
  overflow: auto;
+ padding: 5pt; 
 }
 
 
 .query-refiner {
  float: right;
  padding: 10pt;
- margin: 5pt;
+ margin-left: 5pt;
+ margin-bottom: 5pt;
  border: 1px solid #9C9C9C;
  width: 40%;
 }

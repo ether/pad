@@ -12,17 +12,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
- helpers.setHtmlTitle("Browse tags");
+ helpers.setHtmlTitle("EtherPad: Browse tags");
+ helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
+ helpers.includeCss("plugins/twitterStyleTags/pad.css");
  helpers.setBodyId("padbody");
  helpers.addBodyClass("limwidth nonpropad nonprouser");
  helpers.includeCss("pad2_ejs.css");
- helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
- helpers.includeCss("plugins/twitterStyleTags/pad.css");
- helpers.setRobotsPolicy({index: false, follow: false})
- helpers.includeJQuery();
+ helpers.includeJs("undo-xpopup.js");
  helpers.includeCometJs();
+ helpers.includeJQuery();
  helpers.includeJs("json2.js");
- helpers.addToHead('\n<style type="text/css" title="dynamicsyntax"></style>\n');
+ helpers.includeJs("colorutils.js");
+ helpers.includeJs("ace.js");
+ helpers.includeJs("collab_client.js");
+ helpers.includeJs("draggable.js");
+ helpers.includeJs("pad_utils.js");
+ helpers.includeJs("pad_cookie.js");
+ helpers.includeJs("pad_editor.js");
+ helpers.includeJs("pad_userlist.js");
+ helpers.includeJs("pad_editbar.js");
+ helpers.includeJs("pad_chat.js");
+ helpers.includeJs("pad_docbar.js");
+ helpers.includeJs("pad_impexp.js");
+ helpers.includeJs("pad_savedrevs.js");
+ helpers.includeJs("pad_connectionstatus.js");
+ helpers.includeJs("pad_modals.js");
+ helpers.includeJs("pad2.js");
+ helpers.suppressGA();
+ helpers.setRobotsPolicy({index: false, follow: false});
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)
@@ -36,14 +53,13 @@ limitations under the License. */ %>
  <div id="padtop">
   <div id="topbar" style="margin: 7px; margin-top: 0px;">
    <div id="topbarleft"><!-- --></div>
-    <div id="topbarright"><!-- --></div>
-    <div id="topbarcenter"><a href="/" id="topbaretherpad">EtherPad</a></div>
-    <% if (isProAccountHolder) { %>
-     <div id="accountnav"><%= toHTML(account.email) %><a href="/ep/account/sign-out">(sign out)</a></div>
-    <% } else if (isPro) { %>
-     <div id="accountnav"><a href="<%= signinUrl %>">sign in</a></div>
-    <% } %>
-   </div>
+   <div id="topbarright"><!-- --></div>
+   <div id="topbarcenter"><a href="/" id="topbaretherpad">EtherPad</a></div>
+   <% if (isProAccountHolder) { %>
+    <div id="accountnav"><%= toHTML(account.email) %><a href="/ep/account/sign-out">(sign out)</a></div>
+   <% } else if (isPro) { %>
+    <div id="accountnav"><a href="<%= signinUrl %>">sign in</a></div>
+   <% } %>
   </div>
   <div id="docbar" class="docbar-public">
    <div id="docbarleft"><!-- --></div>
@@ -78,7 +94,7 @@ limitations under the License. */ %>
       <div id="editbarinner">
 	Query:
 	<% if (tags.length == 0 && antiTags.length == 0) { %>
-	  Please select some tags below to browse for pads
+	  Latest changed pads
 	<% } else { %>
 	  <% for (i = 0; i < tags.length; i++) { %>
 	    <a href="/ep/tag/?query=<%= tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
@@ -89,8 +105,8 @@ limitations under the License. */ %>
 	<% } %>
       </div>
     </div>
-    <div style="height: 268px;" id="editorcontainerbox">
-      <div id="editorcontainer" style="padding:5pt; height: 600pt;">
+    <div id="editorcontainerbox">
+      <div id="editorcontainer">
        <div class="query-refiner">
 	<h1>Search for pads that have the tag</h1>
 	<% for (i = 0; i < newTags.length; i++) { %>
