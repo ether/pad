@@ -196,12 +196,21 @@ function onRequest() {
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
   var matchingPads;
-  if (tags.length > 0 || antiTags.length > 0) {
-    var sql = "select p.PAD_ID as ID, p.TAGS from PAD_TAG_CACHE as p, " + querySql.sql + " as q where p.PAD_ID = q.ID limit 10"
+  var sql = '' +
+    'select ' +
+    '  m.id as ID, ' +
+    '  c.TAGS ' +
+    'from ' +
+       querySql.sql + ' as q ' +
+    '  join PAD_SQLMETA as m on ' +
+    '    m.id = q.ID ' +
+    '  join PAD_TAG_CACHE as c on ' +
+    '    c.PAD_ID = q.ID ' +
+    'order by ' +
+    '  lastWriteTime desc ' +
+    'limit 10';
+
     matchingPads = sqlobj.executeRaw(sql, querySql.params);
-  } else {
-    matchingPads = [];
-  }
 
   for (i = 0; i < matchingPads.length; i++) {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
