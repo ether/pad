@@ -40,6 +40,7 @@ limitations under the License. */ %>
  helpers.includeJs("pad2.js");
  helpers.suppressGA();
  helpers.setRobotsPolicy({index: false, follow: false});
+ helpers.addToHead('\n<link rel="alternate" href="/ep/tag/?query=' + tagsToQuery(tags, antiTags) + '&format=rss" type="application/rss+xml" title="Query results as RSS" />\n');
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)

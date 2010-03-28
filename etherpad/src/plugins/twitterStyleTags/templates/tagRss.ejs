@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<%
+ function inArray(item, arr) {
+   for (var i = 0; i < arr.length; i++)
+     if (arr[i] == item)
+       return true;
+   return false;
+ }
+%>
+<rss version="2.0">
+   <channel>
+      <title>
+	 <% if (tags.length == 0 && antiTags.length == 0) { %>
+	   Latest changed pads
+	 <% } else { %>
+	   <% for (i = 0; i < tags.length; i++) { %>
+	     #<%= tags[i] %>
+	   <% } %>
+	   <% for (i = 0; i < antiTags.length; i++) { %>
+	     !#<%= antiTags[i] %>
+	   <% } %>
+	 <% } %>
+      </title>
+      <link>http://liftoff.msfc.nasa.gov/</link>
+      <description>
+         Etherpad pads / changes for the query:
+	 <% if (tags.length == 0 && antiTags.length == 0) { %>
+	   Latest changed pads
+	 <% } else { %>
+	   <% for (i = 0; i < tags.length; i++) { %>
+	     #<%= tags[i] %>
+	   <% } %>
+	   <% for (i = 0; i < antiTags.length; i++) { %>
+	     !#<%= antiTags[i] %>
+	   <% } %>
+	 <% } %>
+      </description>
+      <language>en-us</language>
+      <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
+      <lastBuildDate>Tue, 10 Jun 2003 09:41:01 GMT</lastBuildDate>
+      <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+      <generator>Etherpad</generator>
+      <managingEditor>editor@example.com</managingEditor>
+      <webMaster>webmaster@example.com</webMaster>
+
+      <% for (i = 0; i < matchingPads.length; i++) { %>
+        <%
+	   var matchingPadId = matchingPads[i].ID;
+	   var matchingPadUrl = matchingPadId;
+	   if (!inArray('writable', matchingPads[i].TAGS)) {
+	     matchingPadId = padIdToReadonly(matchingPads[i].ID);
+	     matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+	   }
+        %>
+	<item>
+	  <title><%= matchingPadId %></title>
+	  <link>http://<%= request.host %>/<%= matchingPadUrl %></link>
+	  <description>
+	    <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
+	     #<%= matchingPads[i].TAGS[j] %>
+	    <% } %>
+	  </description>
+	  <pubDate><%= matchingPads[i].lastWriteTime %></pubDate>
+	  <guid>http://<%= request.host %>/<%= matchingPadUrl %></guid>
+	</item>
+      <% } %>
+
+   </channel>
+</rss>

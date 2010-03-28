@@ -199,6 +199,7 @@ function onRequest() {
   var sql = '' +
     'select ' +
     '  m.id as ID, ' +
+    '  DATE_FORMAT(m.lastWriteTime, \'%a, %d %b %Y %H:%i:%s GMT\') as lastWriteTime, ' +
     '  c.TAGS ' +
     'from ' +
        querySql.sql + ' as q ' +
@@ -207,7 +208,7 @@ function onRequest() {
     '  join PAD_TAG_CACHE as c on ' +
     '    c.PAD_ID = q.ID ' +
     'order by ' +
-    '  lastWriteTime desc ' +
+    '  m.lastWriteTime desc ' +
     'limit 10';
 
     matchingPads = sqlobj.executeRaw(sql, querySql.params);
@@ -232,8 +233,7 @@ function onRequest() {
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
 
-  renderHtml("tagBrowser.ejs",
-   {
+  var info = {
     config: appjet.config,
     tagsToQuery: tagsToQuery,
     padIdToReadonly: server_utils.padIdToReadonly,
@@ -245,6 +245,20 @@ function onRequest() {
     isPro: isPro,
     isProAccountHolder: isProUser,
     account: getSessionProAccount(), // may be falsy
-   }, 'twitterStyleTags');
+  };
+
+  var format = "html";
+  if (request.params.format != undefined)
+    format = request.params.format;
+
+  if (format == "html")
+    renderHtml("tagBrowser.ejs", info, 'twitterStyleTags');
+  else if (format == "rss") {
+    response.setContentType("application/xml; charset=utf-8");
+    response.write(renderTemplateAsString("tagRss.ejs", info, 'twitterStyleTags'));
+    if (request.acceptsGzip) {
+      response.setGzip(true);
+    }
+  }
   return true;
 }
