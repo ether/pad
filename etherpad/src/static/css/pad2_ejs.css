@@ -245,7 +245,7 @@ a#docbarslider { display: block; height: 0; padding-top: 30px; position: absolut
 #myswatch { width: 100%; height: 100%; background: transparent;/*...initially*/ }
 #mycolorpicker {
   background: url(/static/img/jun09/pad/colorpicker.gif) no-repeat left top;
-  width: 232px; height: 76px;
+  width: 232px; height: 140px;
   position: absolute;
   left: 13px; top: 13px; z-index: 101;
   display: none;/*...initially*/
@@ -258,6 +258,34 @@ a#docbarslider { display: block; height: 0; padding-top: 30px; position: absolut
 #mycolorpicker .n6 { left: 148px; }
 #mycolorpicker .n7 { left: 175px; }
 #mycolorpicker .n8 { left: 202px; }
+
+#mycolorpicker .n9  { left: 13px; top: 34px ! important;}
+#mycolorpicker .n10 { left: 40px; top: 34px ! important;}
+#mycolorpicker .n11 { left: 67px; top: 34px ! important;}
+#mycolorpicker .n12 { left: 94px; top: 34px ! important;}
+#mycolorpicker .n13 { left: 121px; top: 34px ! important;}
+#mycolorpicker .n14 { left: 148px; top: 34px ! important;}
+#mycolorpicker .n15 { left: 175px; top: 34px ! important;}
+#mycolorpicker .n16 { left: 202px; top: 34px ! important;}
+
+#mycolorpicker .n17  { left: 13px; top: 56px ! important;}
+#mycolorpicker .n18 { left: 40px; top: 56px ! important;}
+#mycolorpicker .n19 { left: 67px; top: 56px ! important;}
+#mycolorpicker .n20 { left: 94px; top: 56px ! important;}
+#mycolorpicker .n21 { left: 121px; top: 56px ! important;}
+#mycolorpicker .n22 { left: 148px; top: 56px ! important;}
+#mycolorpicker .n23 { left: 175px; top: 56px ! important;}
+#mycolorpicker .n24 { left: 202px; top: 56px ! important;}
+
+#mycolorpicker .n25  { left: 13px; top: 78px ! important;}
+#mycolorpicker .n26 { left: 40px; top: 78px ! important;}
+#mycolorpicker .n27 { left: 67px; top: 78px ! important;}
+#mycolorpicker .n28 { left: 94px; top: 78px ! important;}
+#mycolorpicker .n29 { left: 121px; top: 78px ! important;}
+#mycolorpicker .n30 { left: 148px; top: 78px ! important;}
+#mycolorpicker .n31 { left: 175px; top: 78px ! important;}
+#mycolorpicker .n32 { left: 202px; top: 78px ! important;}
+
 #mycolorpicker .pickerswatchouter {
   border: 1px solid white;
   width: 15px; height: 15px; position: absolute;
@@ -272,10 +300,10 @@ a#docbarslider { display: block; height: 0; padding-top: 30px; position: absolut
 }
 #mycolorpicker .picked { border: 1px solid #666 !important; }
 #mycolorpicker .picked .pickerswatch { border: 1px solid #666; }
-#mycolorpickersave { position: absolute; left: 14px; top: 42px;
+#mycolorpickersave { position: absolute; left: 14px; top: 102px;
   width: 47px; height: 0; padding-top: 20px; overflow: hidden;
   cursor: pointer; }
-#mycolorpickercancel { position: absolute; left: 87px; top: 42px;
+#mycolorpickercancel { position: absolute; left: 87px; top: 102px;
   width: 44px; height: 0; padding-top: 20px; overflow: hidden;
   cursor: pointer; }
 #myusernameform { margin-left: 35px; }
