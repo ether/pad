@@ -195,7 +195,6 @@ function enablePlugin(pluginName) {
     saveInstalledHooks(pluginName);
     throw e;
   }
-  log.info({PLUGINS:plugins, HOOKS:hooks});
 }
 
 function disablePlugin(pluginName) {
@@ -207,7 +206,6 @@ function disablePlugin(pluginName) {
   }
   unloadPluginHooks(pluginName);
   saveInstalledHooks(pluginName);
-  log.info({PLUGINS:plugins, HOOKS:hooks});
 }
 
 function registerClientHandlerJS() {
