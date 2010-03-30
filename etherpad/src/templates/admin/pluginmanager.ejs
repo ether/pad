@@ -93,18 +93,18 @@ limitations under the License. */ %>
          <th>Status</th>
          <th></th>
         </tr>
-        <% for (var plugin in pluginModules) { %>
+        <% for (var plugin in plugins.pluginModules) { %>
          <tr>
-          <td><%= pluginModules[plugin].description %></td>
+          <td><%= plugins.pluginModules[plugin].description %></td>
           <td>
-           <% if (plugins[plugin] !== undefined) { %>
+           <% if (plugins.plugins[plugin] !== undefined) { %>
             Installed
            <% } else { %>
             Not installed
            <% } %>
           </td>
           <td>
-           <% if (plugins[plugin] !== undefined) { %>
+           <% if (plugins.plugins[plugin] !== undefined) { %>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
            <% } else { %>

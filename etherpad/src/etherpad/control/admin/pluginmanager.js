@@ -54,8 +54,6 @@ function onRequest() {
 
   renderHtml("admin/pluginmanager.ejs",
    {
-    pluginModules: plugins.pluginModules,
-    plugins: plugins.plugins,
     config: appjet.config,
     bodyClass: 'nonpropad',
     isPro: pro_utils.isProDomainRequest(),
