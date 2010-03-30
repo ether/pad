@@ -69,7 +69,8 @@ var migrations = [
   "m0035_add_email_to_paymentinfo",
   "m0036_create_missing_subscription_records",
   "m0037_create_pro_referral_table",
-  "m0038_pad_coarse_revs"
+  "m0038_pad_coarse_revs",
+  "m0040_create_plugin_tables"
 ];
 
 var mscope = this;
