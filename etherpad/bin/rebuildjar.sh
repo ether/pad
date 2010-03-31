@@ -14,6 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+bin/java-version.sh
+
 if [ -z "$JAR" ]; then
     if [ ! -z `which fastjar` ]; then
         JAR=fastjar

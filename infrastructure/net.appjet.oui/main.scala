@@ -220,9 +220,9 @@ object main {
     val handler = new Context(server, "/", Context.NO_SESSIONS | Context.NO_SECURITY);
     handler.addServlet(new ServletHolder(new OuiServlet), "/");
 
-//    val filterHolder = new FilterHolder(new MultipartFilter());
-//    filterHolder.setInitParameter("uploadDir", System.getProperty("java.io.tmpdir"));
-//    handler.addFilter(filterHolder, "/*", 1);
+    val filterHolder = new FilterHolder(new MultipartFilter());
+    filterHolder.setInitParameter("uploadDir", System.getProperty("java.io.tmpdir"));
+    handler.addFilter(filterHolder, "/*", 1);
 
     global.context = handler;
     
