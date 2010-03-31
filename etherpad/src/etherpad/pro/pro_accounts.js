@@ -512,7 +512,7 @@ function getFullNameById(id) {
 
 function getTempSigninUrl(account, tempPass) {
   return [
-    'http://', httpsHost(pro_utils.getFullProHost()), '/ep/account/sign-in?',
+    'https://', httpsHost(pro_utils.getFullProHost()), '/ep/account/sign-in?',
     'uid=', account.id, '&tp=', tempPass
   ].join('');
 }
