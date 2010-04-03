@@ -45,6 +45,14 @@ function stringFormat(text, obj) {
   return text;
 }
 
+/* All these sql query functions both takes a querySql object as
+ * parameter and returns one. This object has two members - sql and
+ * params. Sql is a string of an sql table name or a subqyery in
+ * parens. The table pr subquery should have an ID column containing a
+ * PAD_ID.
+ */
+
+/* Filters pads by tags and anti-tags */
 function getQueryToSql(tags, antiTags, querySql) {
   var queryTable;
   var queryParams;
@@ -100,6 +108,7 @@ function getQueryToSql(tags, antiTags, querySql) {
   info["excepts"] = exceptArray.join(' ');
   info["wheres"] = whereArray.length > 0 ? ' where ' + whereArray.join(' and ') : '';
  
+  /* Create a subselect from all the joins */ 
   return {
    sql: stringFormat(
     '(select distinct ' +
@@ -114,6 +123,8 @@ function getQueryToSql(tags, antiTags, querySql) {
    params: queryParams.concat(joinParamArray).concat(exceptParamArray)};
 }
 
+/* Returns the sql to count the number of results from some other
+ * query. */
 function nrSql(querySql) {
   var queryTable;
   var queryParams;
@@ -133,6 +144,9 @@ function nrSql(querySql) {
    params: queryParams};
 }
 
+/* Returns the sql to select the 10 best new tags to tack on to a
+ * query, that is, the tags that are closest to halving the result-set
+ * if tacked on. */
 function newTagsSql(querySql) {
   var queryTable;
   var queryParams;
@@ -189,13 +203,14 @@ function onRequest() {
       tags.push(query[i]);
   }
 
+  /* Create the pad filter sql */
   var querySql = getQueryToSql(tags.concat(['public']), antiTags);
-  //log.info(querySql.sql);
 
+  /* Use the pad filter sql to figure out which tags to show in the tag browser this time. */
   var queryNewTagsSql = newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  var matchingPads;
+  /* Select the 10 last changed matching pads and some extra information on them. */ 
   var sql = '' +
     'select ' +
     '  m.id as ID, ' +
@@ -210,8 +225,7 @@ function onRequest() {
     'order by ' +
     '  m.lastWriteTime desc ' +
     'limit 10';
-
-    matchingPads = sqlobj.executeRaw(sql, querySql.params);
+  var matchingPads = sqlobj.executeRaw(sql, querySql.params);
 
   for (i = 0; i < matchingPads.length; i++) {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
