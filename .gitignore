@@ -11,3 +11,4 @@ etherpad/src/static/js/cssmanager_client.js
 etherpad/src/static/js/domline_client.js
 etherpad/src/static/js/easysync2_client.js
 etherpad/src/static/js/linestylefilter_client.js
+etherpad/*.log
