@@ -17,7 +17,12 @@ Template: etherpad-%BRANCH%/port
 Type: string
 Default: 9000
 Description: etherpad tcp port
- Please insert the port on which etherpad should listen, default is 9000.
+ Please insert the port on which etherpad should listen, default is 9000. You
+ cannot use privileged ports (<= 1024).
+ .
+ If you want to make etherpad available on port 80/443 use etherpad-proxy which
+ will install a webserver (like nginx or apache) to proxy dynamic etherpad
+ contents and serve static contents directly.
 
 Template: etherpad-%BRANCH%/setup_database
 Type: boolean
