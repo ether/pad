@@ -1,5 +1,6 @@
 /**
  * Copyright 2009 Google Inc.
+ * Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +55,9 @@ function getRequestSuperdomain() {
 }
 
 function isProDomainRequest() {
-  // the result of this function never changes within the same request.
+  if(!isProAccountEnabled())
+    return false; 
+  // the result of this function never changes within the same request.  
   var c = appjet.requestCache;
   if (c.isProDomainRequest === undefined) {
     c.isProDomainRequest = _computeIsProDomainRequest();
