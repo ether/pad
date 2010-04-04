@@ -232,7 +232,8 @@ function callHook(hookName, args) {
     var plugin = hooks[hookName][i];
     var pluginRes = pluginModules[plugin.plugin][plugin.original || hookName](args);
     if (pluginRes != undefined && pluginRes != null)
-      res = res.concat(pluginRes);
+      for (var i = 0; i < pluginRes.length; i++)
+        res.push(pluginRes[i]); /* Don't use Array.concat as it flatterns arrays within the array */
   }
   return res;
 }
