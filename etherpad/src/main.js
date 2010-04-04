@@ -364,20 +364,22 @@ function handlePath() {
 
   // these paths are handled identically on all sites/subdomains.
   var commonDispatcher = new Dispatcher();
-  commonDispatcher.addLocations(
-    plugins.callHook('handlePath').concat([
-      ['/favicon.ico', forward(static_control)],
-      ['/robots.txt', forward(static_control)],
-      ['/crossdomain.xml', forward(static_control)],
-      [PrefixMatcher('/static/'), forward(static_control)],
-      [PrefixMatcher('/ep/genimg/'), genimg.renderPath],
-      [PrefixMatcher('/ep/pad/'), forward(pad_control)],
-      [PrefixMatcher('/ep/script/'), forward(scriptcontrol)],
-      [/^\/([^\/]+)$/, pad_control.render_pad],
-      [DirMatcher('/ep/unit-tests/'), forward(testcontrol)],
-      [DirMatcher('/ep/pne-manual/'), forward(pne_manual_control)],
-      [DirMatcher('/ep/pro-help/'), forward(pro_help_control)]
-    ]));
+
+  commonDispatcher.addLocations(plugins.callHook('handlePath'));
+
+  commonDispatcher.addLocations([
+    ['/favicon.ico', forward(static_control)],
+    ['/robots.txt', forward(static_control)],
+    ['/crossdomain.xml', forward(static_control)],
+    [PrefixMatcher('/static/'), forward(static_control)],
+    [PrefixMatcher('/ep/genimg/'), genimg.renderPath],
+    [PrefixMatcher('/ep/pad/'), forward(pad_control)],
+    [PrefixMatcher('/ep/script/'), forward(scriptcontrol)],
+    [/^\/([^\/]+)$/, pad_control.render_pad],
+    [DirMatcher('/ep/unit-tests/'), forward(testcontrol)],
+    [DirMatcher('/ep/pne-manual/'), forward(pne_manual_control)],
+    [DirMatcher('/ep/pro-help/'), forward(pro_help_control)]
+  ]);
 
   var etherpadDotComDispatcher = new Dispatcher();
   etherpadDotComDispatcher.addLocations([
