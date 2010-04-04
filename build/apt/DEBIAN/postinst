@@ -1,0 +1,291 @@
+#!/bin/bash
+
+################################################################################
+#
+# Copyright (c) 2010 penSec.IT UG (haftungsbeschränkt)
+#        http://www.pensec.it
+#        mail@pensec.it
+# 
+# Diese Software wird ohne ausdrückliche oder implizierte Garantie
+# bereitgestellt. Auf keinen Fall können die Autoren für irgendwelche Schäden,
+# die durch die Benutzung dieser Software entstehen, haftbar gemacht werden.
+# 
+# Es ist dem Auftraggeber gestattet diese Software für jeden Zweck, inklusive
+# kommerzieller Anwendungen, zu benutzten und zu verändern aber nicht
+# weiterzuverbreiten, solange folgende Bedingungen erfüllt sind:
+# 
+#     1. Die Herkunft dieser Software darf nicht falsch dargestellt werden; Sie
+#        dürfen nicht angeben, dass Sie die ursprüngliche Software geschrieben
+#        haben. Wenn Sie diese Software in einem Produkt benutzten, würde eine
+#        Erwähnung geschätzt werden, sie ist aber nicht erforderlich.
+#     2. Veränderte Quelltextversionen müssen deutlich als solche
+#        gekennzeichnet werden und dürfen nicht als die Originalsoftware
+#        dargestellt werden.
+#     3. Diese Notiz darf in den Quelltexten nicht verändert oder gelöscht
+#        werden.
+#
+################################################################################
+
+
+
+set -e
+. /usr/share/debconf/confmodule
+
+if [ -n "$ETHERPAD_DEBUG" ]; then
+  echo "now debugging $0 $@"
+  set -x
+fi
+
+db_version 2.0
+
+
+
+
+
+#####
+#
+# Fragt einen Konfigurationswert ab und schreibt ihn in die Eigenschaftsdatei
+#
+# @param $1 Name des debconfig Templates
+# @param $2 Name der Datei in welche der Konfigurationswert geschrieben werden
+#     soll
+# @param $3 Wird aktuell nicht verwendet, Platzhalter in etherpad.properties
+#     welcher mit dem Wert dieser Varialbe ersetzt werden soll
+#
+function configuration_property() {
+	TEMPLATE="${1}"
+	PROPERTY_FILE="/etc/etherpad/properties/${2}"
+	PLACEHOLDER="${3}"
+
+	PROPERTY=`cat "${PROPERTY_FILE}"`
+	db_input high "etherpad-%BRANCH%/${TEMPLATE}" || true
+	db_go
+
+	db_get "etherpad-%BRANCH%/${TEMPLATE}"
+	if [ "" != "$RET" ]; then
+		PROPERTY="$RET"
+	fi
+
+	echo "${PROPERTY}" > "${PROPERTY_FILE}"
+}
+#
+#####
+
+
+
+case "$1" in
+
+	configure)
+
+		# Create system user
+		if ! getent passwd etherpad > /dev/null ; then
+			echo 'Adding system-user for etherpad' 1>&2
+			adduser --system --group --quiet \
+				--home /usr/share/etherpad --no-create-home \
+				--disabled-login --force-badname etherpad
+		fi
+
+
+		# Give user the rights to write into the log & data directory
+		if [ -d "/var/log/etherpad" ]; then
+			EMPTY_STATEMENT="true"
+		else
+			mkdir -p "/var/log/etherpad"
+		fi
+		chown -R etherpad:etherpad "/var/log/etherpad"
+
+		if [ -d "/usr/share/etherpad/etherpad/data" ]; then
+			EMPTY_STATEMENT="true"
+		else
+			mkdir -p "/usr/share/etherpad/etherpad/data"
+		fi
+		chown -R etherpad:etherpad "/usr/share/etherpad/etherpad/data"
+
+
+		# Give user the rights do write everywhere, did not yet figure
+		# out which rights are necessary, exactly
+		chown -R etherpad:etherpad "/usr/share/etherpad"
+	;;
+
+esac
+
+
+
+#####
+#
+# Get configuration properties
+#
+configuration_property "is_production"		"is-production"		"IS_PRODUCTION"
+configuration_property "admin_password"		"admin-password"	"ADMIN_PASSWORD"
+configuration_property "port"			"port"			"PORT"
+configuration_property "database_host"		"database-host"		"DATABASE_HOST"
+configuration_property "database_port"		"database-port"		"DATABASE_PORT"
+configuration_property "database_name"		"database-name"		"DATABASE_NAME"
+configuration_property "database_username"	"database-username"	"DATABASE_USERNAME"
+configuration_property "database_password"	"database-password"	"DATABASE_PASSWORD"
+#
+#####
+
+
+
+
+
+#		#####
+#		#
+#		# Install in production mode
+#		#
+#		IS_PRODUCTION="false"
+#		db_input high "etherpad-%BRANCH%/is_production" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/is_production"
+#		if [ "" != "$RET" ]; then
+#			IS_PRODUCTION="$RET"
+#		fi
+#
+#		apply_config "IS_PRODUCTION" "${IS_PRODUCTION}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# Admin password
+#		#
+#		ADMIN_PASSWORD="password"
+#		db_input high "etherpad-%BRANCH%/admin_password" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/admin_password"
+#		if [ "" != "$RET" ]; then
+#			ADMIN_PASSWORD="$RET"
+#		fi
+#
+#		apply_config "ADMIN_PASSWORD" "${ADMIN_PASSWORD}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# Application listen port
+#		#
+#		PORT="9000"
+#		db_input high "etherpad-%BRANCH%/port" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/port"
+#		if [ "" != "$RET" ]; then
+#			PORT="$RET"
+#		fi
+#
+#		apply_config "PORT" "${PORT}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# MySQL Host
+#		#
+#		DATABASE_HOST="localhost"
+#		db_input high "etherpad-%BRANCH%/database_host" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/database_host"
+#		if [ "" != "$RET" ]; then
+#			DATABASE_HOST="$RET"
+#		fi
+#
+#		apply_config "DATABASE_HOST" "${DATABASE_HOST}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# MySQL Port
+#		#
+#		DATABASE_PORT="3306"
+#		db_input high "etherpad-%BRANCH%/database_port" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/database_port"
+#		if [ "" != "$RET" ]; then
+#			DATABASE_PORT="$RET"
+#		fi
+#
+#		apply_config "DATABASE_PORT" "${DATABASE_PORT}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# MySQL database name
+#		#
+#		DATABASE_NAME="etherpad"
+#		db_input high "etherpad-%BRANCH%/database_name" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/database_name"
+#		if [ "" != "$RET" ]; then
+#			DATABASE_NAME="$RET"
+#		fi
+#
+#		apply_config "DATABASE_NAME" "${DATABASE_NAME}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# MySQL database username
+#		#
+#		DATABASE_USERNAME="etherpad"
+#		db_input high "etherpad-%BRANCH%/database_username" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/database_username"
+#		if [ "" != "$RET" ]; then
+#			DATABASE_USERNAME="$RET"
+#		fi
+#
+#		apply_config "DATABASE_USERNAME" "${DATABASE_USERNAME}"
+#		#
+#		#####
+
+#		#####
+#		#
+#		# MySQL database password
+#		#
+#		DATABASE_PASSWORD="password"
+#		db_input high "etherpad-%BRANCH%/database_password" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/database_password"
+#		if [ "" != "$RET" ]; then
+#			DATABASE_PASSWORD="$RET"
+#		fi
+#
+#		apply_config "DATABASE_PASSWORD" "${DATABASE_PASSWORD}"
+#		#
+#		#####
+
+
+#####
+#
+# MySQL-Autosetup should be discussed. Simply calling setup-myql-db.sh is
+# insufficient
+#
+#		# Auto-setup database
+#		db_input medium "etherpad-%BRANCH%/setup_database" || true
+#		db_go
+#
+#		db_get "etherpad-%BRANCH%/setup_database"
+#		if [ "$RET" = "true" ]; then
+#			# TODO
+#		fi
+#
+#####
+
+
+
+
+
+
+
