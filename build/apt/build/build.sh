@@ -23,13 +23,15 @@
 
 
 #####
-# Baut etherpad aus den Quellen und erstellt ein Debian/Ubuntu Paket
+# Build a Debian/Ubuntu Etherpad package of the source
 #
-# @param $1 (optional) Wenn rebuild, dann wird das Repository neu ausgecheckt
-#     anstatt nur geupdated zu werden
-# @param $REPOSITORY_URL URL von welcher das Repository geladen werden soll
-# @param $REPOSITORY_NAME Name des Paketes welches gebaut werden soll
-# @param $REPOSITORY_TYPE Element der Menge {hg, git}
+# @param $1 (optional) If "${1}" == "rebuild" then the cached repository will be
+#     purged and cloned instead of simply updated
+# @param $REPOSITORY_URL the source of the package
+# @param $REPOSITORY_NAME name of the new package, package will be named
+#     etherpad-${REPOSITORY_NAME}
+# @param $REPOSITORY_TYPE Element of set {hg, git}, describes which command line
+#     toolchain (mercurial or git) will be used
 #
 if [ "" == "${REPOSITORY_URL}" ]; then
 	echo "Missing environment variable REPOSITORY_URL"
@@ -47,7 +49,7 @@ fi
 
 
 #####
-# Folgende Parameter sind an das System auf welchem gebaupt wird anzupassen:
+# You have to change following lines to your requirements:
 #
 export JAVA_HOME=/usr/lib/jvm/java-6-sun/
 export SCALA_HOME=/usr/share/java
@@ -60,7 +62,7 @@ export PATH="$JAVA_HOME/bin:$SCALA_HOME/bin:$PATH"
 
 
 #####
-# Interne Konfiguration, muss nicht angepasst werden
+# Don't change this!
 #
 REPOSITORY="${REPOSITORY_URL}"
 BRANCH="${REPOSITORY_NAME}"
@@ -79,30 +81,31 @@ fi
 
 
 
-# Einfaches Update ist nur ausreichend, wenn Repository bereits ausgecheckt
+# If the repository isn't checked out by now we can't do a simple {git|hg} pull,
+# we need to do a complete {git|hg} clone instead
 if [ "yes" != "${REBUILD}" ]; then
 	if [ -d "${TMP_DIR}" ]; then
 		bash -c "cd ${TMP_DIR}; ${REPOSITORY_TYPE} pull"
-#		bash -c "cd ${TMP_DIR}; ${REPOSITORY_TYPE} checkout HEAD^1"
 	else
 		echo "Repository does not exist, will fetch"
 		REBUILD="yes"
 	fi
 fi
 
-# Repository komplett neu auschecken statt nur upzudaten
+# Refresh the complett repository (purge & clone instead of pull)
 if [ "yes" == "${REBUILD}" ]; then
 	if [ -d "${TMP_DIR}" ]; then
 		rm -rf "${TMP_DIR}"
 	fi
 
-	# Source aus ,,Offizieller'' Quelle holen
+	# Fetch the source from remote endpoint
 	$REPOSITORY_TYPE clone "${REPOSITORY}" "${TMP_DIR}"
 fi
 
 
 
-# Checkout halbwegs ueberpruefen
+# If there where errors during {git,hg} clone, then ${TMP_DIR} does not exist
+# and we can't continue
 if [ -d "${TMP_DIR}" ]; then
 	echo "Checkout seesm successful, continuing..."
 else
@@ -110,8 +113,8 @@ else
 	exit 1
 fi
 
-# Haesslicher Fix um mit dem Google Repository arbeiten zu koennen (trunk
-# und branches in mercurial, wtf?)
+# Ugly fix to work with the google repository which includes a trunk and
+# branches directory instead of using mercurial branches
 if [ -d "${TMP_DIR}/trunk" ]; then
 	touch "${TMP_DIR}/LICENSE"
 	touch "${TMP_DIR}/README.md"
@@ -120,7 +123,7 @@ fi
 
 
 
-# Jar neu bauen
+# Rebuild jar
 echo ""
 echo "Trying to apply patch. If it detects the patch doesn't match just skip"
 echo ""
@@ -132,12 +135,12 @@ cp "${TMP_DIR}/infrastructure/build/appjet.jar" "${TMP_DIR}/etherpad/appjet-eth-
 
 
 
-# Testet die gebaute Version
+# Testing the build
 #bash -c "./build/test-build.sh"
 
 
 
-# Buildrevision erhoehen und Kontrolldatei bauen
+# Increments the version & create the control file
 REVISION="0"
 if [ -f "${REVISION_FILE}" ]; then
 	REVISION=`cat "${REVISION_FILE}"`
@@ -145,34 +148,34 @@ if [ -f "${REVISION_FILE}" ]; then
 fi
 echo $REVISION > "${REVISION_FILE}"
 
-# Debian-Control-File patchen
+# Patch the debain control file
 cp "DEBIAN/control" "${TMP_DIR}/control.0"
 sed "s/%BRANCH%/${BRANCH}/" "${TMP_DIR}/control.0" > "${TMP_DIR}/control.1"
 sed "s/%REVISION%/${REVISION}/" "${TMP_DIR}/control.1" > "${TMP_DIR}/control.2"
 cp "${TMP_DIR}/control.2" "${TMP_DIR}/control"
 
-# Installations- und Deinstallationsskript patchen
+# Patch the install & deinstall script
 cp "DEBIAN/prerm" "${TMP_DIR}/prerm"
 cp "DEBIAN/postinst" "${TMP_DIR}/postinst.0"
 sed "s/%BRANCH%/${BRANCH}/" "${TMP_DIR}/postinst.0" > "${TMP_DIR}/postinst.1"
 cp "${TMP_DIR}/postinst.1" "${TMP_DIR}/postinst"
 
-# debconf Templates patchen
+# Patch debconf templates
 cp "DEBIAN/templates" "${TMP_DIR}/templates.0"
 sed "s/%BRANCH%/${BRANCH}/" "${TMP_DIR}/templates.0" > "${TMP_DIR}/templates.1"
 cp "${TMP_DIR}/templates.1" "${TMP_DIR}/templates"
 
-# Init-Skript patchen
+# Patch init script
 cp "etc/init.d/etherpad" "${TMP_DIR}/init.0"
 sed "s/%BRANCH%/${BRANCH}/" "${TMP_DIR}/init.0" > "${TMP_DIR}/init.1"
 cp "${TMP_DIR}/init.1" "${TMP_DIR}/init"
 
-# Konfigurationsverzeichnis kopieren
+# Copy the config folder
 cp -r "etc" "${TMP_DIR}/etc"
 
 
 
-# Paketumgebung bauen
+# Build the package enviroment (needed to build with dpgk-deb build)
 if [ -d "${BUILD_DIR}" ]; then
 	sudo rm -r "${BUILD_DIR}"
 fi
@@ -184,7 +187,7 @@ mkdir -p "${BUILD_DIR}/var/log/etherpad"
 
 
 
-# Benoetigte Dateien zusammenfuehren
+# Gather the required files
 cp "${TMP_DIR}/control" "${BUILD_DIR}/DEBIAN/control"
 cp "${TMP_DIR}/postinst" "${BUILD_DIR}/DEBIAN/postinst"
 cp "${TMP_DIR}/prerm" "${BUILD_DIR}/DEBIAN/prerm"
@@ -201,7 +204,7 @@ cp "${TMP_DIR}/README.md" "${BUILD_DIR}/usr/share/doc/etherpad"
 
 
 
-# Eigentliches Paket bauen
+# Fix priviliges and build the package
 sudo chown -R root:root "${BUILD_DIR}"
 sudo chmod +x "${BUILD_DIR}/DEBIAN/postinst"
 sudo chmod +x "${BUILD_DIR}/DEBIAN/prerm"
@@ -217,7 +220,7 @@ dpkg-deb --build "${BUILD_DIR}" "${PACKAGE_DIR}"
 
 
 
-# Paket in lokales Repository aufnehmen
+# Transfer the package to local repository if environment variable 
 PACKAGE=`bash -c "cd ${PACKAGE_DIR}; find . -name *.deb"`
 
 if [ "yes" == "${DEPLOY_TO_LOCAL_REPOSITORY}" ]; then

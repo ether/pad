@@ -25,12 +25,12 @@
 
 
 #####
-# Muss von rebuild.sh aufgerufen werden
+# Must be called by build.sh
 #####
 
 
 
-# Datenbank leeren damit etherpad testweiste gestartet werden kann
+# Truncate database to test start etherpad
 echo "I'm going to lunch MySQL now, you maybe have to enter your root@localhost password"
 sudo /etc/init.d/mysql start
 
@@ -44,7 +44,7 @@ echo "${DROP_DATABASE}; ${CREATE_DATABASE}; ${DROP_USER}; ${CREATE_USER}" | mysq
 
 
 
-# Etherpad starten und warten bis HTTP-Server laeuft
+# Start etherpad and wait for the HTTP-Server to be available
 echo "I'm going to lunch etherpad in a clean environment, try if it works on http://localhost:9000/"
 echo "Kill with ^C to build debian package (waiting 10 seconds)"
 sleep 10

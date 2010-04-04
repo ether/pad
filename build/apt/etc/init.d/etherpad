@@ -45,14 +45,12 @@
 
 #####
 #
-# Patches the configuration file by replacing ,,%$1%'' with the contents of
-# $2
+# Patches the configuration file by replacing ,,%$2%'' with the contents of file
+# $1 in file $3
 #
 # @param $1 Configuration File which contains the value to set to
 # @param $2 Configuration key to apply (can be done only once)
-# @param $3 Konfigurationsdatei
-#
-# @deprecated Wird nicht mehr verwendet
+# @param $3 Configuration file
 #
 function apply_config() {
 		CONFIG_FILE="${3}"

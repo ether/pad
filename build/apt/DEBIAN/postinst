@@ -38,20 +38,21 @@ db_version 2.0
 
 #####
 #
-# Fragt einen Konfigurationswert ab und schreibt ihn in die Eigenschaftsdatei
+# Propts the user for a configuration value and writes it into a property file
 #
-# @param $1 Name des debconfig Templates
-# @param $2 Name der Datei in welche der Konfigurationswert geschrieben werden
-#     soll
-# @param $3 Wird aktuell nicht verwendet, Platzhalter in etherpad.properties
-#     welcher mit dem Wert dieser Varialbe ersetzt werden soll
+# @param $1 Name of the debconfig template to prompt
+# @param $2 File to write the answer to
+# @param $3 deprecated
 #
 function configuration_property() {
 	TEMPLATE="${1}"
 	PROPERTY_FILE="/etc/etherpad/properties/${2}"
 	PLACEHOLDER="${3}"
 
-	PROPERTY=`cat "${PROPERTY_FILE}"`
+	PROPERTY=""
+	if [ -f "${PROPERTY_FILE}" ]; then
+		PROPERTY=`cat "${PROPERTY_FILE}"`
+	fi
 	db_input high "etherpad-%BRANCH%/${TEMPLATE}" || true
 	db_go
 
