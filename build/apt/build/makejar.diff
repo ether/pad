@@ -1,0 +1,17 @@
+diff -r 81287c8af1ac infrastructure/bin/makejar.sh
+--- a/infrastructure/bin/makejar.sh       Fri Dec 18 18:44:23 2009 +1100
++++ b/infrastructure/bin/makejar.sh       Sat Dec 19 09:50:05 2009 -0500
+@@ -32,11 +32,11 @@
+ 
+ TMPSTORE=/tmp/ajbuild-tmpstore-`date +%s`
+ 
+-JARFILES=`echo $SCALA_HOME/lib/scala-library.jar lib/*.jar lib/manifest`
++JARFILES=`echo $SCALA_HOME/scala-library.jar lib/*.jar lib/manifest`
+ function genjar {
+     echo "unzipping JARs..."
+     pushd $1 >> /dev/null
+-    $JAR xf $SCALA_HOME/lib/scala-library.jar
++    $JAR xf $SCALA_HOME/scala-library.jar
+     rm -rf META-INF
+     for a in ../../lib/*.jar; do
+        $JAR xf $a

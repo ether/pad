@@ -1,5 +1,6 @@
 /**
  * Copyright 2009 Google Inc.
+ * Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +26,11 @@ var COLOR_PALETTE = ['#ffc7c7','#fff1c7','#e3ffc7','#c7ffd5','#c7ffff','#c7d5ff'
 function isProduction() {
   return (appjet.config['etherpad.isProduction'] == "true");
 }
+
+function isProAccountEnabled() {
+  return (appjet.config['etherpad.proAccounts'] == "true");
+}
+  
 
 var SUPERDOMAINS = {
   'localbox.info': true,

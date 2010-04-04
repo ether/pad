@@ -1,4 +1,6 @@
-<% /* Copyright 2009 Google Inc.
+<% /* 
+Copyright 2009 Google Inc.
+Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -77,9 +79,18 @@ limitations under the License. */ %>
 
   <div id="padsidebar">
     <div id="padusers">
-     <a href="/ep/pad/newpad" id="home-newpad">
-      Create new pad
-     </a>
+     <% if (isProAccountEnabled()) { %>
+       <a href="/ep/pad/newpad" style="padding: 25px 0" id="home-newpad">
+        Create new pad
+       </a>       
+       <a href="/ep/pro-signup/" style="padding: 25px 0" id="home-newteam">
+        Create new team
+       </a>
+     <% } else { %>
+       <a href="/ep/pad/newpad" id="home-newpad">
+        Create new pad
+       </a>
+     <% } %>
     </div>
 
     <div id="hdraggie"><!-- --></div>

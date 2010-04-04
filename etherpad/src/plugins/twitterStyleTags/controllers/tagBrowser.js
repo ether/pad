@@ -1,5 +1,6 @@
 /**
  * Copyright 2009 RedHog, Egil Möller <egil.moller@piratpartiet.se>
+ * Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,6 +180,7 @@ function newTagsSql(querySql) {
     'where ' +
     ' tp.TAG_ID = t.ID ' +
     ' and tp.PAD_ID in %(query_post_table)s ' +
+    ' and tp.PAD_ID NOT LIKE \'%$%\'' +
     'group by t.NAME, tn.total ' +
     'having ' +
     ' count(tp.PAD_ID) > 0 and count(tp.PAD_ID) < tn.total ' +
@@ -210,7 +212,7 @@ function onRequest() {
   var queryNewTagsSql = newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  /* Select the 10 last changed matching pads and some extra information on them. */ 
+  /* Select the 10 last changed matching pads and some extra information on them. Except the Pro Pads*/ 
   var sql = '' +
     'select ' +
     '  m.id as ID, ' +
@@ -222,6 +224,8 @@ function onRequest() {
     '    m.id = q.ID ' +
     '  join PAD_TAG_CACHE as c on ' +
     '    c.PAD_ID = q.ID ' +
+    'where ' +
+    '  m.id NOT LIKE \'%$%\'' +
     'order by ' +
     '  m.lastWriteTime desc ' +
     'limit 10';

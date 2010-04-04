@@ -1,0 +1,16 @@
+Package: etherpad-%BRANCH%
+Priority: optional
+Section: web
+Maintainer: penSec.IT UG (haftungsbeschränkt) <etherpad@pensec.it>
+Architecture: all
+Version: 1.0-%REVISION%
+Depends: debconf (>= 0.2.17), sun-java6-jre, scala, mysql-server, mysql-client, libmysql-java, bash
+Description: Etherpad is...
+ EtherPad is the only web-based word processor that allows people to work
+ together in really real-time.
+ .
+ When multiple people edit the same document simultaneously, any changes are
+ instantly reflected on everyone's screen. The result is a new and productive
+ way to collaborate on text documents, useful for meeting notes, drafting
+ sessions, education, team programming, and more.
+
