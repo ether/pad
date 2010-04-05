@@ -259,7 +259,8 @@ function checkRequestIsWellFormed() {
 // checkHost()
 //----------------------------------------------------------------
 function checkHost() {
-  if (appjet.config['etherpad.skipHostnameCheck'] == "true") {
+  var trueRegex = /\s*true\s*/i;
+  if (trueRegex.test(appjet.config['etherpad.skipHostnameCheck'])) {
     return;
   }
 
