@@ -117,9 +117,10 @@ trap notify EXIT
 
 source ../infrastructure/bin/compilecache.sh
 
-if [ "$1" == "dev" ]; then
-	suffix="-dev";
-	shift
+suffix="-dev";
+if [ "$1" == "prod" ]; then
+    suffix="";
+    shift;
 fi
 
 OWD=`pwd`
