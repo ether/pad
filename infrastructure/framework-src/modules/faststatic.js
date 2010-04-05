@@ -104,11 +104,35 @@ function _getMTime(f) {
   }
 }
 
+function manglePluginPath(localFile, fileType) {
+  var prefix = '/static/' + fileType + '/plugins/';
+  if (localFile.substring(0, prefix.length) != prefix)
+    return localFile;
+  var suffix = localFile.substring(prefix.length);
+  var plugin = suffix.split('/', 1)[0];
+  suffix = suffix.substring(plugin.length + 1);
+  return '/plugins/' + plugin + '/static/' + fileType + '/' + suffix;
+}
+
+function manglePluginPaths(localFile) {
+  return manglePluginPath(
+    manglePluginPath(
+      manglePluginPath(
+        manglePluginPath(
+	  manglePluginPath(
+	    localFile,
+	    'js'),
+          'css'),
+        'swf'),
+      'html'),
+    'zip');
+}
+
 function _wrapFile(localFile) {
   return {
     getPath: function() { return localFile; },
     getMTime: function() { return _getMTime(localFile); },
-    getContents: function() { return _readFileAndProcess(localFile, 'string'); }
+    getContents: function() { return _readFileAndProcess(manglePluginPaths(localFile), 'string'); }
   };
 }
 
