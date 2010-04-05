@@ -17,8 +17,15 @@
 bin/java-version.sh
 
 if [ -z "$JAR" ]; then
-    if [ ! -z `which fastjar` ]; then
-        JAR=fastjar
+    if [ ! -z $(which fastjar 2>/dev/null) ]; then
+        # http://lists.gnu.org/archive/html/fastjar-dev/2009-12/msg00000.html
+        version=`fastjar --version | grep fastjar | sed 's/.* //g'`
+        if [[ "$version" = "0.97" || "$version" = "0.98" ]]; then
+            echo "fastjar version $version can't build etherpad.  Falling back to standard jar."
+            JAR=jar
+        else
+            JAR=fastjar
+        fi
     else
         JAR=jar
     fi
