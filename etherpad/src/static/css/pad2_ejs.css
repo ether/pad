@@ -77,6 +77,9 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border: 0px;
   width: 13px;
   height: 13px;
+  position: relative;
+  top: 2px;
+  margin-right: 2px;
 }
 
 .docbarbutton a
