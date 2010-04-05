@@ -51,6 +51,8 @@ import("etherpad.collab.collab_server");
 import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_utils");
 import("etherpad.pro.domains");
+import("etherpad.admin.plugins");
+import("etherpad.control.admin.pluginmanager");
 
 jimport("java.lang.System.out.println");
 
@@ -87,7 +89,8 @@ var _mainLinks = [
   ['reload-blog-db', 'Reload blog DB'],
   ['pro-domain-accounts', 'Pro Domain Accounts'],
   ['beta-valve', 'Beta Valve'],
-  ['reset-subscription', "Reset Subscription"]
+  ['reset-subscription', "Reset Subscription"],
+  ['pluginmanager/', "Plugin manager"]
 ];
 
 function onRequest(name) {
@@ -100,7 +103,11 @@ function onRequest(name) {
   }
 
   var disp = new Dispatcher();
+
+  disp.addLocations(plugins.callHook("handleAdminPath"));
+
   disp.addLocations([
+    [PrefixMatcher('/ep/admin/pluginmanager/'), forward(pluginmanager)],
     [PrefixMatcher('/ep/admin/usagestats/'), forward(statscontrol)]
   ]);
 
@@ -152,9 +159,13 @@ function render_main() {
   div.push(A({href: "/"}, html("&laquo;"), " home"));
   div.push(H1("Admin"));
 
-  _mainLinks.forEach(function(l) {
+  function addMenuItem(l) {
     div.push(DIV(A({href: l[0]}, l[1])));
-  });
+  }
+
+  plugins.callHook("adminMenu").forEach(addMenuItem);
+  _mainLinks.forEach(addMenuItem);
+
   if (sessions.isAnEtherpadAdmin()) {
     div.push(P(A({href: "/ep/admin/setadminmode?v=false"},
                  "Exit Admin Mode")));

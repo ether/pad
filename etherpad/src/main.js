@@ -34,7 +34,6 @@ import("etherpad.importexport.importexport");
 import("etherpad.legacy_urls");
 
 import("etherpad.control.aboutcontrol");
-import("etherpad.control.admin.pluginmanager");
 import("etherpad.control.admincontrol");
 import("etherpad.control.blogcontrol");
 import("etherpad.control.connection_diagnostics_control");
@@ -387,7 +386,6 @@ function handlePath() {
     [DirMatcher('/ep/beta-account/'), forward(pro_beta_control)],
     [DirMatcher('/ep/pro-signup/'), forward(pro_signup_control)],
     [DirMatcher('/ep/about/'), forward(aboutcontrol)],
-    [DirMatcher('/ep/admin/pluginmanager'), forward(pluginmanager)],
     [DirMatcher('/ep/admin/'), forward(admincontrol)],
     [DirMatcher('/ep/blog/posts/'), blogcontrol.render_post],
     [DirMatcher('/ep/blog/'), forward(blogcontrol)],
