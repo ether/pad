@@ -72,7 +72,8 @@ function checkDbVersionUpgrade() {
 
   var dbVersion = parseVersionString(dbVersionString);
   var runningVersion = getVersionNumbers();
-  var force = (appjet.config['etherpad.forceDbUpgrade'] == "true");
+  var trueRegex = /\s*true\s*/i;
+  var force = trueRegex.test(appjet.config['etherpad.forceDbUpgrade']);
 
   if (!force && (runningVersion.major != dbVersion.major)) {
     println("Error: you are attempting to update an EtherPad["+dbVersionString+
