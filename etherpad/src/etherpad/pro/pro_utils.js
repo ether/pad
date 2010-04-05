@@ -72,13 +72,13 @@ function _computeIsProDomainRequest() {
 
   var domain = _stripComet(request.domain);
 
-  if (SUPERDOMAINS[domain]) {
+  if (domainEnabled(domain)) {
     return false;
   }
 
   var requestSuperdomain = getRequestSuperdomain();
 
-  if (SUPERDOMAINS[requestSuperdomain]) {
+  if (domainEnabled(requestSuperdomain)) {
     // now see if this subdomain is actually in our database.
     if (domains.getRequestDomainRecord()) {
       return true;

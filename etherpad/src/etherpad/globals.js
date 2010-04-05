@@ -32,13 +32,14 @@ function isProduction() {
 function isProAccountEnabled() {
   return (appjet.config['etherpad.proAccounts'] == "true");
 }
-  
 
-var SUPERDOMAINS = {
-  'localbox.info': true,
-  'localhost': true,
-  'etherpad.com': true
-};
+function domainEnabled(domain) {
+  var enabled = appjet.config.topdomains.split(',');
+  for (var i = 0; i < enabled.length; i++)
+    if (domain == enabled[i])
+      return true;
+  return false;
+}
 
 var PNE_RELEASE_VERSION = "1.1.3";
 var PNE_RELEASE_DATE = "June 15, 2009";

@@ -268,7 +268,7 @@ function checkHost() {
   }
 
   // we require the domain to either be <superdomain> or a pro domain request.
-  if (SUPERDOMAINS[request.domain]) {
+  if (domainEnabled(request.domain)) {
     return;
   }
   if (pro_utils.isProDomainRequest()) {
