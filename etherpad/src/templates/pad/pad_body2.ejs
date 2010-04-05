@@ -107,55 +107,30 @@ limitations under the License. */ %>
         <td id="docbarpadtitle"><span><%= initialTitle %></span></td>
         <td width="100%">&nbsp;</td>
 <% if (isProAccountHolder) { %> 
-        <td id="docbarsecurity-outer" class="docbarbutton">
+        <td id="docbarsecurity-outer" class="docbarbutton" nowrap>
           <a href="javascript:void(0)" id="docbarsecurity">
-	    <table>
-	      <tr>
-	        <td><img src="/static/img/jun09/pad/icon_security.gif"></td>
-	        <td>Security</td>
-	      </tr>
-	    </table>
+	    <img src="/static/img/jun09/pad/icon_security.gif">Security
 	  </a>
         </td>
 <% } /* isProAccountHolder */ %>
-        <td id="docbaroptions-outer" class="docbarbutton">
+        <td id="docbaroptions-outer" class="docbarbutton" nowrap>
           <a href="javascript:void(0)" id="docbaroptions">
-	    <table>
-	      <tr>
-	        <td><img src="/static/img/jun09/pad/icon_pad_options.gif"></td>
-	        <td>Pad&nbsp;Options</td>
-	      </tr>
-	    </table>
+	    <img src="/static/img/jun09/pad/icon_pad_options.gif">Pad&nbsp;Options
 	  </a>
         </td>
-	<td id="docbarimpexp-outer" class="docbarbutton">
+	<td id="docbarimpexp-outer" class="docbarbutton" nowrap>
           <a href="javascript:void(0)" id="docbarimpexp">
-	    <table>
-	      <tr>
-	        <td><img src="/static/img/jun09/pad/icon_import_export.gif"></td>
-	        <td>Import/Export</td>
-	      </tr>
-	    </table>
+	    <img src="/static/img/jun09/pad/icon_import_export.gif">Import/Export
 	  </a>
         </td>
-	<td id="docbarsavedrevs-outer" class="docbarbutton">
+	<td id="docbarsavedrevs-outer" class="docbarbutton" nowrap>
           <a href="javascript:void(0)" id="docbarsavedrevs">
-	    <table>
-	      <tr>
-	        <td><img src="/static/img/jun09/pad/icon_saved_revisions.gif"></td>
-	        <td>Saved&nbsp;revisions</td>
-	      </tr>
-	    </table>
+	    <img src="/static/img/jun09/pad/icon_saved_revisions.gif">Saved&nbsp;revisions
 	  </a>
         </td>
-        <td id="docbarslider-outer" class="docbarbutton">
+        <td id="docbarslider-outer" class="docbarbutton" nowrap>
           <a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider">
-	    <table>
-	      <tr>
-	        <td><img src="/static/img/jun09/pad/icon_time_slider.gif"></td>
-	        <td>Time&nbsp;Slider</td>
-	      </tr>
-	    </table>
+	    <img src="/static/img/jun09/pad/icon_time_slider.gif">Time&nbsp;Slider
 	  </a>
         </td>
         <td><img src="/static/img/jun09/pad/roundcorner_right_orange.gif"></td>
