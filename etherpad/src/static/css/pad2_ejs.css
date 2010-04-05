@@ -27,18 +27,6 @@ body.squish2width #padpage { width: 700px; }
 .propad #topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
 .propad #topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
 .propad #topbarright { background: url(/static/img/jun09/pad/protop.gif) no-repeat right top; }
-  
-/*
-a#topbarnewpad { display: block; float: left; position: relative; top: 4px; width: 94px;
-  height: 0; padding-top: 26px; overflow: hidden;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -5px -4px; }
-a#topbarnewpad:focus { outline: 0; }
-
-a#topbarfullwidth { display: block; float: right; position: relative; top: 2px; width: 107px;
-  height: 0; padding-top: 27px; overflow: hidden;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -788px -2px; }
-a#topbarfullwidth:focus { outline: 0; }
-*/
 
 a#backtoprosite, #accountnav {
   display: block; position: absolute; height: 15px; line-height: 15px;
@@ -78,41 +66,38 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #docbar { margin-top: 6px; height: 30px; position: relative; zoom: 1;
   background: #fbfbfb url(/static/img/jun09/pad/padtopback2.gif) repeat-x 0 -31px; }
 
+.docbarbutton
+{
+  padding: 2px;
+  border-left: 1px solid #CCC;
+}
+
+.docbarbutton img
+{
+  border: 0px;
+  width: 13px;
+  height: 13px;
+}
+
+.docbarbutton a
+{
+  font-size:10px;
+  text-decoration: none;
+  color: #444;
+  font-weight: bold;
+  float: right;
+}
+
+#docbarslider-outer
+{
+  background-color: #fef2bd;
+  border: 1px solid #CCC;
+  border-right: 0px;
+}
+
 #docbarleft { position: absolute; left: 0; top: 0; height: 100%;
   overflow: hidden;
   background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left -31px; width: 7px; }
-
-<% function docbarButton(name, width, imgleft, posright, hoverimgleft, openimgleft) {
-  return ("#docbar$name$-outer { width: "+width+"px; position: absolute; height: 30px; top: 0; right: "+posright+"px; "+
-  "background: url(/static/img/jun09/pad/padtop5.gif) no-repeat "+(-imgleft)+"px -31px; "+
-  "/* avoid IE flicker using double background */ }"+
-  "a#docbar$name$ { display: block; height: 0; padding-top: 30px; position: absolute; width: 100%; "+
-  "overflow: hidden; background: url(/static/img/jun09/pad/padtop5.gif) no-repeat "+(-imgleft)+"px -31px; "+
-  "z-index: 53; /* > .dbpanel-wrapper */} "+
-  "a#docbar$name$:focus { outline: 0; } "+
-  "a#docbar$name$:hover { background: url(/static/img/jun09/pad/docbarstates3.png) no-repeat "+(-hoverimgleft)+"px 0; } "+
-  ".docbar$name$-opening a#docbar$name$, .docbar$name$-opening a#docbar$name$:hover, .docbar$name$-closing a#docbar$name$, .docbar$name$-closing a#docbar$name$:hover, .docbar$name$-open a#docbar$name$, .docbar$name$-open a#docbar$name$:hover { "+
-  "background: url(/static/img/jun09/pad/docbarstates3.png) no-repeat "+(-openimgleft)+"px 0; } "+
-  "a#docbar$name$:hover, .docbar$name$-closing a#docbar$name$ { padding-top: 29px; } "+
-  ".docbar$name$-opening a#docbar$name$, .docbar$name$-opening a#docbar$name$:hover { "+
-  "/* opening or closing: link covers gray line below it */ "+
-  "padding-top: 30px; }"+
-  ".docbar$name$-open a#docbar$name$, .docbar$name$-open a#docbar$name$:hover { "+
-  "/* link covers gray line below it, and also top highlight of panel */ "+
-  "padding-top: 30px; }").replace(/\$name\$/g, name);
-} %>
-
-<% // include left border, not right %>
-<%= docbarButton("savedrevs", 128, 669, 103, 123, 123) %>
-<%= docbarButton("impexp", 122, 547, 231, 0, 0) %>
-<%= docbarButton("options", 109, 438, 353, 379, 379) %>
-<%= docbarButton("security", 85, 353, 462, 489, 489) %>
-
-#docbarslider-outer { width: 104px; position: absolute; height: 30px; top: 0; right: 0;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -796px -31px;
-  /* avoid IE flicker using double background */ }
-a#docbarslider { display: block; height: 0; padding-top: 30px; position: absolute; width: 100%;
-  overflow: hidden; background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -796px -31px; z-index: 53; /* > .dbpanel-wrapper */}
 
 <% /* changing the size of the title / rename area means adjusting
    the #docbarpadtitle.width, #padtitlebuttons.left,
@@ -130,21 +115,21 @@ a#docbarslider { display: block; height: 0; padding-top: 30px; position: absolut
   font-size: 1.1em; display: none; }
 #docbarrenamelink a { color: #999; }
 #docbarrenamelink a:hover { color: #48d; }
-#padtitlebuttons { position: absolute; width: 120px; zoom: 1;
-  height: 22px; top: 4px; left: 223px; display: none;
-  background: url(/static/img/jun09/pad/padtop5.gif) -19px -35px; }
+#padtitlebuttons { position: absolute; width: 74px; zoom: 1;
+  height: 17px; top: 6px; left: 170px; display: none;
+  background: url(/static/img/jun09/pad/ok_or_cancel.gif) 0px 0px; }
 #padtitlesave { position: absolute; display: block;
-  height: 0; padding-top: 22px; overflow: hidden;
-  width: 49px; left: 0; top: 0; }
+  height: 0; padding-top: 17px; overflow: hidden;
+  width: 23px; left: 0; top: 0; }
 #padtitlecancel { position: absolute; display: block;
-  height: 0; padding-top: 22px; overflow: hidden;
-  width: 49px; right: 0; top: 0; }
+  height: 0; padding-top: 17px; overflow: hidden;
+  width: 35px; right: 0; top: 0; }
 #padtitleedit { position: absolute; top: 4px; left: 5px;
   height: 17px; padding: 2px; font-size: 1.4em;
   background: white; border-left: 1px solid #c3c3c3;
   border-top: 1px solid #c3c3c3;
   border-right: 1px solid #e6e6e6; border-bottom: 1px solid #e6e6e6;
-  width: 207px; display: none;
+  width: 150px; display: none;
 }
   
 #padmain { margin-top: 6px; position: relative; zoom: 1; }

@@ -93,12 +93,6 @@ limitations under the License. */ %>
 <% } %>
     <div id="specialkeyarea"><!-- --></div>
   </div>
-<!--
-  <div id="shuttingdown">
-    <strong style="color:red">Note: EtherPad.com is shutting down March 31, 2010.</strong>
-    <a href="http://<%= fullSuperdomain %>/ep/blog/posts/google-acquires-appjet">(more info)</a>
-  </div>
-  -->
   <div id="alertbar">
     <div id="servermsg">
       <h3>Server Notice<span id="servermsgdate"><!-- --></span>:</h3>
@@ -108,15 +102,64 @@ limitations under the License. */ %>
   </div>
 
   <div id="docbar">
-    <div id="docbarleft"><!-- --></div>
-    <div id="docbarpadtitle"><span><%= initialTitle %></span></div>
-<% if (isProAccountHolder) { %>          
-    <div id="docbarsecurity-outer"><a href="javascript:void(0)" id="docbarsecurity">Security</a></div>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
+    	<td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
+        <td id="docbarpadtitle"><span><%= initialTitle %></span></td>
+        <td width="100%">&nbsp;</td>
+<% if (isProAccountHolder) { %> 
+        <td id="docbarsecurity-outer" class="docbarbutton">
+          <a href="javascript:void(0)" id="docbarsecurity">
+	    <table>
+	      <tr>
+	        <td><img src="/static/img/jun09/pad/icon_security.gif"></td>
+	        <td>Security</td>
+	      </tr>
+	    </table>
+	  </a>
+        </td>
 <% } /* isProAccountHolder */ %>
-    <div id="docbaroptions-outer"><a href="javascript:void(0)" id="docbaroptions">Pad Options</a></div>
-    <div id="docbarsavedrevs-outer"><a href="javascript:void(0)" id="docbarsavedrevs">Saved revisions</a></div>
-    <div id="docbarimpexp-outer"><a href="javascript:void(0)" id="docbarimpexp">Import/Export</a></div>
-    <div id="docbarslider-outer"><a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider">Time Slider</a></div>
+        <td id="docbaroptions-outer" class="docbarbutton">
+          <a href="javascript:void(0)" id="docbaroptions">
+	    <table>
+	      <tr>
+	        <td><img src="/static/img/jun09/pad/icon_pad_options.gif"></td>
+	        <td>Pad&nbsp;Options</td>
+	      </tr>
+	    </table>
+	  </a>
+        </td>
+	<td id="docbarimpexp-outer" class="docbarbutton">
+          <a href="javascript:void(0)" id="docbarimpexp">
+	    <table>
+	      <tr>
+	        <td><img src="/static/img/jun09/pad/icon_import_export.gif"></td>
+	        <td>Import/Export</td>
+	      </tr>
+	    </table>
+	  </a>
+        </td>
+	<td id="docbarsavedrevs-outer" class="docbarbutton">
+          <a href="javascript:void(0)" id="docbarsavedrevs">
+	    <table>
+	      <tr>
+	        <td><img src="/static/img/jun09/pad/icon_saved_revisions.gif"></td>
+	        <td>Saved&nbsp;revisions</td>
+	      </tr>
+	    </table>
+	  </a>
+        </td>
+        <td id="docbarslider-outer" class="docbarbutton">
+          <a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider">
+	    <table>
+	      <tr>
+	        <td><img src="/static/img/jun09/pad/icon_time_slider.gif"></td>
+	        <td>Time&nbsp;Slider</td>
+	      </tr>
+	    </table>
+	  </a>
+        </td>
+        <td><img src="/static/img/jun09/pad/roundcorner_right_orange.gif"></td>
+    </table>
 <% if (isProAccountHolder) { %>          
     <div id="docbarrenamelink">
       <a href="javascript:void(0)">(rename)</a>
