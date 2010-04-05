@@ -64,16 +64,13 @@ limitations under the License. */ %>
     <div id="accountnav"><a href="<%= signinUrl %>">sign in</a></div>
    <% } %>
   </div>
-  <div id="docbar" class="docbar-public">
-   <div id="docbarleft"><!-- --></div>
-   <div title="Browse pads by tag" id="docbarpadtitle"><span>Browse tags</span></div>
-
-   <div id="docbaroptions-outer"><a href="javascript:void(0)" id="docbaroptions">Pad Options</a></div>
-   <div id="docbarsavedrevs-outer"><a href="javascript:void(0)" id="docbarsavedrevs">Saved revisions</a></div>
-   <div id="docbarimpexp-outer"><a href="javascript:void(0)" id="docbarimpexp">Import/Export</a></div>
-   <div id="docbarslider-outer"><a target="_blank" href="/ep/pad/view/xx/latest" id="docbarslider">Time Slider</a></div>
-
-  </div>
+  <div id="docbar">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
+    	<td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
+        <td id="docbarpadtitle"><span>Browse Tags</span></td>
+        <td width="100%">&nbsp;</td>
+        <td><img src="/static/img/jun09/pad/roundcorner_right.gif"></td>
+    </table>
  </div>
  <div id="padmain">
 
