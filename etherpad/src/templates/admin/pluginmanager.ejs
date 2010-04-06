@@ -108,7 +108,12 @@ limitations under the License. */ %>
         </tr>
         <% for (var plugin in plugins.pluginModules) { %>
          <tr>
-          <td><%= plugins.pluginModules[plugin].description %></td>
+          <td class="mousover_parent">
+           <%= plugin %>
+           <div class="mouseover_child">
+            <%= plugins.pluginModules[plugin].description %>
+           </div>
+          </td>
           <td>
            <% if (plugins.plugins[plugin] !== undefined) { %>
             Installed
@@ -120,6 +125,9 @@ limitations under the License. */ %>
            <% if (plugins.plugins[plugin] !== undefined) { %>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
+            <% if (plugins.plugins[plugin].configLink !== undefined) { %>
+             <a href="<%= plugins.plugins[plugin].configLink %>">Configure</a>
+            <% } %>
            <% } else { %>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=install">Install</a>
            <% } %>
