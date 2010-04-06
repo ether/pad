@@ -91,7 +91,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   float: right;
 }
 
-#docbarslider-outer
+.docbarbutton.highlight
 {
   background-color: #fef2bd;
   border: 1px solid #CCC;
