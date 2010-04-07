@@ -1,4 +1,6 @@
-<% /* Copyright 2009 Google Inc.
+<% /* 
+Copyright 2009 Google Inc.
+Copyright 2010 Pita, Peter Martischka
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -433,19 +435,49 @@ limitations under the License. */ %>
       <div id="editbarright"><!-- --></div>      
       <% /* non-floated */ %>
       <div id="editbarinner">
-        <a href="javascript:void (window.pad&&pad.editbarClick('bold'));" class="editbarbutton bold" title="Bold (ctrl-B)">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('italic'));" class="editbarbutton italic" title="Italics (ctrl-I)">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('underline'));" class="editbarbutton underline" title="Underline (ctrl-U)">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('strikethrough'));" class="editbarbutton strikethrough" title="Strikethrough">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('clearauthorship'));" class="editbarbutton clearauthorship" title="Clear Authorship Colors">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('undo'));" class="editbarbutton undo" title="Undo (ctrl-Z)">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('redo'));" class="editbarbutton redo" title="Redo (ctrl-Y)">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('insertunorderedlist'));" class="editbarbutton insertunorderedlist" title="Toggle Bullet List">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('indent'));" class="editbarbutton indent" title="Indent List">&nbsp;</a>
-        <a href="javascript:void (window.pad&&pad.editbarClick('outdent'));" class="editbarbutton outdent" title="Unindent List">&nbsp;</a>
-        <div id="syncstatussyncing" title="Syncing..."><!-- --></div>
-        <div id="syncstatusdone" title="Synced."><!-- --></div>
-        <a href="javascript:void (window.pad&&pad.editbarClick('save'));" class="editbarbutton save" title="Save Revision">&nbsp;</a>
+        <table cellpadding="0" cellspacing="0" border = "0" id="editbartable"><tr>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('bold'));" title="Bold (ctrl-B)"><img src="/static/img/jun09/pad/editbar_bold.gif"></a></td>
+          <td nowrap class="editbarbutton"> <a href="javascript:void (window.pad&&pad.editbarClick('italic'));" title="Italics (ctrl-I)"><img src="/static/img/jun09/pad/editbar_italic.gif"></a></td>
+          <td nowrap class="editbarbutton"> <a href="javascript:void (window.pad&&pad.editbarClick('underline'));"  title="Underline (ctrl-U)"><img src="/static/img/jun09/pad/editbar_underline.gif"></a></td>
+          <td nowrap class="editbarbutton"> <a href="javascript:void (window.pad&&pad.editbarClick('strikethrough'));" title="Strikethrough"><img src="/static/img/jun09/pad/editbar_strikethrough.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+          <td>&nbsp;&nbsp;</td>
+
+	  <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('insertunorderedlist'));" title="Toggle Bullet List"><img src="/static/img/jun09/pad/editbar_insertunorderedlist.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+          <td>&nbsp;&nbsp;</td>
+
+	  <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('indent'));" title="Indent List"><img src="/static/img/jun09/pad/editbar_indent.gif"></a></td>
+          <td nowrap class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('outdent'));" title="Unindent List"><img src="/static/img/jun09/pad/editbar_outdent.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+          <td>&nbsp;&nbsp;</td>
+
+	  <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('clearauthorship'));" title="Clear Authorship Colors"><img src="/static/img/jun09/pad/editbar_clearauthorship.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+          <td>&nbsp;&nbsp;</td>
+
+	  <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('undo'));" title="Undo (ctrl-Z)"><img src="/static/img/jun09/pad/editbar_undo.gif"></a></td>
+          <td nowrap  class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('redo'));" title="Redo (ctrl-Y)"><img src="/static/img/jun09/pad/editbar_redo.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+          <td width="100%">&nbsp;</td>
+        </tr></table>
+        <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
+	  <tr>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+          <td nowrap class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
+          <td nowrap><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+          </tr>
+        </table>
       </div>
     </div>
     <div id="editorcontainerbox">
