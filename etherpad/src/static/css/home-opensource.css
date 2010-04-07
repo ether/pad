@@ -24,3 +24,17 @@
   background: #26b;
 }
 
+#home a#home-newteamsite {
+  display: block;
+  padding: 1em;
+  margin: 12px 60px;
+  font-size: 1.6em;
+  border: 1px solid black;
+  background: #940;
+  color: #fff;
+}
+
+#home a#home-newteamsite:hover {
+  background: #b26;
+}
+
