@@ -511,10 +511,16 @@ function getFullNameById(id) {
 }
 
 function getTempSigninUrl(account, tempPass) {
-  return [
-    'https://', httpsHost(pro_utils.getFullProHost()), '/ep/account/sign-in?',
-    'uid=', account.id, '&tp=', tempPass
-  ].join('');
+  if(appjet.config.listenSecurePort != 0 || appjet.config.useHttpsUrls)
+    return [
+      'https://', httpsHost(pro_utils.getFullProHost()), '/ep/account/sign-in?',
+      'uid=', account.id, '&tp=', tempPass
+    ].join('');
+  else
+    return [
+      'http://', httpHost(pro_utils.getFullProHost()), '/ep/account/sign-in?',
+      'uid=', account.id, '&tp=', tempPass
+    ].join('');
 }
 
 
