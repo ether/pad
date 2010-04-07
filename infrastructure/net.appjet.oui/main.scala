@@ -32,7 +32,7 @@ import org.mortbay.jetty.handler.{HandlerCollection, RequestLogHandler, HandlerL
 import org.mortbay.jetty.{Server, NCSARequestLog, Request, Response};
 import org.mortbay.servlet.GzipFilter;
 
-// removed due to license restrictions
+// removed due to license restrictions; REMOVED_COS_OF_COS
 // import com.oreilly.servlet.MultipartFilter;
 
 import net.appjet.common.util.{BetterFile, HttpServletRequestFactory};
@@ -219,6 +219,8 @@ object main {
     // set up Context and Servlet
     val handler = new Context(server, "/", Context.NO_SESSIONS | Context.NO_SECURITY);
     handler.addServlet(new ServletHolder(new OuiServlet), "/");
+
+//    removed due to license restrictions; REMOVED_COS_OF_COS
 
 //    val filterHolder = new FilterHolder(new MultipartFilter());
 //    filterHolder.setInitParameter("uploadDir", System.getProperty("java.io.tmpdir"));
