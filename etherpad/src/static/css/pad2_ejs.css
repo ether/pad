@@ -163,8 +163,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 {
   position:absolute;
   top: 6px;
-  right: 7px;
-  width: 50px;
+  left: 570px;
   height: 24px;
   width:15px;
   border-collapse:collapse
