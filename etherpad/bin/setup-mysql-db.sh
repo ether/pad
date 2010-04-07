@@ -17,9 +17,9 @@
 db="etherpad"
 
 echo "Creating etherpad ${db}..."
-echo "create database ${db};" | ${mysql} -u root
+echo "create database ${db};" | ${mysql} -u root -p
 
 echo "Granting priviliges..."
-echo "grant all privileges on ${db}.* to 'etherpad'@'localhost' identified by 'password';" | ${mysql} -u root
+echo "grant all privileges on ${db}.* to 'etherpad'@'localhost' identified by 'password';" | ${mysql} -u root -p
 
 echo "Success"
