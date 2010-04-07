@@ -70,6 +70,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 {
   padding: 2px;
   border-left: 1px solid #CCC;
+  white-space: nowrap;
 }
 
 .docbarbutton img
@@ -156,7 +157,6 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   width: 250px;
   height: 24px;
   width:520px;
-  border-collapse:collapse
 }
 
 #editbarsavetable
@@ -166,7 +166,11 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   left: 570px;
   height: 24px;
   width:15px;
-  border-collapse:collapse
+}
+
+#editbarsavetable td, #editbartable td
+{
+  white-space: nowrap;
 }
 
 .editbarbutton
@@ -179,7 +183,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 
 .editbarbutton img
 {
-  margin: 1px 2px;
+  margin: 0px 2px;
   border: 0px;
   width: 16px;
   height: 16px;
