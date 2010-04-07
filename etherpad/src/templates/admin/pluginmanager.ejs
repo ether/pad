@@ -19,6 +19,7 @@ limitations under the License. */ %>
  helpers.setBodyId("padbody");
  helpers.addBodyClass("limwidth nonpropad nonprouser");
  helpers.includeCss("pad2_ejs.css");
+ helpers.includeCss("admin/pluginmanager.css");
  helpers.includeJs("undo-xpopup.js");
  helpers.includeCometJs();
  helpers.includeJQuery();
@@ -63,13 +64,19 @@ limitations under the License. */ %>
    <% } %>
   </div>
   <div id="docbar" class="docbar-public">
-   <div id="docbarleft"><!-- --></div>
-   <div title="Manage plugins" id="docbarpadtitle"><span>Manage plugins</span></div>
-
-   <div id="docbaroptions-outer"><a href="javascript:void(0)" id="docbaroptions">Pad Options</a></div>
-   <div id="docbarsavedrevs-outer"><a href="javascript:void(0)" id="docbarsavedrevs">Saved revisions</a></div>
-   <div id="docbarimpexp-outer"><a href="javascript:void(0)" id="docbarimpexp">Import/Export</a></div>
-   <div id="docbarslider-outer"><a target="_blank" href="/ep/pad/view/xx/latest" id="docbarslider">Time Slider</a></div>
+  <div id="docbar">
+   <table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
+     <tr>
+       <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
+       <td id="docbarpadtitle"><span>Plugin manager</span></td>
+       <td width="100%">&nbsp;</td>
+       <%
+	 plugins.callHookStr('docbarItemsAll', {}, '', '<td class="docbarbutton" nowrap>', '</td>');
+	 plugins.callHookStr('docbarItemsPluginManager', {}, '', '<td class="docbarbutton" nowrap>', '</td>');
+       %>
+       <td><img src="/static/img/jun09/pad/roundcorner_right.gif"></td>
+     </tr>
+   </table>
 
   </div>
  </div>
@@ -89,12 +96,10 @@ limitations under the License. */ %>
       <div id="editbarleft"><!-- --></div>
       <div id="editbarright"><!-- --></div>      
       
-      <div id="editbarinner">
-      </div>
+      <div id="editbarinner"></div>
     </div>
     <div id="editorcontainerbox">
       <div id="editorcontainer">
-       <h1>Plugin manager</h1>
        <table>
         <tr>
          <th>Module name</th>
@@ -103,7 +108,12 @@ limitations under the License. */ %>
         </tr>
         <% for (var plugin in plugins.pluginModules) { %>
          <tr>
-          <td><%= plugins.pluginModules[plugin].description %></td>
+          <td class="mousover_parent">
+           <%= plugin %>
+           <div class="mouseover_child">
+            <%= plugins.pluginModules[plugin].description %>
+           </div>
+          </td>
           <td>
            <% if (plugins.plugins[plugin] !== undefined) { %>
             Installed
@@ -115,6 +125,9 @@ limitations under the License. */ %>
            <% if (plugins.plugins[plugin] !== undefined) { %>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
+            <% if (plugins.plugins[plugin].configLink !== undefined) { %>
+             <a href="<%= plugins.plugins[plugin].configLink %>">Configure</a>
+            <% } %>
            <% } else { %>
             <a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=install">Install</a>
            <% } %>

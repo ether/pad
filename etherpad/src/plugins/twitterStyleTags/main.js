@@ -7,7 +7,7 @@ import("sqlbase.sqlcommon");
 function init() {
  this.hooks = ['handlePath', 'aceGetFilterStack', 'aceCreateDomLine', 'padModelWriteToDB'];
  this.client = new main.init();
- this.description = 'Twitter-style tags';
+ this.description = 'Twitter-style tags allows the user to tag pads by writing #tagname anywhere in the pad text. Tags are automatically linked to searches for that tag in other pads. This plugin also provides an alternative home-page for Etherpad with a display of the last changed public pads as well as that information available as an RSS stream.';
  this.handlePath = hooks.handlePath;
  this.aceGetFilterStack = main.aceGetFilterStack;
  this.aceCreateDomLine = main.aceCreateDomLine;

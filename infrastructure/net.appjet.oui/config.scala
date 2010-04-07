@@ -41,7 +41,7 @@ object config {
       null;
     }
   }
-  def boolOrElse(name: String, default: Boolean) = values.get(name).map(_.equals("true")).getOrElse(default);
+  def boolOrElse(name: String, default: Boolean) = values.get(name).map(_.matches("(?i)\\s*true\\s*")).getOrElse(default);
   def intOrElse(name: String, default: Int) = values.get(name).map(Integer.parseInt(_)).getOrElse(default);
   def longOrElse(name: String, default: Long) = values.get(name).map(java.lang.Long.parseLong(_)).getOrElse(default);
 
