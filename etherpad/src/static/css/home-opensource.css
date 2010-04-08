@@ -10,7 +10,7 @@
   font-size: 3.6em;
 }
 
-#home a#home-newpad, #home a#home-newteam{
+#home a#home-newpad{
   display: block;
   padding: 1em;
   margin: 12px 60px;
@@ -20,11 +20,11 @@
   color: #fff;
 }
 
-#home a#home-newpad:hover, #home a#home-newteam:hover{
+#home a#home-newpad:hover{
   background: #26b;
 }
 
-#home a#home-newteamsite {
+#home a#home-newteam {
   display: block;
   padding: 1em;
   margin: 12px 60px;
@@ -34,7 +34,7 @@
   color: #fff;
 }
 
-#home a#home-newteamsite:hover {
+#home a#home-newteam:hover {
   background: #b26;
 }
 
