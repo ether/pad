@@ -21,14 +21,24 @@ import net.appjet.common.sars.{SarsServer,SarsMessageHandler};
 import java.io.{DataInputStream,DataOutputStream};
 import java.io.{File,FileOutputStream,ByteArrayInputStream,ByteArrayOutputStream};
 
+/* Libraries needed for OO.org Conversion */
+import com.sun.star.bridge.{XBridge,XBridgeFactory};
+import com.sun.star.beans.{PropertyValue,XPropertySet};
+import com.sun.star.connection.{NoConnectException,XConnection,XConnector};
+import com.sun.star.container.XNamed;
+import com.sun.star.document.{XExporter,XFilter};
+import com.sun.star.frame.{XComponentLoader,XStorable};
+import com.sun.star.lang.{XComponent,XMultiComponentFactory};
+import com.sun.star.uno.{UnoRuntime,XComponentContext};
+
 class OOSException(m: String) extends RuntimeException(m);
 class UnsupportedFormatException(format: String) extends OOSException("Unsupported format: "+format);
 object TemporaryFailure extends OOSException("Temporary failure");
 
-// stub object here. Please replace if you'd like to use openoffice!
 object OpenOfficeServerUtility {
   def checkServerAvailability(host: String, port: Int): Boolean = {
-    return false;
+    // Assume the server is running; this is the responsibility of the user
+    return true;
   }
   def runOpenOfficeServer(path: String, host: String, port: Int, timeout: Int, wait: Boolean) {
     // nothing
@@ -36,12 +46,82 @@ object OpenOfficeServerUtility {
 }
 
 class OpenOfficeFileConverter {
+  var host: String = "localhost";
+  var port: Int = 8100;
+
   def setOpenOfficeServerDetails(host: String, port: Int) {
-    // nothing
+    this.host = host;
+    this.port = port;
   }
   
   def convertFile(src: File, dst: File, converter: String, extension: String): Boolean = {
-    return false;
+    try {
+      val fromFile: String = "file:///" + src.getAbsolutePath();
+      val toFile: String = "file:///" + dst.getAbsolutePath();
+
+      val cnx: String = "socket,host="+this.host+",port="+this.port+"";
+      val xRemoteContext: XComponentContext  = com.sun.star.comp.helper.Bootstrap.createInitialComponentContext(null);
+      val x: Object = xRemoteContext.getServiceManager().createInstanceWithContext("com.sun.star.connection.Connector", xRemoteContext);
+      val xConnector: XConnector  = UnoRuntime.queryInterface(classOf[XConnector], x).asInstanceOf[XConnector];
+      val connection: XConnection  = xConnector.connect(cnx);
+
+      if(connection == null) {
+        throw new OOSException("Connection failure");
+      }
+      val x2: Object = xRemoteContext.getServiceManager().createInstanceWithContext("com.sun.star.bridge.BridgeFactory", xRemoteContext);
+      val xBridgeFactory: XBridgeFactory = UnoRuntime.queryInterface(classOf[XBridgeFactory], x2).asInstanceOf[XBridgeFactory];
+      val xBridge: XBridge = xBridgeFactory.createBridge("", "urp", connection, null);
+      val x3: Object = xBridge.getInstance("StarOffice.ServiceManager");
+      if (x3 == null) {
+        throw new OOSException("Failed to get bridge");
+      }
+
+      val xMultiComponentFactory: XMultiComponentFactory  = UnoRuntime.queryInterface(classOf[XMultiComponentFactory], x3).asInstanceOf[XMultiComponentFactory];
+      val xProperySet: XPropertySet  = UnoRuntime.queryInterface(classOf[XPropertySet], xMultiComponentFactory).asInstanceOf[XPropertySet];
+      val oDefaultContext: Object  = xProperySet.getPropertyValue("DefaultContext");
+      val xComponentContext: XComponentContext = UnoRuntime.queryInterface(classOf[XComponentContext], oDefaultContext).asInstanceOf[XComponentContext];
+
+      val desktopObj: Object  = xMultiComponentFactory.createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
+      val xcomponentloader: XComponentLoader = UnoRuntime.queryInterface(classOf[XComponentLoader], desktopObj).asInstanceOf[XComponentLoader];
+
+      if(xcomponentloader == null) {
+        throw new OOSException("XComponent Loader could not be loaded");
+      }
+
+      val loadProps: Array[PropertyValue] = new Array[PropertyValue](2);
+      loadProps(0) = new PropertyValue();
+      loadProps(0).Name = "Hidden";
+      loadProps(0).Value = boolean2Boolean(false);
+
+      loadProps(1) = new PropertyValue();
+      loadProps(1).Name = "UpdateDocMode";
+      loadProps(1).Value = "1";
+
+      val component: XComponent = xcomponentloader.loadComponentFromURL(fromFile,"_blank", 0, loadProps);
+
+      if (component == null) {
+                       throw new OOSException("Failed to load document");
+               }
+
+               val convProps: Array[PropertyValue] = new Array[PropertyValue](2);
+      convProps(0) = new PropertyValue();
+      convProps(0).Name = "FilterName";
+      convProps(0).Value = converter;
+
+      val xstorable: XStorable = UnoRuntime.queryInterface(classOf[XStorable],component).asInstanceOf[XStorable];
+      if (xstorable == null) {
+          throw new OOSException("Storable could not be loaded");
+      }
+      xstorable.storeToURL(toFile, convProps);
+      component.dispose();
+      return true;
+    }
+    catch {
+      case e => {
+           e.printStackTrace();
+                 throw new OOSException("Unknown exception occurred: "+e.getMessage());
+                 }
+    }
   }
 }
 
@@ -69,6 +149,14 @@ object OpenOfficeService {
     soffice = exec;
   }
 
+  var openOfficeServerHost: String = "localhost";
+  var openOfficeServerPort: Int = 8100;
+
+  def setOpenOfficeServer(host: String, port: Int) {
+    openOfficeServerHost = host;
+    openOfficeServerPort = port;
+  }
+
   def convertFile(from: String, to: String, bytes: Array[byte]): Array[byte] = {
     if (from == to) {
       return bytes;
@@ -77,8 +165,18 @@ object OpenOfficeService {
   	val tempFile = createTempFile(bytes, from);
   	val outFile = createTempFile(null, to);
 
-  	val openOfficeServerHost = "localhost";
-  	val openOfficeServerPort = 8100;
+       /*
+        Just hardcoding server and port here.
+        If you intend to use an Openoffice.org instance on a network machine,
+        do it at your risk.
+
+        Just, remember to setOpenOfficeServer from etherpad/importexport/importexport.js,
+        Also, remember that OO.org is reading and writing files over file:/// URI. So, make sure that
+        you can access the files from network machine. Hint, NFS. Not Need for Speed game, you idiot,
+        Network File System.
+
+       */
+
   	if (! OpenOfficeServerUtility.checkServerAvailability(openOfficeServerHost, openOfficeServerPort)) {
   		try {
   			OpenOfficeServerUtility.runOpenOfficeServer(soffice, openOfficeServerHost, openOfficeServerPort, 20000, true);
