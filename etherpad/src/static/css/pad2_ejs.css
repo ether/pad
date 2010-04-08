@@ -63,7 +63,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #shuttingdown { position: relative; zoom: 1; border: 1px solid #992;
   background: #ffc; padding: 0.6em; font-size: 1.2em; margin-top: 6px; }
 
-#docbar { margin-top: 6px; height: 30px; position: relative; zoom: 1;
+#docbar { margin-top: 6px; height: 25px; position: relative; zoom: 1;
   background: #fbfbfb url(/static/img/jun09/pad/padtopback2.gif) repeat-x 0 -31px; }
 
 .docbarbutton
@@ -71,6 +71,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   padding: 2px;
   border-left: 1px solid #CCC;
   white-space: nowrap;
+  vertical-align: top;
 }
 
 .docbarbutton img
@@ -78,9 +79,9 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border: 0px;
   width: 13px;
   height: 13px;
-  position: relative;
-  top: 2px;
   margin-right: 2px;
+  position:relative;
+  top: 3px;
 }
 
 .docbarbutton a
@@ -89,7 +90,9 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   text-decoration: none;
   color: #444;
   font-weight: bold;
-  float: right;
+  margin:0 2px;
+  position:relative;
+  top: 1px;
 }
 
 .docbarbutton.highlight
@@ -109,18 +112,18 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   
 #docbarpadtitle { position: absolute; height: auto; left: 9px;
   width: 280px; font-size: 1.6em; color: #444; font-weight: normal;
-  line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
+  line-height: 22px; margin-left: 2px; height: 22px; top: 2px;
   overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
   white-space:nowrap; }
 .docbar-public #docbarpadtitle { padding-left: 22px;
   background: url(/static/img/jun09/pad/public.gif) no-repeat left center; }
   
-#docbarrenamelink { position: absolute; top: 9px;
+#docbarrenamelink { position: absolute; top: 6px;
   font-size: 1.1em; display: none; }
 #docbarrenamelink a { color: #999; }
 #docbarrenamelink a:hover { color: #48d; }
 #padtitlebuttons { position: absolute; width: 74px; zoom: 1;
-  height: 17px; top: 6px; left: 170px; display: none;
+  height: 17px; top: 4px; left: 170px; display: none;
   background: url(/static/img/jun09/pad/ok_or_cancel.gif) 0px 0px; }
 #padtitlesave { position: absolute; display: block;
   height: 0; padding-top: 17px; overflow: hidden;
@@ -128,8 +131,8 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #padtitlecancel { position: absolute; display: block;
   height: 0; padding-top: 17px; overflow: hidden;
   width: 35px; right: 0; top: 0; }
-#padtitleedit { position: absolute; top: 4px; left: 5px;
-  height: 17px; padding: 2px; font-size: 1.4em;
+#padtitleedit { position: absolute; top: 2px; left: 5px;
+  height: 15px; padding: 2px; font-size: 1.4em;
   background: white; border-left: 1px solid #c3c3c3;
   border-top: 1px solid #c3c3c3;
   border-right: 1px solid #e6e6e6; border-bottom: 1px solid #e6e6e6;
@@ -512,7 +515,7 @@ table#otheruserstable { display: none; }
 /* We don't ever actually hide the wrapper, even when the panel is
    cloased, so that its contents can always be manipulated accurately. */
 .dbpanel-wrapper { position: absolute;
-  overflow: hidden; /* animated: */ height: 0; top: 30px; /* /animated */
+  overflow: hidden; /* animated: */ height: 0; top: 25px; /* /animated */
   z-index: 51; zoom: 1; }
 .dbpanel-panel { position: absolute; bottom: 0; width: 100%; }
 
