@@ -34,6 +34,9 @@ import net.appjet.common.util.{HttpServletRequestFactory, BetterFile};
 
 import Util.enumerationToRichEnumeration;
 
+// Removed due to licensing issues; REMOVED_COS_OF_COS
+// import com.oreilly.servlet.MultipartFilter;
+
 class RequestWrapper(val req: HttpServletRequest) {
   req.setCharacterEncoding("UTF-8");
 //   private lazy val parameterNames =
@@ -124,6 +127,8 @@ class RequestWrapper(val req: HttpServletRequest) {
       else
         null;
     }
+
+  // Depends on cos.jar; REMOVED_COS_OF_COS
   def files(globalScope: Scriptable): Object = {
 //    if (! req.isInstanceOf[com.oreilly.servlet.MultipartWrapper]) {
       new ScriptableAdapter();

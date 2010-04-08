@@ -80,6 +80,8 @@ object config {
               { val argName = "directory" }
   def appHome = stringOrElse("appHome", "");
   
+  @ConfigParam("Whether to generate https URLs even if running locally behind HTTP (useful for Apache handling HTTPS)")
+  def useHttpsUrls = boolOrElse("useHttpsUrls", false);
 
   @ConfigParam("Search path for modules imported via \"import\". Defaults to current working directory.")
               { val argName = "dir1:dir2:..." }
@@ -113,6 +115,9 @@ object config {
       (s.split(":")(0), Integer.parseInt(s.split(":")(1)))
     else
       ("", Integer.parseInt(s))
+
+  @ConfigParam("Whether to show the port numbers to the outside world (false: assume ports visible from the outside are the default http/https ports)")
+  def hidePorts = boolOrElse("hidePorts", false);
 
   @ConfigParam("[host:]port on which to serve the app. Default: 8080.")
               { val argName = "[host:]port" }

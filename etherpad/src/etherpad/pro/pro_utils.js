@@ -47,11 +47,14 @@ function getProRequestSubdomain() {
 
 function getRequestSuperdomain() {
   var parts = request.domain.split('.');
-  parts.reverse();
-  if (parts[0] == ".") {
+  while (parts.length > 0) {
+    var domain = parts.join('.');
+    if (domainEnabled[domain]) {
+      return domain;
+    }
     parts.shift();
   }
-  return [parts[1], parts[0]].join('.');
+  return false;
 }
 
 function isProDomainRequest() {

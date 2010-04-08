@@ -34,7 +34,7 @@ if [ -z "$JAVA" ]; then
 fi
 
 # etherpad properties file
-cfg_file=./data/etherpad.local.properties
+cfg_file=./etc/etherpad.local.properties
 if [ ! -f $cfg_file ]; then
   cfg_file=./etc/etherpad.localdev-default.properties
 fi

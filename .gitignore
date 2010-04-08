@@ -1,4 +1,5 @@
 *~
+etherpad/etc/etherpad.local.properties
 etherpad/src/etherpad/collab/ace/contentcollector.js
 etherpad/src/etherpad/collab/ace/domline.js
 etherpad/src/etherpad/collab/ace/easysync1.js
@@ -12,3 +13,4 @@ etherpad/src/static/js/domline_client.js
 etherpad/src/static/js/easysync2_client.js
 etherpad/src/static/js/linestylefilter_client.js
 etherpad/*.log
+infrastructure/lib/cos.jar
