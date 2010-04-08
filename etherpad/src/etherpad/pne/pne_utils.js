@@ -117,6 +117,7 @@ function saveDbVersion() {
 
 var _eepneAllowedConfigVars = [
   'configFile',
+  'etherpad.soffice',
   'etherpad.useMySQL',
   'etherpad.SQL_JDBC_DRIVER',
   'etherpad.SQL_JDBC_URL',
@@ -134,54 +135,14 @@ var _eepneAllowedConfigVars = [
 ];
 
 function isServerLicensed() {
-  var licenseInfo = licensing.getLicense();
-  if (!licenseInfo) {
-    return false;
-  }
-  if (licensing.isVersionTooOld()) {
-    return false;
-  }
-  if (licensing.isExpired()) {
-    return false;
-  }
   return true;
 }
 
 function enableTrackingAgain() {
-  delete appjet.cache.noMorePneTracking;
 }
 
 function pneTrackerHtml() {
-  if (!isPNE()) {
-    return "";
-  }
-  if (appjet.cache.noMorePneTracking) {
-    return "";
-  }
-
-  var div = DIV({style: "height: 1px; width: 1px; overflow: hidden;"});
-
-  var licenseInfo = licensing.getLicense();
-  var key = null;
-  if (licenseInfo) {
-    key = md5(licenseInfo.key).substr(0, 16);
-  }
-
-  function trackData(name, value) {
-    var imgurl = "http://etherpad.com/ep/tpne/t?";
-    if (key) {
-      imgurl += ("k="+key+"&");
-    }
-    imgurl += (encodeURIComponent(name) + "=" + encodeURIComponent(value));
-    div.push(IMG({src: imgurl}));
-  }
-
-  trackData("ping", "1");
-  trackData("dbdriver", appjet.config['etherpad.SQL_JDBC_DRIVER']);
-  trackData("request.url", request.url);
-
   appjet.cache.noMorePneTracking = true;
-  return div;
 }
 
 

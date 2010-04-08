@@ -48,17 +48,11 @@ function _getLeftnavItems() {
     _PRO, [
       [_PRO, null, "Admin"],
       [_PNE_ONLY, "pne-dashboard", "Server Dashboard"],
-      [_PNE_ONLY, "pne-license-manager/", "Manage License"],
       [_PRO, "account-manager/", "Manage Accounts"],
       [_PRO, "recover-padtext", "Recover Pad Text"],
       [_PRO, null, "Configuration"],
       [_PRO, [[_PNE_ONLY, "pne-config", "Private Server Configuration"],
               [_PRO, "pro-config", "Application Configuration"]]],
-      [_PNE_ONLY, null, "Documentation"],
-      [_PNE_ONLY, "/ep/pne-manual/", "Administrator's Manual"],
-      [_ONDEMAND_ONLY, null, "Billing"],
-      [_ONDEMAND_ONLY, "billing/", "Payment Information"],
-      [_ONDEMAND_ONLY, "billing/invoices", "Past Invoices"],
     ]
   ];
   return nav;
