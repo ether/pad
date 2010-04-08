@@ -49,7 +49,7 @@ function getRequestSuperdomain() {
   var parts = request.domain.split('.');
   while (parts.length > 0) {
     var domain = parts.join('.');
-    if (domainEnabled[domain]) {
+    if (domainEnabled(domain)) {
       return domain;
     }
     parts.shift();
