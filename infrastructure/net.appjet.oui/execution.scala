@@ -39,6 +39,7 @@ import Util.enumerationToRichEnumeration;
 
 class RequestWrapper(val req: HttpServletRequest) {
   req.setCharacterEncoding("UTF-8");
+// REMOVED_COS_OF_COS ... ?
 //   private lazy val parameterNames =
 //     (for (i <- Conversions.convertSet(req.getParameterMap.keySet().asInstanceOf[java.util.Set[String]])) yield i).toList.toArray
 //   private def parameterValues(k: String) = req.getParameterValues(k);
