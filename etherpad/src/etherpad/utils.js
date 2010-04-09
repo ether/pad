@@ -64,10 +64,34 @@ function findTemplate(filename, plugin) {
    return '/templates/' + filename;
 }
 
+function Template(params, plugin) {
+ this._defines = {}
+ this._params = params;
+ this._params.template = this;
+ this._plugin = plugin;
+}
+
+Template.prototype.define = function(name, fn) {
+ this._defines[name] = fn;
+ return '';
+}
+
+Template.prototype.use = function (name, fn, arg) {
+  if (this._defines[name] != undefined)
+    return this._defines[name](arg);
+  else
+    return fn(arg);
+}
+
+Template.prototype.inherit = function (template) {
+ return renderTemplateAsString(template, this._params, this._plugin);
+}
+
 function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
   data.plugins = plugins; // Access callHook and the like...
+  new Template(data, plugin);
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
