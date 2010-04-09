@@ -91,7 +91,7 @@ function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
   data.plugins = plugins; // Access callHook and the like...
-  new Template(data, plugin);
+  var template = new Template(data, plugin);
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
@@ -100,6 +100,7 @@ function renderTemplateAsString(filename, data, plugin) {
   var cacheObj = appjet.scopeCache.ejs[filename];
   if (cacheObj === undefined || fileLastModified(f) > cacheObj.mtime) {
     var templateText = readFile(f);
+    templateText += "<%: template.use('body', function () { return ''; }); %> ";
     cacheObj = {};
     cacheObj.tmpl = new EJS({text: templateText, name: filename});
     cacheObj.mtime = fileLastModified(f);
