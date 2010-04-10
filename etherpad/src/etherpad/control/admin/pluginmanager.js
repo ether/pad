@@ -26,6 +26,7 @@ import("etherpad.pro.pro_utils");
 import("etherpad.helpers");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.admin.plugins");
+import("etherpad.pad.padutils");
 
 
 function onRequest() {  
@@ -52,8 +53,14 @@ function onRequest() {
    userId: padusers.getUserId(),
   });
 
+
+  padutils.setOptsAndCookiePrefs(request);
+  var prefs = helpers.getClientVar('cookiePrefsToSet');
+  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
+
   renderHtml("admin/pluginmanager.ejs",
    {
+    prefs: prefs,
     config: appjet.config,
     bodyClass: 'nonpropad',
     isPro: pro_utils.isProDomainRequest(),
