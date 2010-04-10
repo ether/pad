@@ -70,9 +70,13 @@ function findExistsingFile(files) {
 function findTemplate(filename, plugin) {
   var files = [];
 
-  if (plugin != undefined)
+  if (plugin != undefined) {
     files.push('/plugins/' + plugin + '/templates/' + filename);
-  files.push('/templates/' + filename);
+    files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+    files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
+  }
+  files.push('/themes/' + appjet.config.theme + '/' + filename);
+  files.push('/themes/default/' + filename);
 
   return findExistsingFile(files);
 }
