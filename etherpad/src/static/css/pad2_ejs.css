@@ -166,9 +166,9 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 {
   position:absolute;
   top: 6px;
-  left: 570px;
+  right: 7px;
   height: 24px;
-  width:15px;
+  width:23px;
 }
 
 #editbarsavetable td, #editbartable td
