@@ -11,23 +11,13 @@ distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
-<%
- helpers.setHtmlTitle("Test plugin");
- helpers.setBodyId("padbody");
- helpers.addBodyClass("limwidth nonpropad nonprouser");
- helpers.includeCss("pad2_ejs.css");
- helpers.setRobotsPolicy({index: false, follow: false})
- helpers.includeJQuery();
- helpers.includeCometJs();
- helpers.includeJs("json2.js");
- helpers.includeJs("plugins/testplugin/test.js");
- helpers.addToHead('\n<style type="text/css" title="dynamicsyntax"></style>\n');
-%>
 
-<% template.inherit('page.ejs') %>
-
-<% template.define('content', function() { var ejs_data=''; %>
- <div id="padpage">
-  Welcome to the test plugin
+<% template.define('body', function() { var ejs_data=''; %>
+ <div id="blabla">
+  <h1>Page header</h1>
+  <%: template.use('content', function() { var ejs_data=''; %>
+   Original content
+  <% return ejs_data; }); %>
+  <div>footer</div>
  </div>
 <% return ejs_data; }); %>

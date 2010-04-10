@@ -29,7 +29,6 @@ import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 
-
 function onRequest() {  
   var isPro = pro_utils.isProDomainRequest();
   var userId = padusers.getUserId();
@@ -47,11 +46,13 @@ function onRequest() {
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
 
-  renderHtml("testplugin.ejs",
-   {
-    isPro: isPro,
-    isProAccountHolder: isProUser,
-    account: getSessionProAccount(), // may be falsy
-   }, 'testplugin');
+  renderHtml(
+    "testplugin.ejs",
+    {
+      isPro: isPro,
+      isProAccountHolder: isProUser,
+      account: getSessionProAccount(), // may be falsy
+    },
+   'testplugin');
   return true;
 }
