@@ -79,8 +79,10 @@ Template.prototype.define = function(name, fn) {
 Template.prototype.use = function (name, fn, arg) {
   if (this._defines[name] != undefined)
     return this._defines[name](arg);
-  else
+  else if (fn != undefined)
     return fn(arg);
+  else
+    return '';
 }
 
 Template.prototype.inherit = function (template) {
