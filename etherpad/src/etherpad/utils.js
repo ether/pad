@@ -75,8 +75,8 @@ function findTemplate(filename, plugin) {
     files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
     files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
   }
-  files.push('/themes/' + appjet.config.theme + '/' + filename);
-  files.push('/themes/default/' + filename);
+  files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
+  files.push('/themes/default/templates/' + filename);
 
   return findExistsingFile(files);
 }
