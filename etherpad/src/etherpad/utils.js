@@ -40,6 +40,8 @@ import("etherpad.admin.plugins");
 jimport("java.lang.System.out.print");
 jimport("java.lang.System.out.println");
 
+jimport("java.io.File");
+
 //----------------------------------------------------------------
 // utilities
 //----------------------------------------------------------------
@@ -57,11 +59,22 @@ function randomUniquePadId() {
 // template rendering
 //----------------------------------------------------------------
 
+function findExistsingFile(files) {
+  for (var i = 0; i < files.length; i++) {
+    var f = new File('./src' + files[i]);
+    if (f.exists())
+      return files[i];
+  }
+}
+
 function findTemplate(filename, plugin) {
+  var files = [];
+
   if (plugin != undefined)
-   return '/plugins/' + plugin + '/templates/' + filename;
-  else
-   return '/templates/' + filename;
+    files.push('/plugins/' + plugin + '/templates/' + filename);
+  files.push('/templates/' + filename);
+
+  return findExistsingFile(files);
 }
 
 function Template(params, plugin) {
