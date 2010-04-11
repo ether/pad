@@ -20,10 +20,10 @@ function padModelWriteToDB(args) {
   else
     old_urls_str = '';
 
-  var old_urls = old_urls_str != '' ? old_urls_str.split(' ') : new Array();
+  // var old_urls = old_urls_str != '' ? old_urls_str.split(' ') : new Array();
 
   if (new_urls_str != old_urls_str) {
-    log.info({message: 'Updating urls', new_urls:new_urls, old_urls:old_urls});
+    // log.info({message: 'Updating urls', new_urls:new_urls, old_urls:old_urls});
 
     if (old_urls_row)
       sqlobj.update("PAD_URL_CACHE", {PAD_ID: args.padId }, {URLS: new_urls.join(' ')});
