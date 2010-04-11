@@ -77,6 +77,10 @@ function addClientVars(vars) {
   });
 }
 
+function getClientVar(name) {
+  return _hd().clientVars[name];
+}
+
 function addToHead(stuff) {
   _hd().headExtra += stuff;
 }

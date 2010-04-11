@@ -25,6 +25,7 @@ import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_padmeta");
 import("etherpad.pad.model");
 import("etherpad.sessions.getSession");
+import("etherpad.helpers");
 
 jimport("java.lang.System.out.println");
 
@@ -152,3 +153,39 @@ function getProDisplayTitle(localPadId, title) {
   }
 }
 
+
+function setOptsAndCookiePrefs(request) {
+  opts = {};
+  if (request.params.fullScreen) { // tokbox, embedding
+    opts.fullScreen = true;
+  }
+  if (request.params.tokbox) {
+    opts.tokbox = true;
+  }
+  if (request.params.sidebar) {
+    opts.sidebar = Boolean(Number(request.params.sidebar));
+  }
+  helpers.addClientVars({opts: opts});
+
+
+  var prefs = getPrefsCookieData();
+
+  var prefsToSet = {
+    fullWidth:false,
+    hideSidebar:false
+  };
+  if (prefs) {
+    prefsToSet.isFullWidth = !! prefs.fullWidth;
+    prefsToSet.hideSidebar = !! prefs.hideSidebar;
+  }
+  if (opts.fullScreen) {
+    prefsToSet.isFullWidth = true;
+    if (opts.tokbox) {
+      prefsToSet.hideSidebar = true;
+    }
+  }
+  if ('sidebar' in opts) {
+    prefsToSet.hideSidebar = ! opts.sidebar;
+  }
+  helpers.addClientVars({cookiePrefsToSet: prefsToSet});
+}
