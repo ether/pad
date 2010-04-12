@@ -35,20 +35,10 @@ import("etherpad.pad.padutils");
 
 
 function onRequest() {  
-  var tags = new Array();
-  var antiTags = new Array();
-
-  if (request.params.query != undefined && request.params.query != '') {
-    var query = request.params.query.split(',');
-    for (i = 0; i < query.length; i++)
-     if (query[i][0] == '!')
-      antiTags.push(query[i].substring(1));
-     else
-      tags.push(query[i]);
-  }
+  var tags = tagQuery.queryToTags(request.params.query);
 
   /* Create the pad filter sql */
-  var querySql = tagQuery.getQueryToSql(tags.concat(['public']), antiTags);
+  var querySql = tagQuery.getQueryToSql(tags.tags.concat(['public']), tags.antiTags);
 
   /* Use the pad filter sql to figure out which tags to show in the tag browser this time. */
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);
@@ -77,7 +67,6 @@ function onRequest() {
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
 
-
   padutils.setOptsAndCookiePrefs(request);
   var prefs = helpers.getClientVar('cookiePrefsToSet');
   var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
@@ -87,8 +76,8 @@ function onRequest() {
     config: appjet.config,
     tagQuery: tagQuery,
     padIdToReadonly: server_utils.padIdToReadonly,
-    tags: tags,
-    antiTags: antiTags,
+    tags: tags.tags,
+    antiTags: tags.antiTags,
     newTags: newTags,
     matchingPads: matchingPads,
     bodyClass: 'nonpropad',

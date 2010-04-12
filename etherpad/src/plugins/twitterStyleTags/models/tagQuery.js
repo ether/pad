@@ -21,10 +21,27 @@ import("sqlbase.sqlobj");
 import("etherpad.log");
 
 function tagsToQuery(tags, antiTags) {
- var prefixed = [];
- for (i = 0; i < antiTags.length; i++)
-  prefixed[i] = '!' + antiTags[i];
- return tags.concat(prefixed).join(',');
+  var prefixed = [];
+  for (i = 0; i < antiTags.length; i++)
+    prefixed[i] = '!' + antiTags[i];
+  return tags.concat(prefixed).join(',');
+}
+
+function queryToTags(query) {
+  var tags = {
+    tags: new Array(),
+    antiTags: new Array()
+  };
+
+  if (query != undefined && query != '') {
+    var query = query.split(',');
+    for (i = 0; i < query.length; i++)
+      if (query[i][0] == '!')
+        tags.antiTags.push(query[i].substring(1));
+      else
+        tags.tags.push(query[i]);
+  }
+  return tags;
 }
 
 function stringFormat(text, obj) {
