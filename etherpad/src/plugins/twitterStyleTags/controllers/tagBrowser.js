@@ -54,24 +54,8 @@ function onRequest() {
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  /* Select the 10 last changed matching pads and some extra information on them. Except the Pro Pads*/ 
-  var sql = '' +
-    'select ' +
-    '  m.id as ID, ' +
-    '  DATE_FORMAT(m.lastWriteTime, \'%a, %d %b %Y %H:%i:%s GMT\') as lastWriteTime, ' +
-    '  c.TAGS ' +
-    'from ' +
-       querySql.sql + ' as q ' +
-    '  join PAD_SQLMETA as m on ' +
-    '    m.id = q.ID ' +
-    '  join PAD_TAG_CACHE as c on ' +
-    '    c.PAD_ID = q.ID ' +
-    'where ' +
-    '  m.id NOT LIKE \'%$%\'' +
-    'order by ' +
-    '  m.lastWriteTime desc ' +
-    'limit 10';
-  var matchingPads = sqlobj.executeRaw(sql, querySql.params);
+  padSql = tagQuery.padInfoSql(querySql, 10);
+  var matchingPads = sqlobj.executeRaw(padSql.sql, padSql.params);
 
   for (i = 0; i < matchingPads.length; i++) {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');

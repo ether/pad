@@ -180,3 +180,31 @@ function newTagsSql(querySql) {
     '', info),
    params: queryNrParams.concat(queryParams)};
 }
+
+/* Select the X last changed matching pads and some extra information
+ * on them. Except the Pro Pads*/
+function padInfoSql(querySql, limit, offset) {
+  var sql = '' +
+   'select ' +
+   '  m.id as ID, ' +
+   '  DATE_FORMAT(m.lastWriteTime, \'%a, %d %b %Y %H:%i:%s GMT\') as lastWriteTime, ' +
+   '  c.TAGS ' +
+   'from ' +
+      querySql.sql + ' as q ' +
+   '  join PAD_SQLMETA as m on ' +
+   '    m.id = q.ID ' +
+   '  join PAD_TAG_CACHE as c on ' +
+   '    c.PAD_ID = q.ID ' +
+   'where ' +
+   '  m.id NOT LIKE \'%$%\'' +
+   'order by ' +
+   '  m.lastWriteTime desc ';
+  if (limit != undefined)
+   sql += 'limit ' + limit + " ";
+  if (offset != undefined)
+   sql += 'offset ' + offset + " ";
+  return {
+   sql: sql,
+   params: querySql.params
+  };
+}
