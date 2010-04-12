@@ -70,11 +70,21 @@ function findExistsingFile(files) {
 function findTemplate(filename, plugin) {
   var files = [];
 
-  if (plugin != undefined) {
-    files.push('/plugins/' + plugin + '/templates/' + filename);
-    files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
-    files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
-  }
+  var pluginList = [plugin];
+  try {
+    if (plugin.forEach !== undefined)
+      pluginList = plugin;
+    else
+      pluginList = [plugin];
+  } catch (e) {}
+
+  pluginList.forEach(function (plugin) {
+    if (plugin != undefined) {
+      files.push('/plugins/' + plugin + '/templates/' + filename);
+      files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+      files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
+    }
+  });
   files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
   files.push('/themes/default/templates/' + filename);
 
