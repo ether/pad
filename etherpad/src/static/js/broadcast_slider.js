@@ -138,7 +138,7 @@ var global = this;
         swatchtd.append(swatch);
         tr.append(swatchtd);
         var nametd = $('<td></td>');
-        nametd.html(author.name || "unnamed");
+        nametd.text(author.name || "unnamed");
         tr.append(nametd);
         $("#authorstable").append(tr);
       } else {

@@ -29,6 +29,7 @@ import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
+import("etherpad.pad.padutils");
 
 function tagsToQuery(tags, antiTags) {
  var prefixed = [];
@@ -251,7 +252,13 @@ function onRequest() {
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
 
+
+  padutils.setOptsAndCookiePrefs(request);
+  var prefs = helpers.getClientVar('cookiePrefsToSet');
+  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
+
   var info = {
+    prefs: prefs,
     config: appjet.config,
     tagsToQuery: tagsToQuery,
     padIdToReadonly: server_utils.padIdToReadonly,

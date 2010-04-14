@@ -40,6 +40,8 @@ import("etherpad.admin.plugins");
 jimport("java.lang.System.out.print");
 jimport("java.lang.System.out.println");
 
+jimport("java.io.File");
+
 //----------------------------------------------------------------
 // utilities
 //----------------------------------------------------------------
@@ -57,17 +59,58 @@ function randomUniquePadId() {
 // template rendering
 //----------------------------------------------------------------
 
+function findExistsingFile(files) {
+  for (var i = 0; i < files.length; i++) {
+    var f = new File('./src' + files[i]);
+    if (f.exists())
+      return files[i];
+  }
+}
+
 function findTemplate(filename, plugin) {
-  if (plugin != undefined)
-   return '/plugins/' + plugin + '/templates/' + filename;
+  var files = [];
+
+  if (plugin != undefined) {
+    files.push('/plugins/' + plugin + '/templates/' + filename);
+    files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+    files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
+  }
+  files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
+  files.push('/themes/default/templates/' + filename);
+
+  return findExistsingFile(files);
+}
+
+function Template(params, plugin) {
+ this._defines = {}
+ this._params = params;
+ this._params.template = this;
+ this._plugin = plugin;
+}
+
+Template.prototype.define = function(name, fn) {
+ this._defines[name] = fn;
+ return '';
+}
+
+Template.prototype.use = function (name, fn, arg) {
+  if (this._defines[name] != undefined)
+    return this._defines[name](arg);
+  else if (fn != undefined)
+    return fn(arg);
   else
-   return '/templates/' + filename;
+    return '';
+}
+
+Template.prototype.inherit = function (template) {
+ return renderTemplateAsString(template, this._params, this._plugin);
 }
 
 function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
   data.plugins = plugins; // Access callHook and the like...
+  var template = new Template(data, plugin);
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
@@ -76,6 +119,7 @@ function renderTemplateAsString(filename, data, plugin) {
   var cacheObj = appjet.scopeCache.ejs[filename];
   if (cacheObj === undefined || fileLastModified(f) > cacheObj.mtime) {
     var templateText = readFile(f);
+    templateText += "<%: template.use('body', function () { return ''; }); %> ";
     cacheObj = {};
     cacheObj.tmpl = new EJS({text: templateText, name: filename});
     cacheObj.mtime = fileLastModified(f);

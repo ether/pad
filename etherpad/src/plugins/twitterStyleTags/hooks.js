@@ -23,10 +23,10 @@ function padModelWriteToDB(args) {
   else
     old_tags_str = '';
 
-  var old_tags = old_tags_str != '' ? old_tags_str.split('#') : new Array();
+  // var old_tags = old_tags_str != '' ? old_tags_str.split('#') : new Array();
 
   if (new_tags_str != old_tags_str) {
-    log.info({message: 'Updating tags', new_tags:new_tags, old_tags:old_tags});
+    // log.info({message: 'Updating tags', new_tags:new_tags, old_tags:old_tags});
 
     if (old_tags_row)
       sqlobj.update("PAD_TAG_CACHE", {PAD_ID: args.padId }, {TAGS: new_tags.join('#')});
