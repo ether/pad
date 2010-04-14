@@ -275,7 +275,7 @@ function checkHost() {
     return;
   }
 
-  // redirect to etherpad.com
+  // redirect to main site
   var newurl = "http://etherpad.com"+request.path;
   if (request.query) { newurl += "?"+request.query; }
   response.redirect(newurl);
@@ -303,11 +303,13 @@ function checkHTTPS() {
     http: 80,
     https: 443
   };
+  
+  // Require HTTPS for the following paths:
   var _requiredHttpsPrefixes = [
-    '/ep/admin',      // pro and etherpad
+    '/ep/admin',      // pro and main site
     '/ep/account',    // pro only
-    '/ep/store',      // etherpad.com only
-    '/ep/pro-account' // etherpad.com only
+    '/ep/store',      // main site only
+    '/ep/pro-account' // main site only
   ];
 
   var httpsRequired = false;
@@ -373,8 +375,9 @@ function handlePath() {
     [DirMatcher('/ep/pro-help/'), forward(pro_help_control)]
   ]);
 
-  var etherpadDotComDispatcher = new Dispatcher();
-  etherpadDotComDispatcher.addLocations([
+  // these paths are main site only
+  var mainsiteDispatcher = new Dispatcher();
+  mainsiteDispatcher.addLocations([
     ['/', maincontrol.render_main],
     [DirMatcher('/ep/beta-account/'), forward(pro_beta_control)],
     [DirMatcher('/ep/pro-signup/'), forward(pro_signup_control)],
@@ -392,6 +395,7 @@ function handlePath() {
     [PrefixMatcher('/ep/'), forward(maincontrol)]
   ]);
 
+  // these paths are pro only
   var proDispatcher = new Dispatcher();
   proDispatcher.addLocations([
     ['/', pro_main_control.render_main],
@@ -399,7 +403,7 @@ function handlePath() {
   ]);
 
   // dispatching logic: first try common, then dispatch to
-  // etherpad.com or pro.
+  // main site or pro.
 
   if (commonDispatcher.dispatch()) {
     return;
@@ -412,7 +416,7 @@ function handlePath() {
       return;
     }
   } else {
-    if (etherpadDotComDispatcher.dispatch()) {
+    if (mainsiteDispatcher.dispatch()) {
       return;
     }
   }
