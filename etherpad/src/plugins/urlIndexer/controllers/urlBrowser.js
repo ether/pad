@@ -33,6 +33,34 @@ import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 import("etherpad.pad.padutils");
 
+function urlSql(querySql, limit, offset) {
+  var sql = '' +
+   'select ' +
+   '  u.URL, ' +
+   '  m.id as ID, ' +
+   '  DATE_FORMAT(m.lastWriteTime, \'%a, %d %b %Y %H:%i:%s GMT\') as lastWriteTime, ' +
+   '  c.TAGS ' +
+   'from ' +
+      querySql.sql + ' as q ' +
+   '  join PAD_SQLMETA as m on ' +
+   '    m.id = q.ID ' +
+   '  join PAD_TAG_CACHE as c on ' +
+   '    c.PAD_ID = q.ID ' +
+   '  join PAD_URL as u on ' +
+   '    u.PAD_ID = q.ID ' +
+   'where ' +
+   '  m.id NOT LIKE \'%$%\'' +
+   'order by ' +
+   '  u.URL asc ';
+  if (limit != undefined)
+   sql += 'limit ' + limit + " ";
+  if (offset != undefined)
+   sql += 'offset ' + offset + " ";
+  return {
+   sql: sql,
+   params: querySql.params
+  };
+}
 
 function onRequest() {  
   var tags = tagQuery.queryToTags(request.params.query);
@@ -44,11 +72,11 @@ function onRequest() {
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  padSql = tagQuery.padInfoSql(querySql, 10);
-  var matchingPads = sqlobj.executeRaw(padSql.sql, padSql.params);
+  urlSql = urlSql(querySql, 10);
+  var matchingUrls = sqlobj.executeRaw(urlSql.sql, urlSql.params);
 
-  for (i = 0; i < matchingPads.length; i++) {
-    matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
+  for (i = 0; i < matchingUrls.length; i++) {
+    matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');
   }
 
   var isPro = pro_utils.isProDomainRequest();
@@ -79,7 +107,8 @@ function onRequest() {
     tags: tags.tags,
     antiTags: tags.antiTags,
     newTags: newTags,
-    matchingPads: matchingPads,
+    matchingPads: [],
+    matchingUrls: matchingUrls,
     bodyClass: 'nonpropad',
     isPro: isPro,
     isProAccountHolder: isProUser,
@@ -91,10 +120,10 @@ function onRequest() {
     format = request.params.format;
 
   if (format == "html")
-    renderHtml("tagBrowser.ejs", info, 'twitterStyleTags');
+    renderHtml("urlBrowser.ejs", info, ['urlIndexer', 'twitterStyleTags']);
   else if (format == "rss") {
     response.setContentType("application/xml; charset=utf-8");
-    response.write(renderTemplateAsString("tagRss.ejs", info, 'twitterStyleTags'));
+    response.write(renderTemplateAsString("tagRss.ejs", info, 'urlIndexer'));
     if (request.acceptsGzip) {
       response.setGzip(true);
     }

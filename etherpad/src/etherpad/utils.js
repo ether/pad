@@ -70,11 +70,21 @@ function findExistsingFile(files) {
 function findTemplate(filename, plugin) {
   var files = [];
 
-  if (plugin != undefined) {
-    files.push('/plugins/' + plugin + '/templates/' + filename);
-    files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
-    files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
-  }
+  var pluginList = [plugin];
+  try {
+    if (plugin.forEach !== undefined)
+      pluginList = plugin;
+    else
+      pluginList = [plugin];
+  } catch (e) {}
+
+  pluginList.forEach(function (plugin) {
+    if (plugin != undefined) {
+      files.push('/plugins/' + plugin + '/templates/' + filename);
+      files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+      files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
+    }
+  });
   files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
   files.push('/themes/default/templates/' + filename);
 
@@ -110,7 +120,8 @@ function renderTemplateAsString(filename, data, plugin) {
   data = data || {};
   data.helpers = helpers; // global helpers
   data.plugins = plugins; // Access callHook and the like...
-  var template = new Template(data, plugin);
+  if (data.template == undefined)
+    new Template(data, plugin);
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
