@@ -1,6 +1,11 @@
 import("etherpad.log");
 import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 import("sqlbase.sqlobj");
+import("plugins.urlIndexer.controllers.urlBrowser");
+
+function handlePath() {
+  return [[PrefixMatcher('/ep/url'), forward(urlBrowser)]];
+}
 
 REGEX_WORDCHAR = /[\u0030-\u0039\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u1FFF\u3040-\u9FFF\uF900-\uFDFF\uFE70-\uFEFE\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFDC]/;
 REGEX_URLCHAR = new RegExp('('+/[-:@a-zA-Z0-9_.,~%+\/\\?=&#;()$]/.source+'|'+REGEX_WORDCHAR.source+')');
