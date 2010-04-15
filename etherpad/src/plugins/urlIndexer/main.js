@@ -4,9 +4,10 @@ import("sqlbase.sqlobj");
 import("sqlbase.sqlcommon");
 
 function init() {
- this.hooks = ['padModelWriteToDB'];
+ this.hooks = ['padModelWriteToDB', 'handlePath'];
  this.description = 'Indexes URLs linked to in pads so that they can be displayed outside pads, searched for etc.';
  this.padModelWriteToDB = hooks.padModelWriteToDB;
+ this.handlePath = hooks.handlePath;
 
  this.install = install;
  this.uninstall = uninstall;
