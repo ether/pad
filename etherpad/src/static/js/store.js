@@ -74,7 +74,7 @@ store.eepnetTrial.submit = function() {
   $('#dlsignup').hide();
   $('#processingmsg').fadeIn('fast');
   
-  // first stubmit to etherpad.com...
+  // first submit...
   var data = {};
   $(".signupData").each(function() {
     data[$(this).attr("id")] = $(this).val();
