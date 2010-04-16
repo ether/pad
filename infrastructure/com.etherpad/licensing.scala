@@ -134,7 +134,7 @@ object Licensing {
         println("Done.");
       }
       case "genmainkey" => {
-        println("Generating key for etherpad.com...");
+        println("Generating main key...");
         config.values("licenseGeneratorKey") = args(1);
         val out = new PrintWriter(new FileOutputStream(args(2)));
         out.print(generateKey("etherpad", "AppJet", -1, 0, -1, 0, 0, 0))
