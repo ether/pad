@@ -18,7 +18,7 @@ limitations under the License. */ %>
  helpers.setHtmlTitle("EtherPad: Browse tags");
  helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
  helpers.includeCss("plugins/twitterStyleTags/pad.css");
- helpers.addToHead('\n<link rel="alternate" href="/ep/tag/?query=' + tagQuery.tagsToQuery(tags, antiTags) + '&format=rss" type="application/rss+xml" title="Query results as RSS" />\n');
+ helpers.addToHead('\n<link rel="alternate" href="' + helpers.updateToUrl({format:'rss'}) + '" type="application/rss+xml" title="Query results as RSS" />\n');
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)
@@ -59,10 +59,10 @@ limitations under the License. */ %>
       Latest changed pads
     <% } else { %>
       <% for (i = 0; i < tags.length; i++) { %>
-	<a href="/ep/tag/?query=<%= tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
+	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags)}) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
       <% } %>
       <% for (i = 0; i < antiTags.length; i++) { %>
-	<a href="/ep/tag/?query=<%= tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]})) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
+	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
       <% } %>
     <% } %>
   </td>
@@ -74,12 +74,12 @@ limitations under the License. */ %>
     <%: template.use('queryRefiner', function() { var ejs_data=''; %>
      <h1>Search for pads that have the tag</h1>
      <% for (i = 0; i < newTags.length; i++) { %>
-      <a href="/ep/tag/?query=<%= tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
+      <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags)}) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
      <% } %>
 
      <h1>Search for pads that <em>don't</em> have the tag</h1>
      <% for (i = 0; i < newTags.length; i++) { %>
-      <a href="/ep/tag/?query=<%= tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname])) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
+      <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname]))}) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
      <% } %>
     <% return ejs_data; }); %>
    </div>
@@ -98,7 +98,7 @@ limitations under the License. */ %>
       <dt><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><dt>
       <dd>
        <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
-	<a href="/ep/tag/?query=<%= tagQuery.tagsToQuery(tags.concat([matchingPads[i].TAGS[j]]), antiTags) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
+	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingPads[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
        <% } %>
       </dd>
      <% } %>

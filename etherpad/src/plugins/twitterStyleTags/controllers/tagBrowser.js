@@ -34,7 +34,7 @@ import("sqlbase.sqlobj");
 import("etherpad.pad.padutils");
 
 
-function onRequest() {  
+function onRequest() {
   var tags = tagQuery.queryToTags(request.params.query);
 
   /* Create the pad filter sql */

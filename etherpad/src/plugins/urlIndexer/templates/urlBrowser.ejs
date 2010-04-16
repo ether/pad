@@ -18,7 +18,7 @@ limitations under the License. */ %>
  helpers.setHtmlTitle("EtherPad: Browse URLs by tags");
  helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
  helpers.includeCss("plugins/twitterStyleTags/pad.css");
- helpers.addToHead('\n<link rel="alternate" href="/ep/url/?query=' + tagQuery.tagsToQuery(tags, antiTags) + '&format=rss" type="application/rss+xml" title="Query results as RSS" />\n');
+ helpers.addToHead('\n<link rel="alternate" href="' + helpers.updateToUrl({format:'rss'}) + '" type="application/rss+xml" title="Query results as RSS" />\n');
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)
@@ -46,7 +46,7 @@ limitations under the License. */ %>
   <dd>
    <a href="<%= matchingPadUrl %>"><%= matchingPadId %></a>:
    <% for (j = 0; j < matchingUrls[i].TAGS.length; j++) { %>
-    <a href="/ep/url/?query=<%= tagQuery.tagsToQuery(tags.concat([matchingUrls[i].TAGS[j]]), antiTags) %>" class="padtag" title="<%= matchingUrls[i].TAGS[j] %> matches">#<%= matchingUrls[i].TAGS[j] %></a>
+    <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingUrls[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingUrls[i].TAGS[j] %> matches">#<%= matchingUrls[i].TAGS[j] %></a>
    <% } %>
   </dd>
  <% } %>

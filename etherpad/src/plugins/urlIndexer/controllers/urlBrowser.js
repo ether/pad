@@ -72,8 +72,8 @@ function onRequest() {
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  urlSql = urlSql(querySql, 10);
-  var matchingUrls = sqlobj.executeRaw(urlSql.sql, urlSql.params);
+  url = urlSql(querySql, 10);
+  var matchingUrls = sqlobj.executeRaw(url.sql, url.params);
 
   for (i = 0; i < matchingUrls.length; i++) {
     matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');

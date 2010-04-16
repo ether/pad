@@ -278,3 +278,29 @@ function rafterTerminationDate() {
   return "March 31, 2010";
 }
 
+function updateToUrl(setParams, deleteParams, setPath) {
+  var params = {};
+
+  for (param in request.params)
+    if (deleteParams === undefined || deleteParams.indexOf(param) == -1)
+      params[param] = request.params[param];
+
+  if (setParams !== undefined)
+    for (param in setParams)
+      params[param] = setParams[param];
+
+  var path = request.path;
+  if (setPath !== undefined)
+    path = setPath;
+
+  var paramStr = '';
+  for (param in params) {
+    if (paramStr == '')
+      paramStr += '?';
+    else
+      paramStr += '&';
+    paramStr += param + '=' + params[param];
+  }
+
+  return path + paramStr;
+}
