@@ -17,8 +17,8 @@ MYSQL_CONNECTOR_JAR=/usr/share/java/mysql-connector-java.jar
 MXRAM="1G"
 
 # Classpath
-CP="appjet-eth-dev.jar:data"
-for f in "$ETHERPAD_HOME/etherpad/lib/*.jar"; do
+CP="$ETHERPAD_HOME/etherpad/appjet-eth-dev.jar:$ETHERPAD_HOME/etherpad/data"
+for f in "$ETHERPAD_HOME"/etherpad/lib/*.jar; do
     CP="$CP:$f"
 done
 
@@ -35,11 +35,12 @@ ETHERPAD_OPTS="-classpath $CP \
                -Xms${MXRAM} \
                -Djava.awt.headless=true \
                -XX:MaxGCPauseMillis=500 \
-               -XX:+UseConcorMarkSweepGC \
+               -XX:+UseConcMarkSweepGC \
+               -XX:+CMSIncrementalMode \
                -XX:CMSIncrementalSafetyFactor=50 \
                -XX:+PrintGCDetails \
                -XX:+PrintGCTimeStamps \
-               -Xloggc:./data/logs/backend/jvm-gc.log \
+               -Xloggc:$ETHERPAD_HOME/etherpad/data/logs/backend/jvm-gc.log \
                -Dappjet.jmxremote=true \
                $JAVA_OPTS \
                net.appjet.oui.main \
