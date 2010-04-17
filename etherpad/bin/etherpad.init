@@ -19,8 +19,6 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Collaborative real-time editor"
 NAME=etherpad
-#DAEMON=/usr/sbin/$NAME
-#DAEMON_ARGS="--options args"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 CHUID="$ETHERPAD_USER:$ETHERPAD_GROUP"
