@@ -19,13 +19,14 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Collaborative real-time editor"
 NAME=etherpad
+ETHERPAD_JAR="/usr/local/etherpad/etherpad/appjet-eth-dev.jar"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 CHUID="$ETHERPAD_USER:$ETHERPAD_GROUP"
 
 
 # Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
+[ -f "$ETHERPAD_JAR" ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
