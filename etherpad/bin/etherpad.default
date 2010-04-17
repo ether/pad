@@ -1,0 +1,42 @@
+# Default settings for etherpad. This file is sourced by /bin/sh from
+# /etc/init.d/etherpad.
+
+# Setup paths
+ETHERPAD_HOME=/usr/local/etherpad
+JAVA=/usr/bin/java
+JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+SCALA=/usr/bin/scala
+SCALA_HOME=/usr/share/java
+MYSQL_CONNECTOR_JAR=/usr/share/java/mysql-connector-java.jar
+
+# Maximum amount of RAM to allocate
+MXRAM="1G"
+
+# Classpath
+CP="appjet-eth-dev.jar:data"
+for f in "$ETHERPAD_HOME/etherpad/lib/*.jar"; do
+    CP="$CP:$f"
+done
+
+# Java options
+JAVA_OPTS=""
+
+# Config file
+CFGFILE=/etc/etherpad/local.properties
+
+# Default options
+ETHERPAD_OPTS="-classpath $CP \
+               -server \
+               -Xmx${MXRAM} \
+               -Xms${MXRAM} \
+               -Djava.awt.headless=true \
+               -XX:MaxGCPauseMillis=500 \
+               -XX:+UseConcorMarkSweepGC \
+               -XX:CMSIncrementalSafetyFactor=50 \
+               -XX:+PrintGCDetails \
+               -XX:+PrintGCTimeStamps \
+               -Xloggc:./data/logs/backend/jvm-gc.log \
+               -Dappjet.jmxremote=true \
+               $JAVA_OPTS \
+               net.appjet.oui.main \
+               --configFile=$CFGFILE"
