@@ -1,6 +1,10 @@
 # Default settings for etherpad. This file is sourced by /bin/sh from
 # /etc/init.d/etherpad.
 
+# User and group to run as
+ETHERPAD_USER="etherpad"
+ETHERPAD_GROUP="etherpad"
+
 # Setup paths
 ETHERPAD_HOME=/usr/local/etherpad
 JAVA=/usr/bin/java
