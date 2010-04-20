@@ -75,8 +75,8 @@ limitations under the License. */ %>
 	    <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
             <%: template.use('docBarTitle'); %>
 	    <td width="100%">&nbsp;</td>
-	    <%: plugins.callHookStr('docbarItemsAll', {}, '', '<td class="docbarbutton">', '</td>'); %>
             <%: template.use('docBarItems'); %>
+	    <%: plugins.callHookStr('docbarItemsAll', {}, '', '', ''); %>
 	    <td><img src="/static/img/jun09/pad/roundcorner_right_orange.gif"></td>
 	  </tr>
 	</table>
