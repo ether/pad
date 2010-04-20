@@ -45,3 +45,12 @@ function padModelWriteToDB(args) {
     }
   }
 }
+
+function docbarItemsAll() {
+ return ["<td class='docbarbutton'><a href='/ep/tag/'>Home</a></td>"];
+}
+
+function docbarItemsTagBrowser() {
+ return ["<td class='docbarbutton'><a href='/ep/tag/'>Pads</a></td>"];
+}
+

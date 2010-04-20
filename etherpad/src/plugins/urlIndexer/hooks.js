@@ -42,3 +42,8 @@ function padModelWriteToDB(args) {
     }
   }
 }
+
+function docbarItemsTagBrowser() {
+ return ["<td class='docbarbutton'><a href='/ep/url/'>URLs</a></td>"];
+}
+

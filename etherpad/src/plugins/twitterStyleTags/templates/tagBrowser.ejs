@@ -31,6 +31,13 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>Browse Tags</span></td>
 <% return ejs_data; }); %>
 
+<%
+  template.define('docBarItems', function() {
+    return plugins.callHookStr('docbarItemsTagBrowserPad', {}, '', '', '') +
+           plugins.callHookStr('docbarItemsTagBrowser', {}, '', '', '');
+  });
+%>
+
 <% template.define('sideBar', function() { var ejs_data=''; %>
   <div id="padusers">
    <% if (isProAccountEnabled()) { %>
