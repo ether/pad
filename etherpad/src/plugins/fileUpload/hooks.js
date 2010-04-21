@@ -9,3 +9,7 @@ function handlePath() {
   return [[PrefixMatcher('/ep/fileUpload/'), forward(fileUpload)],
           [PrefixMatcher('/up/'), faststatic.directoryServer('/plugins/fileUpload/upload/', {cache: isProduction()})]];
 }
+
+function editBarItemsLeftPad(arg) {
+  return arg.template.include('fileUploadEditbarButtons.ejs', undefined, ['fileUpload']);
+}

@@ -81,7 +81,7 @@ function onRequest() {
 	isProAccountHolder: isProUser,
 	account: getSessionProAccount(), // may be falsy
       },
-      'fileUpload');
+      ['fileUpload']);
   }
   return true;
 }
