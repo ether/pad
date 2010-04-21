@@ -15,6 +15,7 @@
  */
 
 // just in case... (todo: this must be somewhere else in the client code.)
+// Below Array#map code was direct pasted by AppJet/Etherpad, licence unknown. Possible source: http://www.tutorialspoint.com/javascript/array_map.htm
 if (!Array.prototype.map)
 {
   Array.prototype.map = function(fun /*, thisp*/)
@@ -35,6 +36,7 @@ if (!Array.prototype.map)
   };
 }
 
+// Below Array#forEach code was direct pasted by AppJet/Etherpad, licence unknown. Possible source: http://www.tutorialspoint.com/javascript/array_foreach.htm
 if (!Array.prototype.forEach)
 {
   Array.prototype.forEach = function(fun /*, thisp*/)
@@ -52,6 +54,7 @@ if (!Array.prototype.forEach)
   };
 }
 
+// Below Array#indexOf code was direct pasted by AppJet/Etherpad, licence unknown. Possible source: http://www.tutorialspoint.com/javascript/array_indexof.htm
 if (!Array.prototype.indexOf)
 {
   Array.prototype.indexOf = function(elt /*, from*/)
