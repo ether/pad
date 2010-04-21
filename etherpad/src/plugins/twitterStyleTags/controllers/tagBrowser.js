@@ -91,10 +91,10 @@ function onRequest() {
     format = request.params.format;
 
   if (format == "html")
-    renderHtml("tagBrowser.ejs", info, 'twitterStyleTags');
+    renderHtml("tagBrowser.ejs", info, ['twitterStyleTags']);
   else if (format == "rss") {
     response.setContentType("application/xml; charset=utf-8");
-    response.write(renderTemplateAsString("tagRss.ejs", info, 'twitterStyleTags'));
+    response.write(renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags']));
     if (request.acceptsGzip) {
       response.setGzip(true);
     }

@@ -74,7 +74,7 @@ limitations under the License. */ %>
 
 
 <% template.define('docBarItems', function() { var ejs_data=''; %>
-  <%: plugins.callHookStr('docbarItemsPad', {}, '', '<td class="docbarbutton">', '</td>'); %>
+  <%: template.callHookStr('docbarItemsPad', {}, '', '<td class="docbarbutton">', '</td>'); %>
   <% if (isProAccountHolder) { %> 
     <td id="docbarsecurity-outer" class="docbarbutton">
       <a href="javascript:void(0)" id="docbarsecurity">
@@ -409,10 +409,12 @@ limitations under the License. */ %>
   <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('undo'));" title="Undo (ctrl-Z)"><img src="/static/img/jun09/pad/editbar_undo.gif"></a></td>
   <td  class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('redo'));" title="Redo (ctrl-Y)"><img src="/static/img/jun09/pad/editbar_redo.gif"></a></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+  <%: template.callHookStr('editBarItemsLeftPad', {}, '', '', ''); %>
 <% return ejs_data; }); %>
 
 
 <% template.define('editBarItemsRight', function() { var ejs_data=''; %>
+  <%: template.callHookStr('editBarItemsRightPad', {}, '', '', ''); %>
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
   <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>

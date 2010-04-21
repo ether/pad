@@ -53,6 +53,6 @@ function onRequest() {
       isProAccountHolder: isProUser,
       account: getSessionProAccount(), // may be falsy
     },
-   'testplugin');
+   ['testplugin']);
   return true;
 }

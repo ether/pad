@@ -67,35 +67,27 @@ function findExistsingFile(files) {
   }
 }
 
-function findTemplate(filename, plugin) {
+function findTemplate(filename, pluginList) {
   var files = [];
-
-  var pluginList = [plugin];
-  try {
-    if (plugin.forEach !== undefined)
-      pluginList = plugin;
-    else
-      pluginList = [plugin];
-  } catch (e) {}
-
-  pluginList.forEach(function (plugin) {
-    if (plugin != undefined) {
-      files.push('/plugins/' + plugin + '/templates/' + filename);
-      files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
-      files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
-    }
-  });
+  if (pluginList != undefined)
+    pluginList.forEach(function (plugin) {
+      if (plugin != undefined) {
+	files.push('/plugins/' + plugin + '/templates/' + filename);
+	files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+	files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
+      }
+    });
   files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
   files.push('/themes/default/templates/' + filename);
 
   return findExistsingFile(files);
 }
 
-function Template(params, plugin) {
+function Template(params, pluginList) {
  this._defines = {}
  this._params = params;
  this._params.template = this;
- this._plugin = plugin;
+ this._pluginList = pluginList;
 }
 
 Template.prototype.define = function(name, fn) {
@@ -113,17 +105,50 @@ Template.prototype.use = function (name, fn, arg) {
 }
 
 Template.prototype.inherit = function (template) {
- return renderTemplateAsString(template, this._params, this._plugin);
+  return renderTemplateAsString(template, this._params, this._pluginList);
 }
 
-function renderTemplateAsString(filename, data, plugin) {
+Template.prototype.include = function (template, params, pluginList) {
+  var sendArgs = {};
+  for (var name in this._params)
+    if (name != 'template')
+      sendArgs[name] = this._params[name];
+  if (params != undefined)
+    for (var name in params)
+      sendArgs[name] = params[name];
+
+  if (pluginList == undefined)
+    pluginList = this._pluginList;
+  else
+    pluginList = pluginList.concat(this._pluginList);
+
+  return renderTemplateAsString(template, sendArgs, pluginList);
+}
+
+Template.prototype.callHook = function (hookName, args) {
+  var sendArgs = {template:this};
+  if (args != undefined)
+    for (var name in args)
+      sendArgs[name] = args[name];
+  return plugins.callHook(hookName, sendArgs);
+}
+
+Template.prototype.callHookStr = function (hookName, args, sep, pre, post) {
+  var sendArgs = {template:this};
+  if (args != undefined)
+    for (var name in args)
+      sendArgs[name] = args[name];
+  return plugins.callHookStr(hookName, sendArgs, sep, pre, post);
+}
+
+function renderTemplateAsString(filename, data, pluginList) {
   data = data || {};
   data.helpers = helpers; // global helpers
   data.plugins = plugins; // Access callHook and the like...
   if (data.template == undefined)
-    new Template(data, plugin);
+    new Template(data, pluginList);
 
-  var f = findTemplate(filename, plugin); //"/templates/"+filename;
+  var f = findTemplate(filename, pluginList); //"/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
     appjet.scopeCache.ejs = {};
   }
@@ -140,18 +165,15 @@ function renderTemplateAsString(filename, data, plugin) {
   return html;
 }
 
-function renderTemplate(filename, data, plugin) {
-  response.write(renderTemplateAsString(filename, data, plugin));
+function renderTemplate(filename, data, pluginList) {
+  response.write(renderTemplateAsString(filename, data, pluginList));
   if (request.acceptsGzip) {
     response.setGzip(true);
   }
 }
 
-function renderHtml(bodyFileName, data, plugin) {
-  var bodyHtml = renderTemplateAsString(bodyFileName, data, plugin);
-  bodyHtml = plugins.callHookStr("renderPageBodyPre", {bodyFileName:bodyFileName, data:data, plugin:plugin}) +
-             bodyHtml +
-             plugins.callHookStr("renderPageBodyPost", {bodyFileName:bodyFileName, data:data, plugin:plugin});
+function renderHtml(bodyFileName, data, pluginList) {
+  var bodyHtml = renderTemplateAsString(bodyFileName, data, pluginList);
   response.write(renderTemplateAsString("html.ejs", {bodyHtml: bodyHtml}));
   if (request.acceptsGzip) {
     response.setGzip(true);

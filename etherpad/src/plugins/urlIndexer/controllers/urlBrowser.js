@@ -123,7 +123,7 @@ function onRequest() {
     renderHtml("urlBrowser.ejs", info, ['urlIndexer', 'twitterStyleTags']);
   else if (format == "rss") {
     response.setContentType("application/xml; charset=utf-8");
-    response.write(renderTemplateAsString("tagRss.ejs", info, 'urlIndexer'));
+    response.write(renderTemplateAsString("tagRss.ejs", info, ['urlIndexer']));
     if (request.acceptsGzip) {
       response.setGzip(true);
     }
