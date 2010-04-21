@@ -331,15 +331,6 @@ function render_pad(localPadId) {
     var specialKey = request.params.specialKey ||
       (sessions.isAnEtherpadAdmin() ? collab_server.getSpecialKey('invisible') :
        null);
-    if (request.params.fullScreen) { // tokbox, embedding
-      opts.fullScreen = true;
-    }
-    if (request.params.tokbox) {
-      opts.tokbox = true;
-    }
-    if (request.params.sidebar) {
-      opts.sidebar = Boolean(Number(request.params.sidebar));
-    }
 
     helpers.addClientVars({
       padId: localPadId,
@@ -365,34 +356,17 @@ function render_pad(localPadId) {
       userColor: assignColorId(pad, userId),
       specialKey: specialKey,
       specialKeyTranslation: collab_server.translateSpecialKey(specialKey),
-      opts: opts
     });
   });
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
 
-  var isFullWidth = false;
-  var hideSidebar = false;
-  var cookiePrefs = padutils.getPrefsCookieData();
-  if (cookiePrefs) {
-    isFullWidth = !! cookiePrefs.fullWidth;
-    hideSidebar = !! cookiePrefs.hideSidebar;
-  }
-  if (opts.fullScreen) {
-    isFullWidth = true;
-    if (opts.tokbox) {
-      hideSidebar = true;
-    }
-  }
-  if ('sidebar' in opts) {
-    hideSidebar = ! opts.sidebar;
-  }
-  var bodyClass = (isFullWidth ? "fullwidth" : "limwidth")+
+  padutils.setOptsAndCookiePrefs(request);
+  var prefs = helpers.getClientVar('cookiePrefsToSet');
+  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth") +
     " "+(isPro ? "propad" : "nonpropad")+" "+
     (isProUser ? "prouser" : "nonprouser");
 
-  var cookiePrefsToSet = {fullWidth:isFullWidth, hideSidebar:hideSidebar};
-  helpers.addClientVars({cookiePrefsToSet: cookiePrefsToSet});
 
   renderHtml("pad/pad_body2.ejs",
              {localPadId:localPadId,
@@ -404,7 +378,7 @@ function render_pad(localPadId) {
               isProAccountHolder: isProUser,
               account: getSessionProAccount(), // may be falsy
               toHTML: toHTML,
-              prefs: {isFullWidth:isFullWidth, hideSidebar:hideSidebar},
+              prefs: prefs,
               signinUrl: '/ep/account/sign-in?cont='+
                 encodeURIComponent(request.url),
               fullSuperdomain: pro_utils.getFullSuperdomainHost()

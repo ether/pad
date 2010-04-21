@@ -287,6 +287,14 @@ function checkHost() {
 
 // Check for HTTPS
 function checkHTTPS() {
+  /* Open-source note: this function used to check the protocol and make
+   * sure that pages that needed to be secure went over HTTPS, and pages
+   * that didn't go over HTTP.  However, when we open-sourced the code,
+   * we disabled HTTPS because we didn't want to ship the etherpad.com
+   * private crypto keys. --aiba */
+  return;
+
+
   if (stringutils.startsWith(request.path, "/static/")) { return; }
 
   if (sessions.getSession().disableHttps || request.params.disableHttps) {

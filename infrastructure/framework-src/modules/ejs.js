@@ -33,6 +33,7 @@
 
 import("jsutils.*");
 import("funhtml");
+import("etherpad.log");
 
 jimport("java.lang.System.out.println");
 jimport("net.appjet.ajstdlib.execution.executeCodeInNewScope");
@@ -75,12 +76,13 @@ var EjsScanner = function(source, left, right) {
 	this.double_left = 		left+'%%';
 	this.double_right = 	'%%'+right;
 	this.left_equal = 		left+'%=';
+	this.left_colon = 		left+'%:';
 	this.left_comment = 	left+'%#';
 	if(left=='[') {
-	  this.SplitRegexp = /(\[%%)|(%%\])|(\[%=)|(\[%#)|(\[%)|(%\]\n)|(%\])|(\n)/;
+	  this.SplitRegexp = /(\[%%)|(%%\])|(\[%:)|(\[%=)|(\[%#)|(\[%)|(%\]\n)|(%\])|(\n)/;
 	}
 	else {
-	  this.SplitRegexp = new RegExp('('+this.double_left+')|(%%'+this.double_right+')|('+this.left_equal+')|('+this.left_comment+')|('+this.left_delimiter+')|('+this.right_delimiter+'\n)|('+this.right_delimiter+')|(\n)') 
+	  this.SplitRegexp = new RegExp('('+this.double_left+')|(%%'+this.double_right+')|('+this.left_equal+')|('+this.left_colon+')|('+this.left_equal+')|('+this.left_comment+')|('+this.left_delimiter+')|('+this.right_delimiter+'\n)|('+this.right_delimiter+')|(\n)') 
 	}
 	
 	this.source = source;
@@ -178,7 +180,7 @@ EjsBuffer.prototype = {
 
 /* Adaptation from the Compiler of erb.rb  */
 EjsCompiler = function(source, left) {
-	this.pre_cmd = ['var ___ejsO = "";'];
+	this.pre_cmd = ['var ejs_data = "";'];
 	this.post_cmd = new Array();
 	this.source = ' ';	
 	if (source != null)
@@ -217,7 +219,7 @@ EjsCompiler.prototype = {
   compile: function(options) {
   	options = options || {};
 	this.out = '';
-	var put_cmd = "___ejsO += ";
+	var put_cmd = "ejs_data += ";
 	var insert_cmd = put_cmd;
 	var buff = new EjsBuffer(this.pre_cmd, this.post_cmd);		
 	var content = '';
@@ -241,6 +243,7 @@ EjsCompiler.prototype = {
 					break;
 				case scanner.left_delimiter:
 				case scanner.left_equal:
+				case scanner.left_colon:
 				case scanner.left_comment:
 					scanner.stag = token;
 					if (content.length > 0)
@@ -277,6 +280,9 @@ EjsCompiler.prototype = {
 						case scanner.left_equal:
 							buff.push(insert_cmd + "(EjsScanner.to_text(" + content + "))");
 							break;
+						case scanner.left_colon:
+							buff.push(insert_cmd + content);
+							break;
 					}
 					scanner.stag = null;
 					content = '';
@@ -302,7 +308,7 @@ EjsCompiler.prototype = {
     '  with(_VIEW) {',
     '    with (_CONTEXT) {',
            this.out,
-    '      return ___ejsO;',
+    '      return ejs_data;',
     '    }',
     '  }',
     '};'

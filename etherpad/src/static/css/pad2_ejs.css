@@ -68,31 +68,31 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 
 .docbarbutton
 {
-  padding: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
   border-left: 1px solid #CCC;
   white-space: nowrap;
-  vertical-align: top;
 }
 
 .docbarbutton img
 {
   border: 0px;
   width: 13px;
-  height: 13px;
   margin-right: 2px;
-  position:relative;
-  top: 3px;
+  vertical-align: middle;
+  margin-top: 3px;
+  margin-bottom: 2px;
 }
 
 .docbarbutton a
 {
-  font-size:10px;
+  font-size: 10px;
+  line-height: 18px;
   text-decoration: none;
   color: #444;
   font-weight: bold;
-  margin:0 2px;
-  position:relative;
-  top: 1px;
 }
 
 .docbarbutton.highlight
@@ -166,9 +166,9 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 {
   position:absolute;
   top: 6px;
-  left: 570px;
+  right: 7px;
   height: 24px;
-  width:15px;
+  width:23px;
 }
 
 #editbarsavetable td, #editbartable td
