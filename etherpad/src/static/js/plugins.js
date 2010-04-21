@@ -1,13 +1,14 @@
 plugins = {
   callHook: function (hookName, args) {
-    if (clientVars.hooks[hookName] === undefined)
+  	var hook = clientVars.hooks[hookName];
+    if (hook === undefined)
       return [];
     var res = [];
-    for (i = 0; i < clientVars.hooks[hookName].length; i++) {
-      var plugin = clientVars.hooks[hookName][i];
+    for (var i = 0, N=hook.length; i < N; i++) {
+      var plugin = hook[i];
       var pluginRes = eval(plugin.plugin)[plugin.original || hookName](args);
       if (pluginRes != undefined && pluginRes != null)
-	res = res.concat(pluginRes);
+        res = res.concat(pluginRes);
     }
     return res;
   },
