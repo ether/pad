@@ -101,7 +101,14 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     var extraOpenTags = "";
     var extraCloseTags = "";
 
-    parent.parent.plugins.callHook(
+    var plugins_;
+    if (typeof(plugins)!='undefined') {
+      plugins_ = plugins;
+    } else {
+      plugins_ = parent.parent.plugins;
+    }
+
+    plugins_.callHook(
       "aceCreateDomLine", {domline:domline, cls:cls}
     ).map(function (modifier) {
       cls = modifier.cls;
