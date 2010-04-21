@@ -238,7 +238,7 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
 linestylefilter.getFilterStack = function(lineText, textAndClassFunc, browser) {
   var func = linestylefilter.getURLFilter(lineText, textAndClassFunc);  
 
-  var hookFilters = (function () { try { return top.plugins; } catch (e) { return plugins; }; })().callHook(
+  var hookFilters = parent.parent.plugins.callHook(
     "aceGetFilterStack", {linestylefilter:linestylefilter, browser:browser});
   hookFilters.map(function (hookFilter) {
     func = hookFilter(lineText, func);

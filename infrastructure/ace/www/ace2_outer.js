@@ -168,7 +168,7 @@ function Ace2Editor() {
 
       var iframeHTML = ["'"+doctype+"<html><head>'"];
 
-      top.plugins.callHook(
+      plugins.callHook(
         "aceInitInnerdocbodyHead", {iframeHTML:iframeHTML});
   
       // these lines must conform to a specific format because they are passed by the build script:
@@ -202,6 +202,7 @@ function Ace2Editor() {
 	'<link rel="stylesheet" type="text/css" href="data:text/css,"/>',
 	'\x3cscript>', outerScript, '\x3c/script>',
 	'</head><body id="outerdocbody"><div id="sidediv"><!-- --></div><div id="linemetricsdiv">x</div><div id="overlaysdiv"><!-- --></div></body></html>'];
+
 
       var outerFrame = document.createElement("IFRAME");
       outerFrame.frameBorder = 0; // for IE
