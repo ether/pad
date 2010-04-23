@@ -81,6 +81,7 @@ limitations under the License. */ %>
 	  </tr>
 	</table>
         <%: template.use('docBarTitleEditor'); %>
+        <%: template.callHookStr('docBarDropdownsAll', {}, '', '', ''); %>
         <%: template.use('docBarDropdowns'); %>
       </div><!-- /docbar -->
     </div>
@@ -109,6 +110,8 @@ limitations under the License. */ %>
 	        <%: template.use('editBarItemsRight'); %>
 	      </tr>
 	    </table>
+	    <%: template.callHookStr('editBarDropdownsAll', {}, '', '', ''); %>
+	    <%: template.use('editBarDropdowns'); %>
 	  </div>
 	</div>
 	<div id="editorcontainerbox"><%: template.use('contentArea'); %></div>

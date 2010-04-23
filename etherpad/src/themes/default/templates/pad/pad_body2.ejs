@@ -102,6 +102,7 @@ limitations under the License. */ %>
 
 
 <% template.define('docBarDropdowns', function() { var ejs_data=''; %>
+  <%: template.callHookStr('docBarDropdownsPad', {}, '', '', ''); %>
   <div id="impexp-wrapper" class="dbpanel-wrapper">
     <div id="impexp-panel" class="dbpanel-panel">
       <div class="dbpanel-leftedge"><!-- --></div>
@@ -418,6 +419,11 @@ limitations under the License. */ %>
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
   <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+<% return ejs_data; }); %>
+
+
+<% template.define('editBarDropdowns', function() { var ejs_data=''; %>
+  <%: template.callHookStr('editBarDropdownsPad', {}, '', '', ''); %>
 <% return ejs_data; }); %>
 
 
