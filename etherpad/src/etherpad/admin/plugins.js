@@ -46,8 +46,8 @@ hooks = {};
 clientHooks = {};
 
 function loadAvailablePlugin(pluginName) {
-  if (plugins[pluginName] != undefined)
-    return plugins[pluginName];
+  if (pluginModules[pluginName] != undefined)
+    return pluginModules[pluginName];
 
   var pluginsDir = new Packages.java.io.File("src/plugins");
 
