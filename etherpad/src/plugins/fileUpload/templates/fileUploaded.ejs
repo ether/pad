@@ -1,5 +1,15 @@
-[
-<% for (var i = 0; i < uploads.length; i++)  { %>
- '<%= uploads[i] %>',
-<% } %>
-]
+<html>
+ <head>
+  <script>
+   document.domain = document.domain;
+   uploads = [
+    <% for (var i = 0; i < uploads.length; i++)  { %>
+     '<%= uploads[i] %>',
+    <% } %>
+   ];
+  </script>
+ </head>
+ <body>
+  File(s) uploaded successfully.
+ </body>
+</html>
