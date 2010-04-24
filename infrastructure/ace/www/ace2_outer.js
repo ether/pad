@@ -122,6 +122,10 @@ function Ace2Editor() {
   editor.execCommand = pendingInit(function(cmd, arg1) {
     info.ace_execCommand(cmd, arg1);
   });
+  editor.replaceRange = pendingInit(function(start, end, text) {
+    info.ace_replaceRange(start, end, text);
+  });
+
 
   // calls to these functions ($$INCLUDE_...)  are replaced when this file is processed
   // and compressed, putting the compressed code from the named file directly into the

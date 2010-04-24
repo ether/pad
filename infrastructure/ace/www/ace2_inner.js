@@ -788,6 +788,13 @@ function OUTER(gscope) {
     }
   }
 
+  function replaceRange(start, end, text) {
+    inCallStack('replaceRange', function() {
+      fastIncorp(9);
+      performDocumentReplaceRange(start, end, text);
+    });
+  }
+
   editorInfo.ace_focus = focus;
   editorInfo.ace_importText = importText;
   editorInfo.ace_importAText = importAText;
@@ -800,6 +807,7 @@ function OUTER(gscope) {
   editorInfo.ace_getFormattedCode = getFormattedCode;
   editorInfo.ace_setEditable = setEditable;
   editorInfo.ace_execCommand = execCommand;
+  editorInfo.ace_replaceRange = replaceRange;
 
   editorInfo.ace_setProperty = function(key, value) {
     var k = key.toLowerCase();
@@ -1956,6 +1964,9 @@ function OUTER(gscope) {
   }
 
   function performDocumentReplaceRange(start, end, newText) {
+    if (start == undefined) start = rep.selStart;
+    if (end == undefined) end = rep.selEnd;
+
     //dmesg(String([start.toSource(),end.toSource(),newText.toSource()]));
 
     // start[0]: <--- start[1] --->CCCCCCCCCCC\n
