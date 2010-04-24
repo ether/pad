@@ -31,7 +31,7 @@ jimport("java.io.File",
         "java.lang.Runtime");
 
 
-/* Normal base64 encoding, except we don't care about adding newlines */
+/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - */
 function base64Encode(stringArray) {
   base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+/";
 
@@ -52,8 +52,8 @@ function base64Encode(stringArray) {
 	       base64code.charAt((j >> 6) & 0x3f) +
 	       base64code.charAt(j & 0x3f));
   }
-  /* replace padding with "=" */
-  return encoded.substring(0, encoded.length - padding) + "==".substring(0, padding);
+  /* replace padding with "-" */
+  return encoded.substring(0, encoded.length - padding) + "--".substring(0, padding);
 }
 
 

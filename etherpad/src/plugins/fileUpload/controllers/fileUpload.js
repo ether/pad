@@ -54,9 +54,9 @@ function onRequest() {
     var itemFactory = new fileupload.disk.DiskFileItemFactory();
     var handler = new fileupload.servlet.ServletFileUpload(itemFactory);
     var items = handler.parseRequest(request.underlying).toArray();
-    for (var i = 0; i < items.length; i++){
-      if (!items[i].isFormField())
-        uploads.push('/up/' + models.storeFile(items[i]));
+    for (var i = 0; i < items.length; i++)
+      if (!items[i].isFormField()) {
+        uploads.push(request.scheme + '://' + request.host + '/up/' + models.storeFile(items[i]));
     }
 
     response.setContentType("text/html");
