@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ### BEGIN INIT INFO
-# Provides:          etherpad-%BRANCH%
+# Provides:          etherpad
 # Required-Start:    $local_fs $remote_fs
 # Required-Stop:     $local_fs $remote_fs
 # Default-Start:     2 3 4 5
@@ -41,40 +41,11 @@
 
 # Do NOT "set -e"
 
-
-
-#####
-#
-# Patches the configuration file by replacing ,,%$2%'' with the contents of file
-# $1 in file $3
-#
-# @param $1 Configuration File which contains the value to set to
-# @param $2 Configuration key to apply (can be done only once)
-# @param $3 Configuration file
-#
-function apply_config() {
-		CONFIG_FILE="${3}"
-		TMP_FILE="/tmp/etherpad.properties"
-
-		CONFIG_KEY="$2"
-		CONFIG_VALUE=`cat $1`
-
-		sed "s/%$CONFIG_KEY%/$CONFIG_VALUE/" $CONFIG_FILE > $TMP_FILE
-		cp $TMP_FILE $CONFIG_FILE
-		rm $TMP_FILE
-}
-#
-#####
-
-
-
-
-
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 DESC="etherpad daemon"
 NAME="etherpad"
-DAEMON_BASE="/usr/share/etherpad/etherpad"
+DAEMON_BASE="/usr/share/etherpad"
 DAEMON=$DAEMON_BASE/bin/run.sh
 DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
@@ -98,31 +69,6 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
-	CONFIGURATION_BASE="/etc/etherpad"
-	CONFIGURATION_SRC="${CONFIGURATION_BASE}/etherpad.properties"
-	CONFIGURATION_DEST="${DAEMON_BASE}/etc/etherpad.localdev-default.properties"
-
-
-	# Reset configuration
-	cp "${CONFIGURATION_BASE}/etherpad.properties" "${CONFIGURATION_DEST}"
-
-
-	# Apply configuration properties
-	apply_config "${CONFIGURATION_BASE}/properties/is-production"		"IS_PRODUCTION"		"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/admin-password"		"ADMIN_PASSWORD"	"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/port"			"PORT"			"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/database-host"		"DATABASE_HOST"		"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/database-port"		"DATABASE_PORT"		"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/database-name"		"DATABASE_NAME"		"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/database-username"	"DATABASE_USERNAME"	"${CONFIGURATION_DEST}"
-	apply_config "${CONFIGURATION_BASE}/properties/database-password"	"DATABASE_PASSWORD"	"${CONFIGURATION_DEST}"
-
-
-	# Give the etherpad user the configuration file
-	chown etherpad:etherpad "${CONFIGURATION_DEST}"
-
-
-
 	# Return
 	#   0 if daemon has been started
 	#   1 if daemon was already running
@@ -147,7 +93,7 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name java
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
 	# Wait for children to finish too if this is a daemon that forks
@@ -156,7 +102,7 @@ do_stop()
 	# that waits for the process to drop all resources that could be
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec java
 	[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
@@ -172,7 +118,7 @@ do_reload() {
 	# restarting (for example, when it is sent a SIGHUP),
 	# then implement that here.
 	#
-	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name java
 	return 0
 }
 

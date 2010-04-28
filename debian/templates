@@ -1,0 +1,11 @@
+Template: etherpad/admin_password
+Type: password
+Default: password
+Description: etherpad administration password
+ Please insert the administration password, default is password.
+
+Template: etherpad/topdomains
+Type: string
+Default: 
+Description: Domain name of site
+ Please insert the domain name of your site.

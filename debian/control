@@ -1,0 +1,20 @@
+Source: etherpad
+Section: unknown
+Priority: extra
+Maintainer: Egil Möller <egil.moller@piratpartiet.se>
+Build-Depends: debhelper (>= 7), dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7)
+Build-Conflicts: libgcj-common, java-gcj-compat-headless, java-gcj-compat, gcj-4.3-base
+Standards-Version: 3.8.0
+Homepage: <insert the upstream URL, if relevant>
+
+Package: etherpad
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7)
+Description: Etherpad multiuser web-based word processor
+ EtherPad is the only web-based word processor that allows people to work
+ together in really real-time.
+ .
+ When multiple people edit the same document simultaneously, any changes are
+ instantly reflected on everyone's screen. The result is a new and productive
+ way to collaborate on text documents, useful for meeting notes, drafting
+ sessions, education, team programming, and more.

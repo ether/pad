@@ -14,3 +14,6 @@ etherpad/src/static/js/easysync2_client.js
 etherpad/src/static/js/linestylefilter_client.js
 etherpad/*.log
 infrastructure/lib/cos.jar
+build-arch-stamp
+build-indep-stamp
+configure-stamp

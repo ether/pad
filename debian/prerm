@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 ################################################################################
 #
 # Copyright (c) 2010 penSec.IT UG (haftungsbeschränkt)
 #        http://www.pensec.it
 #        mail@pensec.it
+# Copyright (c) 2010 Egil Möller <egil.moller@piratpartiet.se>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -23,6 +24,18 @@
 
 
 set -e
+. /usr/share/debconf/confmodule
+
+if [ -n "$ETHERPAD_DEBUG" ]; then
+  echo "now debugging $0 $@"
+  set -x
+fi
+
+db_version 2.0
+
+# Set up database
+. /usr/share/dbconfig-common/dpkg/prerm.mysql 
+dbc_go etherpad $@
 
 # Remove log+data directories, otherwise uninstall will fail
 rm -rf /var/log/etherpad
