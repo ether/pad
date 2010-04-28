@@ -18,3 +18,8 @@ build-arch-stamp
 build-indep-stamp
 configure-stamp
 infrastructure/lib/mysql-connector*.jar
+debian/etherpad.debhelper.log
+debian/etherpad.postrm.debhelper
+debian/etherpad.substvars
+debian/etherpad
+debian/files
