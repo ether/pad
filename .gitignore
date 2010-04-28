@@ -17,3 +17,4 @@ infrastructure/lib/cos.jar
 build-arch-stamp
 build-indep-stamp
 configure-stamp
+infrastructure/lib/mysql-connector*.jar
