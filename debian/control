@@ -9,7 +9,7 @@ Homepage: <insert the upstream URL, if relevant>
 
 Package: etherpad
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7)
+Depends: ${shlibs:Depends}, ${misc:Depends}, dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
 Pre-Depends: dbconfig-common
 Description: Etherpad multiuser web-based word processor
  EtherPad is the only web-based word processor that allows people to work
