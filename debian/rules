@@ -82,6 +82,8 @@ install-arch:
 
 	mkdir -p debian/etherpad/usr/share/etherpad
 	cp -a $$(ls | grep -v debian) debian/etherpad/usr/share/etherpad
+	# create directory to save user data
+	mkdir -p debian/etherpad/usr/share/etherpad/etherpad/data
 
 	mkdir -p debian/etherpad/etc
 	mv debian/etherpad/usr/share/etherpad/etherpad/etc debian/etherpad/etc/etherpad
