@@ -32,11 +32,11 @@ fi
 
 TMPSTORE=/tmp/ajbuild-tmpstore-`date +%s`
 
-JARFILES=`echo $SCALA_HOME/scala-library.jar lib/*.jar lib/manifest`
+JARFILES=`echo $SCALA_LIBRARY_JAR lib/*.jar lib/manifest`
 function genjar {
     echo "unzipping JARs..."
     pushd $1 >> /dev/null
-    $JAR xf $SCALA_HOME/scala-library.jar
+    $JAR xf $SCALA_LIBRARY_JAR
     rm -rf META-INF
     for a in ../../lib/*.jar; do
 	$JAR xf $a
