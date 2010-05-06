@@ -1,0 +1,8 @@
+# The script infrastructure/ace/bin/serve is really a scala program
+# but contains magic to make it as executable shell script (the couple first
+# lines in the script will execute scala on itself):
+etherpad source: shell-script-fails-syntax-check ./usr/share/etherpad/infrastructure/ace/bin/serve
+etherpad binary: shell-script-fails-syntax-check ./usr/share/etherpad/infrastructure/ace/bin/serve
+# The template already has a comment for the default field, lintian would
+# want to have an extra comment inside the string to translate, I don't agree:
+etherpad source: translated-default-field templates: 4
