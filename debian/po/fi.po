@@ -1,0 +1,76 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Mikko Rantalainen <mikko.rantalainen@peda.net>, 2010
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: etherpad@packages.debian.org\n"
+"POT-Creation-Date: 2010-05-06 11:07+0300\n"
+"PO-Revision-Date: 2010-05-06 11:13+0300\n"
+"Last-Translator: Mikko Rantalainen <mikko.rantalainen@peda.net>\n"
+"Language-Team: Peda.net\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.3.1\n"
+
+#. Type: password
+#. Default
+#. Note: the translation of this string should match the prompt below
+#: ../templates:1001
+msgid "password"
+msgstr "salasana"
+
+#. Type: password
+#. Description
+#. Note: the translation of this string should match the default password above
+#: ../templates:1002
+msgid "Etherpad administrator password:"
+msgstr "Etherpad-ylläpitäjän salasana:"
+
+#. Type: password
+#. Description
+#. Note: the translation of this string should match the default password above
+#: ../templates:1002
+msgid ""
+"The Etherpad system can be administrated with a browser. To make this safe, "
+"a good password should be set for the administrator. The default is password "
+"is \"password\" (THIS IS NOT SAFE)."
+msgstr ""
+"Etherpad-järjestelmää voidaan ylläpitää selaimella. Ylläpitäjällä tulee olla "
+"hyvä salasana, jotta tämä olisi turvallista. Oletuksena salasana on "
+"\"salasana\" (TÄMÄ EI OLE TURVALLINENN SALASANA)."
+
+#. Type: string
+#. Description
+#: ../templates:2001
+msgid "Fully qualified domain name of the site:"
+msgstr "Etherpad-palvelimen osoite (esimerkiksi example.com):"
+
+#. Type: string
+#. Description
+#: ../templates:2001
+msgid ""
+"The system needs to know the fully qualified domain name of the site where "
+"etherpad system is visible to the world. This may be different from the name "
+"of the system where etherpad is installed (e.g. in case of reverse proxy or "
+"port forwarding). Notice that if you enter \"example.com\" here, the service "
+"will be available at \"http://example.com:9000\" by default."
+msgstr ""
+"Järjestelmän tulee tietää Etherpad-palvelun täydellinen julkinen domain-"
+"nimi. Tämä voi olla eri kuin sen tietokoneen domain-nimi, johon palvelu "
+"asennetaan (esimerkiksi kun käytetään porttien uudelleenohjausta tai reverse "
+"proxy -määrityksiä). Huomaa, että jos syötät tässä \"example.com\", niin "
+"palvelu on oletuksena nähtävillä osoitteessa \"http://example.com:9000\"."
+
+#~ msgid "Please insert the administration password, default is password."
+#~ msgstr ""
+#~ "Koko Etherpad-asennuksen pääkäyttäjän salasana, oletus on \"salasana\"."
+
+#~ msgid "Please insert the domain name of your site."
+#~ msgstr ""
+#~ "Syötä tähän Etherpad-palvelimesi osoite. Varsinainen Etherpad-palvelu "
+#~ "toimii oletuksena portissa 9000 (esimerkiksi http://example.com:9000)."
