@@ -41,3 +41,5 @@ dbc_go etherpad $@
 rm -rf /var/log/etherpad
 rm -rf /usr/share/etherpad/etherpad/data
 
+#DEBHELPER#
+
