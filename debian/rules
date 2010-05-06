@@ -1,87 +1,57 @@
 #!/usr/bin/make -f
-# -*- makefile -*-
-# Sample debian/rules that uses debhelper.
+# Sample debian/rules that uses debhelper. 
+# This file is public domain software, originally written by Joey Hess.
 #
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
+# This version is for packages that are architecture independent.
 #
-# Modified to make a template file for a multi-binary package with separated
-# build-arch and build-indep targets  by Bill Allombert 2001
-
+# Rules to build etherpad
+#
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# This has to be exported to make some magic below work.
-export DH_OPTIONS
-
-
-
-
-
-
-configure: configure-stamp
-configure-stamp:
+build: build-stamp
+build-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
 
-	touch configure-stamp
-
-
-#Architecture
-build: build-arch build-indep
-
-build-arch: build-arch-stamp
-build-arch-stamp: configure-stamp  
-
-	# Add here commands to compile the arch part of the package.
+	# Add here commands to compile the package.
 	#$(MAKE)
 	bin/build.sh
-	touch $@
+	touch build-stamp
 
-build-indep: build-indep-stamp
-build-indep-stamp: configure-stamp  
-
-	# Add here commands to compile the indep part of the package.
-	#$(MAKE) doc
-	touch $@
-
-clean: 
+clean:
+	# update template translation strings:
+	debconf-updatepo
 	dh_testdir
 	dh_testroot
-	rm -f build-arch-stamp build-indep-stamp configure-stamp
+	rm -f build-stamp
 
 	# Add here commands to clean up after the build process.
-	#git clean -X
+	#$(MAKE) clean
+	#$(MAKE) distclean
 
-	dh_clean  --exclude ./build/apt/.tmp.local/infrastructure/bin/makejar.sh.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig
+	dh_clean
 
-install: install-indep install-arch
-install-indep:
+install: build
 	dh_testdir
 	dh_testroot
-	dh_prep -i  --exclude ./build/apt/.tmp.local/infrastructure/bin/makejar.sh.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig
-	dh_installdirs -i
+	dh_prep
+	dh_installdirs
+
+	# Add here commands to install the package into debian/<packagename>.
+	#$(MAKE) prefix=`pwd`/debian/`dh_listpackages`/usr install
 
 	# Add here commands to install the indep part of the package into
 	# debian/<package>-doc.
 	#INSTALLDOC#
 
-	dh_install -i
-
-install-arch:
-	dh_testdir
-	dh_testroot
-	dh_prep -s  --exclude ./build/apt/.tmp.local/infrastructure/bin/makejar.sh.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./build/apt/.tmp.local/infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Decompiler.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Parser.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/Token.java.orig --exclude ./infrastructure/yuicompressor/src/yuicompressor/org/mozilla/javascript/TokenStream.java.orig
-	dh_installdirs -s
-
-	# Add here commands to install the arch part of the package into
-	# debian/tmp.
-	# $(MAKE) DESTDIR=$(CURDIR)/debian/etherpad install
-
 	mkdir -p debian/etherpad/usr/share/etherpad
-	cp -a $$(ls | grep -v debian) debian/etherpad/usr/share/etherpad
+
+	# try to copy content correctly
+	cp -a $$(ls | grep -E -v 'debian|LICENSE|COPYING|INSTALL') debian/etherpad/usr/share/etherpad
+	# fix ups (because the above copy is too dump), remove unneeded stuff
+	find debian/etherpad -type f -and -name ".gitignore" -exec rm {} +
+	find debian/etherpad -type f -and -name "build-stamp" -exec rm {} +
+
 	# create directory to save user data
 	mkdir -p debian/etherpad/usr/share/etherpad/etherpad/data
 
@@ -90,52 +60,53 @@ install-arch:
 	ln -s /etc/etherpad debian/etherpad/usr/share/etherpad/etherpad/etc
 
 	mkdir -p debian/etherpad/var/log/etherpad
+	mkdir -p debian/etherpad/usr/share/lintian/overrides
+	cp debian/source/lintian-overrides debian/etherpad/usr/share/lintian/overrides/etherpad
 
-	mkdir -p debian/etherpad/etc/init.d
-	ln -s /usr/share/etherpad/bin/etherpad.init.d debian/etherpad/etc/init.d/etherpad
+	#mkdir -p debian/etherpad/etc/init.d
+	#ln -s /usr/share/etherpad/bin/etherpad.init.d debian/etherpad/etc/init.d/etherpad
+	dh_installinit --update-rcd-params="start 05 2 3 4 5 . stop 95 S 0 1 6 ."
+
+	dh_install -i
 
 
-	dh_install -s
-
-# Must not depend on anything. This is to be called by
-# binary-arch/binary-indep
-# in another 'make' thread.
-binary-common:
+# Build architecture-independent files here.
+binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs 
+	dh_installchangelogs
 	dh_installdocs
+	# on the fly final copyright file creation:
+	cat debian/copyright LICENSE > debian/etherpad/usr/share/doc/etherpad/copyright
 	dh_installexamples
 #	dh_installmenu
 	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
+#	dh_installcatalogs
 #	dh_installpam
 #	dh_installmime
-#	dh_python
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
+#	dh_installwm
+#	dh_installudev
+#	dh_lintian
+#	dh_bugfiles
+#	dh_undocumented
 	dh_installman
 	dh_link
-	dh_strip
 	dh_compress
 	dh_fixperms
 #	dh_perl
-	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
-# Build architecture independant packages using the common target.
-binary-indep: build-indep install-indep
-	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
 
-# Build architecture dependant packages using the common target.
-binary-arch: build-arch install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
-
-binary: binary-arch binary-indep
-.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
