@@ -1,7 +1,7 @@
 Source: etherpad
 Section: contrib/httpd
 Priority: extra
-Maintainer: Egil Möller <egil.moller@piratpartiet.se>
+Maintainer: Etherpad Foundation <packaging@etherpad.org>
 Build-Depends: po-debconf, debhelper (>= 7)
 Build-Depends-indep: dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), scala-library (>= 2.7)
 Build-Conflicts: libgcj-common, java-gcj-compat-headless, java-gcj-compat, gcj-4.3-base
