@@ -19,8 +19,8 @@ build-stamp:
 	touch build-stamp
 
 clean:
-	# update template translation strings:
-	debconf-updatepo
+	# update template translation strings commented out as git-buildpackage complains that the file changes all the times otherwise...
+	# debconf-updatepo
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
