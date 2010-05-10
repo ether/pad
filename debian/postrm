@@ -36,3 +36,6 @@ db_version 2.0
 # Set up database
 . /usr/share/dbconfig-common/dpkg/postrm.mysql 
 dbc_go etherpad $@
+
+#DEBHELPER#
+

@@ -1,11 +1,20 @@
 Template: etherpad/admin_password
 Type: password
-Default: password
-Description: etherpad administration password
- Please insert the administration password, default is password.
+# Note: the translation of this string should match the prompt below
+_Default: password
+# Note: the translation of this string should match the default password above
+_Description: Etherpad administrator password:
+ The Etherpad system can be administrated with a browser. To make this
+ safe, a good password should be set for the administrator.
+ The default is password is "password" (THIS IS NOT SAFE).
 
 Template: etherpad/topdomains
 Type: string
-Default: 
-Description: Domain name of site
- Please insert the domain name of your site.
+Default: localhost
+_Description: Fully qualified domain name of the site:
+ The system needs to know the fully qualified domain name of the site where
+ etherpad system is visible to the world. This may be different from the
+ name of the system where etherpad is installed (e.g. in case of reverse proxy
+ or port forwarding). Notice that if you enter "example.com" here, the service
+ will be available at "http://example.com:9000" by default.
+

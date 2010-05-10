@@ -1,19 +1,19 @@
 Source: etherpad
-Section: unknown
+Section: contrib/httpd
 Priority: extra
-Maintainer: Egil Möller <egil.moller@piratpartiet.se>
-Build-Depends: debhelper (>= 7), dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7)
+Maintainer: Etherpad Foundation (Packaging) <packaging@etherpad.org>
+Build-Depends: po-debconf, debhelper (>= 7)
+Build-Depends-indep: dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), scala-library (>= 2.7)
 Build-Conflicts: libgcj-common, java-gcj-compat-headless, java-gcj-compat, gcj-4.3-base
-Standards-Version: 3.8.0
-Homepage: <insert the upstream URL, if relevant>
+Standards-Version: 3.8.4
+Homepage: http://github.com/ether/pad
 
 Package: etherpad
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
-Pre-Depends: dbconfig-common
-Description: Etherpad multiuser web-based word processor
- EtherPad is the only web-based word processor that allows people to work
- together in really real-time.
+Architecture: all
+Depends: ${misc:Depends}, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
+Pre-Depends: dbconfig-common, debconf, adduser
+Description:  A web-based word processor that allows people to work
+ together in real-time.
  .
  When multiple people edit the same document simultaneously, any changes are
  instantly reflected on everyone's screen. The result is a new and productive

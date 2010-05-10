@@ -1,0 +1,58 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: etherpad@packages.debian.org\n"
+"POT-Creation-Date: 2010-05-06 11:07+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: password
+#. Default
+#. Note: the translation of this string should match the prompt below
+#: ../templates:1001
+msgid "password"
+msgstr ""
+
+#. Type: password
+#. Description
+#. Note: the translation of this string should match the default password above
+#: ../templates:1002
+msgid "Etherpad administrator password:"
+msgstr ""
+
+#. Type: password
+#. Description
+#. Note: the translation of this string should match the default password above
+#: ../templates:1002
+msgid ""
+"The Etherpad system can be administrated with a browser. To make this safe, "
+"a good password should be set for the administrator. The default is password "
+"is \"password\" (THIS IS NOT SAFE)."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../templates:2001
+msgid "Fully qualified domain name of the site:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../templates:2001
+msgid ""
+"The system needs to know the fully qualified domain name of the site where "
+"etherpad system is visible to the world. This may be different from the name "
+"of the system where etherpad is installed (e.g. in case of reverse proxy or "
+"port forwarding). Notice that if you enter \"example.com\" here, the service "
+"will be available at \"http://example.com:9000\" by default."
+msgstr ""

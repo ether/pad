@@ -1,3 +1,15 @@
+etherpad (1.0.1) karmic; urgency=low
+
+  * Changed maintainer to Packaging
+
+ -- Etherpad Foundation (Packaging) <packaging@etherpad.org>  Mon, 10 May 2010 19:22:19 +0200
+
+etherpad (1.0fixed) karmic; urgency=low
+
+  * Fixed installation scripts
+
+ -- Mikko Rantalainen <mikko.rantalainen@peda.net>  Tue, 04 May 2010 12:57:28 +0300
+
 etherpad (1.0) unstable; urgency=low
 
   * Initial Release.

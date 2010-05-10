@@ -79,3 +79,6 @@ m4 \
  > /etc/etherpad/etherpad.local.properties
 
 chown etherpad:etherpad /etc/etherpad/etherpad.local.properties
+
+#DEBHELPER#
+
