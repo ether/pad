@@ -5,6 +5,7 @@
 # Copyright (c) 2010 penSec.IT UG (haftungsbeschränkt)
 #        http://www.pensec.it
 #        mail@pensec.it
+# Copyright (c) 2010 Egil Möller <egil.moller@piratpartiet.se>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -22,7 +23,19 @@
 
 
 
+set -e
+. /usr/share/debconf/confmodule
 
+if [ -n "$ETHERPAD_DEBUG" ]; then
+  echo "now debugging $0 $@"
+  set -x
+fi
 
-bash -c "`dirname $0`/run-local.sh" > "/var/log/etherpad/log" 2> "/var/log/etherpad/error"
+db_version 2.0
+
+# Set up database
+. /usr/share/dbconfig-common/dpkg/postrm.mysql 
+dbc_go etherpad $@
+
+#DEBHELPER#
 
