@@ -12,6 +12,7 @@ Package: etherpad
 Architecture: all
 Depends: ${misc:Depends}, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
 Pre-Depends: dbconfig-common, debconf, adduser
+Recommends: perl
 Description:  A web-based word processor that allows people to work
  together in real-time.
  .
