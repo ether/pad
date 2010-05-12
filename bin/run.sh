@@ -9,7 +9,9 @@ export MYSQL_CONNECTOR_JAR=/usr/share/java/mysql-connector-java.jar
 export JAVA="/usr/lib/jvm/java-6-sun/bin/java"
 export SCALA="/usr/bin/scala"
 export PATH="/usr/lib/jvm/java-6-sun/bin:$PATH"
+export LOG="/var/log/etherpad/server.log"
 #####
 
 cd etherpad
-exec bin/run-local.sh
+exec bin/run-local.sh "$@" >> "$LOG" 2>&1
+
