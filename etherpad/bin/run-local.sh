@@ -16,7 +16,10 @@
 
 mkdir -p data/appjet
 
+# JVM heap memory limit (actually reserved during startup)
 MXRAM="1G"
+# maximum thread count for etherpad (should be roughly memory in MB / 4)
+MAXTHREADS="250"
 
 if [ -x "/usr/bin/perl" ]; then
 	if [ -e "/proc/meminfo" ]; then
@@ -44,6 +47,14 @@ if [ -x "/usr/bin/perl" ]; then
 			$usable_free = 1024 if ($usable_free > 1024);
 			print int($usable_free)."M\n"
 		};')
+
+	MAXTHREADS=$(echo "$MXRAM" | perl -ne '
+			s/[^\d]//;
+			$maxthreads = int($_/4);
+			if ($maxthreads < 5)
+				{ $maxthreads = 5 }
+			print $maxthreads;
+		')
 	fi
 fi
 
@@ -74,6 +85,9 @@ if [[ $1 == "--cfg" ]]; then
   shift;
 fi
 
+echo "Maximum ram: $MXRAM"
+echo "Maximum thread count: $MAXTHREADS"
+
 echo "Using config file: ${cfg_file}"
 
 exec $JAVA -classpath $CP \
@@ -92,4 +106,6 @@ exec $JAVA -classpath $CP \
     $JAVA_OPTS \
     net.appjet.oui.main \
     --configFile=${cfg_file} \
+    --maxThreads=${MAXTHREADS}
     "$@"
+
