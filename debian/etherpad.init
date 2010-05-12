@@ -82,6 +82,16 @@ do_start()
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
 	# on this one.  As a last resort, sleep for some time.
+
+	[ "$VERBOSE" != no ] && echo -n "Waiting for service to come up ..."
+	for counter in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+		echo "GET /" | netcat -w 1 localhost 9000 > /dev/null 2>&1 && break
+		[ "$VERBOSE" != no ] && echo -n "."
+		sleep 1
+	done
+	[ "$VERBOSE" != no ] && echo ""
+
+	return 0
 }
 
 #
