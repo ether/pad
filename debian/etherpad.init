@@ -122,6 +122,10 @@ case "$1" in
   status)
        status_of_proc -p $PIDFILE "$DAEMON" "$NAME" && exit 0 || exit $?
 	;;
+  force-stop)
+	# make sure every etherpad instance is killed
+	pkill -f 'java.*etherpad'
+	;;
   restart|force-reload)
 	#
 	# If the "reload" option is implemented then remove the
@@ -146,7 +150,7 @@ case "$1" in
 	;;
   *)
 	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload|force-stop}" >&2
 	exit 3
 	;;
 esac
