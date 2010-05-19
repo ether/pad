@@ -23,4 +23,5 @@ debian/etherpad.*.debhelper
 debian/etherpad.substvars
 debian/etherpad
 debian/files
+etherpad/src/plugins/fileUpload/upload
 build-stamp
