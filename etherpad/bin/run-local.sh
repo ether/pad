@@ -46,7 +46,7 @@ fi
 
 echo "Using config file: ${cfg_file}"
 
-$JAVA -classpath $CP \
+exec $JAVA -classpath $CP \
     -server \
     -Xmx${MXRAM} \
     -Xms${MXRAM} \
@@ -63,4 +63,3 @@ $JAVA -classpath $CP \
     net.appjet.oui.main \
     --configFile=${cfg_file} \
     "$@"
-

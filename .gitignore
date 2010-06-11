@@ -14,3 +14,13 @@ etherpad/src/static/js/easysync2_client.js
 etherpad/src/static/js/linestylefilter_client.js
 etherpad/*.log
 infrastructure/lib/cos.jar
+build-arch-stamp
+build-indep-stamp
+configure-stamp
+infrastructure/lib/mysql-connector*.jar
+debian/etherpad.debhelper.log
+debian/etherpad.*.debhelper
+debian/etherpad.substvars
+debian/etherpad
+debian/files
+build-stamp

@@ -1,0 +1,31 @@
+Installation instructions:
+
+* Install the dependencies: Scala 2.7, Sun Java JDK 6, libmysql-java
+
+* Uninstall gcj if it's installed as it seems to interfere with the
+  Scala compiler. You can safely reinstall it after compiling Etherpad
+  if you want to.
+
+* Edit the files bin/build.sh and bin/run.sh (and optionally
+  bin/etherpad.init.d) and change the paths to match your system.
+
+* Run bin/build.sh
+
+* Create a new user on your system called "etherpad"
+
+* Create a MySQL database "etherpad" and a database user "etherpad"
+
+* Copy etherpad/etc/etherpad.localdev-default.properties to etherpad/etc/etherpad.local.properties
+
+* Edit etherpad/etc/etherpad.local.properties and set
+   etherpad.SQL_JDBC_URL
+       Example etherpad.SQL_JDBC_URL = jdbc:mysql://localhost:3306/etherpad
+   etherpad.SQL_PASSWORD
+   etherpad.SQL_USERNAME = etherpad
+   etherpad.adminPass
+   topdomains
+       Example: topdomains = yourhostname.com,localhost
+
+* Create a link to bin/etherpad.init.d from /etc/init.d/etherpad
+
+* Run /etc/init.d/etherpad start
