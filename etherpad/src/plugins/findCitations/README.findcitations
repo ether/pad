@@ -1,0 +1,13 @@
+Use data created by urlIndexer, but now search by URL
+instead of by tag -- in other words, given
+
+http://planetmath-laptop:9000/ep/citations?query=http://foo.bar.com
+
+return a list of the pads that contain http://foo.bar.com
+-- simple as that.
+
+           * * *
+
+Presumably we require that urlIndexer be installed.
+
+But when does it do its work?
