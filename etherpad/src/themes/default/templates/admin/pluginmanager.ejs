@@ -22,6 +22,8 @@ limitations under the License. */ %>
        return true;
    return false;
  }
+
+ plugin_registry = plugins.loadPlugins();
 %>
 
 <% template.define('docBarTitle', function() { var ejs_data=''; %>
@@ -41,27 +43,27 @@ limitations under the License. */ %>
      <th>Status</th>
      <th></th>
     </tr>
-    <% for (var plugin in plugins.pluginModules) { %>
+    <% for (var plugin in plugin_registry.pluginModules) { %>
      <tr>
       <td class="mousover_parent">
        <%= plugin %>
        <div class="mouseover_child">
-	<%= plugins.pluginModules[plugin].description %>
+	<%= plugin_registry.pluginModules[plugin].description %>
        </div>
       </td>
       <td>
-       <% if (plugins.plugins[plugin] !== undefined) { %>
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
 	Installed
        <% } else { %>
 	Not installed
        <% } %>
       </td>
       <td>
-       <% if (plugins.plugins[plugin] !== undefined) { %>
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
-	<% if (plugins.plugins[plugin].configLink !== undefined) { %>
-	 <a href="<%= plugins.plugins[plugin].configLink %>">Configure</a>
+	<% if (plugin_registry.plugins[plugin].configLink !== undefined) { %>
+	 <a href="<%= plugin_registry.plugins[plugin].configLink %>">Configure</a>
 	<% } %>
        <% } else { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=install">Install</a>

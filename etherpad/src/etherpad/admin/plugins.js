@@ -30,6 +30,7 @@ import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 import("exceptionutils");
 import("execution");
+import("cache_utils.syncedWithCache");
 
 jimport("java.io.File",
         "java.io.DataInputStream", 
@@ -39,15 +40,26 @@ jimport("java.io.File",
         "java.io.BufferedReader",
         "net.appjet.oui.JarVirtualFile");
 
-pluginsLoaded = false;
-pluginModules = {};
-plugins = {};
-hooks = {};
-clientHooks = {};
 
-function loadAvailablePlugin(pluginName) {
-  if (pluginModules[pluginName] != undefined)
-    return pluginModules[pluginName];
+function selectOrInsert(table, columns) {
+  var res = sqlobj.selectSingle(table, columns);
+  if (res !== null)
+    return res;
+  sqlobj.insert(table, columns);
+  return sqlobj.selectSingle(table, columns);
+}
+
+
+function PluginRegistry() {
+  this.pluginModules = {};
+  this.plugins = {};
+  this.hooks = {};
+  this.clientHooks = {}; 
+}
+
+PluginRegistry.prototype.loadAvailablePlugin = function (pluginName) {
+  if (this.pluginModules[pluginName] != undefined)
+    return this.pluginModules[pluginName];
 
   var pluginsDir = new Packages.java.io.File("src/plugins");
 
@@ -66,19 +78,19 @@ function loadAvailablePlugin(pluginName) {
   return null;
 }
 
-function loadAvailablePlugins() {
+PluginRegistry.prototype.loadAvailablePlugins = function () {
   var pluginsDir = new Packages.java.io.File("src/plugins");
 
   var pluginNames = pluginsDir.list();
 
   for (i = 0; i < pluginNames.length; i++) {
-    var plugin = loadAvailablePlugin(pluginNames[i]);
+    var plugin = this.loadAvailablePlugin(pluginNames[i]);
     if (plugin != null)
-	pluginModules[pluginNames[i]] = plugin
+	this.pluginModules[pluginNames[i]] = plugin
   }
 }
 
-function loadPluginHooks(pluginName) {
+PluginRegistry.prototype.loadPluginHooks = function (pluginName) {
   function registerHookNames(hookSet, type) {
     return function (hook) {
       var row = {hook:hook, type:type, plugin:pluginName};
@@ -87,23 +99,25 @@ function loadPluginHooks(pluginName) {
       return row;
     }
   }
-  plugins[pluginName] = pluginModules[pluginName].hooks.map(registerHookNames(hooks, 'server'));
-  if (pluginModules[pluginName].client != undefined && pluginModules[pluginName].client.hooks != undefined)
-    plugins[pluginName] = plugins[pluginName].concat(pluginModules[pluginName].client.hooks.map(registerHookNames(clientHooks, 'client')));
+  this.plugins[pluginName] = this.pluginModules[pluginName].hooks.map(registerHookNames(this.hooks, 'server'));
+  if (this.pluginModules[pluginName].client != undefined && this.pluginModules[pluginName].client.hooks != undefined)
+    this.plugins[pluginName] = this.plugins[pluginName].concat(this.pluginModules[pluginName].client.hooks.map(registerHookNames(this.clientHooks, 'client')));
 }
 
-function unloadPluginHooks(pluginName) {
-  for (var hookSet in [hooks, clientHooks])
+PluginRegistry.prototype.unloadPluginHooks = function (pluginName) {
+  [this.hooks, this.clientHooks].forEach(function (hookSet) {
     for (var hookName in hookSet) {
       var hook = hookSet[hookName];
       for (i = hook.length - 1; i >= 0; i--)
-	if (hook[i].plugin == pluginName)
-	  hook.splice(i, 1);
+       if (hook[i].plugin == pluginName) {
+	 hook.splice(i, 1);
+      }
     }
-  delete plugins[pluginName];
+  });
+  delete this.plugins[pluginName];
 }
 
-function loadInstalledHooks() {
+PluginRegistry.prototype.loadInstalledHooks = function () {
   var sql = '' +
    'select ' +
    ' hook.name as hook, ' +
@@ -124,16 +138,16 @@ function loadInstalledHooks() {
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];	
 
-    if (plugins[row.plugin] == undefined)
-      plugins[row.plugin] = [];
-    plugins[row.plugin].push(row);
+    if (this.plugins[row.plugin] == undefined)
+      this.plugins[row.plugin] = [];
+    this.plugins[row.plugin].push(row);
 
     var hookSet;
 
     if (row.type == 'server')
-      hookSet = hooks;
+      hookSet = this.hooks;
     else if (row.type == 'client')
-      hookSet = clientHooks;
+      hookSet = this.clientHooks;
 
     if (hookSet[row.hook] == undefined)
       hookSet[row.hook] = [];
@@ -142,29 +156,21 @@ function loadInstalledHooks() {
   }
 }
 
-function selectOrInsert(table, columns) {
-  var res = sqlobj.selectSingle(table, columns);
-  if (res !== null)
-    return res;
-  sqlobj.insert(table, columns);
-  return sqlobj.selectSingle(table, columns);
-}
-
-function saveInstalledHooks(pluginName) {
+PluginRegistry.prototype.saveInstalledHooks = function (pluginName) {
   var plugin = sqlobj.selectSingle('plugin', {name:pluginName});
 
   if (plugin !== null) {
     sqlobj.deleteRows('plugin_hook', {plugin_id:plugin.id});
-    if (plugins[pluginName] === undefined)
+    if (this.plugins[pluginName] === undefined)
       sqlobj.deleteRows('plugin', {name:pluginName});
   }
 
-  if (plugins[pluginName] !== undefined) {
+  if (this.plugins[pluginName] !== undefined) {
     if (plugin === null)
       plugin = selectOrInsert('plugin', {name:pluginName});
 
-    for (var i = 0; i < plugins[pluginName].length; i++) {
-      var row = plugins[pluginName][i];
+    for (var i = 0; i < this.plugins[pluginName].length; i++) {
+      var row = this.plugins[pluginName][i];
 
       var hook_type = selectOrInsert('hook_type', {name:row.type});
       var hook = selectOrInsert('hook', {name:row.hook, type_id:hook_type.id});
@@ -174,44 +180,32 @@ function saveInstalledHooks(pluginName) {
   }
 }
 
-
-function loadPlugins(force) {
-  if (pluginsLoaded && force == undefined) return;
-  pluginsLoaded = true;
-  loadAvailablePlugins();
-  loadInstalledHooks();
-}
-
-
-/* User API */
-function enablePlugin(pluginName) {
-  loadPlugins();
-  loadPluginHooks(pluginName);
-  saveInstalledHooks(pluginName);
+PluginRegistry.prototype.enablePlugin = function (pluginName) {
+  log.info("enablePlugin(" + pluginName + ")");
+  this.loadPluginHooks(pluginName);
   try {
-    pluginModules[pluginName].install();
+    this.pluginModules[pluginName].install();
+    this.saveInstalledHooks(pluginName);
   } catch (e) {
-    unloadPluginHooks(pluginName);
-    saveInstalledHooks(pluginName);
+    this.unloadPluginHooks(pluginName);
     throw e;
   }
 }
 
-function disablePlugin(pluginName) {
-  loadPlugins();
+PluginRegistry.prototype.disablePlugin = function (pluginName) {
+  log.info("disablePlugin(" + pluginName + ")");
   try {
-    pluginModules[pluginName].uninstall();
+    this.pluginModules[pluginName].uninstall();
   } catch (e) {
     log.info({errorUninstallingPlugin:exceptionutils.getStackTracePlain(e)});
   }
-  unloadPluginHooks(pluginName);
-  saveInstalledHooks(pluginName);
+  this.unloadPluginHooks(pluginName);
+  this.saveInstalledHooks(pluginName);
 }
 
-function registerClientHandlerJS() {
-  loadPlugins();
-  for (pluginName in plugins) {
-    var plugin = pluginModules[pluginName];
+PluginRegistry.prototype.registerClientHandlerJS = function () {
+  for (pluginName in this.plugins) {
+    var plugin = this.pluginModules[pluginName];
     if (plugin.client !== undefined) {
       helpers.includeJs("plugins/" + pluginName + "/main.js");
       if (plugin.client.modules != undefined)
@@ -219,25 +213,53 @@ function registerClientHandlerJS() {
           helpers.includeJs("plugins/" + pluginName + "/" + plugin.client.modules[j] + ".js");
     }
   }
-  helpers.addClientVars({hooks:clientHooks});
+  helpers.addClientVars({hooks:this.clientHooks});
   helpers.includeJs("plugins.js");
 }
 
-function callHook(hookName, args) {
-  loadPlugins();
-  if (hooks[hookName] === undefined)
+PluginRegistry.prototype.callHook = function (hookName, args) {
+  if (this.hooks[hookName] === undefined)
     return [];
   var res = [];
 
-  for (var i = 0; i < hooks[hookName].length; i++) {
-    var plugin = hooks[hookName][i];
-    var pluginRes = pluginModules[plugin.plugin][plugin.original || hookName](args);
+  for (var i = 0; i < this.hooks[hookName].length; i++) {
+    var plugin = this.hooks[hookName][i];
+
+    /* Just assert that the earth is still round sort of... */
+    if (this.pluginModules[plugin.plugin] === undefined) 
+      throw new Error("this.pluginModules doesn't contain registered plugin " + plugin.plugin);
+    if (this.pluginModules[plugin.plugin].hooks === undefined)
+      throw new Error("plugin " + plugin.plugin + " doesn't seem to be a plugin module");
+    if (this.pluginModules[plugin.plugin][plugin.original || hookName] === undefined) 
+      throw new Error("plugin " + plugin.plugin + " doesn't contain registered hook " + (plugin.original || hookName));
+    if (this.plugins[plugin.plugin] === undefined)
+      throw new Error("plugin " + plugin.plugin + " isn't registered, but has a registered hook: " + hookName);
+
+    var pluginRes = this.pluginModules[plugin.plugin][plugin.original || hookName](args);
     if (pluginRes != undefined && pluginRes != null)
       for (var j = 0; j < pluginRes.length; j++)
         res.push(pluginRes[j]); /* Don't use Array.concat as it flatterns arrays within the array */
   }
   return res;
 }
+
+function loadPlugins(force) {
+  return syncedWithCache("plugin_registry", function(cache) {
+    if (force !== undefined || cache.plugin_registry === undefined) {
+      cache.plugin_registry = new PluginRegistry();
+      cache.plugin_registry.loadAvailablePlugins();
+      cache.plugin_registry.loadInstalledHooks();
+    }
+    return cache.plugin_registry;
+  });
+}
+
+
+/* User API */
+function enablePlugin(pluginName) { loadPlugins().enablePlugin(pluginName); }
+function disablePlugin(pluginName) { loadPlugins().disablePlugin(pluginName); }
+function registerClientHandlerJS() { loadPlugins().registerClientHandlerJS(); }
+function callHook(hookName, args) { return loadPlugins().callHook(hookName, args); }
 
 function callHookStr(hookName, args, sep, pre, post) {
   if (sep == undefined) sep = '';

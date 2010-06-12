@@ -29,7 +29,7 @@ function onRequest() {
   var disp = new Dispatcher();
 
   /* FIXME: Is there a more effective way to do this? */
-  for (plugin in plugins.plugins) {
+  for (plugin in plugins.loadPlugins().plugins) {
     disp.addLocations([
       [PrefixMatcher('/static/js/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/js/', opts)],
       [PrefixMatcher('/static/css/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/css/', opts)],

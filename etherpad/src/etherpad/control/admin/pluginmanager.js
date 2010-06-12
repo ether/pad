@@ -28,10 +28,7 @@ import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.admin.plugins");
 import("etherpad.pad.padutils");
 
-
 function onRequest() {  
-  plugins.loadPlugins();
-
   if (request.params.action == 'install') {
    plugins.enablePlugin(request.params.plugin);
   } else if (request.params.action == 'uninstall') {
