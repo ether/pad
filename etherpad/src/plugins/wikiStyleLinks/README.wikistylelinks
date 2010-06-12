@@ -1,0 +1,17 @@
+README on wikiStylelinks
+
+PROJECT DESCRIPTION
+
+Wiki-style links allow the user to link from Pad A to Pad
+B by writing [[name of Pad B]] in Pad A.  Often a wiki
+implementation will mark up the link [[name of Pad B]] in
+different ways depending on whether Pad B exists or not.
+
+For the first round of development, just creating the
+links is enough.  For the second round, we could add extra
+behavior to deal with the exists-or-not thing.
+
+BACKGROUND
+
+This is going to be a massively simplified version of the
+twitterStyleTags plugin.
