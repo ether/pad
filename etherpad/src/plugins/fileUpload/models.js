@@ -31,9 +31,9 @@ jimport("java.io.File",
         "java.lang.Runtime");
 
 
-/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - */
+/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - and we use * instead of / */
 function base64Encode(stringArray) {
-  base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+/";
+  base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+*";
 
   /* Pad array to nearest three byte multiple */
   var padding = (3 - (stringArray.length % 3)) % 3;
@@ -63,9 +63,7 @@ function makeSymlink(destination, source) {
 
 
 /* Reads a File and updates a digest with its content */
-function updateDigestFromFile(digest, file) {
-  var handle = new java.io.FileInputStream(file);
-
+function updateDigestFromFile(digest, handle) {
   var bytes = java.lang.reflect.Array.newInstance(Byte.TYPE, 512);
   var nbytes = 0;  
 
@@ -82,7 +80,7 @@ function storeFile(fileItem) {
   var extension = nameParts[nameParts.length-1];
 
   var digest = MessageDigest.getInstance("SHA1");
-  updateDigestFromFile(digest, fileItem.getStoreLocation());
+  updateDigestFromFile(digest, fileItem.getInputStream()); // Used to use getStoreLocation(), but that only works for on-disk-files
   var checksum = base64Encode(digest.digest());
 
   fileItem.write(File("src/plugins/fileUpload/upload/" + checksum));
