@@ -51,14 +51,14 @@ import("etherpad.pad.padutils");
 function urlFilterSql(querySql, url) {
 log.info("Hi from urlFilterSql.");
   var sql = '' +
-   'select distinct q.ID from ' +
-   ' ' + querySql.sql + ' as q ' +
-   ' join PAD_URL as u on ' +
-   '  q.ID =  u.PAD_ID and ' +
-   '  u.URL = ? ';
+   '(select distinct subq.ID from ' +
+   '  ' + querySql.sql + ' as subq ' +
+   '  join PAD_URL as u on ' +
+   '   subq.ID =  u.PAD_ID and ' +
+   '   u.URL = ?) ';
   return {
    sql: sql,
-   params: querySql.params + [url]
+   params: querySql.params.concat([url])
   };
 }
 
@@ -85,18 +85,31 @@ log.info("Hi from urlFilterSql.");
 function onRequest() {  
   log.info("Hi from onRequest.");
   var urlOfInterest = request.params.query;
+  var matchingPads = [];
 
-  /* A (sub)-query for #public pads */
-  var querySql = tagQuery.getQueryToSql(['public'], []);
+  if(urlOfInterest !== undefined){
+   /* A (sub)-query for #public pads */
+   var querySql = tagQuery.getQueryToSql(['public'], []);
 
-//  querySql = urlFilterSql(querySql, urlOfInterest);
+   querySql = urlFilterSql(querySql, urlOfInterest);
+   log.info(querySql); 
 
-  /* Limit is "how many entries to get back"; and 
-     offset -- which is optional -- is
-     "if there are more than that many, where do we start" */
-  var matchingPadsSql = tagQuery.padInfoSql(querySql, 10);
+   /* Limit is "how many entries to get back"; and 
+      offset -- which is optional -- is
+      "if there are more than that many, where do we start" */
 
-  var matchingPads = sqlobj.executeRaw(matchingPadsSql.sql, matchingPadsSql.params);
+   /* The reason for doing anything else with the pads is
+      to be able to display some additional data to the
+      user (not just a list of names).  */
+   var matchingPadsSql = tagQuery.padInfoSql(querySql, 10);
+
+   log.info(matchingPadsSql);
+
+   matchingPads = sqlobj.executeRaw(matchingPadsSql.sql, matchingPadsSql.params);
+  }
+  else {
+   urlOfInterest = "";
+  }
 
   for (i = 0; i < matchingPads.length; i++) {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
@@ -136,6 +149,7 @@ function onRequest() {
     antiTags: [],
     newTags: [],
     matchingPads: matchingPads,
+    urlOfInterest: urlOfInterest,
     matchingUrls: [],
     bodyClass: 'nonpropad',
     isPro: isPro,
@@ -147,11 +161,15 @@ function onRequest() {
   if (request.params.format != undefined)
     format = request.params.format;
 
-  if (format == "html")
-    renderHtml("citationBrowser.ejs", info, ['citationBrowser', 'twitterStyleTags']);
+  /* Call renderHtml with the name of the plugin(s) where
+     it should search for templates. */
+
+  if (format == "html"){
+    renderHtml("citationBrowser.ejs", info, ['findCitations', 'twitterStyleTags']);
+}
   else if (format == "rss") {
     response.setContentType("application/xml; charset=utf-8");
-    response.write(renderTemplateAsString("tagRss.ejs", info, 'citationBrowser'));
+    response.write(renderTemplateAsString("tagRss.ejs", info, 'findCitations'));
     if (request.acceptsGzip) {
       response.setGzip(true);
     }
