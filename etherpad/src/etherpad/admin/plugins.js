@@ -206,6 +206,12 @@ PluginRegistry.prototype.disablePlugin = function (pluginName) {
 PluginRegistry.prototype.registerClientHandlerJS = function () {
   for (pluginName in this.plugins) {
     var plugin = this.pluginModules[pluginName];
+
+    if (this.pluginModules[pluginName] === undefined)
+      throw new Error("this.pluginModules doesn't contain registered plugin " + pluginName);
+    if (this.pluginModules[pluginName].hooks === undefined)
+      throw new Error("plugin " + pluginName + " doesn't seem to be a plugin module");
+
     if (plugin.client !== undefined) {
       helpers.includeJs("plugins/" + pluginName + "/main.js");
       if (plugin.client.modules != undefined)
