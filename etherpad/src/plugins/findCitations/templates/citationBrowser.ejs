@@ -13,6 +13,7 @@ distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
+
 <%
  template.inherit('tagBrowser.ejs');
  helpers.setHtmlTitle("EtherPad: See which pads contain a given URL");
@@ -25,3 +26,13 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>See which pads contain a given URL</span></td>
 <% return ejs_data; }); %>
 
+<% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
+  <td> Search using the box at right.</td>
+<% return ejs_data; }); %>
+
+<% template.define('queryRefiner', function() { var ejs_data=''; %>
+  <h1>Please enter a URL...</h1>
+  <form action="/ep/citations/" method="get">
+  <input type="text" name="query" value="<%= urlOfInterest %>"> <button type="submit">Go</button>
+  </form>
+<% return ejs_data; }); %>
