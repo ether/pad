@@ -1,2 +1,10 @@
 /* Presumably we can do something cool with CSS to make
    links look good, but we don't need to do it now. */
+
+.wikilink a {
+ font-variant:small-caps;
+ text-decoration:none !important;
+ color:#000000 !important;
+ font-size:0.8em;
+}
+
