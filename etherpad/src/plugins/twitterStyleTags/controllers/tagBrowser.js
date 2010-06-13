@@ -32,6 +32,7 @@ import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
 import("etherpad.pad.padutils");
+import("fastJSON");
 
 
 function onRequest() {
@@ -72,32 +73,43 @@ function onRequest() {
   var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
 
   var info = {
-    prefs: prefs,
-    config: appjet.config,
-    tagQuery: tagQuery,
-    padIdToReadonly: server_utils.padIdToReadonly,
     tags: tags.tags,
     antiTags: tags.antiTags,
     newTags: newTags,
-    matchingPads: matchingPads,
-    bodyClass: 'nonpropad',
-    isPro: isPro,
-    isProAccountHolder: isProUser,
-    account: getSessionProAccount(), // may be falsy
+    matchingPads: matchingPads
   };
 
   var format = "html";
   if (request.params.format != undefined)
     format = request.params.format;
 
-  if (format == "html")
-    renderHtml("tagBrowser.ejs", info, ['twitterStyleTags']);
-  else if (format == "rss") {
-    response.setContentType("application/xml; charset=utf-8");
-    response.write(renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags']));
+  if (format == "json") {
+    response.setContentType("application/json; charset=utf-8");
+    response.write(fastJSON.stringify(info));
     if (request.acceptsGzip) {
       response.setGzip(true);
     }
+  } else {
+    info['tagQuery'] = tagQuery;
+    info['prefs'] = prefs;
+    info['config'] = appjet.config;
+    info['padIdToReadonly'] = server_utils.padIdToReadonly;
+    info['bodyClass'] = 'nonpropad';
+    info['isPro'] = isPro;
+    info['isProAccountHolder'] = isProUser;
+    info['account'] = getSessionProAccount(); // may be falsy
+
+    if (format == "html") {
+      renderHtml("tagBrowser.ejs", info, ['twitterStyleTags']);
+    } else if (format == "rss") {
+      response.setContentType("application/xml; charset=utf-8");
+      response.write(renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags']));
+      if (request.acceptsGzip) {
+	response.setGzip(true);
+      }
+   } else {
+     throw new Error("Unknown format " + format);
+   }
   }
   return true;
 }
