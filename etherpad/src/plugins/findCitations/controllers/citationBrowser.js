@@ -49,6 +49,7 @@ import("etherpad.pad.padutils");
 /* Will filter pads based on URLs  */
 
 function urlFilterSql(querySql, url) {
+log.info("Hi from urlFilterSql.");
   var sql = '' +
    'select distinct q.ID from ' +
    ' ' + querySql.sql + ' as q ' +
@@ -82,7 +83,7 @@ function urlFilterSql(querySql, url) {
    true, but who knows if we'd ever want such a thing.) */
 
 function onRequest() {  
-
+  log.info("Hi from onRequest.");
   var urlOfInterest = request.params.query;
 
   /* A (sub)-query for #public pads */

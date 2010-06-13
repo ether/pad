@@ -14,7 +14,7 @@ function init() {
 /* All this iframe stuff is obviously client-side. */
 
 function aceInitInnerdocbodyHead(args) {
-  console.log("Hi!");
+//  console.log("Hi!");
   args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/wikiStyleLinks/pad.css"/>\'');
 }
 
@@ -53,6 +53,7 @@ function aceInitInnerdocbodyHead(args) {
     -- then indicate the 1st bracketed expression. */
 
 function aceGetFilterStack(args) {
+//  console.log("Hi 2!");
   return [getWikiLinkFilter(args.linestylefilter)];
 }
 
@@ -68,6 +69,7 @@ function aceGetFilterStack(args) {
    args.cls.indexOf >= 0 means that the thing is contained in the list*/
 
 function aceCreateDomLine(args) {
+//  console.log("Hi 3!");
   if (args.cls.indexOf('wikilink') >= 0) {
     var href;
     /* cls contains the name of a pad that's being linked to --
@@ -100,8 +102,9 @@ function aceCreateDomLine(args) {
    it returns a function.  But that doesn't happen here.  */
 
 function getWikiLinkFilter (linestylefilter) {
+//  console.log("Hi 4!");
   return function (lineText, textAndClassFunc) {
-
+//  console.log("Hi 5!");
     var regExp = new RegExp("\\[\\[[^\\[\\]]*]]", "g");
 
     regExp.lastIndex = 0;
@@ -154,4 +157,5 @@ function getWikiLinkFilter (linestylefilter) {
 /* used on the client side only; something similar needed
    in every client-side plugin to get it to go*/
 
+//console.log("Hi new init!");
 wikiStyleLinks = new init();

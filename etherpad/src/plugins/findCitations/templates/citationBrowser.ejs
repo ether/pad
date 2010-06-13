@@ -13,7 +13,9 @@ distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
+
 <%
+ console.log("OK");
  template.inherit('tagBrowser.ejs');
  helpers.setHtmlTitle("EtherPad: See which pads contain a given URL");
  helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
@@ -24,4 +26,3 @@ limitations under the License. */ %>
 <% template.define('docBarTitle', function() { var ejs_data=''; %>
   <td id="docbarpadtitle"><span>See which pads contain a given URL</span></td>
 <% return ejs_data; }); %>
-
