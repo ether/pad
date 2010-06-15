@@ -31,7 +31,7 @@ jimport("java.io.File",
         "java.lang.Runtime");
 
 
-/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - and we use * instead of / */
+/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - and we use % instead of / */
 function base64Encode(stringArray) {
   base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+%";
 
