@@ -1,0 +1,33 @@
+The idea is to provide "real time" updates on a given
+search term.  Ideally, realTimeRecentChanges would be a
+plugin to a "grand unified search" mechanism for EtherPad.
+
+GUS would work in the following manner: it would support
+some set of inputs (e.g. some tags and anti-tags, some
+URLs, plain text, whatever), and provide some set of
+outputs (e.g. JSON, RSS, HTML).
+
+These inputs and outputs could then be wired together in a
+web page.  Adding a plugin like realTimeRecentChanges
+would change the way that web page works; in this
+particular case, it would cause the outputs to be updated
+in real time.
+
+The pseudocode for realTimeRecentChanges is: 
+
+  * do a JSON query at given intervals
+  * transform the results into HTML
+  * insert results in a tagBrowser-like page.
+
+Note: This should modify the Tag Browser AND any other
+search tools that derive from it, however, for the moment
+I'm just going to demo it as an alternative version of the
+Tag Browser.
+
+MORE DETAILED FLOW DIAGRAM:
+
+* the only hook provided is handlePath
+* this is used to forward /ep/rtrc to rtrcBrowser
+* rtrcBrowser.onRequest should do something (probably realTimeMatchingPads.start)?
+
+MY LEARNING GAPS:

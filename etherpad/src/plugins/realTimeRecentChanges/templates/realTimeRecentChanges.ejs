@@ -1,0 +1,44 @@
+<% /* 
+Copyright 2009 Google Inc.
+Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */ %>
+<%
+
+ /* I'm starting by copying and pasting findCitations.ejs
+    here, with the thought that we will once again just
+    override a few parts of the tagBrowser.  However,
+    that's not the way I want the final version of this
+    thing to work: I want a plugin that overrides various
+    parts of the tagBrowser WHEREVER THEY ARE USED, so I
+    can get real-time updating in all of the search
+    plugins.  BUT for a demonstration of the idea, it
+    would be nice to at least see real-time search results
+    appearing somewhere.  Hence this file as an
+    intermediate step.  */
+
+ template.inherit('page.ejs');
+ helpers.setHtmlTitle("EtherPad: Tag search updating in real time");
+ helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
+ helpers.includeCss("plugins/twitterStyleTags/pad.css");
+%>
+
+/* template.define('contentArea') -- See:
+   ~/etherpadding/egil-merge/etherpad/src/themes/default/templates/page.ejs  */
+
+<%: template.define('contentArea', function() { var ejs_data=''; %>
+<% /* Just a div that the real time javascript can put stuff into!  */ %>
+<div id="realtimedata">
+No data yet!
+</div>
+<% return ejs_data; }); %>
