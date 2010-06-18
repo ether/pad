@@ -1,98 +1,87 @@
 /* Inspired by JUITTER 1.0.0 BY RODRIGO FANTE */
 
- /* Apparently AJAX will know what it's doing if
-    everything is defined in some standard way? (See
-    conectaEtherpad, below.)  But since I don't know how
-    AJAX works, I'm just guessing.  Also, I replaced $
-    with jQuery throughout -- I suspect it doesn't make
-    any sense, but since I don't know what "$" means,
-    I'm plunging ahead...*/
-
-/* We need to create a TIMER and a variable that shows
-   whether it is RUNNING.  This is used in temporizador. */
-
 function createSearchURL(){
  var url = "http://localhost:9000/ep/tag/?format=json";
  /* We could in theory do something here. */
  return url; }
 
-/* DON'T do it like this. */
+/* This could take an argument, i.e. to
+   say whether the loop has run before or not?
+   (Trying it.)*/
+function runMainLoop(mode){
+    var mytimer;
+    /* initialization mode: start working on the realtimedata div */
+    if(mode===0)
+        jQuery("#realtimedata").html("");
+    /*fetch new data and do stuff, but first reset the msgNb...*/
+    msgNb = 0;
+    runAjaxStuff();
+    /*once that's done, call self again.*/
+    mytimer=setTimeout(runMainLoop(1),seconds*1000);
+}
 
-function start(){
- this.conectaEtherpad(1)
- /* "running" will have to be defined in this context. */
- if (timer != undefined && !running)
-  this.temporizador(); }
-
-function update(){
- this.conectaEtherpad(2);
- if (timer!=undefined)
-  this.temporizador(); }
-
-function delRegister(){
- /* remove the oldest entry on the list */
- if(msgNb>=numMSG){
-    jQuery(".twittLI").each(
-     function(o,elemLI){
-       if(o>=numMSG)
-        jQuery(this).hide("slow");
-       });  }}
-
-function temporizador(){
- /* live mode timer */
- running=true;
- aTim = timer.split("-");
- if(aTim[0]=="live" && aTim[1].length>0){
-         tempo = aTim[1]*1000;
-         setTimeout("update()",tempo); }}
-
-function conectaEtherpad(mode){
+function runAjaxStuff(){
  jQuery.ajax({
    url: createSearchURL(),
    type: 'GET',
    dataType: 'jsonp',
    timeout: 1000,
-   error: function(){ jQuery("#realtimedata").html("fail#"); },
-   success: doSomethingWithJSON(json, mode)}); }
+   error: function(){jQuery("#realtimedata").html("fail#"); },
+   success: doSomethingWithJSON(json);});}
 
-  /* This function inserts some HTML to format items
-  -- Perhaps we'd do that directly in the ejs file instead? */
+ /* This function inserts some HTML to format items
+ -- Perhaps we'd do that directly in the ejs file instead? */
 
-function doSomethingWithJSON(json, mode){
-  /* initialization */
-  if(mode==1)
-    jQuery("#realtimedata").html("");
-  /* Mark up each of the matching pads. */
-  jQuery.each(json.matchingPads, function(i,item){
-     if(mode==1 || (i < numMSG)){
-        if(i==0){
-          tultID = item.id;
-          jQuery("<ul></ul>")
-           .attr('id', 'twittList'+ultID)
-           .attr('class','twittList')
-           .prependTo("#"+contDiv);
-        }
-     /* Marking up the items we obtained. */
-     if (item.text != "undefined") {
-      var link =  "http://twitter.com/" + item.from_user + "/status/" + item.id;
-      var tweet = jQuery.Juitter.filter(item.text);
+function doSomethingWithJSON(json){
+    jQuery("<ul>")
+        .attr('class', "allmatches")
+        .prependTo("#realtimedata");
+    /* Mark up each of the matching pads. */
+    jQuery.each(json.matchingPads, function(i,item){
+            /* Inserting and marking up the items we obtained. */
+            if (item.text != "undefined") {
+                /*We collect all of the tags into one string --
+                  better markup could be used to be consistent with
+                  the usual look & feel.*/
+                var tagString = "";
+                for (j = 0; j < matchingPads[i].TAGS.length; j++){
+                    tagString = tagString +
+	                "<a href=http://localhost/ep/tag?query=" +
+                        matchingPads[i].TAGS[j] +
+                        "class=padtag + title=" + matchingPads[i].TAGS[j] +
+                        " matches>" + matchingPads[i].TAGS[j] + "</a>";
+                }
+                jQuery("<li>")
+                    .html("<a href=http://localhost:9000/"+item.ID+">"
+                          +item.ID+"</a>"+
+                          "&nbsp; " + item.lastWriteTime +
+                          "<br>" + tagString)
+                    .attr('id', "matchingpad"+msgNb)
+                    .appendTo("#realtimedata");
 
-      jQuery("<li></li>")
-         .html(mHTML)
-         .attr('id', 'twittLI'+msgNb)
-         .attr('class', 'twittLI')
-         .appendTo("#twittList"+ultID);
+                jQuery('#matchingpad'+msgNb).hide();
+                jQuery('#matchingpad'+msgNb).show("slow");
 
-      jQuery('#twittLI'+msgNb).hide();
-      jQuery('#twittLI'+msgNb).show("slow");
+                msgNb++; }}});
+    /* After dealing with the new stuff, remove any old
+       entries */
+    /*Do we have to deal with some kind of reset of msgNb?*/
+    if(msgNb>=maxNumMessages){
+        jQuery(".matchingpad").each(
+            function(k,elemLI){
+                if(k >= maxNumMessages)
+                    jQuery(this).hide("slow");
+            });}
+}
 
-      /* remove old entries */
-      jQuery.Juitter.delRegister();
-      msgNb++; }}});}
-
-// Something like this here
-
-$(window).load(function () {
+// Something like this here:
+$(document).ready(function () {
   // do stuff to start things on client side
   // (set up the start, timer, all that stuff)
+  var seconds = 15;
+  var msgNb = 0;
+  var maxNumMessages = 10;
+  var timer=setTimeout(runMainLoop(0),seconds*1000);
 });
+
+realTimeRecentChanges = new init();
