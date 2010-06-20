@@ -7,7 +7,8 @@ Installation instructions:
   if you want to.
 
 * Edit the files bin/build.sh and bin/run.sh (and optionally
-  bin/etherpad.init.d) and change the paths to match your system.
+  etherpad/bin/etherpad.default) and change the paths to match your
+  system.
 
 * Run bin/build.sh
 

@@ -12,4 +12,5 @@ export PATH="/usr/lib/jvm/java-6-sun/bin:$PATH"
 #####
 
 cd etherpad
-exec bin/run-local.sh
+# the argument here is the maximum amount of RAM to allocate
+exec bin/run-local.sh 256M
