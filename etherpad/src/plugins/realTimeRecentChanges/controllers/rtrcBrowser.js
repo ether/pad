@@ -105,7 +105,7 @@ function onRequest() {
     info['account'] = getSessionProAccount(); // may be falsy
 
     if (format == "html") {
-      renderHtml("rtrcBrowser.ejs", info, ['realTimeRecentChanges']);
+      renderHtml("realTimeRecentChanges.ejs", info, ['realTimeRecentChanges']);
     } else if (format == "rss") {
       response.setContentType("application/xml; charset=utf-8");
       response.write(renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags']));

@@ -28,6 +28,8 @@ limitations under the License. */ %>
     intermediate step.  */
 
  template.inherit('page.ejs');
+ helpers.includeJQuery();
+
  helpers.setHtmlTitle("EtherPad: Tag search updating in real time");
  helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
  helpers.includeCss("plugins/twitterStyleTags/pad.css");
@@ -41,3 +43,4 @@ limitations under the License. */ %>
 <div id="realtimedata">
 </div>
 <% return ejs_data; }); %>
+

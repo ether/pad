@@ -1,5 +1,9 @@
 /* Inspired by JUITTER 1.0.0 BY RODRIGO FANTE */
 
+function init() {
+  this.hooks = [];
+}
+
 function createSearchURL(){
  var url = "http://localhost:9000/ep/tag/?format=json";
  /* We could in theory do something here. */
@@ -27,7 +31,8 @@ function runAjaxStuff(){
    dataType: 'jsonp',
    timeout: 1000,
    error: function(){jQuery("#realtimedata").html("fail#"); },
-   success: doSomethingWithJSON(json);});}
+   success: doSomethingWithJSON(json)
+   });}
 
  /* This function inserts some HTML to format items
  -- Perhaps we'd do that directly in the ejs file instead? */
@@ -62,7 +67,7 @@ function doSomethingWithJSON(json){
                 jQuery('#matchingpad'+msgNb).hide();
                 jQuery('#matchingpad'+msgNb).show("slow");
 
-                msgNb++; }}});
+                msgNb++; }});
     /* After dealing with the new stuff, remove any old
        entries */
     /*Do we have to deal with some kind of reset of msgNb?*/
@@ -74,14 +79,13 @@ function doSomethingWithJSON(json){
             });}
 }
 
-// Something like this here:
-$(document).ready(function () {
+realTimeRecentChanges = new init();
+
+jQuery(window).load(function () {
   // do stuff to start things on client side
   // (set up the start, timer, all that stuff)
   var seconds = 15;
   var msgNb = 0;
   var maxNumMessages = 10;
   var timer=setTimeout(runMainLoop(0),seconds*1000);
-});
-
-realTimeRecentChanges = new init();
+}); 
