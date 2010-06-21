@@ -81,11 +81,13 @@ function doSomethingWithJSON(json){
 
 realTimeRecentChanges = new init();
 
-jQuery(window).load(function () {
-  // do stuff to start things on client side
-  // (set up the start, timer, all that stuff)
-  var seconds = 15;
-  var msgNb = 0;
-  var maxNumMessages = 10;
-  var timer=setTimeout(runMainLoop(0),seconds*1000);
-}); 
+/* This gives me problems!  */
+
+// jQuery(window).load(function () {
+//   // do stuff to start things on client side
+//   // (set up the start, timer, all that stuff)
+//   var seconds = 15;
+//   var msgNb = 0;
+//   var maxNumMessages = 10;
+//   var timer=setTimeout(runMainLoop(0),seconds*1000);
+// }); 
