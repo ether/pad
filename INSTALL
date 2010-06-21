@@ -6,7 +6,7 @@ Installation instructions:
   Scala compiler. You can safely reinstall it after compiling Etherpad
   if you want to.
 
-* Edit the files bin/build.sh and bin/run.sh (and optionally
+* Edit the file bin/exports.sh (and optionally
   etherpad/bin/etherpad.default) and change the paths to match your
   system.
 
