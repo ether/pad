@@ -21,10 +21,11 @@
 #
 ################################################################################
 
-source exports.sh
+ETHERPADDIR="$(cd "$(dirname "$0")/.."; pwd)"
+source "$ETHERPADDIR/bin/exports.sh"
 
 # Rebuild jar
-( cd infrastructure; ./bin/makejar.sh; )
-( cd infrastructure/ace; bin/make normal etherpad; )
-cp infrastructure/build/appjet.jar etherpad/appjet-eth-dev.jar
-rm -rf infrastructure/{appjet,build,buildjs,buildcache}
+( cd "$ETHERPADDIR"/infrastructure; ./bin/makejar.sh; )
+( cd "$ETHERPADDIR"/infrastructure/ace; bin/make normal etherpad; )
+cp "$ETHERPADDIR"/infrastructure/build/appjet.jar $ETHERPADDIR/etherpad/appjet-eth-dev.jar
+rm -rf "$ETHERPADDIR"/infrastructure/{appjet,build,buildjs,buildcache}
