@@ -6,3 +6,7 @@ etherpad binary: shell-script-fails-syntax-check ./usr/share/etherpad/infrastruc
 # The template already has a comment for the default field, lintian would
 # want to have an extra comment inside the string to translate, I don't agree:
 etherpad source: translated-default-field templates: 4
+# etherpad package contains an optional python script that does not work unless
+# recommended packages are installed, lintian does not get this (or I don't know how to tell it)
+etherpad binary: python-script-but-no-python-dep ./usr/share/etherpad/bin/DocumentConverter.py
+

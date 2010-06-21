@@ -6,6 +6,7 @@
 #        http://www.pensec.it
 #        mail@pensec.it
 # Copyright (c) 2010 Egil Möller <egil.moller@piratpartiet.se>
+# Copyright (c) 2010 Mikko Rantalainen <mikko.rantalainen@peda.net>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -27,4 +28,4 @@ source "$ETHERPADDIR/bin/exports.sh"
 cd "$ETHERPADDIR/etherpad"
 
 # the argument here is the maximum amount of RAM to allocate
-exec bin/run-local.sh 256M
+exec bin/run-local.sh --etherpad.soffice="$SOFFICE_BIN" "$@" 256M

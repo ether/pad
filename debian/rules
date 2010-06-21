@@ -65,7 +65,7 @@ install: build
 
 	#mkdir -p debian/etherpad/etc/init.d
 	#ln -s /usr/share/etherpad/bin/etherpad.init.d debian/etherpad/etc/init.d/etherpad
-	dh_installinit --update-rcd-params="start 05 2 3 4 5 . stop 95 S 0 1 6 ."
+	dh_installinit --update-rcd-params="start 05 2 3 4 5 . stop 95 0 1 6 ."
 
 	dh_install -i
 
