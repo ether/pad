@@ -119,6 +119,11 @@ function Ace2Editor() {
     // returns array of {error: <browser Error object>, time: +new Date()}
     return info.ace_getUnhandledErrors();
   };
+
+  editor.callWithAce = pendingInit(function(fn, callStack, normalize) {
+    return info.ace_callWithAce(fn, callStack, normalize);
+  });
+
   editor.execCommand = pendingInit(function(cmd, arg1) {
     info.ace_execCommand(cmd, arg1);
   });

@@ -215,6 +215,10 @@ function OUTER(gscope) {
     scheduler.setTimeout(function() { alert(str); }, 0);
   }
 
+  editorInfo.ace_getRep = function () {
+    return rep;
+  }
+
   var currentCallStack = null;
   function inCallStack(type, action) {
     if (disposed) return;
@@ -329,6 +333,7 @@ function OUTER(gscope) {
     }
     return result;
   }
+  editorInfo.ace_inCallStack = inCallStack;
 
   function inCallStackIfNecessary(type, action) {
     if (! currentCallStack) {
@@ -338,6 +343,7 @@ function OUTER(gscope) {
       action();
     }
   }
+  editorInfo.ace_inCallStackIfNecessary = inCallStackIfNecessary;
 
   function recolorLineByKey(key) {
     if (rep.lines.containsKey(key)) {
@@ -748,12 +754,6 @@ function OUTER(gscope) {
   }
 
   var CMDS = {
-    bold: function() { toggleAttributeOnSelection('bold'); },
-    italic: function() { toggleAttributeOnSelection('italic'); },
-    underline: function() { toggleAttributeOnSelection('underline'); },
-    strikethrough: function() { toggleAttributeOnSelection('strikethrough'); },
-    undo: function() { doUndoRedo('undo'); },
-    redo: function() { doUndoRedo('redo'); },
     clearauthorship: function(prompt) {
       if ((!(rep.selStart && rep.selEnd)) || isCaret()) {
         if (prompt) {
@@ -768,13 +768,6 @@ function OUTER(gscope) {
         setAttributeOnSelection('author', '');
       }
     },
-    insertunorderedlist: doInsertUnorderedList,
-    indent: function() {
-      if (! doIndentOutdent(false)) {
-        doInsertUnorderedList();
-      }
-    },
-    outdent: function() { doIndentOutdent(true); }
   };
 
   function execCommand(cmd) {
@@ -808,6 +801,23 @@ function OUTER(gscope) {
   editorInfo.ace_setEditable = setEditable;
   editorInfo.ace_execCommand = execCommand;
   editorInfo.ace_replaceRange = replaceRange;
+
+  editorInfo.ace_callWithAce = function (fn, callStack, normalize) {
+    function wrapper () { return fn(editorInfo); }
+
+    if (normalize !== undefined) {
+      wrapper1 = wrapper;
+      function wrapper () {
+        editorInfo.ace_fastIncorp(9);
+	wrapper1();
+      }
+    }
+
+    if (callStack !== undefined)
+      return editorInfo.ace_inCallStack(callStack, wrapper);
+    else
+      return wrapper();
+  }
 
   editorInfo.ace_setProperty = function(key, value) {
     var k = key.toLowerCase();
@@ -973,6 +983,7 @@ function OUTER(gscope) {
     // normalize but don't do any lexing or anything
     incorporateUserChanges(newTimeLimit(0));
   }
+  editorInfo.ace_fastIncorp = fastIncorp;
 
   function incorpIfQuick() {
     var me = incorpIfQuick;
@@ -1603,6 +1614,7 @@ function OUTER(gscope) {
     return (rep.selStart && rep.selEnd && rep.selStart[0] == rep.selEnd[0] &&
 	    rep.selStart[1] == rep.selEnd[1]);
   }
+  editorInfo.ace_isCaret = isCaret;
 
   // prereq: isCaret()
   function caretLine() { return rep.selStart[0]; }
@@ -1990,6 +2002,7 @@ function OUTER(gscope) {
     performDocumentApplyAttributesToRange(lineAndColumnFromChar(start),
 					  lineAndColumnFromChar(end), attribs);
   }
+  editorInfo.ace_performDocumentApplyAttributesToCharRange = performDocumentApplyAttributesToCharRange;
 
   function performDocumentApplyAttributesToRange(start, end, attribs) {
     var builder = Changeset.builder(rep.lines.totalWidth());
@@ -2036,6 +2049,7 @@ function OUTER(gscope) {
     performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
                                           [[attributeName, attributeValue]]);
   }
+  editorInfo.ace_setAttributeOnSelection = setAttributeOnSelection;
 
   function toggleAttributeOnSelection(attributeName) {
     if (!(rep.selStart && rep.selEnd)) return;
@@ -2085,6 +2099,7 @@ function OUTER(gscope) {
 					    [[attributeName,'true']]);
     }
   }
+  editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
 
   function performDocumentReplaceSelection(newText) {
     if (!(rep.selStart && rep.selEnd)) return;
@@ -2868,6 +2883,7 @@ function OUTER(gscope) {
 
     return foundLists;
   }
+  editorInfo.ace_doIndentOutdent = doIndentOutdent;
 
   function doTabKey(shiftDown) {
     if (! doIndentOutdent(shiftDown)) {
@@ -3301,6 +3317,7 @@ function OUTER(gscope) {
       }
     }
   }
+  editorInfo.ace_doUndoRedo = doUndoRedo;
 
   /*function enforceNewTextTypedStyle() {
     var sel = getSelection();
@@ -4379,6 +4396,7 @@ function OUTER(gscope) {
     }
     setLineListTypes(mods);
   }
+  editorInfo.ace_doInsertUnorderedList = doInsertUnorderedList;
 
   var mozillaFakeArrows = (browser.mozilla && (function() {
     // In Firefox 2, arrow keys are unstable while DOM-manipulating
