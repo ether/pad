@@ -17,6 +17,6 @@ plugins = {
     if (sep == undefined) sep = '';
     if (pre == undefined) pre = '';
     if (post == undefined) post = '';
-    return callHook(hookName, args).map(function (x) { return pre + x + post}).join(sep || "");
+    return plugins.callHook(hookName, args).map(function (x) { return pre + x + post}).join(sep || "");
   }
 };
