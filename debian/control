@@ -13,10 +13,12 @@ Architecture: all
 Depends: ${misc:Depends}, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
 Pre-Depends: dbconfig-common, debconf, adduser
 Recommends: perl, python-uno
-Description:  A web-based word processor that allows people to work
- together in real-time.
+Description: web service for collaborative real time word processor
+ A web-based word processor that allows people to work together in real-time.
  .
  When multiple people edit the same document simultaneously, any changes are
  instantly reflected on everyone's screen. The result is a new and productive
  way to collaborate on text documents, useful for meeting notes, drafting
  sessions, education, team programming, and more.
+ .
+ Minimum recommended server memory: 1GB.
