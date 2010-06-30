@@ -1,5 +1,6 @@
 // THIS FILE IS ALSO AN APPJET MODULE: etherpad.collab.ace.contentcollector
-// %APPJET%: import("etherpad.collab.ace.easysync2.Changeset")
+// %APPJET%: import("etherpad.collab.ace.easysync2.Changeset");
+// %APPJET%: import("etherpad.admin.plugins");
 
 /**
  * Copyright 2009 Google Inc.
@@ -26,6 +27,13 @@ function sanitizeUnicode(s) {
 function makeContentCollector(collectStyles, browser, apool, domInterface,
                               className2Author) {
   browser = browser || {};
+
+  var plugins_;
+  if (typeof(plugins)!='undefined') {
+    plugins_ = plugins;
+  } else {
+    plugins_ = parent.parent.plugins;
+  }
 
   var dom = domInterface || {
     isNodeText: function(n) {
@@ -105,7 +113,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   var cc = {};
   function _ensureColumnZero(state) {
     if (! lines.atColumnZero()) {
-      _startNewLine(state);
+      cc.startNewLine(state);
     }
   }
   var selection, startPoint, endPoint;
@@ -146,13 +154,13 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       selEnd = _pointHere(0, state);
     }
   }
-  function _incrementFlag(state, flagName) {
+  cc.incrementFlag = function(state, flagName) {
     state.flags[flagName] = (state.flags[flagName] || 0)+1;
   }
-  function _decrementFlag(state, flagName) {
+  cc.decrementFlag = function(state, flagName) {
     state.flags[flagName]--;
   }
-  function _incrementAttrib(state, attribName) {
+  cc.incrementAttrib = function(state, attribName) {
     if (! state.attribs[attribName]) {
       state.attribs[attribName] = 1;
     }
@@ -161,7 +169,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     }
     _recalcAttribString(state);
   }
-  function _decrementAttrib(state, attribName) {
+  cc.decrementAttrib = function(state, attribName) {
     state.attribs[attribName]--;
     _recalcAttribString(state);
   }
@@ -218,7 +226,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
             ['insertorder', 'first']],
       apool));
   }
-  function _startNewLine(state) {
+  cc.startNewLine = function(state) {
     if (state) {
       var atBeginningOfLine = lines.textOfLine(lines.length()-1).length == 0;
       if (atBeginningOfLine && state.listType && state.listType != 'none') {
@@ -233,6 +241,11 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       startPoint = selection.startPoint;
       endPoint = selection.endPoint;
     }
+  };
+  cc.doAttrib = function(na) {
+    attribs = (attribs || []);
+    attribs.push(na);
+    cc.incrementAttrib(state, na);
   };
   cc.collectContent = function (node, state) {
     if (! state) {
@@ -294,14 +307,14 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         x += consumed;
         txt = rest;
         if (txt.length > 0) {
-          _startNewLine(state);
+          cc.startNewLine(state);
         }
       }
     }
     else {
       var tname = (dom.nodeTagName(node) || "").toLowerCase();
       if (tname == "br") {
-        _startNewLine(state);
+        cc.startNewLine(state);
       }
       else if (tname == "script" || tname == "style") {
         // ignore
@@ -314,31 +327,27 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         if ((! isPre) && browser.safari) {
           isPre = (styl && /\bwhite-space:\s*pre\b/i.exec(styl));
         }
-        if (isPre) _incrementFlag(state, 'preMode');
+        if (isPre) cc.incrementFlag(state, 'preMode');
         var attribs = null;
         var oldListTypeOrNull = null;
         var oldAuthorOrNull = null;
         if (collectStyles) {
-          function doAttrib(na) {
-            attribs = (attribs || []);
-            attribs.push(na);
-            _incrementAttrib(state, na);
-          }
+	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
           if (tname == "b" || (styl && /\bfont-weight:\s*bold\b/i.exec(styl)) ||
               tname == "strong") {
-            doAttrib("bold");
+            cc.doAttrib("bold");
           }
           if (tname == "i" || (styl && /\bfont-style:\s*italic\b/i.exec(styl)) ||
               tname == "em") {
-            doAttrib("italic");
+            cc.doAttrib("italic");
           }
           if (tname == "u" || (styl && /\btext-decoration:\s*underline\b/i.exec(styl)) ||
               tname == "ins") {
-            doAttrib("underline");
+            cc.doAttrib("underline");
           }
           if (tname == "s" || (styl && /\btext-decoration:\s*line-through\b/i.exec(styl)) ||
               tname == "del") {
-            doAttrib("strikethrough");
+            cc.doAttrib("strikethrough");
           }
           if (tname == "ul") {
             var type;
@@ -372,10 +381,14 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
           cc.collectContent(c, state);
         }
 
-        if (isPre) _decrementFlag(state, 'preMode');
+        if (collectStyles) {
+	  plugins_.callHook('collectContentPost', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+        }
+
+        if (isPre) cc.decrementFlag(state, 'preMode');
         if (attribs) {
           for(var i=0;i<attribs.length;i++) {
-            _decrementAttrib(state, attribs[i]);
+            cc.decrementAttrib(state, attribs[i]);
           }
         }
         if (oldListTypeOrNull) {
@@ -391,7 +404,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     }
     if (isBlock) {
       if (lines.length()-1 == startLine) {
-        _startNewLine(state);
+        cc.startNewLine(state);
       }
       else {
         _ensureColumnZero(state);
@@ -422,12 +435,6 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   // last line is complete (i.e. if a following span should be on a new line).
   // can be called at any point
   cc.getLines = function() { return lines.textLines(); };
-
-  //cc.applyHints = function(hints) {
-  //if (hints.pastedLines) {
-  //
-  //}
-  //}
 
   cc.finish = function() {
     lines.flush();

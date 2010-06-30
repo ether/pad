@@ -1,7 +1,9 @@
 function init() {
-  this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine'];
+  this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine', 'collectContentPre', 'collectContentPost'];
   this.aceAttribsToClasses = aceAttribsToClasses;
   this.aceCreateDomLine = aceCreateDomLine;
+  this.collectContentPre = collectContentPre;
+  this.collectContentPost = collectContentPost;
 }
 
 function aceAttribsToClasses(args) {
@@ -18,9 +20,23 @@ function aceCreateDomLine(args) {
 
 function heading1clicked(event) {
   padeditor.ace.callWithAce(function (ace) {
-  ace.ace_toggleAttributeOnSelection("heading1");
- }, "heading1", true);
+    rep = ace.ace_getRep();
+    ace.ace_toggleAttributeOnSelection("heading1");
+    ace.ace_replaceRange(rep.selStart, rep.selStart, "\n");
+    ace.ace_replaceRange(rep.selEnd, rep.selEnd, "\n");
+  }, "heading1", true);
 
+}
+
+function collectContentPre(args) {
+  if (args.tname == "h1") {
+    args.cc.doAttrib("heading1");
+  }
+}
+
+function collectContentPost(args) {
+  if (args.tname == "h1")
+    cc.startNewLine(args.state);
 }
 
 /* used on the client side only */
