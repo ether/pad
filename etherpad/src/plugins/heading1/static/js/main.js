@@ -25,18 +25,17 @@ function heading1clicked(event) {
     ace.ace_replaceRange(rep.selStart, rep.selStart, "\n");
     ace.ace_replaceRange(rep.selEnd, rep.selEnd, "\n");
   }, "heading1", true);
-
 }
 
 function collectContentPre(args) {
   if (args.tname == "h1") {
-    args.cc.doAttrib("heading1");
+    args.cc.doAttrib(args.state, "heading1");
   }
 }
 
 function collectContentPost(args) {
   if (args.tname == "h1")
-    cc.startNewLine(args.state);
+    args.cc.startNewLine(args.state);
 }
 
 /* used on the client side only */

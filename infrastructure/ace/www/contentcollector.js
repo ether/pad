@@ -242,17 +242,20 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       endPoint = selection.endPoint;
     }
   };
-  cc.doAttrib = function(na) {
-    attribs = (attribs || []);
-    attribs.push(na);
+  cc.doAttrib = function(state, na) {
+    state.localAttribs = (state.localAttribs || []);
+    state.localAttribs.push(na);
     cc.incrementAttrib(state, na);
   };
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
+	       localAttribs: null,
                attribs: {/*name -> nesting counter*/},
                attribString: ''};
     }
+    var localAttribs = state.localAttribs;
+    state.localAttribs = null;
     var isBlock = isBlockElement(node);
     var isEmpty = _isEmpty(node, state);
     if (isBlock) _ensureColumnZero(state);
@@ -328,26 +331,25 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
           isPre = (styl && /\bwhite-space:\s*pre\b/i.exec(styl));
         }
         if (isPre) cc.incrementFlag(state, 'preMode');
-        var attribs = null;
         var oldListTypeOrNull = null;
         var oldAuthorOrNull = null;
         if (collectStyles) {
 	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
           if (tname == "b" || (styl && /\bfont-weight:\s*bold\b/i.exec(styl)) ||
               tname == "strong") {
-            cc.doAttrib("bold");
+	    cc.doAttrib(state, "bold");
           }
           if (tname == "i" || (styl && /\bfont-style:\s*italic\b/i.exec(styl)) ||
               tname == "em") {
-            cc.doAttrib("italic");
+	    cc.doAttrib(state, "italic");
           }
           if (tname == "u" || (styl && /\btext-decoration:\s*underline\b/i.exec(styl)) ||
               tname == "ins") {
-            cc.doAttrib("underline");
+	    cc.doAttrib(state, "underline");
           }
           if (tname == "s" || (styl && /\btext-decoration:\s*line-through\b/i.exec(styl)) ||
               tname == "del") {
-            cc.doAttrib("strikethrough");
+	   cc.doAttrib(state, "strikethrough");
           }
           if (tname == "ul") {
             var type;
@@ -386,9 +388,9 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         }
 
         if (isPre) cc.decrementFlag(state, 'preMode');
-        if (attribs) {
-          for(var i=0;i<attribs.length;i++) {
-            cc.decrementAttrib(state, attribs[i]);
+        if (state.localAttribs) {
+          for(var i=0;i<state.localAttribs.length;i++) {
+            cc.decrementAttrib(state, state.localAttribs[i]);
           }
         }
         if (oldListTypeOrNull) {
@@ -415,6 +417,8 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       // in IE, a point immediately after a DIV appears on the next line
       _reachBlockPoint(node, 1, state);
     }
+
+    state.localAttribs = localAttribs;
   };
   // can pass a falsy value for end of doc
   cc.notifyNextNode = function (node) {
