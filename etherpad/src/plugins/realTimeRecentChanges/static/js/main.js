@@ -9,35 +9,24 @@ function createSearchURL(){
  /* We could in theory do something here. */
  return url; }
 
-/* This could take an argument, i.e. to
-   say whether the loop has run before or not?
-   (Trying it.)*/
-function runMainLoop(mode){
-    var mytimer;
-    /* initialization mode: start working on the realtimedata div */
-    if(mode===0)
-        jQuery("#realtimedata").html("");
-    /*fetch new data and do stuff, but first reset the msgNb...*/
-    msgNb = 0;
-    runAjaxStuff();
-    /*once that's done, call self again.*/
-    mytimer=setTimeout(runMainLoop(1),seconds*1000);
+function runMainLoop(){
+    jQuery.ajax({
+      url: createSearchURL(),
+      type: 'GET',
+      dataType: 'jsonp',
+      timeout: 1000,
+      error: function(){jQuery("#realtimedata").html("fail#"); },
+      success: doSomethingWithJSON(json)
+    }).delay(1500);
 }
-
-function runAjaxStuff(){
- jQuery.ajax({
-   url: createSearchURL(),
-   type: 'GET',
-   dataType: 'jsonp',
-   timeout: 1000,
-   error: function(){jQuery("#realtimedata").html("fail#"); },
-   success: doSomethingWithJSON(json)
-   });}
 
  /* This function inserts some HTML to format items
  -- Perhaps we'd do that directly in the ejs file instead? */
 
 function doSomethingWithJSON(json){
+    var msgNb = 0;
+    var maxNumMessages = 10;
+
     jQuery("<ul>")
         .attr('class', "allmatches")
         .prependTo("#realtimedata");
@@ -77,17 +66,16 @@ function doSomethingWithJSON(json){
                 if(k >= maxNumMessages)
                     jQuery(this).hide("slow");
             });}
+    runMainLoop();
 }
 
 realTimeRecentChanges = new init();
 
 /* This gives me problems!  */
 
-// jQuery(window).load(function () {
-//   // do stuff to start things on client side
-//   // (set up the start, timer, all that stuff)
-//   var seconds = 15;
-//   var msgNb = 0;
-//   var maxNumMessages = 10;
-//   var timer=setTimeout(runMainLoop(0),seconds*1000);
-// }); 
+$(document).ready(function () {
+  // do stuff to start things on client side
+  // (set up the start, timer, all that stuff)
+  jQuery("#realtimedata").html("");
+  runMainLoop();
+}); 
