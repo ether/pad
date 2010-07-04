@@ -37,7 +37,9 @@ limitations under the License. */ %>
 
 <% template.define('body', function() { var ejs_data=''; %>
   <div id="padpage">
+
     <!-- TOPBAR REMOVED -->
+
       <div id="alertbar">
 	<div id="servermsg">
 	  <h3>Server Notice<span id="servermsgdate"><!-- --></span>:</h3>
@@ -66,9 +68,56 @@ limitations under the License. */ %>
 	        <td width="100%">&nbsp;</td>
   	      </tr>
             </table>
+<!-- injecting all the pro stuff here -->
+	<% if (isProAccountHolder) { %>          
+	  <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
+	  <div id="accountnav"><%= toHTML(account.email) %>
+	    <a href="/ep/account/sign-out">(sign out)</a>
+	  </div>
+	<% } else if (isPro) { %>
+	  <div id="accountnav">
+	    <a href="<%= signinUrl %>">sign in</a>
+	  </div>
+	<% } %>
+	<div id="specialkeyarea"><!-- --></div>
+      </div>
+      <div id="alertbar">
+	<div id="servermsg">
+	  <h3>Server Notice<span id="servermsgdate"><!-- --></span>:</h3>
+	  <a id="hidetopmsg" href="javascript: void pad.hideServerMessage()">hide</a>
+	  <p id="servermsgtext"><!-- --></p>
+	</div>
+      </div>
+<!-- end of pro injection -->
+<!-- injecting docbar dropdowns -->
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
+	  <tr>
+	    <!-- <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td> -->
+            <!-- <%: template.use('docBarTitle'); %> -->
+	    <td width="100%">&nbsp;</td>
+            <!-- <%: template.use('docBarItems'); %> -->
+	    <!-- <%: template.callHookStr('docbarItemsAll', {}, '', '', ''); %> -->
+	    <td></td>
+	  </tr>
+	</table>
+        <!-- <%: template.use('docBarTitleEditor'); %> -->
+        <%: template.callHookStr('docBarDropdownsAll', {}, '', '', ''); %>
+        <%: template.use('docBarDropdowns'); %>
+<!-- end of docbar dropdowns -->
+
+<!-- injecting width pref and sidebar stuff -->
+	<!-- <div id="widthprefcheck" -->
+	<!--      class="<%= (prefs.isFullWidth?'widthprefchecked':'widthprefunchecked') %>" -->
+	<!--      ></div> -->
+	<!-- <div id="sidebarcheck" -->
+	<!--      class="<%= (prefs.hideSidebar?'sidebarunchecked':'sidebarchecked') %>" -->
+	<!--      ></div> -->
+<!-- end of width/sidebar injection -->
+
 	    <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
 	      <tr>
 	        <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
+                <%: template.use('docBarItems'); %>
 	        <%: template.use('editBarItemsRight'); %>
 	      </tr>
 	    </table>

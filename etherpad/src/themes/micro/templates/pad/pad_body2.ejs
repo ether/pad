@@ -82,21 +82,26 @@ limitations under the License. */ %>
       </a>
     </td>
   <% } /* isProAccountHolder */ %>
+  <td id="docbarzoom"  class="docbarbutton">
+<!-- injecting zoom -->
+ <a href="javascript:void(0)" id="zoom" title="Zoom">+/-</a>
+<!-- end of zoom injection -->
+</td>
   <td id="docbaroptions-outer" class="docbarbutton">
-    <a href="javascript:void(0)" id="docbaroptions">
-      <img src="/static/img/jun09/pad/icon_pad_options.gif">Pad&nbsp;Options</a>
+    <a href="javascript:void(0)" id="docbaroptions" title="Pad Options">
+      <img src="/static/img/jun09/pad/icon_pad_options.gif"></a>
   </td>
   <td id="docbarimpexp-outer" class="docbarbutton">
-    <a href="javascript:void(0)" id="docbarimpexp">
-      <img src="/static/img/jun09/pad/icon_import_export.gif">Import/Export</a>
+    <a href="javascript:void(0)" id="docbarimpexp" title="Import/Export">
+      <img src="/static/img/jun09/pad/icon_import_export.gif"></a>
   </td>
   <td id="docbarsavedrevs-outer" class="docbarbutton">
-    <a href="javascript:void(0)" id="docbarsavedrevs">
-      <img src="/static/img/jun09/pad/icon_saved_revisions.gif">Saved&nbsp;revisions</a>
+    <a href="javascript:void(0)" id="docbarsavedrevs" title="Saved Revisions">
+      <img src="/static/img/jun09/pad/disk.gif"></a>
   </td>
-  <td id="docbarslider-outer" class="docbarbutton highlight">
-    <a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider">
-      <img src="/static/img/jun09/pad/icon_time_slider.gif">Time&nbsp;Slider</a>
+  <td id="docbarslider-outer" class="docbarbutton">
+    <a target="_blank" href="/ep/pad/view/<%= localPadId %>/latest" id="docbarslider" title="Time Slider">
+      <img src="/static/img/jun09/pad/icon_time_slider.gif"></a>
   </td>
 <% return ejs_data; }); %>
 
@@ -417,6 +422,8 @@ limitations under the License. */ %>
 <% template.define('editBarItemsRight', function() { var ejs_data=''; %>
   <%: template.callHookStr('editBarItemsRightPad', {}, '', '', ''); %>
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+  <td>
+</td>
   <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
 <% return ejs_data; }); %>
