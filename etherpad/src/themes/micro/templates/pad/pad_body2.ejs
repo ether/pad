@@ -75,6 +75,31 @@ limitations under the License. */ %>
 
 <% template.define('docBarItems', function() { var ejs_data=''; %>
   <%: template.callHookStr('docbarItemsPad', {}, '', '<td class="docbarbutton">', '</td>'); %>
+<!-- injecting all the pro stuff here -->
+	<% if (isProAccountHolder) { %>
+          <td id="backtopro" class="docbarbutton">
+	  <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
+	  <div id="accountnav"><%= toHTML(account.email) %>
+	    <a href="/ep/account/sign-out">(sign out)</a>
+	  </div>
+         </td>
+	<% } else if (isPro) { %>
+          <td id="acctnav" class="docbarbutton">
+	  <div id="accountnav">
+	    <a href="<%= signinUrl %>">sign in</a>
+	  </div>
+          </td>
+	<% } %>
+	<div id="specialkeyarea"></div>
+      </div>
+      <div id="alertbar">
+	<div id="servermsg">
+	  <h3>Server Notice<span id="servermsgdate"><!-- --></span>:</h3>
+	  <a id="hidetopmsg" href="javascript: void pad.hideServerMessage()">hide</a>
+	  <p id="servermsgtext"><!-- --></p>
+	</div>
+      </div>
+<!-- end of pro injection -->
   <% if (isProAccountHolder) { %> 
     <td id="docbarsecurity-outer" class="docbarbutton">
       <a href="javascript:void(0)" id="docbarsecurity">
