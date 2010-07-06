@@ -1,7 +1,7 @@
 import("etherpad.log");
 import("plugins.findCitations.hooks");
 
-function init() {
+function findCitationsInit() {
  this.hooks = ['handlePath', 'docbarItemsTagBrowser'];
  this.description = 'Use data created by urlIndexer, but now search by URL instead of by tag.';
 

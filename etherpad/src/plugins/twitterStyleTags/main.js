@@ -4,9 +4,9 @@ import("plugins.twitterStyleTags.static.js.main");
 import("sqlbase.sqlobj");
 import("sqlbase.sqlcommon");
 
-function init() {
+function twitterStyleTagsInit() {
  this.hooks = ['handlePath', 'aceGetFilterStack', 'aceCreateDomLine', 'padModelWriteToDB', 'docbarItemsAll', 'docbarItemsTagBrowser'];
- this.client = new main.init();
+ this.client = new main.twitterStyleTagsInit();
  this.description = 'Twitter-style tags allows the user to tag pads by writing #tagname anywhere in the pad text. Tags are automatically linked to searches for that tag in other pads. This plugin also provides an alternative home-page for Etherpad with a display of the last changed public pads as well as that information available as an RSS stream.';
  this.handlePath = hooks.handlePath;
  this.aceGetFilterStack = main.aceGetFilterStack;

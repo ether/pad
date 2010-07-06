@@ -2,7 +2,7 @@ import("etherpad.log");
 import("plugins.heading1.hooks");
 import("plugins.heading1.static.js.main");
 
-function init() {
+function heading1Init() {
  this.hooks = ['editBarItemsLeftPad', 'aceAttribsToClasses', 'aceCreateDomLine'];
  this.description = 'heading1';
  this.client = new main.init();

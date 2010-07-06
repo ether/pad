@@ -69,7 +69,7 @@ PluginRegistry.prototype.loadAvailablePlugin = function (pluginName) {
     var importStmt = "import('" + pluginModulePath + "')";
     try {
       var res = execution.fancyAssEval(importStmt, "main;");
-      res = new res.init();
+      res = new res[pluginName + "Init"]();
       return res;
     } catch (e) {
       log.info({errorLoadingPlugin:exceptionutils.getStackTracePlain(e)});

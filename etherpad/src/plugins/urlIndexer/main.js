@@ -3,7 +3,7 @@ import("plugins.urlIndexer.hooks");
 import("sqlbase.sqlobj");
 import("sqlbase.sqlcommon");
 
-function init() {
+function urlIndexerInit() {
  this.hooks = ['padModelWriteToDB', 'handlePath', 'docbarItemsTagBrowser'];
  this.description = 'Indexes URLs linked to in pads so that they can be displayed outside pads, searched for etc.';
  this.padModelWriteToDB = hooks.padModelWriteToDB;
