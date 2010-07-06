@@ -5,7 +5,7 @@ import("plugins.heading1.static.js.main");
 function heading1Init() {
  this.hooks = ['editBarItemsLeftPad', 'aceAttribsToClasses', 'aceCreateDomLine'];
  this.description = 'heading1';
- this.client = new main.init();
+ this.client = new main.heading1Init();
  this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
  this.aceAttribsToClasses = main.aceAttribsToClasses;
  this.aceCreateDomLine = main.aceCreateDomLine;

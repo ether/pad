@@ -1,4 +1,4 @@
-function init() {
+function testpluginInit() {
  this.hooks = ['kafoo'];
  this.kafoo = kafoo;
 }
@@ -8,4 +8,4 @@ function kafoo() {
 }
 
 /* used on the client side only */
-testplugin = new init();
+testplugin = new testpluginInit();

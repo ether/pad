@@ -21,7 +21,7 @@ import("plugins.wikiStyleLinks.static.js.main");
 
 function wikiStyleLinksInit() {
  this.hooks = ['aceGetFilterStack', 'aceCreateDomLine'];
- this.client = new main.init();
+ this.client = new main.wikiStyleLinksInit();
  this.description = 'Wiki-style links lets the user link from Pad A to Pad B by writing [[name of Pad B]] in Pad A.';
  this.aceGetFilterStack = main.aceGetFilterStack;
  this.aceCreateDomLine = main.aceCreateDomLine;

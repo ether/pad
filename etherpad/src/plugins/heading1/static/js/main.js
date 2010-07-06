@@ -1,4 +1,4 @@
-function init() {
+function heading1Init() {
   this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine', 'collectContentPre', 'collectContentPost'];
   this.aceAttribsToClasses = aceAttribsToClasses;
   this.aceCreateDomLine = aceCreateDomLine;
@@ -39,4 +39,4 @@ function collectContentPost(args) {
 }
 
 /* used on the client side only */
-heading1 = new init();
+heading1 = new heading1Init();
