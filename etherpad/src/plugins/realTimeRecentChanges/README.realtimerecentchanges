@@ -1,0 +1,73 @@
+The idea is to provide "real time" updates on a given
+search term.  Ideally, realTimeRecentChanges would be a
+plugin to a "grand unified search" mechanism for EtherPad.
+
+GUS would work in the following manner: it would support
+some set of inputs (e.g. some tags and anti-tags, some
+URLs, plain text, whatever), and provide some set of
+outputs (e.g. JSON, RSS, HTML).
+
+These inputs and outputs could then be wired together in a
+web page.  Adding a plugin like realTimeRecentChanges
+would change the way that web page works; in this
+particular case, it would cause the outputs to be updated
+in real time.
+
+The pseudocode for realTimeRecentChanges is: 
+
+  * do a JSON query at given intervals
+  * transform the results into HTML
+  * insert results in a tagBrowser-like page.
+
+Note: This should modify the Tag Browser AND any other
+search tools that derive from it, however, for the moment
+I'm just going to demo it as an alternative version of the
+Tag Browser.
+
+MORE DETAILED FLOW DIAGRAM:
+
+* the only hook provided is handlePath
+* this is used to forward /ep/rtrc to rtrcBrowser
+* rtrcBrowser.onRequest should do something (probably realTimeMatchingPads.start)?
+
+MY LEARNING GAPS:
+
+$(window).load(function () {...} vs $(document).ready(function () {...}
+
+jQuery.ajax (settings) -- performs an asynchronous HTTP request
+
+
+
+Well, I've never used jQuery before.  This is what Mr
+Juitter has to say about it:
+
+In your template's <head>, include jQuery and juitter
+javascript files like this:
+
+<script language="javascript" src="/app/js/jquery-1.3.1.min.js" type="text/javascript"></script>
+
+<script language="javascript" src="/app/js/jquery.juitter.js" type="text/javascript"></script>
+
+<script language="javascript" src="/app/js/system.js" type="text/javascript"></script>
+
+The first file is the jQuery core to make Juitter work,
+the second file is the Juitter core and config file, and
+the last file system.js is an example of how to make
+Juitter work on your website.
+
+Now you'll need a container for your tweets, just insert a
+DIV with an ID just like the example below:
+
+<div id="juitterContainer"></div>
+
+If you want to personalize the loading message, the container DIV ID and more just edit the conf. variables at the beginning of the jquery.juitter.js file.
+
+To make Juitter work just follow the instructions on the system.js file.
+
+To see how to edit the CSS download the Juitter website source code.
+
+Follow me on twitter @rodrigofante (portuguese) or @mrjuitter (english).
+
+Check here the Juitter source code for developers.
+
+Download here the Juitter website source code to see an example of how Juitter works.
