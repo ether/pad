@@ -4,6 +4,7 @@ function init() {
   this.hooks = [];
 }
 
+
 function runMainLoop(){
   setTimeout('runMainLoop()', 5000);
   $("div.realtimedata").empty();
@@ -18,6 +19,7 @@ function doSomethingWithJSON(json){
     var msgNb = 0;
     var maxNumMessages = 10;
     $("div.realtimedata").append('<ul class="allmatches">')
+
     /* Mark up each of the matching pads. */
     jQuery.each(json.matchingPads, function(i,item){
             /* Inserting and marking up the items we obtained. */
@@ -66,9 +68,11 @@ function doSomethingWithJSON(json){
 
 realTimeRecentChanges = new init();
 
-// jQuery(document).ready(function () {
-//     // do stuff to start things on client side
-//     // (set up the start, timer, all that stuff)
-//     console.log("Starting up");
-//     runMainLoop();
-// }); 
+/* This gives me problems!  */
+
+$(document).ready(function () {
+  // do stuff to start things on client side
+  // (set up the start, timer, all that stuff)
+  jQuery("#realtimedata").html("");
+  runMainLoop();
+}); 
