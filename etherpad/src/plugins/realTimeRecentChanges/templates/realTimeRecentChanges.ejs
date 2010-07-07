@@ -33,14 +33,27 @@ limitations under the License. */ %>
  helpers.setHtmlTitle("EtherPad: Tag search updating in real time");
  helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
  helpers.includeCss("plugins/twitterStyleTags/pad.css");
+
+
 %>
 
-/* template.define('contentArea') -- See:
-   ~/etherpadding/egil-merge/etherpad/src/themes/default/templates/page.ejs  */
 
 <%: template.define('contentArea', function() { var ejs_data=''; %>
 <% /* Just a div that the real time javascript can put stuff into!  */ %>
-<div id="realtimedata">
-</div>
+<div class="realtimedata">Bla bla bla</div>
+<% /* Hopefully this will just happen client-side ?  */%>
+
+<script type="text/javascript" src="./jquery-1.4.2.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function () {
+    // do stuff to start things on client side
+    // (set up the start, timer, all that stuff)
+    console.log("Starting up");
+    runMainLoop();
+}); 
+</script>
+
+
 <% return ejs_data; }); %>
 
