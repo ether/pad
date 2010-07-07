@@ -80,16 +80,31 @@ var padeditbar = (function(){
       if (self.isEnabled()) {
         if (cmd == 'save') {
           padsavedrevs.saveNow();
-        }
-        else if (cmd == 'clearauthorship') {
-          padeditor.ace.execCommand('clearauthorship', function() {
-            if (window.confirm("Clear authorship colors on entire document?")) {
-              padeditor.ace.execCommand('clearauthorship');
-            }
-          });
-        }
-        else {
-          padeditor.ace.execCommand(cmd);
+        } else {
+	  padeditor.ace.callWithAce(function (ace) {
+	    if (cmd == 'bold' || cmd == 'italic' || cmd == 'underline' || cmd == 'strikethrough')
+	      ace.ace_toggleAttributeOnSelection(cmd);
+            else if (cmd == 'undo' || cmd == 'redo') 
+	      ace.ace_doUndoRedo(cmd);
+            else if (cmd == 'insertunorderedlist') 
+	      ace.ace_doInsertUnorderedList();
+            else if (cmd == 'indent') {
+	      if (! ace.ace_doIndentOutdent(false)) {
+	       ace.ace_doInsertUnorderedList();
+	      }
+	    } else if (cmd == 'outdent') {
+              ace.ace_doIndentOutdent(true);
+	    } else if (cmd == 'clearauthorship') {
+	      if ((!(ace.ace_getRep().selStart && ace.ace_getRep().selEnd)) || ace.ace_isCaret()) {
+		if (window.confirm("Clear authorship colors on entire document?")) {
+		  ace.ace_performDocumentApplyAttributesToCharRange(0, ace.ace_getRep().alltext.length,
+							    [['author', '']]);
+		}
+	      } else {
+		ace.ace_setAttributeOnSelection('author', '');
+	      }
+	    }
+	  }, cmd, true);
         }
       }
       padeditor.ace.focus();

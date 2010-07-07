@@ -1,4 +1,4 @@
-function init() {
+function fileUploadInit() {
   this.hooks = [];
   this.uploadFileClicked = uploadFileClicked;
   this.submitClicked = submitClicked;
@@ -35,4 +35,4 @@ function submitClicked() {
 }
 
 /* used on the client side only */
-fileUpload = new init();
+fileUpload = new fileUploadInit();

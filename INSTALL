@@ -1,4 +1,26 @@
-Installation instructions:
+Installation instructions for debian based systems such as Ubuntu or Debian:
+
+* build the .deb package (only needed if you don't have a ready made package)
+
+  sudo apt-get install po-debconf debhelper dbconfig-common sun-java6-jdk mysql-client libmysql-java scala scala-library
+
+  debuild -us -uc
+
+As an alternative to debuild you can run
+
+  git-buildpackage -us -uc
+
+if you cloned the git repository (debuild will work also, but git-buildpackage
+does some extra sanity checks). In the end you will have a file called
+etherpad*.deb in the directory one level above your current directory.
+
+* install the .deb package
+
+  cd ..
+  sudo dpkg -i etherpad*.deb
+
+
+Installation instructions for POSIX compatible unix systems (also works for Debian and Ubuntu):
 
 * Install the dependencies: Scala 2.7, Sun Java JDK 6, libmysql-java
 
@@ -6,7 +28,7 @@ Installation instructions:
   Scala compiler. You can safely reinstall it after compiling Etherpad
   if you want to.
 
-* Edit the files bin/build.sh and bin/run.sh (and optionally
+* Edit the file bin/exports.sh (and optionally
   etherpad/bin/etherpad.default) and change the paths to match your
   system.
 

@@ -16,7 +16,48 @@
 
 mkdir -p data/appjet
 
+# JVM heap memory limit (actually reserved during startup)
 MXRAM="1G"
+# maximum thread count for etherpad (should be roughly memory in MB / 4)
+MAXTHREADS="250"
+
+if [ -x "/usr/bin/perl" ]; then
+	if [ -e "/proc/meminfo" ]; then
+	# compute the MXRAM parameter:
+	# default it to half of the usable real free memory,
+	# but at least 100M and up to 1024M
+	# TODO: this should be rewritten in awk to always work (awk is part of coreutils, perl is not)
+	MXRAM=$(cat /proc/meminfo | perl -ne '
+		BEGIN {
+			$free = 0;
+			$buffers = 0;
+			$cached = 0
+		};
+
+		if (m/^MemFree:\s*(\d+)/)
+			{ $free = $1/1024 };
+		if (m/^Buffers:\s*(\d+)/)
+			{ $buffers = $1/1024 };
+		if (m/^Cached:\s*(\d+)/)
+			{ $cached = $1/1024 };
+
+		END {
+			$usable_free = ($free + $buffers + $cached)/2;
+			$usable_free = 100 if ($usable_free < 100);
+			$usable_free = 1024 if ($usable_free > 1024);
+			print int($usable_free)."M\n"
+		};')
+
+	MAXTHREADS=$(echo "$MXRAM" | perl -ne '
+			s/[^\d]//;
+			$maxthreads = int($_/4);
+			if ($maxthreads < 5)
+				{ $maxthreads = 5 }
+			print $maxthreads;
+		')
+	fi
+fi
+
 if [ ! -z $1 ]; then
     if [ ! '-' = `echo $1 | head -c 1` ]; then
         MXRAM="$1";
@@ -44,6 +85,9 @@ if [[ $1 == "--cfg" ]]; then
   shift;
 fi
 
+echo "Maximum ram: $MXRAM"
+echo "Maximum thread count: $MAXTHREADS"
+
 echo "Using config file: ${cfg_file}"
 
 exec $JAVA -classpath $CP \
@@ -62,4 +106,6 @@ exec $JAVA -classpath $CP \
     $JAVA_OPTS \
     net.appjet.oui.main \
     --configFile=${cfg_file} \
+    --maxThreads=${MAXTHREADS}
     "$@"
+

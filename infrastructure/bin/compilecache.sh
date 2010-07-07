@@ -17,6 +17,8 @@
 CP_CMD="cp -R -u"
 if [ `uname` == "Darwin" ]; then
 	CP_CMD="/bin/cp -R -n"
+elif  [ `uname` == "FreeBSD" ]; then
+	CP_CMD="/bin/cp -R -n"
 elif [ `uname` == "SunOS" ]; then
 	CP_CMD="cp -R" #Solaris cp does not have '-u'
 fi

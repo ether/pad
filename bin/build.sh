@@ -21,20 +21,11 @@
 #
 ################################################################################
 
-#####
-# You have to change following lines to your requirements:
-#
-export JAVA_HOME="/usr/lib/jvm/java-6-sun/"
-export SCALA_HOME="/usr/share/java"
-export SCALA_LIBRARY_JAR="/usr/share/java/scala-library.jar"
-export MYSQL_CONNECTOR_JAR="/usr/share/java/mysql-connector-java.jar"
-export JAVA="/usr/lib/jvm/java-6-sun/bin/java"
-export SCALA="/usr/bin/scala"
-export PATH="/usr/lib/jvm/java-6-sun/bin:$PATH"
-#####
+ETHERPADDIR="$(cd "$(dirname "$0")/.."; pwd)"
+source "$ETHERPADDIR/bin/exports.sh"
 
 # Rebuild jar
-( cd infrastructure; ./bin/makejar.sh; )
-( cd infrastructure/ace; bin/make normal etherpad; )
-cp infrastructure/build/appjet.jar etherpad/appjet-eth-dev.jar
-rm -rf infrastructure/{appjet,build,buildjs,buildcache}
+( cd "$ETHERPADDIR"/infrastructure; ./bin/makejar.sh; )
+( cd "$ETHERPADDIR"/infrastructure/ace; bin/make normal etherpad; )
+cp "$ETHERPADDIR"/infrastructure/build/appjet.jar $ETHERPADDIR/etherpad/appjet-eth-dev.jar
+rm -rf "$ETHERPADDIR"/infrastructure/{appjet,build,buildjs,buildcache}

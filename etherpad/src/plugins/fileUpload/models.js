@@ -31,9 +31,9 @@ jimport("java.io.File",
         "java.lang.Runtime");
 
 
-/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - and we use * instead of / */
+/* Normal base64 encoding, except we don't care about adding newlines and we encode padding as - and we use - instead of / */
 function base64Encode(stringArray) {
-  base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+%";
+  base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789" + "+-";
 
   /* Pad array to nearest three byte multiple */
   var padding = (3 - (stringArray.length % 3)) % 3;

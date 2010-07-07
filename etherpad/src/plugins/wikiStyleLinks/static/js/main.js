@@ -5,7 +5,7 @@
  * client-side hooks are defined in this file, is why.
  */
 
-function init() {
+function wikiStyleLinksInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceGetFilterStack', 'aceCreateDomLine'];
   this.aceInitInnerdocbodyHead = aceInitInnerdocbodyHead;
   this.aceGetFilterStack = aceGetFilterStack;
@@ -161,4 +161,4 @@ function getWikiLinkFilter (linestylefilter) {
  * in every client-side plugin to get it to go
  */
 
-wikiStyleLinks = new init();
+wikiStyleLinks = new wikiStyleLinksInit();

@@ -215,6 +215,10 @@ function OUTER(gscope) {
     scheduler.setTimeout(function() { alert(str); }, 0);
   }
 
+  editorInfo.ace_getRep = function () {
+    return rep;
+  }
+
   var currentCallStack = null;
   function inCallStack(type, action) {
     if (disposed) return;
@@ -329,6 +333,7 @@ function OUTER(gscope) {
     }
     return result;
   }
+  editorInfo.ace_inCallStack = inCallStack;
 
   function inCallStackIfNecessary(type, action) {
     if (! currentCallStack) {
@@ -338,6 +343,7 @@ function OUTER(gscope) {
       action();
     }
   }
+  editorInfo.ace_inCallStackIfNecessary = inCallStackIfNecessary;
 
   function recolorLineByKey(key) {
     if (rep.lines.containsKey(key)) {
@@ -748,12 +754,6 @@ function OUTER(gscope) {
   }
 
   var CMDS = {
-    bold: function() { toggleAttributeOnSelection('bold'); },
-    italic: function() { toggleAttributeOnSelection('italic'); },
-    underline: function() { toggleAttributeOnSelection('underline'); },
-    strikethrough: function() { toggleAttributeOnSelection('strikethrough'); },
-    undo: function() { doUndoRedo('undo'); },
-    redo: function() { doUndoRedo('redo'); },
     clearauthorship: function(prompt) {
       if ((!(rep.selStart && rep.selEnd)) || isCaret()) {
         if (prompt) {
@@ -768,13 +768,6 @@ function OUTER(gscope) {
         setAttributeOnSelection('author', '');
       }
     },
-    insertunorderedlist: doInsertUnorderedList,
-    indent: function() {
-      if (! doIndentOutdent(false)) {
-        doInsertUnorderedList();
-      }
-    },
-    outdent: function() { doIndentOutdent(true); }
   };
 
   function execCommand(cmd) {
@@ -808,6 +801,23 @@ function OUTER(gscope) {
   editorInfo.ace_setEditable = setEditable;
   editorInfo.ace_execCommand = execCommand;
   editorInfo.ace_replaceRange = replaceRange;
+
+  editorInfo.ace_callWithAce = function (fn, callStack, normalize) {
+    function wrapper () { return fn(editorInfo); }
+
+    if (normalize !== undefined) {
+      wrapper1 = wrapper;
+      function wrapper () {
+        editorInfo.ace_fastIncorp(9);
+	wrapper1();
+      }
+    }
+
+    if (callStack !== undefined)
+      return editorInfo.ace_inCallStack(callStack, wrapper);
+    else
+      return wrapper();
+  }
 
   editorInfo.ace_setProperty = function(key, value) {
     var k = key.toLowerCase();
@@ -973,6 +983,7 @@ function OUTER(gscope) {
     // normalize but don't do any lexing or anything
     incorporateUserChanges(newTimeLimit(0));
   }
+  editorInfo.ace_fastIncorp = fastIncorp;
 
   function incorpIfQuick() {
     var me = incorpIfQuick;
@@ -1418,12 +1429,6 @@ function OUTER(gscope) {
 	if (ss[0] >= 0) selStart = [ss[0]+a+netNumLinesChangeSoFar, ss[1]];
 	if (se[0] >= 0) selEnd = [se[0]+a+netNumLinesChangeSoFar, se[1]];
 
-	/*var oldLines = rep.alltext.substring(rep.lines.offsetOfIndex(a),
-	  rep.lines.offsetOfIndex(b));
-	var newLines = lines.join('\n')+'\n';
-	dmesg("OLD: "+htmlPrettyEscape(oldLines));
-	dmesg("NEW: "+htmlPrettyEscape(newLines));*/
-
 	var entries = [];
 	var nodeToAddAfter = lastDirtyNode;
 	var lineNodeInfos = new Array(lines.length);
@@ -1603,6 +1608,7 @@ function OUTER(gscope) {
     return (rep.selStart && rep.selEnd && rep.selStart[0] == rep.selEnd[0] &&
 	    rep.selStart[1] == rep.selEnd[1]);
   }
+  editorInfo.ace_isCaret = isCaret;
 
   // prereq: isCaret()
   function caretLine() { return rep.selStart[0]; }
@@ -1990,6 +1996,7 @@ function OUTER(gscope) {
     performDocumentApplyAttributesToRange(lineAndColumnFromChar(start),
 					  lineAndColumnFromChar(end), attribs);
   }
+  editorInfo.ace_performDocumentApplyAttributesToCharRange = performDocumentApplyAttributesToCharRange;
 
   function performDocumentApplyAttributesToRange(start, end, attribs) {
     var builder = Changeset.builder(rep.lines.totalWidth());
@@ -2036,6 +2043,7 @@ function OUTER(gscope) {
     performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
                                           [[attributeName, attributeValue]]);
   }
+  editorInfo.ace_setAttributeOnSelection = setAttributeOnSelection;
 
   function toggleAttributeOnSelection(attributeName) {
     if (!(rep.selStart && rep.selEnd)) return;
@@ -2085,6 +2093,7 @@ function OUTER(gscope) {
 					    [[attributeName,'true']]);
     }
   }
+  editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
 
   function performDocumentReplaceSelection(newText) {
     if (!(rep.selStart && rep.selEnd)) return;
@@ -2455,21 +2464,6 @@ function OUTER(gscope) {
     return false;
     //console.log("%o %o %s", rep.selStart, rep.selEnd, rep.selFocusAtStart);
   }
-
-  /*function escapeHTML(s) {
-    var re = /[&<>'"]/g; /']/; // stupid indentation thing
-    if (! re.MAP) {
-      // persisted across function calls!
-      re.MAP = {
-	'&': '&amp;',
-	'<': '&lt;',
-	'>': '&gt;',
-	'"': '&#34;',
-	"'": '&#39;'
-      };
-    }
-    return s.replace(re, function(c) { return re.MAP[c]; });
-  }*/
 
   function doCreateDomLine(nonEmpty) {
     if (browser.msie && (! nonEmpty)) {
@@ -2868,6 +2862,7 @@ function OUTER(gscope) {
 
     return foundLists;
   }
+  editorInfo.ace_doIndentOutdent = doIndentOutdent;
 
   function doTabKey(shiftDown) {
     if (! doIndentOutdent(shiftDown)) {
@@ -2912,12 +2907,7 @@ function OUTER(gscope) {
                                  prevLineEntry.lineMarker);
             if (thisLineListType) {
               // this line is a list
-              /*if (prevLineListType) {
-               // prev line is a list too, remove this bullet
-               performDocumentReplaceRange([theLine-1, prevLineEntry.text.length],
-               [theLine, lineEntry.lineMarker], '');
-               }
-               else*/ if (prevLineBlank && ! prevLineListType) {
+              if (prevLineBlank && ! prevLineListType) {
                  // previous line is blank, remove it
                  performDocumentReplaceRange([theLine-1, prevLineEntry.text.length],
                                              [theLine, 0], '');
@@ -3003,91 +2993,11 @@ function OUTER(gscope) {
   function handleKeyEvent(evt) {
     if (DEBUG && top.DONT_INCORP) return;
 
-    /*if (evt.which == 48) {
-      //setEditable(! isEditable);
-      //doAlert(getInnerWidth());
-      //doAlert(doc.documentElement.innerWidth)
-      alert(eval(prompt()));
-      evt.preventDefault();
-      return;
-    }*/
-    /*if (evt.which == 48) {
-      alert(doc.body.innerHTML);
-    }*/
-    /*if (evt.which == 48 && evt.type == "keydown") {
-      var lineHeights = [];
-      function eachChild(node, func) {
-	if (node.firstChild) {
-	  var n = node.firstChild;
-	  while (n) {
-	    func(n);
-	    n = n.nextSibling;
-	  }
-	}
-      }
-      eachChild(doc.body, function (n) {
-	if (n.clientHeight) {
-	  lineHeights.push(n.clientHeight);
-	}
-      });
-      alert(lineHeights.join(','));
-    }*/
-    /*if (evt.which == 48) {
-      top.DONT_INCORP = true;
-      var cmdTarget = doc;
-      if (browser.msie) {
-	if (doc.selection) {
-	  cmdTarget = doc.selection.createRange();
-	}
-	else cmdTarget = null;
-      }
-      if (cmdTarget) {
-	cmdTarget.execCommand("Bold", false, null);
-      }
-      alert(doc.body.innerHTML);
-      evt.preventDefault();
-      return;
-    }*/
-    /*if (evt.which == 48) {
-      if (evt.type == "keypress") {
-	top.console.log(window.getSelection().getRangeAt(0));
-	evt.preventDefault();
-      }
-      return;
-    }*/
-    /*if (evt.which == 48) {
-      if (evt.type == "keypress") {
-	inCallStack("bold", function() {
-	  fastIncorp(9);
-	  toggleAttributeOnSelection('bold');
-	});
-	evt.preventDefault();
-      }
-      return;
-    }*/
-    /*if (evt.which == 48) {
-      if (evt.type == "keypress") {
-        inCallStack("insertunorderedlist", function() {
-	  fastIncorp(9);
-          doInsertUnorderedList();
-        });
-	evt.preventDefault();
-      }
-      return;
-    }*/
-
     if (! isEditable) return;
 
     var type = evt.type;
     var charCode = evt.charCode;
     var keyCode = evt.keyCode;
-    var mods = "";
-    if (evt.altKey) mods = mods+"A";
-    if (evt.ctrlKey) mods = mods+"C";
-    if (evt.shiftKey) mods = mods+"S";
-    if (evt.metaKey) mods = mods+"M";
-    var modsPrfx = "";
-    if (mods) modsPrfx = mods+"-";
     var which = evt.which;
 
     //dmesg("keyevent type: "+type+", which: "+which);
@@ -3216,14 +3126,6 @@ function OUTER(gscope) {
           doDeleteKey();
 	  specialHandled = true;
 	}
-	/*if ((!specialHandled) && isTypeForCmdKey &&
-	    String.fromCharCode(which).toLowerCase() == "u" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
-	  // cmd-U
-	  doc.body.innerHTML = '';
-	  evt.preventDefault();
-	  specialHandled = true;
-	}*/
 
 	if (mozillaFakeArrows && mozillaFakeArrows.handleKeyEvent(evt)) {
 	  evt.preventDefault();
@@ -3301,45 +3203,7 @@ function OUTER(gscope) {
       }
     }
   }
-
-  /*function enforceNewTextTypedStyle() {
-    var sel = getSelection();
-    var n = (sel && sel.startPoint && sel.startPoint.node);
-    if (!n) return;
-    var isInOurNode = false;
-    while (n) {
-      if (n.tagName) {
-	var tag = n.tagName.toLowerCase();
-	if (tag == "b" || tag == "strong") {
-	  isInOurNode = true;
-	  break;
-	}
-	if (((typeof n.className) == "string") &&
-	    n.className.toLowerCase().indexOf("Apple-style-span") >= 0) {
-	  isInOurNode = true;
-	  break;
-	}
-      }
-      n = n.parentNode;
-    }
-
-    if (! isInOurNode) {
-      doc.execCommand("Bold", false, null);
-    }
-
-    if (! browser.msie) {
-      var browserSelection = window.getSelection();
-      if (browserSelection && browserSelection.type != "None" &&
-	  browserSelection.rangeCount !== 0) {
-	var range = browserSelection.getRangeAt(0);
-	var surrounder = doc.createElement("B");
-	range.surroundContents(surrounder);
-	range.selectNodeContents(surrounder);
-	browserSelection.removeAllRanges();
-	browserSelection.addRange(range);
-      }
-    }
-  }*/
+  editorInfo.ace_doUndoRedo = doUndoRedo;
 
   function updateBrowserSelectionFromRep() {
     // requires normalized DOM!
@@ -3376,24 +3240,6 @@ function OUTER(gscope) {
   }
 
   function getRepHTML() {
-    /*function lineWithSelection(text, lineNum) {
-      var haveSelStart = (rep.selStart && rep.selStart[0] == lineNum);
-      var haveSelEnd = (rep.selEnd && rep.selEnd[0] == lineNum);
-      var startCol = (haveSelStart && rep.selStart[1]);
-      var endCol = (haveSelEnd && rep.selEnd[1]);
-      var len = text.length;
-      if (haveSelStart && haveSelEnd && startCol == endCol) {
-	var color = "#000";
-	if (endCol == len) {
-	  return '<span style="border-right: 1px solid '+color+'">'+
-	    htmlEscape(text)+'</span>';
-	}
-	else {
-	  return htmlEscape
-	}
-      }
-    }*/
-
     return map(rep.lines.slice(), function (entry) {
       var text = entry.text;
       var content;
@@ -3768,28 +3614,6 @@ function OUTER(gscope) {
 	    diveDeep();
 	  }
 	}
-	/*// make sure Firefox cursor is shallow enough;
-	// to fix problem where "return" between two spans doesn't move the caret to
-	// the next line
-        // (decided against)
-	while (!(p.node.isRoot || p.node.parent().isRoot || p.node.parent().parent().isRoot)) {
-	  if (p.index == 0 && ! p.node.prev()) {
-	    p.node = p.node.parent();
-	    p.maxIndex = 1;
-	  }
-	  else if (p.index == p.maxIndex && ! p.node.next()) {
-	    p.node = p.node.parent();
-	    p.maxIndex = 1;
-	    p.index = 1;
-	  }
-	  else break;
-	}
-	if ((! p.node.isRoot) && (!p.node.parent().isRoot) &&
-	    (p.index == p.maxIndex) && p.node.next()) {
-	  p.node = p.node.next();
-	  p.maxIndex = nodeMaxIndex(p.node);
-	  p.index = 0;
-	}*/
 	if (isNodeText(p.node)) {
 	  return { container: p.node, offset: p.index };
 	}
@@ -3904,12 +3728,6 @@ function OUTER(gscope) {
     var scrollY = getScrollY();
     var win = outerWin;
     var r = 20;
-    /*if (scrollX <= iframePadLeft+r) win.scrollBy(-iframePadLeft-r, 0);
-    else if (getPageWidth() - scrollX - getInnerWidth() <= iframePadRight+r)
-      scrollBy(iframePadRight+r, 0);*/
-    /*if (scrollY <= iframePadTop+r) win.scrollBy(0, -iframePadTop-r);
-    else if (getPageHeight() - scrollY - getInnerHeight() <= iframePadBottom+r)
-      scrollBy(0, iframePadBottom+r);*/
 
     enforceEditability();
 
@@ -4017,13 +3835,6 @@ function OUTER(gscope) {
     }
   }
 
-  /*function handleTextEvent(evt) {
-    top.console.log("TEXT EVENT");
-    inCallStackIfNecessary("handleTextEvent", function() {
-      observeChangesAroundSelection();
-    });
-  }*/
-
   function bindTheEventHandlers() {
     bindEventHandler(window, "unload", teardown);
     bindEventHandler(document, "keydown", handleKeyEvent);
@@ -4039,12 +3850,6 @@ function OUTER(gscope) {
       bindEventHandler(document.documentElement, "compositionstart", handleCompositionEvent);
       bindEventHandler(document.documentElement, "compositionend", handleCompositionEvent);
     }
-
-    /*bindEventHandler(window, "mousemove", function(e) {
-      if (e.pageX < 10) {
-	window.DEBUG_DONT_INCORP = (e.pageX < 2);
-      }
-    });*/
   }
 
   function handleIEOuterClick(evt) {
@@ -4181,12 +3986,6 @@ function OUTER(gscope) {
     else
       target.detachEvent("on" + type, handler);
   }
-
-  /*forEach(['rep', 'getCleanNodeByKey', 'getDirtyRanges', 'isNodeDirty',
-		    'getSelection', 'setSelection', 'updateBrowserSelectionFromRep',
-		    'makeRecentSet', 'resetProfiler', 'getScrollXY', 'makeIdleAction'], function (k) {
-		      top['_'+k] = eval(k);
-		    });*/
 
   function getSelectionPointX(point) {
     // doesn't work in wrap-mode
@@ -4379,6 +4178,7 @@ function OUTER(gscope) {
     }
     setLineListTypes(mods);
   }
+  editorInfo.ace_doInsertUnorderedList = doInsertUnorderedList;
 
   var mozillaFakeArrows = (browser.mozilla && (function() {
     // In Firefox 2, arrow keys are unstable while DOM-manipulating

@@ -44,6 +44,13 @@ linestylefilter.getAuthorClassName = function(author) {
 linestylefilter.getLineStyleFilter = function(lineLength, aline,
                                               textAndClassFunc, apool) {
 
+  var plugins_;
+  if (typeof(plugins)!='undefined') {
+    plugins_ = plugins;
+  } else {
+    plugins_ = parent.parent.plugins;
+  }
+
   if (lineLength == 0) return textAndClassFunc;
 
   var nextAfterAuthorColors = textAndClassFunc;
@@ -69,7 +76,9 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
             }
 	    else if (linestylefilter.ATTRIB_CLASSES[key]) {
 	      classes += ' '+linestylefilter.ATTRIB_CLASSES[key];
-	    }
+	   } else {
+	     classes += plugins_.callHookStr("aceAttribsToClasses", {linestylefilter:linestylefilter, key:key, value:value}, " ", " ", "");
+	   }
 	  }
 	}
       });
