@@ -1,6 +1,5 @@
-function init() {
+function realTimeRecentChangesInit() {
   this.hooks = [];
 }
 
-realTimeRecentChanges = new init();
-
+realTimeRecentChanges = new realTimeRecentChangesInit();
