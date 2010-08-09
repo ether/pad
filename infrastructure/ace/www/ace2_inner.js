@@ -769,6 +769,7 @@ function OUTER(gscope) {
       }
     },
     insertunorderedlist: doInsertUnorderedList,
+	image: doInsertImage,
     indent: function() {
       if (! doIndentOutdent(false)) {
         doInsertUnorderedList();
@@ -3064,9 +3065,8 @@ function OUTER(gscope) {
       }
       return;
     }*/
-
     if (! isEditable) return;
-
+	
     var type = evt.type;
     var charCode = evt.charCode;
     var keyCode = evt.keyCode;
@@ -3110,10 +3110,13 @@ function OUTER(gscope) {
 	}
       }
       else if (type == "keydown") {
+		
 	outsideKeyDown(evt);
+		
       }
 
       if (! stopped) {
+
 	if (isTypeForSpecialKey && keyCode == 8) {
 	  // "delete" key; in mozilla, if we're at the beginning of a line, normalize now,
 	  // or else deleting a blank line can take two delete presses.
@@ -4342,7 +4345,12 @@ function OUTER(gscope) {
       performDocumentApplyChangeset(cs);
     }
   }
-
+  function doInsertImage(){
+	//alert(rep.selStart);
+	var url = prompt("Image file location:","http://");
+	if(url)
+		performDocumentReplaceSelection('<img src="'+url+'"/>');
+  }
   function doInsertUnorderedList() {
     if (! (rep.selStart && rep.selEnd)) {
       return;
