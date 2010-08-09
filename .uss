@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Id>etherpad</Id>
+  <name>Etherpad</name>
+  <package-name>etherpad</package-name>
+  <bootstrap>echo "http://code.google.com/p/etherpad/wiki/Instructions"
+
+sudo apt-get install mysql-client mysql-server scala fastjar openjdk-6-jdk
+cd etherpad
+sudo ./bin/setup-mysql-db.sh
+./bin/rebuildjar.sh</bootstrap>
+  <build-and-run>cd etherpad
+./bin/run-local.sh
+
+gnome-open http://localhost:9000</build-and-run>
+  <run-tests />
+</project>
