@@ -24,3 +24,4 @@ debian/etherpad.substvars
 debian/etherpad
 debian/files
 build-stamp
+.project
