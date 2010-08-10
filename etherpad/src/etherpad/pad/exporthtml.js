@@ -82,7 +82,7 @@ function getPadHTML(pad, revNum) {
       assem.append(tags[i]);
       assem.append('>');
     }
-
+	var images = _findImages(text);
     var urls = _findURLs(text);
 
     var idx = 0;
@@ -173,7 +173,18 @@ function getPadHTML(pad, revNum) {
         }
       }
     } // end processNextChars
-
+	if(images) {
+		
+		images.forEach(function(imageData){
+			var startIndex = imageData.start;
+        	var src = imageData.src;
+        	var srcLength = src.length;
+			processNextChars(startIndex - idx);
+        	assem.append('<img src="'+src.replace(/\"/g, '&quot;')+'"/>');
+        	//processNextChars(urlLength);
+        	//assem.append('</a>');
+		});
+	}
     if (urls) {
       urls.forEach(function(urlData) {
         var startIndex = urlData[0];
@@ -360,6 +371,8 @@ function _processSpaces(s) {
 }
 
 
+// DEFINITELY SOME WORRYING DUPLICATION!
+
 // copied from ACE
 var _REGEX_WORDCHAR = /[\u0030-\u0039\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u1FFF\u3040-\u9FFF\uF900-\uFDFF\uFE70-\uFEFE\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFDC]/;
 var _REGEX_SPACE = /\s/;
@@ -379,4 +392,20 @@ function _findURLs(text) {
   }
 
   return urls;
+}
+// TODO make this work more like StackExchange using reference-style syntax
+var _REGEX_IMG = new RegExp(/(http.+\.png)/);
+// returns null if no images, or [{start:10,src:'http://example.com/image.png'}, ...]
+function _findImages(text){
+	_REGEX_IMG.lastIndex = 0;
+	var images = null;
+	  var execResult;
+	  while ((execResult = _REGEX_URL.exec(text))) {
+	    images = (images || []);
+	    var startIndex = execResult.index;
+	    var src = execResult[0];
+	    images.push({start:startIndex, src:src});
+	  }
+	
+	  return images;
 }
