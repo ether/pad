@@ -1,9 +1,12 @@
 import("etherpad.log");
+import("plugins.showImages.static.js.main");
+
 function init() {
- this.hooks = ['aceGetFilterStack'];
- 
+ this.hooks = ['aceGetFilterStack', 'aceCreateDomLine'];
+ this.client = new main.init(); 
  this.description = 'Render images inline';
- this.aceGetFilterStack = aceGetFilterStack;
+ this.aceGetFilterStack = main.aceGetFilterStack;
+ this.aceCreateDomLine = main.aceCreateDomLine;
  this.install = install;
  this.uninstall = uninstall;
 }
@@ -15,11 +18,3 @@ function install() {
 function uninstall() {
  log.info("Uninstalling inlineImages");
 }
-
-function aceGetFilterStack (options){
-	var linestylefilter = options.linestylefilter;
-	return  [  
-				linestylefilter.getRegexpFilter( new RegExp("*.png", "g"), 'IAMGOR')
-		    ];
-}
-
