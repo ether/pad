@@ -23,7 +23,7 @@ function aceCreateDomLine(args) {
 
    return [{
    		cls: cls,
-   		extraOpenTags: '<img src="' + src + '"/>',
+   		extraOpenTags: '<img src="' + src + '" width="500px"/>',
 		extraCloseTags:''
    	}];
   }

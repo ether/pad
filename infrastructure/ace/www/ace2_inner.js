@@ -4349,7 +4349,7 @@ function OUTER(gscope) {
 	//alert(rep.selStart);
 	var url = prompt("Image file location:","http://");
 	if(url)
-		performDocumentReplaceSelection('<img src="'+url+'"/>');
+		performDocumentReplaceSelection(url);
   }
   function doInsertUnorderedList() {
     if (! (rep.selStart && rep.selEnd)) {
