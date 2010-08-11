@@ -3,10 +3,25 @@
  %>
  
  <h1> <%=section%></h1>
+ <% if(summary){ %>
+	 <div id="overview">
+		 <%=summary%> [<a href="/<%=summary_pad_id%>">Edit</a>]
+	 </div>
+ <% }else{ %>
+ 	 [<a href="/<%=summary_pad_id%>">Add summary information</a>]
+ <% } %>
+ <h2>Specs</h2>
  
  <% for(var i in  pads){
- 	var pad = pads[i]; %>
-	<p> <a href='<%= groupBasedId(pad.id) %>'><%=  shortName(pad.id) %></a> </p>
+ 	var pad = pads[i];
+	 %>
+	<p>
+		
+		<a href='<%= groupBasedId(pad.padId) %>'>
+			<img src="<%=pad.images[0]%>" width="100px"/>
+			<%=  shortName(pad.padId) %>
+		</a> 
+	</p>
  <%}%>
  
  
