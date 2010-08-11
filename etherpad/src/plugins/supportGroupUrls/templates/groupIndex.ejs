@@ -2,5 +2,12 @@
 // template.inherit('page.ejs');
  %>
  
- <h1>This is a group index!</h1>
- <p>Filter = <%=filter%></p>
+ <h1> <%=section%></h1>
+ 
+ <% for(var i in  pads){
+ 	var pad = pads[i]; %>
+	<p> <a href='<%= groupBasedId(pad.id) %>'><%=  shortName(pad.id) %></a> </p>
+ <%}%>
+ 
+ 
+ 
