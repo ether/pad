@@ -6,7 +6,9 @@ import("etherpad.control.pad.pad_control");
 
 function handlePath() {
   return [
-  	[/^\/specs\/$/, groupUrls.render_index],
-  	[/^\/specs\/([^\/]+\/)+$/, groupUrls.render_index]
+  	[/^\/specs\/$/, forward(groupUrls)],
+	[/^\/specs\/([^\/]+\/)+$/, forward(groupUrls)],
+	[/^\/specs\/([^\/]+\/)+/, groupUrls.render_page]
+  
   ];
 }
