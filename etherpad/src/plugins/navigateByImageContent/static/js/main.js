@@ -3,11 +3,11 @@ import("sqlbase.sqlbase");
 import("etherpad.log");
 
 function init() {
-  this.hooks = ['renderPageBodyPre',];
-  this.aceGetFilterStack = renderPageBodyPre;
+  this.hooks = ['renderNavigation',];
+  this.aceGetFilterStack = renderNavigation;
 }
 
-function renderPageBodyPre(){
+function renderNavigation(){
 	var result = '<table><tr>';
 	var query= {};
 	var getPath = function(id){return id;};

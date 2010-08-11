@@ -36,32 +36,10 @@ limitations under the License. */ %>
 %>
 
 <% template.define('body', function() { var ejs_data=''; %>
-<h1>THIS IS THE UBUNTU TEMPLATE</h1>
+
   <div id="padpage">
     <div id="padtop">
-      <div id="topbar">
-	<% /* floated left */ %>
-	<div id="topbarleft"><!-- --></div>
-	<% /* <a href="#" id="topbarnewpad">New Pad</a> */ %>
-	<% /* floated right */ %>
-	<div id="topbarright"><!-- --></div>
-	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
-	<% /* non-floated */ %>
-	<div id="topbarcenter">
-	  <a href="/" id="topbaretherpad">EtherPad</a>
-	</div>
-	<% if (isProAccountHolder) { %>          
-	  <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
-	  <div id="accountnav"><%= toHTML(account.email) %>
-	    <a href="/ep/account/sign-out">(sign out)</a>
-	  </div>
-	<% } else if (isPro) { %>
-	  <div id="accountnav">
-	    <a href="<%= signinUrl %>">sign in</a>
-	  </div>
-	<% } %>
-	<div id="specialkeyarea"><!-- --></div>
-      </div>
+
       <div id="alertbar">
 	<div id="servermsg">
 	  <h3>Server Notice<span id="servermsgdate"><!-- --></span>:</h3>
@@ -69,10 +47,13 @@ limitations under the License. */ %>
 	  <p id="servermsgtext"><!-- --></p>
 	</div>
       </div>
-
+	<div id="navigation">
+		 <%: plugins.callHookStr('renderNavigation', {}, '', '', ''); %>
+	</div>
       <div id="docbar">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
 	  <tr>
+	  
 	    <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
             <%: template.use('docBarTitle'); %>
 	    <td width="100%">&nbsp;</td>
@@ -85,7 +66,7 @@ limitations under the License. */ %>
         <%: template.use('docBarDropdowns'); %>
       </div><!-- /docbar -->
     </div>
-
+	
     <div id="padmain">
       <div id="padsidebar"><%: template.use('sideBar'); %></div> 
 

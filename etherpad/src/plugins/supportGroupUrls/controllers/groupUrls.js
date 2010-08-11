@@ -18,7 +18,10 @@ function onRequest() {
 	var matching_pads = sqlobj.selectMulti("PAD_SQLMETA",{id:['like', filter+'%']});
 	var pads = [];
 	// seems like too many db queries - is there a selectMultiJSON command thing? getAllJSON? Does that support filter conditions?
-	for(var i in matching_pads) pads.push(sqlbase.getJSON("PAD_META", matching_pads[i].id));
+	for (var i in matching_pads) {
+		var json= sqlbase.getJSON("PAD_META", matching_pads[i].id);
+		if(json)		pads.push(json);
+	}
 	
 	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'');
 	

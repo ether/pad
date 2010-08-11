@@ -326,7 +326,7 @@ function render_pad(localPadId) {
         initialPassword = propad.getPassword();
       });
     }
-    documentBarTitle = (proTitle || "Public Pad");
+    documentBarTitle = (proTitle || localPadId || "Public Pad");
 
     var specialKey = request.params.specialKey ||
       (sessions.isAnEtherpadAdmin() ? collab_server.getSpecialKey('invisible') :

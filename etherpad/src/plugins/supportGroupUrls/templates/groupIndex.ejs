@@ -11,8 +11,8 @@
  	 [<a href="/<%=summary_pad_id%>">Add summary information</a>]
  <% } %>
  <h2>Specs</h2>
- 
- <% for(var i in  pads){
+ <%= pads.length %>
+ <% for(var i=0;i< pads.length;i++){
  	var pad = pads[i];
 	 %>
 	<p>
