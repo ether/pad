@@ -5,10 +5,10 @@
  <h1> <%=section%></h1>
  <% if(summary){ %>
 	 <div id="overview">
-		 <%=summary%> [<a href="/<%=summary_pad_id%>">Edit</a>]
+		 <%=summary%> [<a href="/<%=summary_pad_id%>">Edit <%=summary_pad_id%></a>]
 	 </div>
  <% }else{ %>
- 	 [<a href="/<%=summary_pad_id%>">Add summary information</a>]
+ 	 [<a href="/<%=summary_pad_id%>">Add summary information (<%=summary_pad_id%>)</a>]
  <% } %>
  <h2>Specs</h2>
  <%= pads.length %>

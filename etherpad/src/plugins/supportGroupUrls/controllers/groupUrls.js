@@ -20,10 +20,10 @@ function onRequest() {
 	// seems like too many db queries - is there a selectMultiJSON command thing? getAllJSON? Does that support filter conditions?
 	for (var i in matching_pads) {
 		var json= sqlbase.getJSON("PAD_META", matching_pads[i].id);
-		if(json)		pads.push(json);
+		if(json) pads.push(json);
 	}
 	
-	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'');
+	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'').replace(/\//g, '-');
 	
 	var summary;
 	model.accessPadGlobal(summary_pad_id, function(pad){
