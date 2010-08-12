@@ -22,18 +22,15 @@ function renderNavigation(){
 	}
 	
 	var allPads = sqlobj.selectMulti("PAD_SQLMETA",query);
-	
+	// TODO - use a proper ejs template for this!
 	for(var i=0; i < allPads.length; i++){
 		var pad = allPads[i];
 		var meta = sqlbase.getJSON("PAD_META", pad.id);
 		result += '<th><a href="' + getPath(pad.id) + '" title="'+pad.id+'">';
-		if (meta && meta.images && meta.images.constructor && meta.images.constructor.toString().match(/Array/)) {
-			
-			result += '<img src="' + meta.images[0] + '" alt="' + pad.id + '" width="60px"/>';
-		}
-		else {
-			result += pad.id;
-		}	
+		var image_available =   (meta && meta.images && meta.images.constructor && meta.images.constructor.toString().match(/Array/));
+		var src = image_available ? meta.images[0] : '/static/img/plugins/navigateByImageContent/placeholder.png'; 		
+		var width = image_available ? 60 : 24;
+		result += '<img src="' + src + '" alt="' + pad.id + '" width="' + width +'px"/>';
 		result += '</a></th>';
 	}
 	

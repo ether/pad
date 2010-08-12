@@ -31,7 +31,8 @@ function onRequest() {
   /* FIXME: Is there a more effective way to do this? */
   for (plugin in plugins.plugins) {
     disp.addLocations([
-      [PrefixMatcher('/static/js/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/js/', opts)],
+      [PrefixMatcher('/static/img/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/img/', opts)],
+	  [PrefixMatcher('/static/js/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/js/', opts)],
       [PrefixMatcher('/static/css/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/css/', opts)],
       [PrefixMatcher('/static/swf/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/swf/', opts)],
       [PrefixMatcher('/static/html/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/html/', opts)],
