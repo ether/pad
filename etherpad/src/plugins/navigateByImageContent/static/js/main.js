@@ -9,7 +9,7 @@ function init() {
 
 function renderNavigation(){
 	var result = '<table><tr>';
-	var section;
+	var section = '';
 	var query= {};
 	var getPath = function(id){return id;};
 	var match = request.path.match(/^((\/specs\/)([^\/]+\/)+)([^\/]+)$/);
@@ -37,7 +37,6 @@ function renderNavigation(){
 		};
 				 
 	});
-	
 	return renderTemplateAsString('imageNavigation.ejs',{pads:pads, section:section}, 'navigateByImageContent');
 }
 navigateByImageContent = new init();
