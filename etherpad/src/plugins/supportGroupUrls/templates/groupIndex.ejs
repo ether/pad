@@ -18,7 +18,9 @@
 	<p>
 		
 		<a href='<%= groupBasedId(pad.padId) %>'>
+			<% if(pad.images){ %>
 			<img src="<%=pad.images[0]%>" width="100px"/>
+			<% } %>
 			<%=  shortName(pad.padId) %>
 		</a> 
 	</p>

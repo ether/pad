@@ -47,6 +47,12 @@ function render_page(){
 	return pad_control.render_pad(padId);
 }
 function redirect_to_specs_path(){
-	response.redirect("/specs" + request.path);
-	
+	if (!isStaticRequest()) {
+		response.redirect("/specs" + request.path);
+	}else{
+		
+	}
+}
+function render_main(){
+	response.redirect("/specs/");
 }
