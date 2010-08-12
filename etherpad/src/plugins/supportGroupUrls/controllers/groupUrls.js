@@ -6,6 +6,7 @@ import("sqlbase.sqlbase");
 import("etherpad.pad.exporthtml");
 import("etherpad.pad.model");
 import("etherpad.pad.padutils");
+import("etherpad.sessions.getSession");
 function onRequest() {
 	var section = request.path.toString().split("/specs/")[1];
 	var filter = section.replace(/\//g,"-");
@@ -43,14 +44,16 @@ function onRequest() {
 }
 function render_page(){
 	var padId = request.path.toString().split("/specs/")[1].replace(/\//g,"-");
-	log.info("****rendering  " + padId);
+	getSession().instantCreate = encodeURIComponent(padId);
+	//log.info("****rendering  " + padId);
+	
 	return pad_control.render_pad(padId);
 }
 function redirect_to_specs_path(){
 	if (!isStaticRequest()) {
 		response.redirect("/specs" + request.path);
 	}else{
-		
+		// do something else... this static routing's a bit of a mess..
 	}
 }
 function render_main(){
