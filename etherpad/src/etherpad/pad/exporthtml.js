@@ -400,7 +400,7 @@ function _findImages(text){
 	_REGEX_IMG.lastIndex = 0;
 	var images = null;
 	  var execResult;
-	  while ((execResult = _REGEX_URL.exec(text))) {
+	  while ((execResult = _REGEX_IMG.exec(text))) {
 	    images = (images || []);
 	    var startIndex = execResult.index;
 	    var src = execResult[0];
