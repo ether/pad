@@ -1,0 +1,15 @@
+<table>
+	<tr>
+		<th>
+			<% if (section) { %>
+			Pads in <%= section %>:
+			<% }else{ %>
+			All pads:
+			<% } %>
+		</th>
+		<% for(var i in pads ){
+			var pad = pads[i]; %>
+			<td><a href="<%=pad.path%>" title="<%=pad.path%>"><img src="<%= pad.src %>" width="<%=pad.width%>px"/></a></td>
+		<% }%>
+	</tr>
+</table>
