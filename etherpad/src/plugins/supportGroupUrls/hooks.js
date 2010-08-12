@@ -6,9 +6,10 @@ import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 
 function handlePath() {
   return [
+    [/^\/([^\/]+)$/, groupUrls.redirect_to_specs_path], // supercede  [/^\/([^\/]+)$/, pad_control.render_pad],
   	[/^\/specs\/$/, forward(groupUrls)],
-	[/^\/specs\/([^\/]+\/)+$/, forward(groupUrls)],
-	[/^\/specs\/([^\/]+\/)+/, groupUrls.render_page]
+	[/^\/specs\/([^\/]+\/)*$/, forward(groupUrls)],
+	[/^\/specs\/([^\/]+\/)*/, groupUrls.render_page]
   
   ];
 }

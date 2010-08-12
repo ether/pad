@@ -5,6 +5,7 @@ import("sqlbase.sqlobj");
 import("sqlbase.sqlbase");
 import("etherpad.pad.exporthtml");
 import("etherpad.pad.model");
+import("etherpad.pad.padutils");
 function onRequest() {
 	var section = request.path.toString().split("/specs/")[1];
 	var filter = section.replace(/\//g,"-");
@@ -25,10 +26,9 @@ function onRequest() {
 	
 	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'').replace(/\//g, '-');
 	
-	var summary;
-	model.accessPadGlobal(summary_pad_id, function(pad){
-		if(pad.exists())			
-			summary	= exporthtml.getPadHTML( pad );	
+	var summary = 
+	padutils.accessPadLocal(summary_pad_id, function(pad){
+		return pad.exists() ? exporthtml.getPadHTML( pad ) : null;	
 	}, 'r');
 	 
 	
@@ -43,5 +43,10 @@ function onRequest() {
 }
 function render_page(){
 	var padId = request.path.toString().split("/specs/")[1].replace(/\//g,"-");
+	log.info("****rendering  " + padId);
 	return pad_control.render_pad(padId);
+}
+function redirect_to_specs_path(){
+	response.redirect("/specs" + request.path);
+	
 }

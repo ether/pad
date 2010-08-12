@@ -9,7 +9,6 @@ function padModelWriteToDB(args){
 	
 	var REGEXP_IMG = /http.+\.(png|jpg)/igm;
 	var matches = text.match(REGEXP_IMG);//REGEXP_IMG.exec(text);
-	for(var i=0; i < matches.length;i++)  log.info("match[" + i + "]=" +matches[i]);
 	
 	meta.images = matches;
 	
