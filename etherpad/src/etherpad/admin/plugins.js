@@ -212,7 +212,8 @@ function registerClientHandlerJS() {
   loadPlugins();
   for (pluginName in plugins) {
     var plugin = pluginModules[pluginName];
-    if (plugin.client !== undefined) {
+	if(!plugin) log.info("Plugin " + pluginName + "not found");
+    if (plugin && plugin.client !== undefined) {
       helpers.includeJs("plugins/" + pluginName + "/main.js");
       if (plugin.client.modules != undefined)
         for (j = 0; j < client.modules.length; j++)

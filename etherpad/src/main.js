@@ -158,7 +158,7 @@ serverhandlers.tasks.flushPad = function(globalPadId, reason) {
   dbwriter.taskFlushPad(globalPadId, reason);
 };
 serverhandlers.tasks.checkForStalePads = function() {
-  // bit worried about this - I don't think I want to delete 'stale' pads on this implementation!
+  // bit worried about this - I don't think I want to delete 'stale' pads on this implementation!	
   //dbwriter.taskCheckForStalePads();
 };
 serverhandlers.tasks.statisticsDailyUpdate = function() {
