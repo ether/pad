@@ -1,0 +1,39 @@
+ <%
+ %>
+<html>
+<head>
+	<title><%=section%></title>
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/supportGroupUrls/groupIndex.css" /> 
+</head>
+<body>
+<div id="wrapper">
+<div id="navbar">
+	<a id="ubuntu" href="/specs/">Sections</a>
+ </div>
+ <h1> <%=section%></h1>
+
+ <div id="main">
+ <% if(summary){ %>
+	 <div id="overview">
+		 <%=summary%> [<a href="/<%=summary_pad_id%>">Edit <%=summary_pad_id%></a>]
+	 </div>
+ <% }else{ %>
+ 	 [<a href="/<%=summary_pad_id%>">Add summary information (<%=summary_pad_id%>)</a>]
+ <% } %>
+ 
+ <h2>Specs</h2>
+ <% for(var i=0;i< pads.length;i++){
+ 	var pad = pads[i];
+	 %>
+	<a href='<%= groupBasedId(pad.padId) %>'>
+		<% if(pad.images){ %>
+		<img src="<%=pad.images[0]%>" width="100px"/>
+		<% } %>
+		<%=  shortName(pad.padId) %>
+	</a> 
+ <%}%>
+ </div>
+ </div>
+ <div id="footer">Footer content</div>
+ </body>
+ </html>
