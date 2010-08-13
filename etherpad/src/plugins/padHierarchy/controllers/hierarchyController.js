@@ -7,7 +7,7 @@ import("etherpad.pad.exporthtml");
 import("etherpad.pad.model");
 import("etherpad.pad.padutils");
 import("etherpad.sessions.getSession");
-//import("plugins.padHierarchy.helpers.hierarchyHelper.*");
+import("plugins.padHierarchy.helpers.hierarchyHelper.*");
 function onRequest() {
 	var section = request.path.toString().split("/specs/")[1];
 	var filter = section.replace(/\//g,"-");
@@ -19,11 +19,13 @@ function onRequest() {
 	}
 	
 	var matching_pads = sqlobj.selectMulti("PAD_SQLMETA",{id:['like', filter+'%']});
-	var pads = [];
+	var pads = {};
+	var pad_titles = getHierarchy(matching_pads.map(function(item){ return item.id; }));
+	
 	// seems like too many db queries - is there a selectMultiJSON command thing? getAllJSON? Does that support filter conditions?
 	for (var i in matching_pads) {
 		var json= sqlbase.getJSON("PAD_META", matching_pads[i].id);
-		if(json) pads.push(json);
+		if(json) pads[matching_pads[i].id] = json;
 	}
 	
 	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'').replace(/\//g, '-');

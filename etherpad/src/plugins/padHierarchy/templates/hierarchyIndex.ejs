@@ -22,8 +22,8 @@
  <% } %>
  
  <h2>Specs</h2>
- <% for(var i=0;i< pads.length;i++){
- 	var pad = pads[i];
+ <% for(var e in pads){
+ 	var pad = pads[e];
 	 %>
 	<a href='<%= groupBasedId(pad.padId) %>'>
 		<% if(pad.images){ %>
