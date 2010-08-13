@@ -31,31 +31,57 @@ HierarchyTest.prototype.testNestingDetection = function(){
 	
 	var expectation = [
 		{
-			"maverick": [
-			{
-				"software-center": [
-					"lobby", "apturl", "buy", "buying", "deauthorizing", {
-						"department": ["subsection"]
-					}, "reinstalling-previous-purchases", "whats-new"]
-			}, {
-				"installer": [{
-					"partitioner": ["when-other-os-installed"]
+			id:"maverick", children: [
+				{id:"software-center", children: [
+					{id:"lobby", children:[]}, 
+					{id:"apturl", children:[]},
+					{id:"buy", children:[]} , 
+					{id:"buying",children:[]},
+					{id:"deauthorizing", children:[]},
+					{id:"department", children: [ {id:"subsection", children:[]}]},
+					{id:"reinstalling-previous-purchases",children:[]},
+					{id:"whats-new",children:[]}]
+			}, 
+				{id:"installer",children:[
+					{id:"partitioner", children: [{
+						id: "when-other-os-installed",
+						children: []
+					}]
+				}, {id:"setup-process", children: [
+					{
+						id: "get-ready",
+						children: []
+					},
+					{
+						id: "keyboard-layout",
+						children: []
+					}, {
+						id: "slideshow",
+						children: []
+					}, {
+						id: "welcome",
+						children: []
+					},{
+						id: "wifi-prompt",
+						children: []
+					}]
 				}, {
-					"setup-process": ["get-ready", "keyboard-layout", "slideshow", "welcome", "wifi-prompt"]
-				}, "user-account-create"]
+					id: "user-account-create",
+					children: []
+				}]
 			}]
 		},
 		{
-			"people": [{
-				"michaelforrest": {
-					"ubuntu-spec-editor": ["authentication"]
-				}
-			}]
+			id:"people", children: [
+				{id:"michaelforrest", children: [
+					{id:"ubuntu-spec-editor",children: [ {id:"authentication", children:[] }]}
+				]}
+			]
 		}
 	];
 	var result = getHierarchy(titles);
-	assertEquals(2, result.length);
-	assertEquals(2, result[0].length);
+	assertEquals("should be two children on the root (maverick and people) - result was " + result.children, 2, result.children.length);
+	assertEquals("should be two children under maverick (installer and software center)",2, result.children[0].children.length );
 	//assertEquals("maverick", result[0][0]);
 	//assertEquals(expectation,getHierarchy(titles), "should have right number of top-level structures");
 	
