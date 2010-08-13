@@ -25,3 +25,4 @@ debian/etherpad
 debian/files
 build-stamp
 .project
+.externalToolBuilders
