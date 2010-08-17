@@ -15,7 +15,7 @@
  */
 
 import("etherpad.collab.ace.easysync2.Changeset");
-
+import("etherpad.log");
 function getPadPlainText(pad, revNum) {
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
@@ -82,6 +82,7 @@ function getPadHTML(pad, revNum) {
       assem.append(tags[i]);
       assem.append('>');
     }
+	log.info("\n\nLOOKING FOR IMAGES\n\n")
 	var images = _findImages(text);
     var urls = _findURLs(text);
 
@@ -394,7 +395,7 @@ function _findURLs(text) {
   return urls;
 }
 // TODO make this work more like StackExchange using reference-style syntax
-var _REGEX_IMG = new RegExp(/(http.+\.png)/);
+var _REGEX_IMG =  new RegExp("http.+((\.png)|(\.jpg))", "g");
 // returns null if no images, or [{start:10,src:'http://example.com/image.png'}, ...]
 function _findImages(text){
 	_REGEX_IMG.lastIndex = 0;

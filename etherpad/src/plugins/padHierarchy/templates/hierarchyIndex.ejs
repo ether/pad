@@ -1,39 +1,63 @@
- <%
- %>
-<html>
-<head>
-	<title><%=section%></title>
-	<link rel="stylesheet" type="text/css" href="/static/css/plugins/supportGroupUrls/groupIndex.css" /> 
-</head>
-<body>
+
+<%
+	helpers.includeJs("jquery-1.3.2.js");
+	helpers.includeJs("plugins/padHierarchy/jquerycssmenu.js");
+	helpers.includeCss("plugins/padHierarchy/ubuntu.css");
+	helpers.setHtmlTitle(section);
+%>
+<% template.define('body', function() { var ejs_data=''; %>
 <div id="wrapper">
 <div id="navbar">
 	<a id="ubuntu" href="/specs/">Sections</a>
+	<div id="current_section_menu" class="menu">
+		<ul>
+	 	<% grouped_pad_list %>
+		</ul>
+	</div>
  </div>
- <h1> <%=section%></h1>
 
  <div id="main">
+ <h1> <%=section%></h1>
+ <a class="edit" href="/<%=summary_pad_id%>">edit <%=summary_pad_id%></a>
  <% if(summary){ %>
 	 <div id="overview">
-		 <%=summary%> [<a href="/<%=summary_pad_id%>">Edit <%=summary_pad_id%></a>]
+		 <%=summary%> 
 	 </div>
  <% }else{ %>
- 	 [<a href="/<%=summary_pad_id%>">Add summary information (<%=summary_pad_id%>)</a>]
+ 	 [<a class="edit" href="/<%=summary_pad_id%>">Add summary information (<%=summary_pad_id%>)</a>]
  <% } %>
  
- <h2>Specs</h2>
- <% for(var e in pads){
- 	var pad = pads[e];
-	 %>
-	<a href='<%= groupBasedId(pad.padId) %>'>
-		<% if(pad.images){ %>
-		<img src="<%=pad.images[0]%>" width="100px"/>
-		<% } %>
-		<%=  shortName(pad.padId) %>
-	</a> 
- <%}%>
+ 	<% 
+ 	for (var e in grouped_pads.children){ 
+		var group = grouped_pads.children[e];
+		var pad = pads[group.id];
+		if(pad){  %>
+		<div class="pad_summary">
+			<a href="#<%=pad.padId%>">
+				<% if(pad.images){ %>
+				 	<img src="<%=pad.images[0]%>" width="100px"/>
+				<% } %>
+			 	<%= shortName(pad.padId) %>
+		 	</a>
+ 		</div>
+	 <% }} %>
+	
+	<%
+ 	for (var e in grouped_pads.children){ 
+		var group = grouped_pads.children[e];
+		var pad = pads[group.id];
+		if(pad){  %>
+		<div class="pad_detail">
+			<a name="<%=pad.padId%>"></a>
+			<h2><%=shortName(pad.padId)%></h2>
+			<a href='<%= groupBasedId(pad.padId) %>' class="edit">
+				edit <%=  shortName(pad.padId) %>
+			</a>
+			<%= pad.html %>
+		</div> 
+	 <% }} %>		
+	</div>
  </div>
  </div>
  <div id="footer">Footer content</div>
- </body>
- </html>
+ <% return ejs_data; }); %>
