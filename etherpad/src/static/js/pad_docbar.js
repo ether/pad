@@ -94,7 +94,7 @@ var paddocbar = (function() {
         impexp: { animator: getPanelOpenCloseAnimator("impexp", 160) },
         savedrevs: { animator: getPanelOpenCloseAnimator("savedrevs", 79) },
         options: { animator: getPanelOpenCloseAnimator(
-          "options", 114) },
+          "options", 134) },
         security: { animator: getPanelOpenCloseAnimator("security", 130) }
       };
 

@@ -201,6 +201,12 @@ limitations under the License. */ %>
 	<label for="options-linenoscheck" id="options-linenoslabel">Line numbers</label>
 	<div id="options-fontlabel">Display font:</div>
 	<select id="viewfontmenu"><option value="normal">Normal</option><option value="monospace">Monospaced</option></select>
+	<form action="/ep/pad/delete" method="post" id="delete-pad"> 
+	  <input type="hidden" name="returnPath" value="/" /> 
+	  <input id="padIdToDelete" name="padIdToDelete" type="hidden" value="<%=localPadId %>" /> 
+	  <input type="submit" value="delete"  onclick="return confirm('Are you sure you want to delete this pad?')"/> 
+	</form> 
+	
 	<div id="options-viewexplain">These options affect everyone's view of the pad.</div>
 	<a id="options-close" href="javascript:void(0)">Hide</a>
       </div>

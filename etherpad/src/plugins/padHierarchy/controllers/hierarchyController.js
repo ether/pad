@@ -24,13 +24,15 @@ function onRequest() {
 	
 	// seems like too many db queries - is there a selectMultiJSON command thing? getAllJSON? Does that support filter conditions?
 	for (var i in matching_pads) {
-		var json= sqlbase.getJSON("PAD_META", matching_pads[i].id);
+		var json = sqlbase.getJSON("PAD_META", matching_pads[i].id);
 		
-		if(json) pads[matching_pads[i].id] = json;
-		var html = padutils.accessPadLocal(matching_pads[i].id, function(pad){
-			return pad.exists() ? exporthtml.getPadHTML( pad ) : null;	
-		}, 'r');			
-		pads[matching_pads[i].id].html = html;
+		if (json) {
+			pads[matching_pads[i].id] = json;
+			var html = padutils.accessPadLocal(matching_pads[i].id, function(pad){
+				return pad.exists() ? exporthtml.getPadHTML(pad) : null;
+			}, 'r');
+			pads[matching_pads[i].id].html = html;
+		}
 	}
 	
 	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'').replace(/\//g, '-');

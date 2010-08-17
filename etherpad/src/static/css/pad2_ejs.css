@@ -499,7 +499,7 @@ table#otheruserstable { display: none; }
 #savedrevs-wrapper .dbpanel-rightedge { background-position: 0 -10px; }
 
 #options-wrapper { width: 340px; right: 200px; }
-#options-panel { height: 114px; }
+#options-panel { height: 134px; }
 .docbaroptions-closing #options-wrapper { z-index: 50; }
 
 #security-wrapper { width: 320px; right: 300px; }
@@ -689,6 +689,7 @@ form#reconnectform { display: none; }
 #options-linenoscheck { position: absolute; left: 15px; top: 57px; width: 15px; height: 15px; }
 #options-linenoslabel { position: absolute; left: 35px; top: 57px; }
 #options-fontlabel { position: absolute; left: 15px; top: 82px; }
+#padoptions form{ position: absolute; left:15px; top:104px; }
 #viewfontmenu { position: absolute; top: 80px; left: 90px; width: 110px; }
 #options-viewexplain { position: absolute; left: 215px; top: 15px; width: 100px; height: 70px;
   padding-left: 10px; padding-top: 10px; border-left: 1px solid #ccc;

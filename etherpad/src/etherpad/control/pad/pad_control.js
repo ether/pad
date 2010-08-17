@@ -53,6 +53,8 @@ import("etherpad.control.pad.pad_changeset_control");
 import("etherpad.control.pad.pad_importexport_control");
 import("etherpad.collab.readonly_server");
 
+import("etherpad.pad.dbwriter");
+
 import("dispatch.{Dispatcher,PrefixMatcher,DirMatcher,forward}");
 
 jimport("java.lang.System.out.println");
@@ -184,6 +186,18 @@ function render_newpad() {
   session.instantCreate = padId;
   response.redirect("/"+padId);
 }
+
+function render_delete_post() { 
+    var localPadId = request.params.padIdToDelete; 
+    model.accessPadGlobal(localPadId, function(pad) { 
+            collab_server.bootUsersFromPad(pad, "deleted"); 
+            pad.destroy(); 
+            }); 
+    dbwriter.taskFlushPad(localPadId, "delete"); 
+    response.redirect(request.params.returnPath); 
+} 
+
+
 
 // Tokbox
 function render_newpad_xml_post() {
