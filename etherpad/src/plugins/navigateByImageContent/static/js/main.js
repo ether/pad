@@ -12,7 +12,7 @@ function renderNavigation(){
 	var section = '';
 	var query= {};
 	var getPath = function(id){return id;};
-	var match = request.path.match(/^((\/specs\/)([^\/]+\/)+)([^\/]+)$/);
+	var match = request.path.match(/^((\/pads\/)([^\/]+\/)+)([^\/]+)$/);
 	if(match){ 
 		section = request.path.replace(match[2], '').replace(match[4], '');
 		var like = section.replace(/\//g,"-");

@@ -82,7 +82,6 @@ function getPadHTML(pad, revNum) {
       assem.append(tags[i]);
       assem.append('>');
     }
-	log.info("\n\nLOOKING FOR IMAGES\n\n")
 	var images = _findImages(text);
     var urls = _findURLs(text);
 

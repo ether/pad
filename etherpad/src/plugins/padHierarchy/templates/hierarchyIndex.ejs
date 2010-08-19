@@ -1,36 +1,37 @@
 
 <%
-	helpers.includeJs("jquery-1.3.2.js");
-	helpers.includeJs("plugins/padHierarchy/jquerycssmenu.js");
+	//helpers.includeJs("jquery-1.3.2.js");
+	//helpers.includeJs("plugins/padHierarchy/jquerycssmenu.js");
 	helpers.includeCss("plugins/padHierarchy/ubuntu.css");
 	helpers.setHtmlTitle(section);
 %>
 <% template.define('body', function() { var ejs_data=''; %>
 <div id="wrapper">
 <div id="navbar">
-	<a id="ubuntu" href="/specs/">Sections</a>
+	<a id="ubuntu" href="/">Pads</a>
 	<div id="current_section_menu" class="menu">
 		<ul>
-	 	<% grouped_pad_list %>
+	 	<%= grouped_pad_list %>
 		</ul>
 	</div>
  </div>
 
  <div id="main">
  <h1> <%=section%></h1>
- <a class="edit" href="/<%=summary_pad_id%>">edit <%=summary_pad_id%></a>
+ <a class="edit" href="/pads/<%=filter%>/+edit">edit <%=filter%></a>
  <% if(summary){ %>
 	 <div id="overview">
 		 <%=summary%> 
 	 </div>
  <% }else{ %>
- 	 [<a class="edit" href="/<%=summary_pad_id%>">Add summary information (<%=summary_pad_id%>)</a>]
+ 	 [<a class="edit" href="/pads/<%=filter%>/+edit">Add summary information (<%=filter%>)</a>]
  <% } %>
  
  	<% 
  	for (var e in grouped_pads.children){ 
 		var group = grouped_pads.children[e];
 		var pad = pads[group.id];
+		
 		if(pad){  %>
 		<div class="pad_summary">
 			<a href="#<%=pad.padId%>">
@@ -47,17 +48,17 @@
 		var group = grouped_pads.children[e];
 		var pad = pads[group.id];
 		if(pad){  %>
-		<div class="pad_detail">
-			<a name="<%=pad.padId%>"></a>
+		<div class="pad_detail" name="<%=pad.padId%>">
 			<h2><%=shortName(pad.padId)%></h2>
-			<a href='<%= groupBasedId(pad.padId) %>' class="edit">
+			<a href='<%= groupBasedId(pad.padId) %>/+edit' class="edit">
 				edit <%=  shortName(pad.padId) %>
 			</a>
 			<%= pad.html %>
+			<a href="<%=groupBasedId(pad.padId) %>">[more]</a>
 		</div> 
 	 <% }} %>		
 	</div>
  </div>
  </div>
- <div id="footer">Footer content</div>
+ <div id="footer">Powered by <a href="http://etherpad.com" target="_blank">Etherpad</a></div>
  <% return ejs_data; }); %>

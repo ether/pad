@@ -9,18 +9,21 @@ import("etherpad.pad.padutils");
 import("etherpad.sessions.getSession");
 import("plugins.padHierarchy.helpers.hierarchyHelper.*");
 function onRequest() {
-	var section = request.path.toString().split("/specs/")[1];
-	var filter = section.replace(/\//g,"-");
+	
+	var section_path = (request.path.toString() == '/pads') ? 'pads'  :  request.path.toString().split("/pads/")[1].replace(/\/$/ , '');
+	var id_filter = section_path=='pads' ? '' : section_path.replace(/\//g,"-");
+	
 	function shortName(pad_id){
-		return pad_id.replace(filter, '');
+		return pad_id.replace(id_filter + "-", '');
 	}
 	function groupBasedId(pad_id){
-		return request.path + shortName(pad_id);	
+		return request.path + '/' +shortName(pad_id);	
 	}
 	
-	var matching_pads = sqlobj.selectMulti("PAD_SQLMETA",{id:['like', filter+'%']});
+	var matching_pads = sqlobj.selectMulti("PAD_SQLMETA",{id:['like', id_filter+'%']});
+	
 	var pads = {};
-	var grouped_pads = getHierarchy(matching_pads.map(function(item){ return item.id; }),section.replace(/^\/|\/$/g, ''));
+	var grouped_pads = getHierarchy(matching_pads.map(function(item){ return item.id; }),id_filter);
 	
 	// seems like too many db queries - is there a selectMultiJSON command thing? getAllJSON? Does that support filter conditions?
 	for (var i in matching_pads) {
@@ -35,20 +38,16 @@ function onRequest() {
 		}
 	}
 	
-	var summary_pad_id = request.path.replace(/^\/specs\//,'').replace(/\/$/,'').replace(/\//g, '-');
-	
-	var summary = 
-	padutils.accessPadLocal(summary_pad_id, function(pad){
+	var summary = padutils.accessPadLocal(id_filter, function(pad){
 		return pad.exists() ? exporthtml.getPadHTML( pad ) : null;	
 	}, 'r');
 	 
 	
 	renderHtml('hierarchyIndex.ejs',{	
 									grouped_pad_list:getGroupChildren(grouped_pads),
-									summary_pad_id:summary_pad_id,
 									summary:summary,
-									section:section,
-									filter:filter, 
+									section:section_path,
+									filter:id_filter, 
 									pads:pads,
 									grouped_pads:grouped_pads,
 									groupBasedId:groupBasedId,
@@ -56,7 +55,10 @@ function onRequest() {
 	return true;
 }
 function getGroupLink(group){
-	return '<a href="'+ group.path +'" >' + (group.shortName || group.id) + '</a>';
+	return '<a href="'+ group.path +'" >' 
+										+ (group.shortName || group.id) 
+										//+ group.path
+										+'</a>';
 }
 
 function getGroupChildren( group ){
@@ -74,19 +76,24 @@ function getGroupChildren( group ){
 		
 
 
-function render_page(){
-	var padId = request.path.toString().split("/specs/")[1].replace(/\//g,"-");
+function edit_page(){
+	var padId = request.path.toString().split("/pads/")[1].replace(/\/\+edit$/, '').replace(/\//g,"-");
 	getSession().instantCreate = encodeURIComponent(padId);
 	
 	return pad_control.render_pad(padId);
 }
-function redirect_to_specs_path(){
+function redirect_to_pads_path(){
 	if (!isStaticRequest()) {
-		response.redirect("/specs" + request.path);
+		if (request.path == '/pads') {
+			return onRequest();
+		}
+		else {
+			response.redirect("/pads" + request.path);
+		}
 	}else{
-		// do something else... this static routing's a bit of a mess..
+		// do something else... this static routing's a bit strange..
 	}
 }
 function render_main(){
-	response.redirect("/specs/");
+	response.redirect("/pads");
 }

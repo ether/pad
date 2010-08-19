@@ -1,3 +1,16 @@
+/**
+ * THIS PLUGIN IS NOT READY TO BE MERGED JUST YET...
+ * 
+ * This plugin allows documents to be arranged hierarchically
+ * and presented independently of the editing environment in
+ * a variety of formats.
+ * 
+ * A goal is to limit access to the edit mode (denoted by urls
+ * ending with /+edit ) to a set of contributors based
+ * on openid-based authentication.
+ *  
+ */
+
 import("etherpad.log");
 import("plugins.padHierarchy.static.js.main");
 import("plugins.padHierarchy.hooks");

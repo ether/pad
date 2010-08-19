@@ -6,7 +6,8 @@ function HierarchyParser(){
 	this.parse = function(titles, topLevelLabel){
 		var chain = [];
 		var result = { id:topLevelLabel, shortName:topLevelLabel, children:[] };
-		for(var i = 0; i < titles.length; i++){
+		result.path = getPath(result);
+		for(var i = 1; i < titles.length; i++){
 			var obj = {children:[]};
 			obj.id =titles[i];
 			
@@ -35,11 +36,12 @@ function HierarchyParser(){
 			result.unshift(parent.shortName);
 			parent = parent.parent;
 		}
-		return '/specs/' + result.join('/');
+		return ('/pads/' + result.join('/')).replace(/\/\//, '/'); // hacky 
 	}
 }
 
 // helper method
 function getHierarchy(titles, topLevelLabel){
+	log.info("TOP LEVEL LABEL = " + topLevelLabel + "\n\n\n");
 	return new HierarchyParser().parse(titles,topLevelLabel);
 }

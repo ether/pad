@@ -97,7 +97,7 @@ textarea, select, input {
 }
 
 #navbar {
-    height: 32px;
+    /*height: 32px;*/
     padding-top: 60px;
     width: 960px;
     background: url('/static/img/ubuntu/header_background.png') repeat-x;
@@ -254,10 +254,17 @@ textarea, select, input {
 a.edit { color:#999;float:right;} 
 
 .pad_summary{ width:100px; float:left; margin-right:16px}
-.pad_detail{clear:both;}
+.pad_detail{clear:both; margin-bottom:2em;}
+
+#main img{max-width:100%;}
+
+.more {padding-bottom:2em;}
+
+/*
 .menu{  }
 	.menu ul{margin:0; padding:0;}
 		.menu ul li{margin:0; list-style:none; background-color:white; border:1px solid #eee;position:relative;display:inline;float:left;}
 			.menu ul li a { display:block; padding:5px; margin-right:3px; }
 				.menu ul li ul{position: absolute;left: 0;display: block;visibility: hidden;border-top: 1px solid black;}
 					.menu ul li ul li{display: list-item;float: none;}
+				*/

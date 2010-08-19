@@ -7,10 +7,9 @@ import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 function handlePath() {
   return [
   	['/', hierarchyController.render_main],
-    [/^\/([^\/]+)$/, hierarchyController.redirect_to_specs_path], // supercede  [/^\/([^\/]+)$/, pad_control.render_pad],
-  	[/^\/specs\/$/, forward(hierarchyController)],
-	[/^\/specs\/([^\/]+\/)*$/, forward(hierarchyController)],
-	[/^\/specs\/([^\/]+\/)*/, hierarchyController.render_page]
+    [/^\/([^\/]+)$/, hierarchyController.redirect_to_pads_path], // supercede  [/^\/([^\/]+)$/, pad_control.render_pad],
+	[/^\/pads(.*)\/\+edit$/, hierarchyController.edit_page],
+	[/^\/pads.*/, forward(hierarchyController)]
   
   ];
 }
