@@ -24,6 +24,7 @@ buildmenu:function(menuid, arrowsvar){
 			$subul.css({top:this.istopheader? this._dimensions.h+"px" : 0})
 			$curobj.children("a:eq(0)").append("<div class='" + (this.istopheader ? arrowsvar.down.class : arrowsvar.right.class) + "'></div>");
 			$curobj.hover(
+
 				function(e){
 					var $targetul=$(this).children("ul:eq(0)")
 					this._offsets={left:$(this).offset().left, top:$(this).offset().top}

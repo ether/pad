@@ -70,7 +70,7 @@ function getPadsBelow(top_id){
 }
 function getImageTag(group){
 	if(!group.meta ) return '';
-	return (group.meta.images ? "<img src='" + group.meta.images[0] + "' width='60px'/>" : '');
+	return (group.meta.images ? "<img src='" + group.meta.images[0] + "' width='60px'/>" : '<div class="noimage">&nbsp;</div>');
 }
 function getGroupLink(group, options){
 	return '<a href="'+ group.path +''+ (options && options.edit? '/+edit' : '') +'" >' + getImageTag(group) + (group.shortName || group.id || 'pads') + '</a>';
