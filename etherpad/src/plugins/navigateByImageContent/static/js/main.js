@@ -12,9 +12,15 @@ function renderNavigation(){
 	var section = '';
 	var query= {};
 	var getPath = function(id){return id;};
-	var match = request.path.match(/^((\/pads\/)([^\/]+\/)+)([^\/]+)$/);
-	if(match){ 
+	
+	// http://localhost:9000/pads/maverick/software-center/buying/+edit
+	
+	var match = request.path.match(/^((\/pads)((\/[^\/]+)+))\/\+edit$/);
+	
+	if(match){
+		log.info("\n\nMATCH: " + match.join("----")); 
 		section = request.path.replace(match[2], '').replace(match[4], '');
+		log.info("\n\nSECTION:" + section);
 		var like = section.replace(/\//g,"-");
 		query = { id:['like', like + "%" ]  };
 		getPath = function(id){return match[1] + id.replace(like,'');};

@@ -3,10 +3,11 @@ import('etherpad.log');
 function HierarchyParser(){
 	
 	// this basically goes down and then checks back up the chain for the closest grouping
-	this.parse = function(titles, topLevelLabel){
+	this.parse = function(titles, topLevelLabel,block){
 		var chain = [];
 		var result = { id:topLevelLabel, shortName:topLevelLabel, children:[] };
 		result.path = getPath(result);
+		if(block) result = block(result);
 		for(var i = 1; i < titles.length; i++){
 			var obj = {children:[]};
 			obj.id =titles[i];
@@ -25,6 +26,10 @@ function HierarchyParser(){
 			}
 			obj.shortName = obj.id.replace(new RegExp("^" + obj.parent.id + "-"), '');
 			obj.path = getPath(obj);
+			if(block){
+				obj = block(obj);
+			}
+			
 			chain.push(obj);
 		}
 		return result;	
@@ -41,7 +46,6 @@ function HierarchyParser(){
 }
 
 // helper method
-function getHierarchy(titles, topLevelLabel){
-	log.info("TOP LEVEL LABEL = " + topLevelLabel + "\n\n\n");
-	return new HierarchyParser().parse(titles,topLevelLabel);
+function getHierarchy(titles, topLevelLabel, block){
+	return new HierarchyParser().parse(titles,topLevelLabel,block);
 }
