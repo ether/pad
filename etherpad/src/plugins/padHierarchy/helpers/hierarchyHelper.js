@@ -69,6 +69,7 @@ function getPadsBelow(top_id){
 	});
 }
 function getImageTag(group){
+	if(!group.meta ) return '';
 	return (group.meta.images ? "<img src='" + group.meta.images[0] + "' width='60px'/>" : '');
 }
 function getGroupLink(group, options){
