@@ -1,4 +1,9 @@
 import('etherpad.log');
+import("sqlbase.sqlobj");
+import("sqlbase.sqlbase");
+import("etherpad.pad.exporthtml");
+import("etherpad.utils.*");
+import("etherpad.pad.padutils");
 // class
 function HierarchyParser(){
 	
@@ -45,7 +50,41 @@ function HierarchyParser(){
 	}
 }
 
-// helper method
+// helper methods
 function getHierarchy(titles, topLevelLabel, block){
 	return new HierarchyParser().parse(titles,topLevelLabel,block);
 }
+function getPadsBelow(top_id){
+	var matching_pads = sqlobj.selectMulti("PAD_SQLMETA",{id:['like', top_id+'%']});
+	return getHierarchy(matching_pads.map(function(item){ return item.id; }),top_id, function(pad){
+		var json = sqlbase.getJSON("PAD_META", pad.id);
+		if (json) {
+			pad.meta = json;
+			var html = padutils.accessPadLocal(pad.id, function(pad){
+				return pad.exists() ? exporthtml.getPadHTML(pad) : null;
+			}, 'r');
+			pad.html = html;
+		}
+		return pad;
+	});
+}
+function getImageTag(group){
+	return (group.meta.images ? "<img src='" + group.meta.images[0] + "' width='60px'/>" : '');
+}
+function getGroupLink(group, options){
+	return '<a href="'+ group.path +''+ (options && options.edit? '/+edit' : '') +'" >' + getImageTag(group) + (group.shortName || group.id || 'pads') + '</a>';
+}
+
+function getGroupChildren( group , options){
+	if(group.children.length == 0){
+		return getGroupLink(group, options);
+	}
+	var result = getGroupLink(group) + '<ul>';
+	for(var i=0; i<group.children.length; i++){
+		var child = group.children[i];
+		result += '<li>' +getGroupChildren(child,options)  + "</li>";
+	}
+	return result+ '</ul>';
+}
+		
+		

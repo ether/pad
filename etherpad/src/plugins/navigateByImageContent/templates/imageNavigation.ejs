@@ -1,20 +1,5 @@
-<table>
-	<tr>
-		<th>
-			<% if (section) { 
-				var parents = section.split("/");
-				for(var i = 0; i < parents.length; i++){
-					var parent = parents[i];			%>
-					<a href="/pads/<%= parents.slice(0,i+1).join('/') %>"><%=parent%></a> &gt;
-				<% } %>		
-			<% }else{ %>
-			All pads:
-			<% } %>
-		</th>
-		<% for(var i in pads ){
-			var pad = pads[i]; %>
-			<td><a href="<%=pad.path%>" title="<%=pad.path%>"><img src="<%= pad.src %>" width="<%=pad.width%>px"/></a></td>
-		<% }%>
-		
-	</tr>
-</table>
+	<div id="current_section_menu" class="menu header">
+		<ul>
+	 	<%= grouped_pad_list %>
+		</ul>
+	</div>

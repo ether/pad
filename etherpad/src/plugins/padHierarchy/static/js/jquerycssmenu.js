@@ -5,7 +5,8 @@
 *********************/
 
 //Specify full URL to down and right arrow images (25 is padding-right to add to top level LIs with drop downs):
-var arrowimages={down:['downarrowclass', 'arrow-down.gif', 25], right:['rightarrowclass', 'arrow-right.gif']}
+var arrowimages={down:{class:"arrow down"}, 
+				 right:{class:"arrow right"}};
 
 var jquerycssmenu={
 
@@ -21,11 +22,7 @@ buildmenu:function(menuid, arrowsvar){
 			this._dimensions={w:this.offsetWidth, h:this.offsetHeight, subulw:$subul.outerWidth(), subulh:$subul.outerHeight()}
 			this.istopheader=$curobj.parents("ul").length==1? true : false
 			$subul.css({top:this.istopheader? this._dimensions.h+"px" : 0})
-			$curobj.children("a:eq(0)").css(this.istopheader? {paddingRight: arrowsvar.down[2]} : {}).append(
-				'<img src="'+ (this.istopheader? arrowsvar.down[1] : arrowsvar.right[1])
-				+'" class="' + (this.istopheader? arrowsvar.down[0] : arrowsvar.right[0])
-				+ '" style="border:0;" />'
-			)
+			$curobj.children("a:eq(0)").append("<div class='" + (this.istopheader ? arrowsvar.down.class : arrowsvar.right.class) + "'></div>");
 			$curobj.hover(
 				function(e){
 					var $targetul=$(this).children("ul:eq(0)")
@@ -45,4 +42,6 @@ buildmenu:function(menuid, arrowsvar){
 }
 
 //build menu with ID="myjquerymenu" on page:
-jquerycssmenu.buildmenu("current_section_menu", arrowimages)
+$(function(){
+	jquerycssmenu.buildmenu("current_section_menu", arrowimages)
+})

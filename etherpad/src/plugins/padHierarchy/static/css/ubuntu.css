@@ -97,8 +97,9 @@ textarea, select, input {
 }
 
 #navbar {
-    /*height: 32px;*/
+    height: 32px;
     padding-top: 60px;
+	
     width: 960px;
     background: url('/static/img/ubuntu/header_background.png') repeat-x;
     margin: 0;
@@ -260,11 +261,21 @@ a.edit { color:#999;float:right;}
 
 .more {padding-bottom:2em;}
 
-/*
-.menu{  }
-	.menu ul{margin:0; padding:0;}
+
+.menu{ height:30px}
+	.menu a{font-weight:normal;border:1px solid #ccc;background-color:#fff;color:#333}
+	.menu a:hover {text-decoration:none; }
+	.menu ul {list-style:none; float:right;padding:0px 3px 0 0;}
+	.menu li {padding-right:8px }
+	.menu li img{vertical-align:middle;margin-right:8px}
+/*	.menu ul{margin:0; padding:0;}
 		.menu ul li{margin:0; list-style:none; background-color:white; border:1px solid #eee;position:relative;display:inline;float:left;}
 			.menu ul li a { display:block; padding:5px; margin-right:3px; }
 				.menu ul li ul{position: absolute;left: 0;display: block;visibility: hidden;border-top: 1px solid black;}
 					.menu ul li ul li{display: list-item;float: none;}
-				*/
+*/
+.arrow {vertical-align:text-bottom;width:16px; height:16px; display:inline-block; overflow:hidden; background:url(/static/img/ubuntu/ui-icons_222222_256x240.png) 192px 48px;}
+.arrow.right{ background-position:208px 48px;}
+
+#navigation {height:30px; padding-top:8px; position:absolute;z-index:1000;top:0px}
+#docbar{ margin-top:30px }
