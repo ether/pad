@@ -16,7 +16,8 @@ function onRequest() {
 	var grouped_pads = getPadsBelow(id_filter);
  
 	
-	renderHtml('hierarchyIndex.ejs',{	
+	renderHtml('hierarchyIndex.ejs',{
+									path:request.path,
 									grouped_pad_list:getGroupChildren(grouped_pads),
 									pads:grouped_pads,
 									selected_pad:grouped_pads}

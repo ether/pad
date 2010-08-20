@@ -12,6 +12,7 @@ body {
     background: url('/static/img/ubuntu/bg_dotted.png');
 }
 
+
 .clearBoth {
     clear: both;
 }
@@ -122,7 +123,7 @@ textarea, select, input {
 }
 
 #main {
-    padding: 48px 16px 0;
+    padding: 8px 16px 0;
 }
 
 #content {
@@ -262,11 +263,11 @@ a.edit { color:#999;float:right;}
 .more {padding-bottom:2em;}
 
 
-.menu{ height:30px; }
-	.menu a{font-weight:normal;color:#333; float:left}
+.menu{  }
+	.menu a{font-weight:normal;color:#333; float:left;}
 	.menu a:hover {text-decoration:none; }
-	.menu ul {list-style:none; padding:0px 3px 0 0; vertical-align:top; float:left}
-		.menu ul ul{background-color:#fff;  -moz-box-shadow: 0px 2px 5px #888;   -webkit-box-shadow: 0px 2px 5px #888; display:block}
+	.menu ul {list-style:none; padding:0px 3px 0 0; vertical-align:top; float:left; display:block}
+		.menu ul ul{background-color:#fff;  -moz-box-shadow: 0px 2px 5px #888;   -webkit-box-shadow: 0px 2px 5px #888;}
 	.menu li {padding-right:8px;  }
 		.menu li img{vertical-align:middle;margin-right:8px;}
 		.menu div.noimage { width:0px; display:inline-block }
@@ -279,6 +280,9 @@ a.edit { color:#999;float:right;}
 .arrow {vertical-align:text-bottom;width:16px; height:16px; display:inline-block; overflow:hidden; background:url(/static/img/ubuntu/ui-icons_222222_256x240.png) 192px 48px;}
 .arrow.right{ background-position:208px 48px;}
 
+#padoptions {font-size:12px}
 
-#navigation {height:30px; padding-top:8px; position:absolute;z-index:1000;top:0px}
+#navigation {height:30px;position:absolute;z-index:1000;top:0px}
 #docbar{ margin-top:30px }
+
+#new {float:right; padding-right:16px}

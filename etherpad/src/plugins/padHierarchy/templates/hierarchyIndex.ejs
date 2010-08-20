@@ -1,6 +1,7 @@
 
 <%
 	helpers.includeJs("jquery-1.3.2.js");
+	helpers.includeJs("plugins/padHierarchy/padAdmin.js");
 	helpers.includeJs("plugins/padHierarchy/jquerycssmenu.js");
 	helpers.includeCss("plugins/padHierarchy/ubuntu.css");
 	helpers.setHtmlTitle(selected_pad.id);
@@ -11,18 +12,24 @@
 	<a id="ubuntu" href="/">Pads</a>
 	<div id="current_section_menu" class="menu">
 		<ul>
-	 	<%= grouped_pad_list %>
+		 	<%= grouped_pad_list %>
 		</ul>
+	</div>
+	<div id="new">
+		<select id="new">
+			<option>New document</option>
+			<option value='<%=path%>'>In this section...</option>
+		</select>
 	</div>
  </div>
 
  <div id="main">
- <h1> <%=selected_pad.id%></h1>
+
  <a class="edit" href="<%=selected_pad.path%>/+edit">edit <%=selected_pad.id%></a>
  	 <div id="overview">
 		 <%=selected_pad.html%> 
 	 </div>
- 	<p>This group has <%=pads.children.length%> children</p>
+
  	<% 
  	for (var e in pads.children){ 
 		var pad = pads.children[e];
