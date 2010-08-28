@@ -124,6 +124,7 @@ function renderTemplateAsString(filename, data, plugin) {
     new Template(data, plugin);
 
   var f = findTemplate(filename, plugin); //"/templates/"+filename;
+  if(f == undefined) f = "/templates/"+filename;
   if (! appjet.scopeCache.ejs) {
     appjet.scopeCache.ejs = {};
   }
