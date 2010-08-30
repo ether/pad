@@ -1,0 +1,288 @@
+body {
+    font-family: UbuntuBeta
+}
+
+body {
+    margin: 0 auto;
+    width: 976px;
+    font-family: 'UbuntuBeta';
+    background: #ecebe9;
+    font-size: 12px;
+    line-height: 16px;
+    background: url('/static/img/ubuntu/bg_dotted.png');
+}
+
+
+.clearBoth {
+    clear: both;
+}
+
+.floatRight {
+    float: right;
+}
+
+h1 {
+    font-size: 36px;
+    line-height: 40px;
+    margin: 24px 0 32px 0px;
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 24px;
+    line-height: 28px;
+    margin: 0 0 8px 0;
+    font-weight: normal;
+}
+
+h3 {
+    font-size: 16px;
+    line-height: 20px;
+    margin: 0 0 8px 0;
+    font-weight: normal;
+}
+
+h4 {
+    font-size: 12px;
+    margin: 0;
+    font-weight: normal;
+}
+
+p {
+    font-size: 12px;
+    margin: 0 0 1em 0;
+}
+
+a {
+    color: #772953;
+    text-decoration: none;
+    font-weight: bold
+}
+
+a img {
+    border: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #4f1937;
+}
+
+textarea, select, input {
+    margin: 4px 0 8px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    border: 1px solid #888;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.inputGap {
+    margin-bottom: 32px;
+}
+
+#wrapper {
+    background: white;
+    position: relative;
+    z-index: 2;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding-bottom: 64px;
+    -moz-box-shadow: 0px 2px 5px #888;
+    -webkit-box-shadow: 0px 2px 5px #888;
+}
+
+#navbar {
+    height: 32px;
+    padding-top: 60px;
+	
+    width: 960px;
+    background: url('/static/img/ubuntu/header_background.png') repeat-x;
+    margin: 0;
+    padding-left: 16px;
+    -moz-box-shadow: 0px 1px 2px #888;
+    z-index: 2;
+    position: relative;
+    -moz-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+}
+
+#navbar #ubuntu {
+    position: absolute;
+    width: 117px;
+    height: 32px;
+    top: 10px;
+    right: 18px;
+    background: url('/static/img/ubuntu/header_logo.png') no-repeat;
+    text-indent: -9999px;
+}
+
+#main {
+    padding: 8px 16px 0;
+}
+
+#content {
+    background-color: #F7F7F7;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    padding: 16px 240px 32px 160px;
+}
+
+#content textarea {
+    font-family: 'Ubuntu Beta Web Font';
+    display: block;
+    width: 542px;
+    height: 160px;
+}
+
+#content input {
+    font-family: 'Ubuntu Beta Web Font';
+    display: block;
+    width: 542px;
+}
+
+#content input.button {
+    width: auto;
+}
+
+#content .bigColumn {
+    width: 448px;
+    float: left;
+}
+
+#content .bigColumn textarea {
+    width: 430px;
+    margin-left: 16px;
+}
+
+#content .smallColumn {
+    float: left;
+    width: 96px;
+}
+
+#content .smallColumn select {
+    display: block;
+    width: 96px;
+}
+
+#content .bigColumn input {
+    width: 318px;
+}
+
+#content .rightFields {
+    width: 208px;
+    float: left;
+    padding-left: 16px;
+}
+
+#content .rightFields select {
+    display: block;
+}
+
+#content .rightFields select option {
+    font-weight: normal;
+    font-style: normal
+}
+
+#content .rightFields select option.bold {
+    font-weight: bold;
+}
+
+#content .rightFields select option.italic {
+    font-style: italic;
+}
+
+#content .bold {
+    font-weight: bold;
+}
+
+#content .italic {
+    font-style: italic;
+}
+
+#content #flash {
+    color: red;
+    background: pink;
+    border: 1px solid red;
+    padding: 8px;
+    margin-bottom: 32px;
+}
+
+#hidden {
+    display: none;
+}
+
+#hidden #renderBox {
+    margin: 0 0 16px 64px;
+}
+
+#hidden #renderBox #rendered {
+    margin-bottom: 8px;
+}
+
+#hidden #renderBox #canvas {
+    margin-bottom: 8px;
+    display: block;
+}
+
+#hidden a {
+    display: block;
+    margin-bottom: 32px;
+}
+
+#hidden #screenshotContainer {
+    display: none;
+}
+
+#footer {	padding: 16px;    background-color: #F7F6F5;}
+
+#footer #welcome {
+    float: left;
+}
+
+#footer #signout {
+    float: right;
+}
+
+.dialog {
+    display: none;
+}
+
+a.edit { color:#999;float:right;} 
+
+.pad_summary{ width:100px; float:left; margin-right:16px}
+.pad_detail{clear:both; margin-bottom:2em;}
+
+#main img{max-width:100%;}
+
+.more {padding-bottom:2em;}
+
+
+.menu{  }
+	.menu a{font-weight:normal;color:#333; float:left;}
+	.menu a:hover {text-decoration:none; }
+	.menu ul {list-style:none; padding:0px 3px 0 0; vertical-align:top; float:left; display:block}
+		.menu ul ul{background-color:#fff;  -moz-box-shadow: 0px 2px 5px #888;   -webkit-box-shadow: 0px 2px 5px #888;}
+	.menu li {padding-right:8px;  }
+		.menu li img{vertical-align:middle;margin-right:8px;}
+		.menu div.noimage { width:0px; display:inline-block }
+/*	.menu ul{margin:0; padding:0;}
+		.menu ul li{margin:0; list-style:none; background-color:white; border:1px solid #eee;position:relative;display:inline;float:left;}
+			.menu ul li a { display:block; padding:5px; margin-right:3px; }
+				.menu ul li ul{position: absolute;left: 0;display: block;visibility: hidden;border-top: 1px solid black;}
+					.menu ul li ul li{display: list-item;float: none;}
+*/
+.arrow {vertical-align:text-bottom;width:16px; height:16px; display:inline-block; overflow:hidden; background:url(/static/img/ubuntu/ui-icons_222222_256x240.png) 192px 48px;}
+.arrow.right{ background-position:208px 48px;}
+
+#padoptions {font-size:12px}
+
+#navigation {height:30px;position:absolute;z-index:1000;top:0px}
+#docbar{ margin-top:30px }
+
+#new {float:right; padding-right:16px}
