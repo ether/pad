@@ -16,3 +16,19 @@ function padModelWriteToDB(args){
 	
 	//args.pad.writeToDB(); recursive loop!!
 }
+
+
+function renderNavigation(args) {
+	// http://localhost:9000/pads/maverick/+edit
+
+        var parts = args.request.path.split("/pads/");
+	if (parts.length < 2) return '';
+
+	var pad_path = parts[1].split("/+edit")[0];
+	var parent_path = pad_path.split("/");
+	parent_path.pop();
+	var pad_id = parent_path.join("-");
+	
+	var pads = getPadsBelow(pad_id);
+	return renderTemplateAsString('imageNavigation.ejs',{pads:pads, grouped_pad_list:getGroupChildren(pads,{edit:true})}, 'navigateByImageContent');
+}
