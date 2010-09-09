@@ -803,20 +803,23 @@ function OUTER(gscope) {
   editorInfo.ace_replaceRange = replaceRange;
 
   editorInfo.ace_callWithAce = function (fn, callStack, normalize) {
-    function wrapper () { return fn(editorInfo); }
+    var wrapper = function () {
+      return fn(editorInfo);
+    }
 
     if (normalize !== undefined) {
-      wrapper1 = wrapper;
-      function wrapper () {
+      var wrapper1 = wrapper;
+      wrapper = function () {
         editorInfo.ace_fastIncorp(9);
 	wrapper1();
       }
     }
 
-    if (callStack !== undefined)
+    if (callStack !== undefined) {
       return editorInfo.ace_inCallStack(callStack, wrapper);
-    else
+    } else {
       return wrapper();
+    }
   }
 
   editorInfo.ace_setProperty = function(key, value) {
