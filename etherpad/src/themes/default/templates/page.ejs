@@ -90,8 +90,11 @@ limitations under the License. */ %>
     </div>
 
     <div id="padmain">
-      <div id="padsidebar"><%: template.use('sideBar'); %></div> 
-
+      <script>
+	$(document).ready(function () {
+	  makeResizableHPane("#padeditor", "#vdraggie", "#padsidebar", 0, 0);
+	});
+      </script>
       <div id="padeditor">
 	<div id="editbar" class="disabledtoolbar">
 	  <% /* floated left */ %>
@@ -120,20 +123,9 @@ limitations under the License. */ %>
 	<div id="editorcontainerbox"><%: template.use('contentArea'); %></div>
       </div><!-- /padeditor -->
 
-      <div id="bottomarea">
-	<div id="viewbarcontents">
-	  <div id="viewzoomtitle">Zoom:</div>
-	  <select id="viewzoommenu"><option value="z85">85%</option><option value="z100">100%</option><option value="z115">115%</option><option value="z150">150%</option><option value="z200">200%</option><option value="z300">300%</option></select>
-	</div>
+      <div id="vdraggie"><!-- --></div>
 
-	<div id="widthprefcheck"
-	     class="<%= (prefs.isFullWidth?'widthprefchecked':'widthprefunchecked') %>"
-	     ><!-- --></div>
-	<div id="sidebarcheck"
-	     class="<%= (prefs.hideSidebar?'sidebarunchecked':'sidebarchecked') %>"
-	     ><!-- --></div>
-      </div>
-
+      <div id="padsidebar"><%: template.use('sideBar'); %></div> 
     </div><!-- /padmain -->
 
   </div><!-- /padpage -->

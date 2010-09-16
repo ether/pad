@@ -27,17 +27,17 @@ limitations under the License. */ %><!DOCTYPE html PUBLIC
 
     <%= helpers.headExtra() %>
 
+    <!-- javascript -->
+
+    <%= helpers.clientVarsScript() %>
+    <%= helpers.jsIncludes() %>
+    <%= helpers.googleAnalytics() %>
+
   </head>
 
   <body id="<%= helpers.bodyId() %>" class="<%= helpers.bodyClasses() %>">
 
     <%= bodyHtml %>
-
-<!-- javascript -->
-
-<%= helpers.clientVarsScript() %>
-<%= helpers.jsIncludes() %>
-<%= helpers.googleAnalytics() %>
 
   </body>
 </html>

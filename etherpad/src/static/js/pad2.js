@@ -141,6 +141,7 @@ var pad = {
     padeditor.dispose();
   },
   resizePage: function() {
+  return;
     if (! pad.resizeInited) {
       return;
     }
@@ -525,22 +526,12 @@ var sidebarSplit = (function(){
   var self = {
     desiredUsersBoxHeight: MIN_SIZED_BOX_HEIGHT,
     init: function() {
+    return;
       self.desiredUsersBoxHeight = Math.max(
         $("#otherusers").height(), MIN_SIZED_BOX_HEIGHT);
-      makeDraggable($("#hdraggie"), function(eType, evt, state) {
-        if (eType == 'dragstart') {
-          state.startY = evt.pageY;
-          state.startHeight = $("#otherusers").height();
-        }
-        else if (eType == 'dragupdate') {
-          var newHeight = state.startHeight + (evt.pageY - state.startY);
-          if (newHeight < MIN_SIZED_BOX_HEIGHT) {
-            newHeight = MIN_SIZED_BOX_HEIGHT;
-          }
-          self.desiredUsersBoxHeight = newHeight;
-          relayout();
-        }
-      });
+
+      //makeResizableVPane("#padusers", "#hdraggie", "#padchat", MIN_SIZED_BOX_HEIGHT, MIN_SIZED_BOX_HEIGHT);
+
     },
     setBottom: function(bottomPx) {
       var curBottom = $("#padsidebar").offset().top + $("#padsidebar").height();
