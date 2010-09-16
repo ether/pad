@@ -62,21 +62,21 @@ function makeDraggable(jqueryNodes, eventHandler) {
 function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
   if (minTop === undefined) minTop = 0;
   if (minBottom === undefined) minBottom = 0;
-  var totalHeight = $(top).height() + $(bottom).height();
-  var maxTop = totalHeight - minBottom;
 
   makeDraggable($(sep), function(eType, evt, state) {
     if (eType == 'dragstart') {
       state.startY = evt.pageY;
       state.topHeight = $(top).height();
       state.bottomHeight = $(bottom).height();
+      state.minTop = minTop;
+      state.maxTop = (state.topHeight + state.bottomHeight) - minBottom;
     }
     else if (eType == 'dragupdate') {
       var change = evt.pageY - state.startY;
 
       var topHeight = state.topHeight + change;
-      if (topHeight < minTop) { topHeight = minTop; }
-      if (topHeight > maxTop) { topHeight = maxTop; }
+      if (topHeight < state.minTop) { topHeight = state.minTop; }
+      if (topHeight > state.maxTop) { topHeight = state.maxTop; }
       change = topHeight - state.topHeight;
 
       var bottomHeight = state.bottomHeight - change;
@@ -84,8 +84,8 @@ function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
       $(top).css('bottom', 'auto');
       $(top).height(topHeight);
       $(sep).css('top', topHeight + "px");
-      $(bottom).css('top', 'auto');
-      $(bottom).height(bottomHeight);
+      $(bottom).css('top', (topHeight +  $(sep).height()) + 'px');
+      $(bottom).css('height', 'auto');
     }
   });
 }
@@ -93,21 +93,21 @@ function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
 function makeResizableHPane(left, sep, right, minLeft, minRight) {
   if (minLeft === undefined) minLeft = 0;
   if (minRight === undefined) minRight = 0;
-  var totalWidth = $(left).width() + $(right).width();
-  var maxLeft = totalWidth - minRight;
 
   makeDraggable($(sep), function(eType, evt, state) {
     if (eType == 'dragstart') {
       state.startX = evt.pageX;
       state.leftWidth = $(left).width();
       state.rightWidth = $(right).width();
+      state.minLeft = minLeft;
+      state.maxLeft = (state.leftWidth + state.rightWidth) - minRight;
     }
     else if (eType == 'dragupdate') {
       var change = evt.pageX - state.startX;
 
       var leftWidth = state.leftWidth + change;
-      if (leftWidth < minLeft) { leftWidth = minLeft; }
-      if (leftWidth > maxLeft) { leftWidth = maxLeft; }
+      if (leftWidth < state.minLeft) { leftWidth = state.minLeft; }
+      if (leftWidth > state.maxLeft) { leftWidth = state.maxLeft; }
       change = leftWidth - state.leftWidth;
 
       var rightWidth = state.rightWidth - change;
@@ -115,8 +115,8 @@ function makeResizableHPane(left, sep, right, minLeft, minRight) {
       $(left).css('right', 'auto');
       $(left).width(leftWidth);
       $(sep).css('left', leftWidth + "px");
-      $(right).css('left', 'auto');
-      $(right).width(rightWidth);
+      $(right).css('left', (leftWidth + $(sep).width()) + 'px');
+      $(right).css('width', 'auto');
     }
   });
 }
