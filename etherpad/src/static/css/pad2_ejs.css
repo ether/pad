@@ -182,6 +182,8 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   position:absolute;
   right:0;
   top:0;
+  overflow: hidden;
+  color: #444444;
 }
 
 #editbarleft { float: left; height: 100%; overflow: hidden;
@@ -274,6 +276,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   right: 0;
   top: 0;
   width: 290px;
+  overflow: hidden;
 }
 .hidesidebar #padsidebar { width: 0; overflow: hidden; }
 

@@ -115,9 +115,6 @@ function onRequest() {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
   }
 
-  var isPro = pro_utils.isProDomainRequest();
-  var userId = padusers.getUserId();
-
   /* Sets a bunch of javascript variables on the client side. 
      (What goes here is up to the client.)*/
 
@@ -127,21 +124,11 @@ function onRequest() {
    clientIp: request.clientAddr,
    colorPalette: COLOR_PALETTE,
    serverTimestamp: +(new Date),
-   isProPad: isPro,
-   userIsGuest: padusers.isGuest(userId),
-   userId: userId,
   });
-
-  var isProUser = (isPro && ! padusers.isGuest(userId));
-
-  padutils.setOptsAndCookiePrefs(request);
-  var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
 
   /* This is info that is set on to renderTemplateAsString -- these are just variables
      that are sent into the ejs.  */
   var info = {
-    prefs: prefs,
     config: appjet.config,
     tagQuery: tagQuery,
     padIdToReadonly: server_utils.padIdToReadonly,
@@ -152,9 +139,6 @@ function onRequest() {
     urlOfInterest: urlOfInterest,
     matchingUrls: [],
     bodyClass: 'nonpropad',
-    isPro: isPro,
-    isProAccountHolder: isProUser,
-    account: getSessionProAccount(), // may be falsy
   };
 
   var format = "html";

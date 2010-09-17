@@ -29,7 +29,6 @@ limitations under the License. */ %>
   helpers.includeJs("pad_editbar.js");
   helpers.includeJs("pad_docbar.js");
   helpers.includeJs("pad_modals.js");
-  helpers.includeJs("pad2.js");
   helpers.suppressGA();
   helpers.setRobotsPolicy({index: false, follow: false});
 
@@ -49,16 +48,7 @@ limitations under the License. */ %>
 	<div id="topbarcenter">
 	  <a href="/" id="topbaretherpad">EtherPad</a>
 	</div>
-	<% if (isProAccountHolder) { %>          
-	  <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
-	  <div id="accountnav"><%= toHTML(account.email) %>
-	    <a href="/ep/account/sign-out">(sign out)</a>
-	  </div>
-	<% } else if (isPro) { %>
-	  <div id="accountnav">
-	    <a href="<%= signinUrl %>">sign in</a>
-	  </div>
-	<% } %>
+        <%: template.use('topBar'); %>
 	<div id="specialkeyarea"><!-- --></div>
       </div>
       <div id="alertbar">

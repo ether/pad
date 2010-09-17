@@ -25,6 +25,7 @@ limitations under the License. */ %>
   helpers.includeJs("pad_impexp.js");
   helpers.includeJs("pad_savedrevs.js");
   helpers.includeJs("pad_connectionstatus.js");
+  helpers.includeJs("pad2.js");
 
   var padUrlAttrValue = request.url.split("?", 1)[0].replace(/\"/g, '&quot;');
 
@@ -52,6 +53,20 @@ limitations under the License. */ %>
     return pieces.join('');
   }
 %>
+
+
+<% template.define('topBar', function() { var ejs_data=''; %>
+  <% if (isProAccountHolder) { %>          
+    <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
+    <div id="accountnav"><%= toHTML(account.email) %>
+      <a href="/ep/account/sign-out">(sign out)</a>
+    </div>
+  <% } else if (isPro) { %>
+    <div id="accountnav">
+      <a href="<%= signinUrl %>">sign in</a>
+    </div>
+  <% } %>
+<% return ejs_data; }); %>
 
 
 <% template.define('docBarTitle', function() { var ejs_data=''; %>

@@ -79,28 +79,15 @@ function onRequest() {
     matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');
   }
 
-  var isPro = pro_utils.isProDomainRequest();
-  var userId = padusers.getUserId();
-
   helpers.addClientVars({
    userAgent: request.headers["User-Agent"],
    debugEnabled: request.params.djs,
    clientIp: request.clientAddr,
    colorPalette: COLOR_PALETTE,
    serverTimestamp: +(new Date),
-   isProPad: isPro,
-   userIsGuest: padusers.isGuest(userId),
-   userId: userId,
   });
 
-  var isProUser = (isPro && ! padusers.isGuest(userId));
-
-  padutils.setOptsAndCookiePrefs(request);
-  var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
-
   var info = {
-    prefs: prefs,
     config: appjet.config,
     tagQuery: tagQuery,
     padIdToReadonly: server_utils.padIdToReadonly,
@@ -110,9 +97,6 @@ function onRequest() {
     matchingPads: [],
     matchingUrls: matchingUrls,
     bodyClass: 'nonpropad',
-    isPro: isPro,
-    isProAccountHolder: isProUser,
-    account: getSessionProAccount(), // may be falsy
   };
 
   var format = "html";

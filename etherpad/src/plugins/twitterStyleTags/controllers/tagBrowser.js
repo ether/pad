@@ -52,25 +52,13 @@ function onRequest() {
     matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
   }
 
-  var isPro = pro_utils.isProDomainRequest();
-  var userId = padusers.getUserId();
-
   helpers.addClientVars({
    userAgent: request.headers["User-Agent"],
    debugEnabled: request.params.djs,
    clientIp: request.clientAddr,
    colorPalette: COLOR_PALETTE,
    serverTimestamp: +(new Date),
-   isProPad: isPro,
-   userIsGuest: padusers.isGuest(userId),
-   userId: userId,
   });
-
-  var isProUser = (isPro && ! padusers.isGuest(userId));
-
-  padutils.setOptsAndCookiePrefs(request);
-  var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
 
   var info = {
     tags: tags.tags,
@@ -91,13 +79,9 @@ function onRequest() {
     }
   } else {
     info['tagQuery'] = tagQuery;
-    info['prefs'] = prefs;
     info['config'] = appjet.config;
     info['padIdToReadonly'] = server_utils.padIdToReadonly;
     info['bodyClass'] = 'nonpropad';
-    info['isPro'] = isPro;
-    info['isProAccountHolder'] = isProUser;
-    info['account'] = getSessionProAccount(); // may be falsy
 
     if (format == "html") {
       renderHtml("tagBrowser.ejs", info, ['twitterStyleTags']);
