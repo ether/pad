@@ -47,7 +47,7 @@ function padModelWriteToDB(args) {
 }
 
 function docbarItemsAll() {
- return ["<td class='docbarbutton'><a href='/ep/tag/'>Home</a></td>"];
+ return ["<td class='docbarbutton highlight'><a href='/ep/tag/'>Home</a></td>"];
 }
 
 function docbarItemsTagBrowser() {
