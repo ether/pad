@@ -69,30 +69,6 @@ function _isAuthorizedAdmin() {
   return (getSession().adminAuth === true);
 }
 
-var _mainLinks = [
-  ['exceptions', 'Exceptions Monitor'],
-  ['usagestats/', 'Usage Stats'],
-  ['padinspector', 'Pad Inspector'],
-  ['dashboard', 'Dashboard'],
-  ['eepnet-licenses', 'EEPNET Licenses'],
-  ['config', 'appjet.config'],
-  ['shell', 'Shell'],
-  ['timings', 'timing data'],
-  ['broadcast-message', 'Pad Broadcast'],
-//  ['analytics', 'Google Analytics'],
-  ['varz', 'varz'],
-  ['genlicense', 'Manually generate a license key'],
-  ['flows', 'Flows (warning: slow)'],
-  ['diagnostics', 'Pad Connection Diagnostics'],
-  ['cachebrowser', 'Cache Browser'],
-  ['pne-tracker', 'PNE Tracking Stats'],
-  ['reload-blog-db', 'Reload blog DB'],
-  ['pro-domain-accounts', 'Pro Domain Accounts'],
-  ['beta-valve', 'Beta Valve'],
-  ['reset-subscription', "Reset Subscription"],
-  ['pluginmanager/', "Plugin manager"]
-];
-
 function onRequest(name) {
   if (name == "auth") {
     return;
@@ -154,27 +130,11 @@ function render_auth() {
 }
 
 function render_main() {
-  var div = DIV();
-
-  div.push(A({href: "/"}, html("&laquo;"), " home"));
-  div.push(H1("Admin"));
-
-  function addMenuItem(l) {
-    div.push(DIV(A({href: l[0]}, l[1])));
-  }
-
-  plugins.callHook("adminMenu").forEach(addMenuItem);
-  _mainLinks.forEach(addMenuItem);
-
-  if (sessions.isAnEtherpadAdmin()) {
-    div.push(P(A({href: "/ep/admin/setadminmode?v=false"},
-                 "Exit Admin Mode")));
-  }
-  else {
-    div.push(P(A({href: "/ep/admin/setadminmode?v=true"},
-                 "Enter Admin Mode")));
-  }
-  response.write(HTML(_commonHead(), BODY(div)));
+  renderHtml("admin/page.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+   });
 }
 
 //----------------------------------------------------------------
@@ -188,10 +148,18 @@ function render_config() {
 
   vars.sort();
 
-  response.setContentType('text/plain; charset=utf-8');
+  body = PRE()
   vars.forEach(function(v) {
-    response.write("appjet.config."+v+" = "+appjet.config[v]+"\n");
+    body.push("appjet.config."+v+" = "+appjet.config[v]+"\n");
   });
+
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Config',
+    content: body
+   });
 }
 
 //----------------------------------------------------------------
@@ -208,7 +176,6 @@ function render_test() {
 
 function render_dashboard() {
   var body = BODY();
-  body.push(A({href: '/ep/admin/'}, html("&laquo; Admin")));
   body.push(H1({style: "border-bottom: 1px solid black;"}, "Dashboard"));
 
   /*
@@ -249,7 +216,13 @@ function render_dashboard() {
   body.push(H2({style: "color: #226; font-size: 1em;"}, "Recurring revenue, monthly"));
   body.push(renderRevenueStats());
 
-  response.write(HTML(_commonHead(), body));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Dashboard',
+    content: body
+   });
 }
 
 // Note: This function is called by the PNE dashboard (pro_admin_control.js)!  Be careful.
@@ -385,13 +358,19 @@ function renderRevenueStats() {
 //----------------------------------------------------------------
 
 function render_broadcast_message_get() {
-  var body = BODY(FORM({action: request.path, method: 'post'},
-                       H3('Broadcast Message to All Active Pad Clients:'),
-                       TEXTAREA({name: 'msgtext', style: 'width: 100%; height: 100px;'}),
-                       H3('JavaScript code to be eval()ed on client (optional, be careful!): '),
-                       TEXTAREA({name: 'jscode', style: 'width: 100%; height: 100px;'}),
-                       INPUT({type: 'submit', value: 'Broadcast Now'})));
-  response.write(HTML(body));
+  var body = FORM({action: request.path, method: 'post'},
+		  H3('Broadcast Message to All Active Pad Clients:'),
+		  TEXTAREA({name: 'msgtext', style: 'width: 100%; height: 100px;'}),
+		  H3('JavaScript code to be eval()ed on client (optional, be careful!): '),
+		  TEXTAREA({name: 'jscode', style: 'width: 100%; height: 100px;'}),
+		  INPUT({type: 'submit', value: 'Broadcast Now'}));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Broadcast message',
+    content: body
+   });
 }
 
 function render_broadcast_message_post() {
@@ -407,7 +386,13 @@ function render_broadcast_message_post() {
     text: msgText,
     js: jsCode
   });
-  response.write(HTML(BODY(P("OK"), P(A({href: request.path}, "back")))));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Broadcast message',
+    content: P("OK")
+   });
 }
 
 function render_shell() {
@@ -542,9 +527,13 @@ function render_padinspector_get() {
       '});'
     ].join('\n')));
 
-    response.write(HTML(
-      HEAD(SCRIPT({type: 'text/javascript', src: '/static/js/jquery-1.3.2.js?'+(+(new Date))})),
-      BODY(div, script)));
+    renderHtml("admin/dynamic.ejs",
+     {
+      config: appjet.config,
+      bodyClass: 'nonpropad',
+      title: 'Pad inspector',
+      content: DIV(body, script)
+     });
   }, "r");
 }
 
@@ -664,7 +653,8 @@ function render_timings() {
   var timer = Packages.net.appjet.ajstdlib.timer;
   var opnames = timer.getOpNames();
 
-  response.write(P(A({href: '/ep/admin/timingsreset'}, "reset all")));
+  var d = DIV()
+  d.push(P(A({href: '/ep/admin/timingsreset'}, "reset all")));
 
   var t = TABLE({border: 1, cellspacing: 0, cellpadding: 3, style: 'font-family: monospace;'});
   t.push(TR(TH("operation"),
@@ -694,8 +684,14 @@ function render_timings() {
               TD(r(row[2])),
               TD(r(row[3]))));
   });
-
-  response.write(t);
+  d.push(t);
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Timing data',
+    content: d
+   });
 }
 
 function render_timingsreset() {
@@ -770,10 +766,19 @@ function render_timingsreset() {
 
 function render_varz() {
   var varzes = varz.getSnapshot();
-  response.setContentType('text/plain; charset=utf-8');
+
+  var body = PRE();
   for (var k in varzes) {
-    response.write(k+': '+varzes[k]+'\n');
+    body.push(k+': '+varzes[k]+'\n');
   }
+
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Varz',
+    content: body
+   });
 }
 
 function render_extest() {
@@ -852,13 +857,19 @@ function render_diagnostics() {
     t.push(tr);
   });
 
-  var body = BODY();
+  var body = DIV();
   body.push(P("Showing entries ", start, "-", start+diagnostic_entries.length, ". ",
               (start > 0 ? makeLink("Show previous "+count+".", [], [], start-count) : ""),
               (diagnostic_entries.length == count ? makeLink("Show next "+count+".", [], [], start+count) : "")));
   body.push(t);
 
-  response.write(HTML(body));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Diagnostics',
+    content: body
+   });
 }
 
 //----------------------------------------------------------------
@@ -1281,7 +1292,14 @@ function render_reload_blog_db_get() {
   }
   d.push(FORM({method: "post", action: request.path},
     INPUT({type: "submit", value: "Reload Blog DB Now"})));
-  response.write(HTML(BODY(d)));
+
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Reload blog DB',
+    content: d
+   });
 }
 
 function render_reload_blog_db_post() {
@@ -1298,7 +1316,7 @@ function render_pro_domain_accounts() {
   domains.forEach(function(d) { domainMap[d.id] = d; });
   accounts.sort(function(a,b) { return cmp(b.lastLoginDate, a.lastLoginDate); });
 
-  var b = BODY({style: "font-family: monospace;"});
+  var b = DIV({style: "font-family: monospace;"});
   b.push(accounts.length + " pro accounts.");
   var t = TABLE({border: 1});
   t.push(TR(TH("email"),
@@ -1312,7 +1330,14 @@ function render_pro_domain_accounts() {
 
   b.push(t);
 
-  response.write(HTML(b));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Pro accounts',
+    content: b
+   });
+
 }
 
 
@@ -1365,7 +1390,14 @@ function render_beta_valve_get() {
     t.push(tr);
   });
   d.push(t);
-  response.write(d);
+
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Beta valve',
+    content: d
+   });
 }
 
 function render_beta_valve_toggle_post() {
@@ -1443,7 +1475,7 @@ function render_runsubscriptions() {
 }
 
 function render_reset_subscription() {
-  var body = BODY();
+  var body = DIV();
   if (request.isGet) {
     body.push(FORM({method: "POST"},
                    "Subdomain: ", INPUT({type: "text", name: "subdomain"}), BUTTON({name: "clear"}, "Go")));
@@ -1477,6 +1509,11 @@ function render_reset_subscription() {
       body.push("Done!")
     }
   }
-  body.push(A({href: request.path}, html("&laquo; back")));
-  response.write(HTML(body));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Reset subscription',
+    content: body
+   });
 }

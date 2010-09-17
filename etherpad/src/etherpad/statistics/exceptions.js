@@ -20,6 +20,7 @@ import("etherpad.log");
 import("cache_utils.syncedWithCache");
 import("funhtml.*");
 import("jsutils.{eachProperty,keys}");
+import("etherpad.utils.*");
 
 function _dayKey(date) {
   return [date.getFullYear(), date.getMonth()+1, date.getDate()].join(',');
@@ -206,19 +207,21 @@ function render() {
     // gen HTML
     function num(n) { return SPAN({className:'num'}, n); }
 
-    response.write(STYLE(html(".trace { height: 300px; overflow: auto; background: #eee; margin-left: 1em; font-family: monospace; border: 1px solid #833; padding: 4px; }\n"+
+    var b = DIV();
+
+    b.push(STYLE(html(".trace { height: 300px; overflow: auto; background: #eee; margin-left: 1em; font-family: monospace; border: 1px solid #833; padding: 4px; }\n"+
                               ".exc { margin: 1em 0; }\n"+
                               ".num { font-size: 150%; }")));
 
-    response.write(P("Total exceptions in past day: ", num(totalDayCount),
+    b.push(P("Total exceptions in past day: ", num(totalDayCount),
                      ", past week: ", totalWeekCount));
 
-    response.write(P(SMALL(EM("Data on this page is live."))));
+    b.push(P(SMALL(EM("Data on this page is live."))));
 
-    response.write(H2("Exceptions grouped by stack trace:"));
+    b.push(H2("Exceptions grouped by stack trace:"));
 
     dayDatas.forEach(function(data) {
-      response.write(DIV({className:'exc'},
+      b.push(DIV({className:'exc'},
                          'Past day: ',num(data.count),', Past week: ',
                          data.weekCount,', Different tracker cookies today: ',
                          data.numTrackers,
@@ -227,5 +230,13 @@ function render() {
                          (data.message[2] || ''),'\n',
                          DIV({className:'trace'}, data.trace)));
     });
+
+    renderHtml("admin/dynamic.ejs",
+     {
+      config: appjet.config,
+      bodyClass: 'nonpropad',
+      title: 'Exceptions',
+      content: b
+     });
   });
 }

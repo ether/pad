@@ -119,9 +119,13 @@ function _renderCommandShell() {
 }
 
 function handleRequest() {
-  var body = BODY();
-  body.push(A({href: '/ep/admin/'}, html("&laquo; Admin")));
-  body.push(BR(), BR());
+  var body = DIV();
   body.push(_renderCommandShell());
-  response.write(HTML(body));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Shell',
+    content: body
+   });
 }

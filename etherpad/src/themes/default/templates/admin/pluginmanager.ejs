@@ -12,16 +12,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
- template.inherit('page.ejs');
- helpers.setHtmlTitle("EtherPad: Manage plugins");
+ template.inherit('admin/page.ejs');
+ helpers.setHtmlTitle("EtherPad: Administration: Manage plugins");
  helpers.includeCss("admin/pluginmanager.css");
-
- function inArray(item, arr) {
-   for (var i = 0; i < arr.length; i++)
-     if (arr[i] == item)
-       return true;
-   return false;
- }
 
  plugin_registry = plugins.loadPlugins();
 %>
@@ -30,8 +23,8 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>Plugin manager</span></td>
 <% return ejs_data; }); %>
 
-
 <% template.define('docBarItems', function() { var ejs_data=''; %>
+  <%: plugins.callHookStr('docbarItemsAdmin', {}, '', '<td class="docbarbutton">', '</td>'); %>
   <%: plugins.callHookStr('docbarItemsPluginManager', {}, '', '<td class="docbarbutton">', '</td>'); %>
 <% return ejs_data; }); %>
 
