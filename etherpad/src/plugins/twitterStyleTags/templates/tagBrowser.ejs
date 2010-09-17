@@ -41,10 +41,10 @@ limitations under the License. */ %>
 <% template.define('sideBar', function() { var ejs_data=''; %>
   <div id="padusers">
    <% if (isProAccountEnabled()) { %>
-     <a href="/ep/pad/newpad" style="padding: 25px 0" id="home-newpad">
+     <a href="/ep/pad/newpad" style="padding: 25px 0" class="bigbutton">
       Create new pad
      </a>       
-     <a href="/ep/pro-signup/" style="padding: 25px 0" id="home-newteam">
+     <a href="/ep/pro-signup/" style="padding: 25px 0" class="bigbutton">
       Create new team
      </a>
    <% } else { %>
@@ -61,17 +61,19 @@ limitations under the License. */ %>
 
 <% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
   <td>
-    Query:
-    <% if (tags.length == 0 && antiTags.length == 0) { %>
-      Latest changed pads
-    <% } else { %>
-      <% for (i = 0; i < tags.length; i++) { %>
-	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags)}) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
+    <h1>
+      Query:
+      <% if (tags.length == 0 && antiTags.length == 0) { %>
+	Latest changed pads
+      <% } else { %>
+	<% for (i = 0; i < tags.length; i++) { %>
+	  <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags)}) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
+	<% } %>
+	<% for (i = 0; i < antiTags.length; i++) { %>
+	  <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
+	<% } %>
       <% } %>
-      <% for (i = 0; i < antiTags.length; i++) { %>
-	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
-      <% } %>
-    <% } %>
+    </h1>
   </td>
 <% return ejs_data; }); %>
 

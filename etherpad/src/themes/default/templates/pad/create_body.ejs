@@ -11,16 +11,35 @@ distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad: Create a new pad?"); %>
+<%
+ template.inherit('page.ejs');
+%>
 
-<div id="createpadpage" class="fpcontent">
-  <form action="<%= request.path %>" method="post">
+<% template.define('docBarTitle', function() { var ejs_data=''; %>
+  <td id="docbarpadtitle"><span>Create new pad</span></td>
+<% return ejs_data; }); %>
 
-    <p><tt id="padurl">http://<%= request.host %>/<%= toHTML(padId) %></tt></p>
 
-    <br/>
-    <p>There is no EtherPad document here. Would you like to create one?</p>
 
-    <input type="hidden" name="padId" value="<%= toHTML(padId) %>" />
-    <input type="submit" id="createPad" value="Create Pad" />
-  </form>
-</div>
+
+<% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
+  <td>
+    <h1>http://<%= request.host %>/<%= toHTML(padId) %> does not yet exist</h1>
+  </td>
+<% return ejs_data; }); %>
+
+<% template.define('contentArea', function() { var ejs_data=''; %>
+  <div id="editorcontainer">
+    <div id="createpadpage" class="fpcontent">
+      <form action="<%= request.path %>" method="post">
+	<input type="hidden" name="padId" value="<%= toHTML(padId) %>" />
+	<input type="submit" id="createPad" class="bigbutton" value="Yes, please create the pad" />
+      </form>
+    </div>
+  </div>
+<% return ejs_data; }); %>
+
+<% template.define('sideBar', function() { var ejs_data=''; %>
+  <div id="padsidebarfull">
+  </div>
+<% return ejs_data; }); %>

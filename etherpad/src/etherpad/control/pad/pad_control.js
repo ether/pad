@@ -393,8 +393,11 @@ function render_create_get() {
     "pad/create_body_rafter.ejs" :
     "pad/create_body.ejs";
   // </RAFTER>
-  renderFramed(template, {padId: padId,
-                          fullSuperdomain: pro_utils.getFullSuperdomainHost()});
+  renderHtml(template,
+   {config: appjet.config,
+    bodyClass: 'nonpropad',
+    padId: padId,
+    fullSuperdomain: pro_utils.getFullSuperdomainHost()});
 }
 
 function render_create_post() {

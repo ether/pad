@@ -1047,3 +1047,40 @@ form#reconnectform { display: none; }
   /* scale the image */
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/static/img/jun09/pad/overlay2.png", sizingMethod="scale");
 }
+
+
+#editbarinner h1 {
+ line-height: 29px;
+ font-size: 16px;
+ padding-left: 6pt;
+ margin-top: 0;
+}
+
+#editbarinner h1 a {
+ font-size: 12px;
+}
+
+.bigbutton {
+ display: block;
+ background-color: #a3bde0;
+ color: #555555;
+ border-style: solid;
+ border-width: 2px;
+ border-left-color: #d6e2f1;
+ border-right-color: #86aee1;
+ border-top-color: #d6e2f1;
+ border-bottom-color: #86aee1;
+ margin: 10pt;
+ text-align: center;
+ text-decoration: none;
+ padding: 50pt;
+ font-size: 20pt;
+ -moz-border-radius-topleft: 3pt;
+ -moz-border-radius-topright: 3pt;
+ -moz-border-radius-bottomleft: 3pt;
+ -moz-border-radius-bottomright: 3pt;
+ -webkit-border-top-left-radius: 3pt;
+ -webkit-border-top-right-radius: 3pt;
+ -webkit-border-bottom-left-radius: 3pt;
+ -webkit-border-bottom-right-radius: 3pt;
+}
