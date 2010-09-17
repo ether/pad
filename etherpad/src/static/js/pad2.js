@@ -34,7 +34,6 @@ var pad = {
   clientTimeOffset: (+new Date()) - clientVars.serverTimestamp,
   preloadedImages: false,
   padOptions: {},
-  resizeInited: false,
 
   // these don't require init; clientVars should all go through here
   getPadId: function() { return clientVars.padId; },
@@ -55,13 +54,6 @@ var pad = {
     pad.collabClient.sendClientMessage(msg);
   },
 
-  initResize: function() {
-    $(window).bind("resize", pad.resizePage);
-    pad.resizeInited = true;
-    pad.resizePage();
-    // just in case, periodically check size:
-    setInterval(function() { pad.resizePage(); }, 2000);
-  },
   init: function() {
     pad.diagnosticInfo.uniqueId = padutils.uniqueId();
     pad.initTime = +(new Date());
@@ -109,8 +101,6 @@ var pad = {
     padsavedrevs.init(clientVars.initialRevisionList);
 
     padeditor.init(postAceInit, pad.padOptions.view || {});
-    sidebarSplit.init();
-    pad.initResize();
 
     paduserlist.init(pad.myUserInfo);
     padchat.init(clientVars.chatHistory, pad.myUserInfo);
@@ -134,32 +124,9 @@ var pad = {
       padeditbar.init();
       setTimeout(function() { padeditor.ace.focus(); }, 0);
     }
-
-    pad.resizePage();
   },
   dispose: function() {
     padeditor.dispose();
-  },
-  resizePage: function() {
-  return;
-    if (! pad.resizeInited) {
-      return;
-    }
-    // requires padeditor and sidebarSplit
-    var pageHeight = $(window).height();
-    if ($("#djs").length > 0) {
-      pageHeight -= $("#djs").outerHeight();
-    }
-    var MIN_PAGE_HEIGHT = 400;
-    if (pageHeight < MIN_PAGE_HEIGHT) {
-      pageHeight = MIN_PAGE_HEIGHT;
-    }
-    var bottomAreaHeight = 28;
-    padeditor.setBottom(pageHeight - bottomAreaHeight);
-    sidebarSplit.setBottom(pageHeight - bottomAreaHeight);
-    paddocbar.handleResizePage();
-    padmodals.relayoutWithBottom(pageHeight);
-    pad.handleWidthChange();
   },
   notifyChangeName: function(newName) {
     pad.myUserInfo.name = newName;
@@ -371,7 +338,6 @@ var pad = {
       padutils.cancelActions("set-sidebar-visibility");
       $("body").removeClass('hidesidebar');
     }
-    pad.resizePage();
   },
   handleCollabAction: function(action) {
     if (action == "commitPerformed") {
@@ -483,68 +449,6 @@ var pad = {
   }
 };
 
-var sidebarSplit = (function(){
-  var MIN_SIZED_BOX_HEIGHT = 75;
-
-  function relayout(heightDelta) {
-    heightDelta = (heightDelta || 0);
-
-    var sizedBox1 = $("#otherusers");
-    var sizedBox2 = $("#chatlines");
-    var height1 = sizedBox1.height();
-    var height2 = sizedBox2.height();
-    var newTotalHeight = height1 + height2 + heightDelta;
-    var newHeight1 = height1;
-    var newHeight2 = height2;
-
-    if (newTotalHeight >= MIN_SIZED_BOX_HEIGHT*2) {
-      // room for both panes to be at least min height
-      if (newTotalHeight >= self.desiredUsersBoxHeight + MIN_SIZED_BOX_HEIGHT) {
-        // room for users pane to be desiredUsersBoxHeight
-        newHeight1 = self.desiredUsersBoxHeight;
-        newHeight2 = newTotalHeight - newHeight1;
-      }
-      else {
-        newHeight2 = MIN_SIZED_BOX_HEIGHT;
-        newHeight1 = newTotalHeight - newHeight2;
-      }
-    }
-    else {
-      newHeight1 = Math.round(newTotalHeight/2);
-      newHeight2 = newTotalHeight - newHeight1;
-    }
-
-    sizedBox1.height(newHeight1);
-    sizedBox2.height(newHeight2);
-
-    $("#connectionbox").height(
-      $("#myuser").outerHeight() + $("#userlistbuttonarea").outerHeight() +
-        height1
-    );
-  }
-
-  var self = {
-    desiredUsersBoxHeight: MIN_SIZED_BOX_HEIGHT,
-    init: function() {
-    return;
-      self.desiredUsersBoxHeight = Math.max(
-        $("#otherusers").height(), MIN_SIZED_BOX_HEIGHT);
-
-      //makeResizableVPane("#padusers", "#hdraggie", "#padchat", MIN_SIZED_BOX_HEIGHT, MIN_SIZED_BOX_HEIGHT);
-
-    },
-    setBottom: function(bottomPx) {
-      var curBottom = $("#padsidebar").offset().top + $("#padsidebar").height();
-      var deltaBottom = bottomPx - curBottom;
-
-      if (deltaBottom != 0) {
-        relayout(deltaBottom);
-      }
-    }
-  };
-  return self;
-}());
-
 var alertBar = (function() {
 
   var animator = padutils.makeShowHideAnimator(arriveAtAnimationState, false, 25, 400);
@@ -552,14 +456,12 @@ var alertBar = (function() {
   function arriveAtAnimationState(state) {
     if (state == -1) {
       $("#alertbar").css('opacity', 0).css('display', 'block');
-      pad.resizePage();
     }
     else if (state == 0) {
       $("#alertbar").css('opacity', 1);
     }
     else if (state == 1) {
       $("#alertbar").css('opacity', 0).css('display', 'none');
-      pad.resizePage();
     }
     else if (state < 0) {
       $("#alertbar").css('opacity', state+1);
