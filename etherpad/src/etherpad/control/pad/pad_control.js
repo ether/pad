@@ -34,6 +34,7 @@ import("etherpad.log.{logRequest,logException}");
 import("etherpad.sessions");
 import("etherpad.sessions.getSession");
 import("etherpad.utils.*");
+import("etherpad.collab.server_utils");
 import("etherpad.pro.pro_padmeta");
 import("etherpad.pro.pro_pad_db");
 import("etherpad.pro.pro_utils");
@@ -370,6 +371,7 @@ function render_pad(localPadId) {
 
   renderHtml("pad/pad_body2.ejs",
              {localPadId:localPadId,
+	      padIdReadonly: server_utils.padIdToReadonly(localPadId),
               pageTitle:toHTML(proTitle || localPadId),
               initialTitle:toHTML(documentBarTitle),
               bodyClass: bodyClass,
