@@ -118,7 +118,7 @@ var global = this;
   // just take over the whole slider screen with a reconnect message
   function showReconnectUI() {
     if(!clientVars.sliderEnabled || !clientVars.supportsSlider) {
-        $("#padmain, #rightbars").css('top', "95px");
+        $("#padmain, #rightbars").css('top', "130px");
         $("#timeslider").show();
     }
     $('#error').show();
@@ -372,7 +372,7 @@ var global = this;
 
       if(clientVars.sliderEnabled) {
         if(clientVars.supportsSlider) {
-          $("#padmain, #rightbars").css('top', "95px");
+          $("#padmain, #rightbars").css('top', "130px");
           $("#timeslider").show();
           setSliderLength(clientVars.totalRevs);
           setSliderPosition(clientVars.revNum);
@@ -381,7 +381,7 @@ var global = this;
           })
         } else {
           // slider is not supported
-          $("#padmain, #rightbars").css('top', "95px");
+          $("#padmain, #rightbars").css('top', "130px");
           $("#timeslider").show();
           $("#error").html("The timeslider feature is not supported on this pad. <a href=\"/ep/about/faq#disabledslider\">Why not?</a>");
           $("#error").show();
