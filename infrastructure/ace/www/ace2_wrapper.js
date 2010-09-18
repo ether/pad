@@ -112,11 +112,6 @@ AppjetCodeEditor.prototype.setEditable = function(x) {
   this.aceImpl.setEditable(x);
 };
 
-AppjetCodeEditor.prototype.adjustSize = function() {
-  this.adjustContainerSizes();
-  this.aceImpl.adjustSize();
-};
-
 //------- straight pass-through functions ---------------
 
 AppjetCodeEditor.prototype.importCode = function(rawCode) {
@@ -168,9 +163,6 @@ ACEPlain.prototype.init = function(containerId, initialCode, done) {
   this.textArea = textArea;
   this.containerDiv = container;
 
-  // first-time size adjustments
-  this.adjustSize();
-
   // remember keystrokes
   var ace = this;
   textArea.keydown(function(e) {
@@ -194,11 +186,6 @@ ACEPlain.prototype.importCode = function(rawCode) {
 
 ACEPlain.prototype.exportCode = function() {
   return this.textArea.attr('value');
-};
-
-ACEPlain.prototype.adjustSize = function() {
-  this.textArea.width('100%');
-  this.textArea.height(this.containerDiv.height());
 };
 
 ACEPlain.prototype.setOnKeyPress = function(f) { this.onKeyPress = f; };
