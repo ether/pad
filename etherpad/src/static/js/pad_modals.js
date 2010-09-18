@@ -55,7 +55,7 @@ var padmodals = (function() {
     clearShareBoxTo();
   }
 
-  var allModals = $("#feedbackbox, #sharebox");
+  var allModals = "#feedbackbox, #sharebox";
 
   var shareboxExpanded = false;
   var shareExpander = padutils.makeShowHideAnimator(function(state) {
@@ -191,7 +191,7 @@ var padmodals = (function() {
                                         $("#feedbackbox").outerWidth())/2));
     },
     showFeedback: function() {
-      allModals.hide();
+      $(allModals).hide();
       $("#feedbackbox").show();
       showOverlay($("#feedbackbox"));
     },
@@ -215,7 +215,7 @@ var padmodals = (function() {
         $("#sharebox-stripe").get(0).className = 'sharebox-stripe-private';
       }
 
-      allModals.hide();
+      $(allModals).hide();
       $("#sharebox").show();
       showOverlay($("#sharebox"));
       $("#sharebox-url").focus().select();
@@ -224,7 +224,7 @@ var padmodals = (function() {
       padutils.cancelActions('hide-feedbackbox');
       padutils.cancelActions('hide-sharebox');
       $("#sharebox-response").hide();
-      allModals.hide();
+      $(allModals).hide();
       hideOverlay();
     },
     hideFeedbackLaterIfNoOtherInteraction: function() {

@@ -1037,7 +1037,7 @@ form#reconnectform { display: none; }
   background-image: url(/static/img/jun09/pad/overlay2.png);
   background-repeat: repeat-both;
   width: 100%; position: absolute;
-  height: 400px; left: 0; top: 0;
+  height: 100%; left: 0; top: 0;
 }
 
 * html #modaloverlay { /* for IE 6+ */
