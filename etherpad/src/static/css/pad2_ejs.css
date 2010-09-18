@@ -172,7 +172,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 .hidesidebar #padeditor { right: 0; }
 
 #vdraggie {
-  background: url(/static/img/jun09/pad/hdraggie.gif) no-repeat center center;
+  background: url(/static/img/jun09/pad/vdraggie.gif) no-repeat center center;
   cursor: W-resize;
   bottom:0;
   position:absolute;
