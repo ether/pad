@@ -120,7 +120,9 @@ function manglePluginPaths(localFile) {
       manglePluginPath(
         manglePluginPath(
 	  manglePluginPath(
-	    localFile,
+	    manglePluginPath(
+	      localFile,
+	      'img'),
 	    'js'),
           'css'),
         'swf'),

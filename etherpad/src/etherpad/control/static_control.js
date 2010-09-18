@@ -35,6 +35,7 @@ function onRequest() {
       [PrefixMatcher('/static/css/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/css/', opts)],
       [PrefixMatcher('/static/swf/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/swf/', opts)],
       [PrefixMatcher('/static/html/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/html/', opts)],
+      [PrefixMatcher('/static/img/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/img/', opts)],
       [PrefixMatcher('/static/zip/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/zip/', opts)]]);
   }
 
