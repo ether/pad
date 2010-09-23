@@ -501,7 +501,10 @@ table#otheruserstable { display: none; }
 #sharebutton {
   background: url(/static/img/jun09/pad/inviteshare2.gif) no-repeat 0 -31px;
   position: absolute; display: block; top: 3px; padding-top: 23px;
-  height: 0; overflow: hidden; width: 96px; left: 96px; }
+  height: 0; overflow: hidden; width: 96px;
+  left:50%;
+  margin-left: -48px;
+}
 
   /*#guestslabel { font-size: 1.2em; position: absolute; width: auto;
   height: 22px; line-height: 22px; top: 4px; left: 8px; }
