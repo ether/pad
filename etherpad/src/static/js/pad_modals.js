@@ -55,55 +55,7 @@ var padmodals = (function() {
     clearShareBoxTo();
   }
 
-  var allModals = "#feedbackbox, #sharebox";
-
-  var shareboxExpanded = false;
-  var shareExpander = padutils.makeShowHideAnimator(function(state) {
-    function pow(x) { x = 1-x; x *= x*x; return 1-x; }
-    function ease(x) { return (x < 0) ? pow(x+1) : 1-pow(x); }
-    var smallHeight = 110 + (pad.getUserIsGuest() ? 0 : 50);
-    var bigHeight = 326 + (pad.getUserIsGuest() ? 0 : 50);
-    var boxHeight = (Math.abs(ease(state)))*(bigHeight-smallHeight) + smallHeight;
-    $("#sharebox").height(boxHeight);
-    // sharebox-open controls the disclosure triangle
-    // and also the visibility of any response (error/success)
-    // messages, which must be hidden during animation as well
-    // as when closed.
-    if (state == 0) {
-      $("#sharebox").addClass('sharebox-open');
-    }
-    else if (state > 0) {
-      $("#sharebox").removeClass('sharebox-open');
-      $("#sharebox-response").hide();
-    }
-  }, false, 20, 500);
-
-  //var overlayNode = null;
-
-  /*function adjustOverlay() {
-    if (overlayNode) {
-      var nodeWidth = overlayNode.width();
-      var nodeHeight = overlayNode.height();
-      var nodePos = overlayNode.position();
-      var outset = 10;
-      $("#modaloverlay").css({width: nodeWidth+outset*2,
-                              height: nodeHeight+outset*2,
-                              left: nodePos.left-outset,
-                              top: nodePos.top-outset});
-    }
-   }*/
-
-  function showOverlay(forNode) {
-    //overlayNode = forNode;
-    //adjustOverlay();
-    $("#modaloverlay").show();
-  }
-  function hideOverlay() {
-    $("#modaloverlay").hide();
-  }
-
   var self = {
-    shareExpander: shareExpander,
     init: function() {
       self.initFeedback();
       self.initShareBox();
@@ -157,17 +109,6 @@ var padmodals = (function() {
       $("#sharebox-subject").val(self.getDefaultShareBoxSubjectForName(pad.getUserName()));
       $("#sharebox-message").val(self.getDefaultShareBoxMessageForName(pad.getUserName()));
 
-      $("#sharebox-dislink").click(function() {
-        if (shareboxExpanded) {
-          shareboxExpanded = false;
-          shareExpander.hide();
-        }
-        else {
-          shareboxExpanded = true;
-          shareExpander.show();
-        }
-      });
-
       $("#sharebox-stripe .setsecurity").click(function() {
         self.hideModal();
         paddocbar.setShownPanel('security');
@@ -191,9 +132,7 @@ var padmodals = (function() {
                                         $("#feedbackbox").outerWidth())/2));
     },
     showFeedback: function() {
-      $(allModals).hide();
-      $("#feedbackbox").show();
-      showOverlay($("#feedbackbox"));
+      self.showModal("#feedbackbox");
     },
     showShareBox: function() {
       // when showing the dialog, if it still says "Somebody" invited you
@@ -215,17 +154,20 @@ var padmodals = (function() {
         $("#sharebox-stripe").get(0).className = 'sharebox-stripe-private';
       }
 
-      $(allModals).hide();
-      $("#sharebox").show();
-      showOverlay($("#sharebox"));
+      self.showModal("#sharebox", 500);
       $("#sharebox-url").focus().select();
     },
-    hideModal: function() {
+    showModal: function(modalId, duration) {
+      $(".modaldialog").hide();
+      $(modalId).show().css({'opacity': 0}).animate({'opacity': 1}, duration);
+      $("#modaloverlay").show().css({'opacity': 0}).animate({'opacity': 1}, duration);
+    },
+    hideModal: function(duration) {
       padutils.cancelActions('hide-feedbackbox');
       padutils.cancelActions('hide-sharebox');
       $("#sharebox-response").hide();
-      $(allModals).hide();
-      hideOverlay();
+      $(".modaldialog").animate({'opacity': 0}, duration, function () { $("#modaloverlay").hide(); });
+      $("#modaloverlay").animate({'opacity': 0}, duration, function () { $("#modaloverlay").hide(); });
     },
     hideFeedbackLaterIfNoOtherInteraction: function() {
       return padutils.getCancellableAction('hide-feedbackbox',

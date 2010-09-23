@@ -540,21 +540,16 @@ table#otheruserstable { display: none; }
 }
 #djs p { margin: 0; padding: 0; display: block; }
 
-#connectionbox {
-  position: absolute; left: 0; top: 0; width: 100%;
-  height: 191px;/*...initially; #padusers height */
-  z-index: 10; zoom: 1; overflow: hidden;
+.modaldialog.cboxreconnecting .modaldialog-inner,
+.modaldialog.cboxconnecting .modaldialog-inner {
+  background: url(/static/img/jun09/pad/connectingbar.gif) no-repeat center 60px;
+  height: 100px;
 }
-#connectionboxinner {
-  position: relative; width: 100%; height: 100%; overflow: hidden;
+.modaldialog.cboxreconnecting {
+  background: #fed;
 }
-.cboxconnecting #connectionboxinner {
-  background: #ffd url(/static/img/jun09/pad/connectingbar.gif) no-repeat center 60px;
-}
-.cboxreconnecting #connectionboxinner {
-  background: #fed url(/static/img/jun09/pad/connectingbar.gif) no-repeat center 60px;
-}
-.cboxdisconnected #connectionboxinner {
+.modaldialog.cboxconnecting,
+.modaldialog.cboxdisconnected {
   background: #fdd;
 }
 .cboxdisconnected #connectionboxinner div { display: none; }
@@ -611,7 +606,6 @@ table#otheruserstable { display: none; }
 .cboxreconnecting #connectionboxinner .reconnecting { display: block; }
 
 #reconnect_form button {
-  position: relative; width: 268px; height: 28px; left: 10px;
   font-size: 12pt;
 }
 
@@ -871,8 +865,7 @@ form#reconnectform { display: none; }
 #mainmodals { z-index: 600; /* higher than the modals themselves
                                so that modals are on top in IE */ }
 
-.modalfield { font-size: 1.2em; padding: 1px; border: 1px solid #bbb;
-  position: absolute;}
+.modalfield { font-size: 1.2em; padding: 1px; border: 1px solid #bbb;}
 #mainmodals .editempty { color: #aaa; }
 
 <% feedbackbox = {width:400, height:270}; %>
@@ -926,74 +919,76 @@ form#reconnectform { display: none; }
 #feedbackbox a, #feedbackbox li a:visited { color: #47b; }
 #feedbackbox tt { font-size: 110%; }
 
-<% var shareboxfull = {width:485, height:326}; %>
-#sharebox {
-  position: absolute;
-  width: 485px;
-  left: 300px/*set in code*/; top: 100px; display: none;
-  z-index: 501; zoom: 1;
-  overflow: hidden;
-  background: white; border: 1px solid #999;
-}
-#sharebox { height: 160px/*set in code*/; }
-.nonprouser #sharebox { height: 110px/*set in code*/; }
-#sharebox-inner { width: 100%; }
-#sharebox-forms { position: absolute; top: 50px; width: 100%; }
-#sharebox-hide, #sharebox-send {
-  position: absolute; background-repeat: no-repeat;
-  background-image: url(/static/img/jun09/pad/sharebox4.gif);
-}
-#sharebox-hide, #sharebox-send { display: block; }
-#sharebox-hide { width: 22px; height: 22px; right: 9px; top: 7px;
-  background-position: <%= -(shareboxfull.width-31) %>px -6px;
-}
-#sharebox-send { width: 87px; height: 22px; right: 15px; top: <%= shareboxfull.height-22-15 %>px;
-  background-position: <%= -(shareboxfull.width-87-15) %>px <%= -(shareboxfull.height-22-15) %>px;
-}
-#sharebox-url { position: absolute; left: 20px; top: 42px; width: 440px; height: 18px;
-  text-align: left; font-size: 1.3em; line-height: 18px; padding: 2px; }
-
-#sharebox-to { left: 90px; top: 117px; height: auto; width: 378px; background: #ffe; }
-#sharebox-subject { left: 90px; top: 150px; height: auto; width: 378px; font-weight: bold; }
-#sharebox-message { left: 90px; top: 182px; width: 380px; height: 90px; }
-#sharebox-response { position: absolute; bottom: 15px; left: 15px;
-  width: 350px; height: auto; font-size: 1.2em; display: none; }
-#sharebox .goodresponse { font-weight: bold; color: green; }
-#sharebox .badresponse { font-weight: bold; color: red; }
-#sharebox-dislink { position: absolute; left: 12px; top: 78px;
-  height: 22px; width: 220px; cursor: pointer;
+.expand-collapse {
+  height: 22px;
   background-image: url(/static/img/jun09/pad/sharedistri.gif);
   background-repeat: no-repeat;
-  background-position: 0 5px;
+  background-position: 0 3px;
+  padding-left: 17px;
+  text-decoration: none;
 }
-.sharebox-open #sharebox-dislink { background-position: 0 -28px; }
-#sharebox-shownwhenexpanded { display: none; }
-.sharebox-open #sharebox-shownwhenexpanded { display: block; }
-
-#sharebox-pastelink { font-size: 155%; font-weight: bold;
-  top: 13px; left: 17px; position: absolute; color: #444; }
-#sharebox-orsend { font-size: 145%; font-weight: bold;
-  top: 80px; left: 31px; position: absolute; color: #444; }
-#sharebox-fieldname-to, #sharebox-fieldname-subject, #sharebox-fieldname-message {
-  position: absolute; font-weight: bold; font-size: 125%;
-  left: 15px; color: #222;
+.expand-collapse.expanded {
+  background-position: 0 -31px;
 }
-#sharebox-fieldname-to { top: 119px; }
-#sharebox-fieldname-subject { top: 152px; }
-#sharebox-fieldname-message { top: 183px; }
 
-#sharebox-stripe { position: absolute; left: 10px;
-  width: 436px; top: 8px; height: 45px; line-height: 1.2; }
-#sharebox-stripe div { padding: 5px; font-size: 130%; }
-#sharebox-stripe strong { font-weight: bold; }
-.sharebox-stripe-public { background: #cfc; }
-.sharebox-stripe-private { background: #fec; }
-.sharebox-stripe-public .private { display: none; }
-.sharebox-stripe-private .public { display: none; }
-#sharebox-stripe a { color: #06c; }
+
+.modaldialog {
+  position: absolute;
+  top: 100px;
+  left:50%;
+  margin-left:-243px;
+  width: 485px;
+  display: none;
+  z-index: 501;
+  zoom: 1;
+  overflow: hidden;
+  background: white;
+ border: 1px solid #999;
+}
+.modaldialog .modaldialog-inner { padding: 10pt; }
+.modaldialog .modaldialog-inner * { margin: 2pt; }
+.modaldialog .modaldialog-hide {
+  float: right;
+  background-repeat: no-repeat;
+  background-image: url(/static/img/jun09/pad/sharebox4.gif);
+  display: block;
+  width: 22px; height: 22px;
+  background-position: -454px -6px;
+  margin-right:-5px;
+  margin-top:-5px;
+}
+
+.modaldialog label,
+.modaldialog h1 {
+  color:#222222;
+  font-size:125%;
+  font-weight:bold;
+}
+
+.modaldialog th {
+  vertical-align: top;
+  text-align: left;
+}
 
 .nonprouser #sharebox-stripe { display: none; }
-.nonprouser #sharebox-forms { top: 0; }
+
+.sharebox-url {
+  width: 440px; height: 18px;
+  text-align: left;
+  font-size: 1.3em;
+  line-height: 18px;
+  padding: 2px;
+}
+
+#sharebox-send {
+  float: right;
+  background-repeat: no-repeat;
+  background-image: url(/static/img/jun09/pad/sharebox4.gif);
+  display: block;
+  width: 87px; height: 22px;
+  background-position: -383px -289px;
+}
+
 
 #viewbarcontents { display: none; }
 #viewzoomtitle {
