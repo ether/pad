@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
  template.inherit('page.ejs');
+ helpers.includeCss("admin/admin.css");
  helpers.setHtmlTitle("EtherPad: Administration");
 %>
 
@@ -26,7 +27,7 @@ limitations under the License. */ %>
 
 <% template.define('sideBar', function() { var ejs_data=''; %>
   <div id="padsidebarfull">
-    <ul>
+    <ul class="menu">
       <%: template.use('adminMenu', function() { var ejs_data=''; %>
 	<li>Configuration
 	  <ul>

@@ -1,5 +1,6 @@
 #editorcontainer {
- padding: 5pt; 
+ padding: 5pt;
+ height: auto;
 }
 
 #editorcontainerbox {

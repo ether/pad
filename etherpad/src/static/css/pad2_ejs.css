@@ -98,8 +98,17 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   margin-bottom: 2px;
 }
 
-.docbarbutton a
-{
+.menu,
+.menu ul {
+  font-size: 10pt;
+  list-style-type: none;
+}
+
+.menu ul {
+  padding-left: 20px;
+}
+
+.menu a {
   font-size: 10px;
   line-height: 18px;
   text-decoration: none;
@@ -296,11 +305,6 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   right: 0;
   bottom: 0;
   padding: 8px;
-}
-
-#padsidebarfull ul {
-  padding-left: 20px;
-  font-size: 10pt;
 }
 
 #padusers {
