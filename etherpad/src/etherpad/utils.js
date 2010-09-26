@@ -69,15 +69,20 @@ function findExistsingFile(files) {
 
 function findTemplate(filename, pluginList) {
   var files = [];
+  var theme = appjet.config.theme;
+  if (request.params._theme != undefined) {
+   /* FIXME: sanitize input (refuse themenames with slashes in them) */
+    theme = request.params._theme;
+  }
   if (pluginList != undefined)
     pluginList.forEach(function (plugin) {
       if (plugin != undefined) {
 	files.push('/plugins/' + plugin + '/templates/' + filename);
-	files.push('/themes/' + appjet.config.theme + '/plugins/' + plugin + '/templates/' + filename);
+	files.push('/themes/' + theme + '/plugins/' + plugin + '/templates/' + filename);
 	files.push('/themes/default/plugins/' + plugin + '/templates/' + filename);
       }
     });
-  files.push('/themes/' + appjet.config.theme + '/templates/' + filename);
+  files.push('/themes/' + theme + '/templates/' + filename);
   files.push('/themes/default/templates/' + filename);
 
   return findExistsingFile(files);
