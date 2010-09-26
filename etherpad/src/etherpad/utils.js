@@ -70,8 +70,8 @@ function findExistsingFile(files) {
 function findTemplate(filename, pluginList) {
   var files = [];
   var theme = appjet.config.theme;
-  if (request.params._theme != undefined) {
-   /* FIXME: sanitize input (refuse themenames with slashes in them) */
+  if (   request.params._theme != undefined
+      && request.params._theme.match(new RegExp("^[^/]*$", "g")) != null) {
     theme = request.params._theme;
   }
   if (pluginList != undefined)
