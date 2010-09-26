@@ -20,8 +20,6 @@ limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad: Create a 
 <% return ejs_data; }); %>
 
 
-
-
 <% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
   <td>
     <h1>http://<%= request.host %>/<%= toHTML(padId) %> does not yet exist</h1>
@@ -30,16 +28,33 @@ limitations under the License. */ %><% helpers.setHtmlTitle("EtherPad: Create a 
 
 <% template.define('contentArea', function() { var ejs_data=''; %>
   <div id="editorcontainer">
-    <div id="createpadpage" class="fpcontent">
-      <form action="<%= request.path %>" method="post">
-	<input type="hidden" name="padId" value="<%= toHTML(padId) %>" />
-	<input type="submit" id="createPad" class="bigbutton" value="Yes, please create the pad" />
-      </form>
-    </div>
   </div>
 <% return ejs_data; }); %>
 
 <% template.define('sideBar', function() { var ejs_data=''; %>
   <div id="padsidebarfull">
   </div>
+<% return ejs_data; }); %>
+
+
+<% template.define('modals', function() { var ejs_data=''; %>
+  <script>
+   $(document).ready(function () {
+     padmodals.showModal("#createbox");
+   });
+  </script>
+  <div id="modaloverlay"><div id="modaloverlay-inner"><!-- --></div></div>
+
+  <div id="mainmodals">
+    <div id="createbox" class="modaldialog">
+      <div id="createbox-inner" class="modaldialog-inner">
+	<form action="<%= request.path %>" method="post">
+	  <input type="hidden" name="padId" value="<%= toHTML(padId) %>" />
+	  <input type="submit" id="createPad" class="bigbutton" value="Yes, please create the pad" />
+	</form>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+  </div>
+
 <% return ejs_data; }); %>

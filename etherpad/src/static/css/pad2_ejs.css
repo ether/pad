@@ -1086,3 +1086,9 @@ form#reconnectform { display: none; }
  -webkit-border-bottom-left-radius: 3pt;
  -webkit-border-bottom-right-radius: 3pt;
 }
+
+.modaldialog .bigbutton {
+ padding-left: 0;
+ padding-right: 0;
+ width: 100%;
+}
