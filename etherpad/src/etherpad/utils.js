@@ -77,9 +77,9 @@ function findThemeFile(filename, pluginList) {
   if (pluginList != undefined)
     pluginList.forEach(function (plugin) {
       if (plugin != undefined) {
-	files.push('/plugins/' + plugin + '/' + filename);
 	files.push('/themes/' + theme + '/plugins/' + plugin + '/' + filename);
 	files.push('/themes/default/plugins/' + plugin + '/' + filename);
+	files.push('/plugins/' + plugin + '/' + filename);
       }
     });
   files.push('/themes/' + theme + '/' + filename);
