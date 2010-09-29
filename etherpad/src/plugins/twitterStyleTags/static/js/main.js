@@ -9,9 +9,9 @@ twitterStyleTagsInit.prototype.aceInitInnerdocbodyHead = function(args) {
 twitterStyleTagsInit.prototype.aceGetFilterStack = function(args) {
   return [
     args.linestylefilter.getRegexpFilter(
-      new RegExp("#[^,#=!\\s][^,#=!\\s]*", "g"), 'padtag'),
+      new RegExp("#[^,#=!\\s\"'][^,#=!\\s}\"']*", "g"), 'padtag'),
     args.linestylefilter.getRegexpFilter(
-      new RegExp("=[^#=\\s][^#=\\s]*", "g"), 'padtagsearch')
+      new RegExp("=[^#=\\s\"'][^#=\\s\"']*", "g"), 'padtagsearch')
   ];
 }
 
@@ -19,8 +19,9 @@ twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
   if (args.cls.indexOf('padtagsearch') >= 0) {
     var href;
     cls = args.cls.replace(/(^| )padtagsearch:(\S+)/g, function(x0, space, padtagsearch) {
-      href = '/ep/tag/?query=' + padtagsearch.substring(1);
-      return space + "padtagsearch padtagsearch_" + padtagsearch.substring(1);
+      var tag = encodeURI(padtagsearch.substring(1));
+      href = '/ep/tag/?query=' + tag;
+      return space + "padtagsearch padtagsearch_" + tag;
     });
 
    return [{
@@ -30,8 +31,9 @@ twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
   } else if (args.cls.indexOf('padtag') >= 0) {
     var href;
     cls = args.cls.replace(/(^| )padtag:(\S+)/g, function(x0, space, padtag) {
-      href = '/ep/tag/?query=' + padtag.substring(1);
-      return space + "padtag padtag_" + padtag.substring(1);
+      var tag = encodeURI(padtag.substring(1));
+      href = '/ep/tag/?query=' + tag;
+      return space + "padtag padtag_" + tag;
     });
 
    return [{
