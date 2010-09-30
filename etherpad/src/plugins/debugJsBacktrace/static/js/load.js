@@ -1,3 +1,8 @@
 window.onerror = function() {
-  alert(printStackTrace().join('\n\n'));
+  var trace = printStackTrace().join('\n\n');
+  if (typeof(console) != "undefined") {
+    console.log(trace);
+  } else {
+    alert(trace);
+  }
 }
