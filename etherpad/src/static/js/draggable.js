@@ -80,11 +80,17 @@ function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
       change = topHeight - state.topHeight;
 
       var bottomHeight = state.bottomHeight - change;
+      var sepHeight = $(sep).height();
+
+      var totalHeight = topHeight + sepHeight + bottomHeight;
+      topHeight = 100.0 * topHeight / totalHeight;
+      sepHeight = 100.0 * sepHeight / totalHeight;
+      bottomHeight = 100.0 * bottomHeight / totalHeight;
 
       $(top).css('bottom', 'auto');
-      $(top).height(topHeight);
-      $(sep).css('top', topHeight + "px");
-      $(bottom).css('top', (topHeight +  $(sep).height()) + 'px');
+      $(top).css('height', topHeight + "%");
+      $(sep).css('top', topHeight + "%");
+      $(bottom).css('top', (topHeight +  sepHeight) + '%');
       $(bottom).css('height', 'auto');
     }
   });
@@ -111,11 +117,17 @@ function makeResizableHPane(left, sep, right, minLeft, minRight) {
       change = leftWidth - state.leftWidth;
 
       var rightWidth = state.rightWidth - change;
+      var sepWidth = $(sep).width();
+
+      var totalWidth = leftWidth + sepWidth + rightWidth;
+      leftWidth = 100.0 * leftWidth / totalWidth;
+      sepWidth = 100.0 * sepWidth / totalWidth;
+      rightWidth = 100.0 * rightWidth / totalWidth;
 
       $(left).css('right', 'auto');
-      $(left).width(leftWidth);
-      $(sep).css('left', leftWidth + "px");
-      $(right).css('left', (leftWidth + $(sep).width()) + 'px');
+      $(left).css('width', leftWidth + "%");
+      $(sep).css('left', leftWidth + "%");
+      $(right).css('left', (leftWidth + sepWidth) + '%');
       $(right).css('width', 'auto');
     }
   });
