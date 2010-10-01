@@ -12,10 +12,18 @@ body, textarea { font-family: Arial, sans-serif; }
 
 #padpage {
  position: absolute;
- left: 8px;
- right: 8px;
  top: 0px;
  bottom: 8px;
+ left: 50%;
+ margin-left: -450px;
+ width: 900px;
+}
+
+.maximized #padpage {
+ left: 8px;
+ right: 8px;
+ width: auto;
+ margin-left: 0;
 }
 
 body.fullwidth #padpage { width: auto; margin-left: 6px; margin-right: 6px; }
@@ -1053,6 +1061,18 @@ form#reconnectform { display: none; }
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/static/img/jun09/pad/overlay2.png", sizingMethod="scale");
 }
 
+a#topbarmaximize {
+ float: right;
+ width: 16px;
+ height: 16px;
+ margin-right:-143px;
+ margin-top:4px;
+ background: url(/static/img/jun09/pad/maximize_normal.png);
+}
+
+.maximized a#topbarmaximize {
+ background: url(/static/img/jun09/pad/maximize_maximized.png);
+}
 
 #editbarinner h1 {
  line-height: 29px;

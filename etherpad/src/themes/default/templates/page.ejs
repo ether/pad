@@ -46,6 +46,7 @@ limitations under the License. */ %>
 	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
 	<% /* non-floated */ %>
 	<div id="topbarcenter">
+	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize"></a>
 	  <a href="/" id="topbaretherpad">EtherPad</a>
 	</div>
         <%: template.use('topBar'); %>
