@@ -197,8 +197,11 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   position:absolute;
   right:0;
   top:0;
-  overflow: hidden;
   color: #444444;
+}
+
+#editbarinner {
+  overflow: hidden;
 }
 
 #editbarleft { float: left; height: 100%; overflow: hidden;

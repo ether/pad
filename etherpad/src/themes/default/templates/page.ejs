@@ -90,28 +90,30 @@ limitations under the License. */ %>
       </script>
       <div id="padeditor">
 	<div id="editbar" class="disabledtoolbar">
-	  <% /* floated left */ %>
-	  <div id="editbarleft"><!-- --></div>
-	  <% /* floated right */ %>
-	  <div id="editbarright"><!-- --></div>      
-	  <% /* non-floated */ %>
-	  <div id="editbarinner">
-	    <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
-              <tr>
-                <%: template.use('editBarItemsLeft'); %>
-	        <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
-	        <td width="100%">&nbsp;</td>
-  	      </tr>
-            </table>
-	    <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
-	      <tr>
-	        <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
-	        <%: template.use('editBarItemsRight'); %>
-	      </tr>
-	    </table>
-	    <%: template.callHookStr('editBarDropdownsAll', {}, '', '', ''); %>
-	    <%: template.use('editBarDropdowns'); %>
-	  </div>
+          <div id="editbarinner">
+	    <% /* floated left */ %>
+	    <div id="editbarleft"><!-- --></div>
+	    <% /* floated right */ %>
+	    <div id="editbarright"><!-- --></div>      
+	    <% /* non-floated */ %>
+	    <div id="editbarinner">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
+		<tr>
+		  <%: template.use('editBarItemsLeft'); %>
+		  <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
+		  <td width="100%">&nbsp;</td>
+		</tr>
+	      </table>
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
+		<tr>
+		  <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
+		  <%: template.use('editBarItemsRight'); %>
+		</tr>
+	      </table>
+	      <%: template.callHookStr('editBarDropdownsAll', {}, '', '', ''); %>
+	      <%: template.use('editBarDropdowns'); %>
+	    </div>
+          </div>
 	</div>
 	<div id="editorcontainerbox"><%: template.use('contentArea'); %></div>
       </div><!-- /padeditor -->
