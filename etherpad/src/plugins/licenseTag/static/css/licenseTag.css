@@ -1,0 +1,14 @@
+#licenseTag-license-selector {
+  background: white;
+  border: 1px solid #C4C4C4;
+  position: absolute;
+  z-index: 55;
+  padding: 4pt;
+  display: none;
+  height: 400px;
+  overflow: auto;
+ }
+
+#licenseTag-license-selector ul {
+  list-style: none;
+}
