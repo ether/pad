@@ -154,23 +154,21 @@ var padutils = {
     return pieces.join('');
   },
   bindEnterAndEscape: function(node, onEnter, onEscape) {
-    function handleKey(evt) {
-      if (evt.which == 27 && onEscape) {
-        // "escape" key
-        if (evt.type == 'keydown') {
-          onEscape(evt);
-        }
-        evt.preventDefault();
-      }
-      else if (evt.which == 13 && onEnter) {
-        // return/enter
-        if (evt.type == 'keyup') {
+    if (onEnter) {
+      node.keypress( function(evt) {
+        if (evt.which == 13) {
           onEnter(evt);
         }
-        evt.preventDefault();
-      }
+      });
     }
-    $(node).bind('keyup keypress keydown', handleKey);
+
+    if (onEscape) {
+      node.keydown( function(evt) {
+        if (evt.which == 27) {
+          onEscape(evt);
+        }
+      });
+    }
   },
   timediff: function(d) {
     function format(n, word) {
