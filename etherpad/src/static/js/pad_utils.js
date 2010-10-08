@@ -154,23 +154,27 @@ var padutils = {
     return pieces.join('');
   },
   bindEnterAndEscape: function(node, onEnter, onEscape) {
-    function handleKey(evt) {
-      if (evt.which == 27 && onEscape) {
-        // "escape" key
-        if (evt.type == 'keydown') {
-          onEscape(evt);
-        }
-        evt.preventDefault();
-      }
-      else if (evt.which == 13 && onEnter) {
-        // return/enter
-        if (evt.type == 'keyup') {
+
+    // Use keypress instead of keyup in bindEnterAndEscape
+    // Keyup event is fired on enter in IME (Input Method Editor), But
+    // keypress is not. So, I changed to use keypress instead of keyup.
+    // It is work on Windows (IE8, Chrome 6.0.472), CentOs (Firefox 3.0) and Mac OSX (Firefox 3.6.10, Chrome 6.0.472, Safari 5.0).
+    
+    if (onEnter) {
+      node.keypress( function(evt) {
+        if (evt.which == 13) {
           onEnter(evt);
         }
-        evt.preventDefault();
-      }
+      });
     }
-    $(node).bind('keyup keypress keydown', handleKey);
+
+    if (onEscape) {
+      node.keydown( function(evt) {
+        if (evt.which == 27) {
+          onEscape(evt);
+        }
+      });
+    }
   },
   timediff: function(d) {
     function format(n, word) {
