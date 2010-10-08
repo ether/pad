@@ -1510,8 +1510,12 @@ function OUTER(gscope) {
     }
 
     p.mark("repsel");
-    // update rep
-    repSelectionChange(selStart, selEnd, selection && selection.focusAtStart);
+    // update rep if we have a new selection
+    // NOTE: IE loses the selection when you click stuff in e.g. the
+    // editbar, so removing the selection when it's lost is not a good
+    // idea. 
+    if (selection)
+      repSelectionChange(selStart, selEnd, selection && selection.focusAtStart);
     // update browser selection
     p.mark("browsel");
     if (selection && (domChanges || isCaret())) {
