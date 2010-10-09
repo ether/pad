@@ -37,6 +37,12 @@ import("fastJSON");
 
 function onRequest() {
   var tags = tagQuery.queryToTags(request.params.query);
+  var format = "html";
+  if (request.params.format != undefined)
+    format = request.params.format;
+  var limit = 10;
+  if (format == "sitemap")
+    var limit = undefined;
 
   /* Create the pad filter sql */
   var querySql = tagQuery.getQueryToSql(tags.tags.concat(['public']), tags.antiTags);
@@ -45,7 +51,7 @@ function onRequest() {
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);
   var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
 
-  padSql = tagQuery.padInfoSql(querySql, 10);
+  padSql = tagQuery.padInfoSql(querySql, limit);
   var matchingPads = sqlobj.executeRaw(padSql.sql, padSql.params);
 
   for (i = 0; i < matchingPads.length; i++) {
@@ -67,10 +73,6 @@ function onRequest() {
     matchingPads: matchingPads
   };
 
-  var format = "html";
-  if (request.params.format != undefined)
-    format = request.params.format;
-
   if (format == "json") {
     response.setContentType("application/json; charset=utf-8");
     response.write(fastJSON.stringify(info));
@@ -88,6 +90,12 @@ function onRequest() {
     } else if (format == "rss") {
       response.setContentType("application/xml; charset=utf-8");
       response.write(renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags']));
+      if (request.acceptsGzip) {
+	response.setGzip(true);
+      }
+    } else if (format == "sitemap") {
+      response.setContentType("application/xml; charset=utf-8");
+      response.write(renderTemplateAsString("tagSitemap.ejs", info, ['twitterStyleTags']));
       if (request.acceptsGzip) {
 	response.setGzip(true);
       }
