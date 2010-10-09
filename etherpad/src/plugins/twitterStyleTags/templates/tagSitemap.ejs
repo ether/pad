@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%
+  function inArray(item, arr) {
+    for (var i = 0; i < arr.length; i++)
+      if (arr[i] == item)
+	return true;
+    return false;
+  }
+
+
+  function padzero(n) {
+    return n < 10 ? '0' + n : n;
+  }
+
+  function pad2zeros(n) {
+    if (n < 100) {
+      n = '0' + n;
+    }
+    if (n < 10) {
+      n = '0' + n;
+    }
+    return n;     
+  }
+  function toISOString(d) {
+    return d.getUTCFullYear()
+      + '-'
+      + padzero(d.getUTCMonth() + 1)
+      + '-'
+      + padzero(d.getUTCDate())
+      + 'T'
+      + padzero(d.getUTCHours())
+      + ':'
+      + padzero(d.getUTCMinutes())
+      + ':'
+      + padzero(d.getUTCSeconds())
+      + '.'
+      + pad2zeros(d.getUTCMilliseconds())
+      + 'Z';
+  }
+
+%>
+<!-- generator="Etherpad/v1.1" -->
+<!-- sitemap-generator-url="http://etherpad.org" -->
+<!-- sitemap-generator-version="awesome apples" -->
+<!-- generated-on="unknown" -->
+<urlset
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+>
+  <% for (i = 0; i < matchingPads.length; i++) { %>
+    <%
+       var matchingPadId = matchingPads[i].ID;
+       if (!inArray('writable', matchingPads[i].TAGS)) {
+	 matchingPadId = padIdToReadonly(matchingPads[i].ID);
+       }
+       matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+    %>
+    <url>
+      <loc>http://<%= request.host %>/<%= matchingPadUrl %>/</loc>
+      <lastmod><%= toISOString(new Date(matchingPads[i].lastWriteTime)) %></lastmod>
+      <changefreq>dayly</changefreq>
+      <priority>1.0</priority>
+    </url>
+  <% } %>
+</urlset>
