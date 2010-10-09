@@ -155,7 +155,7 @@ function getEmailFromAddr() {
   if (pne_utils.isPNE()) {
     fromDomain = getFullProDomain();
   }
-  return (appjet.config.customBrandingName +'<'support@etherpad.org'>');
+  return (appjet.config.customBrandingName +'<'+appjet.config.customEmailAddress+'>');
 }
 
 function renderGlobalProNotice() {

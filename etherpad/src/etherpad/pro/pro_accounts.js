@@ -118,7 +118,7 @@ function createNewAccount(domainId, fullName, email, password, isAdmin, skipVali
     var account = {
       domainId: domainId,
       fullName: fullName,
-      email: email,
+      email: appjet.config.customEmailAddress,
       passwordHash: _computePasswordHash(password),
       createdDate: now,
       isAdmin: isAdmin
