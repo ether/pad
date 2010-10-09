@@ -39,6 +39,7 @@ if [ `uname` == "FreeBSD" ]; then
 else
         [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
         [ -e "/usr/lib/jvm/java-6-sun" ] && export JAVA_HOME="/usr/lib/jvm/java-6-sun"
+        [ -e "/usr/lib/jvm/java-6-sun" ] && export JAVA_OPTS="-Xbootclasspath/p:../infrastructure/lib/rhino-js-1.7r1.jar:/usr/share/java/scala-library.jar" 
         export SCALA_HOME="/usr/share/java"
         export SCALA_LIBRARY_JAR="/usr/share/java/scala-library.jar"
         export MYSQL_CONNECTOR_JAR="/usr/share/java/mysql-connector-java.jar"
