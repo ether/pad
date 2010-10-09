@@ -151,11 +151,11 @@ function getFullSuperdomainHost() {
 }
 
 function getEmailFromAddr() {
-  var fromDomain = 'etherpad.com';
+  var fromDomain = 'etherpad.org';
   if (pne_utils.isPNE()) {
     fromDomain = getFullProDomain();
   }
-  return ('"EtherPad" <noreply@'+fromDomain+'>');
+  return (appjet.config.customBrandingName +'<'support@etherpad.org'>');
 }
 
 function renderGlobalProNotice() {

@@ -17,7 +17,7 @@ limitations under the License. */ %>
 <%
   template.inherit('page.ejs');
 
-  helpers.setHtmlTitle("EtherPad: "+pageTitle);
+  helpers.setHtmlTitle(appjet.config.customBrandingName + ": " + pageTitle);
   helpers.includeJs("ace.js");
   helpers.includeJs("collab_client.js");
   helpers.includeJs("pad_userlist.js");

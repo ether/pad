@@ -10,8 +10,8 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - EtherPad"); %>
-<% helpers.includeJQuery() %>
+limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + appjet.config.customBrandingName); %>
+      <p>Welcome to your <%= appjet.config.customBrandingName %> Beta Account!<% helpers.includeJQuery() %>
 <% helpers.includeJs("etherpad.js") %>
 <% helpers.includeCss("pro/pro-home.css"); %>
 <% helpers.includeCss("pro/padlist.css"); %>
