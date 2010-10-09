@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
  template.inherit('admin/page.ejs');
- helpers.setHtmlTitle("EtherPad: Administration: Manage plugins");
+ helpers.setHtmlTitle(appjet.config.customBrandingName +": Manage plugins");
  plugin_registry = plugins.loadPlugins();
 %>
 

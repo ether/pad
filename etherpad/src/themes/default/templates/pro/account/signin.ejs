@@ -13,7 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */ %><% helpers.includeJQuery() %>
 <% helpers.includeJs("pro/signin-client.js") %>
 <% helpers.includeCss("pro/account.css") %>
-<% helpers.setHtmlTitle("EtherPad: Sign In") %>
+<% helpers.setHtmlTitle(appjet.config.customBrandingName +": Sign In") %>
+
 
 <div class="fpcontent">
   <div class="account-container">
@@ -25,7 +26,7 @@ limitations under the License. */ %><% helpers.includeJQuery() %>
     <div class="bb-top">
       <div class="bb-topleft"><!-- --></div>
       <div class="bb-topright"><!-- --></div>
-      <div class="bb-title">Sign In to <%= siteName %> EtherPad</div>
+      <div class="bb-title">Sign In to <%= siteName %> <%= appjet.config.customBrandingName %></div>
     </div>
     <div class="bb-in">
       <%= errorDiv() %>
