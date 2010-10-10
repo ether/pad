@@ -50,7 +50,7 @@ a#backtoprosite, #accountnav a { color: #cde7ff; text-decoration: underline; }
 
 a#backtoprosite { padding-left: 20px; left: 6px;
   background: url(/static/img/jun09/pad/protop.gif) no-repeat -5px -6px; }
-#accountnav { right: 10px; color: #fff; }
+#accountnav { right: 30px; color: #fff; }
   
 #topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
 a#topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
@@ -60,6 +60,9 @@ a#topbaretherpad { margin-left: auto; margin-right: auto; display: block; width:
 
 
 #topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
+
+
+
 #EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
 #Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
 
@@ -344,7 +347,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #otherusers {
   overflow: auto;
   position: absolute;
-  top: 31px;
+  top: 41px;
   left: 0;
   right: 0;
   bottom: 28px;
@@ -594,7 +597,7 @@ table#otheruserstable { display: none; }
 .cboxdisconnected_unauth .disconnected h2.h2_unauth { display: block; }
 
 #connectionstatus {
-  position: absolute; width: 37px; height: 32px; overflow: hidden;
+  position: absolute; width: 37px; height: 41px; overflow: hidden;
   right: 0;
   z-index: 11;
 }
