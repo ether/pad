@@ -31,6 +31,7 @@ import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
 import("sqlbase.sqlobj");
+import("etherpad.admin.plugins");
 import("etherpad.pad.padutils");
 
 function urlSql(querySql, limit, offset) {
@@ -67,6 +68,11 @@ function onRequest() {
 
   /* Create the pad filter sql */
   var querySql = tagQuery.getQueryToSql(tags.tags.concat(['public']), tags.antiTags);
+
+  var hooks = plugins.callHook('queryToSql');
+  for (i = 0; i < hooks.length; i++) {
+    querySql = hooks[i](querySql);
+  }
 
   /* Use the pad filter sql to figure out which tags to show in the tag browser this time. */
   var queryNewTagsSql = tagQuery.newTagsSql(querySql);

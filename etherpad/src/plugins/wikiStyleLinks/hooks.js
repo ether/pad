@@ -5,10 +5,6 @@ import("sqlbase.sqlobj");
 import("etherpad.collab.server_utils");
 import("etherpad.pad.padutils");
 
-function handlePath() {
-  return [[PrefixMatcher('/ep/link/'), forward(linkBrowser)]];
-}
-
 function padModelWriteToDB(args) {
   /* Update links for the pad */
 
@@ -43,7 +39,7 @@ function padModelWriteToDB(args) {
 
 function queryToSql(args) {
   return [function (querySql) {
-    if (request.params.linksto == undefined) {
+    if (request.params.linksto == undefined || request.params.linksto == '') {
       return querySql;
     } else  {
       var padId = request.params.linksto;
