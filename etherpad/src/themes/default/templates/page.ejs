@@ -46,8 +46,18 @@ limitations under the License. */ %>
 	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
 	<% /* non-floated */ %>
 	<div id="topbarcenter">
+
+	  <a href="/" id="topbarBrand"><%= appjet.config.customBrandingName %></a>
+        <% /* Replace above with an image if you want */ %>
+
+            <% if (appjet.config.showLinkandLicense == "true") { %>
+	  <a href="http://etherpad.org" id="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" id="Licensing">free software</a>
+	    <% } %>
+
 	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize" title="Toggle maximization"></a>
-          <a href="/" id="topbaretherpad"><%= appjet.config.customBrandingName %></a>
+               <!--
+ <a href="/" id="topbaretherpad"><%= appjet.config.customBrandingName %></a>
+		-->
 	</div>
         <%: template.use('topBar'); %>
 	<div id="specialkeyarea"><!-- --></div>
