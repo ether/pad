@@ -54,3 +54,6 @@ function docbarItemsTagBrowser() {
  return ["<td class='docbarbutton'><a href='/ep/tag/'>Pads</a></td>"];
 }
 
+function editBarItemsLeftPad(arg) {
+  return arg.template.include('twitterStyleTagsEditbarButtons.ejs', undefined, ['twitterStyleTags']);
+}

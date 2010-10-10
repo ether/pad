@@ -3,10 +3,10 @@ import("plugins.langTag.hooks");
 import("plugins.langTag.static.js.main");
 
 function langTagInit() {
- this.hooks = ['editBarItemsLeftPad'];
+ this.hooks = ['twitterStyleTagsTagSelector'];
  this.description = 'Language tag inserter (for twitterStyleTags).';
  this.client = new main.langTagInit();
- this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
+ this.twitterStyleTagsTagSelector = hooks.tagSelectors;
  this.install = install;
  this.uninstall = uninstall;
 }

@@ -3,10 +3,10 @@ import("plugins.licenseTag.hooks");
 import("plugins.licenseTag.static.js.main");
 
 function licenseTagInit() {
- this.hooks = ['editBarItemsLeftPad'];
+ this.hooks = ['twitterStyleTagsTagSelector'];
  this.description = 'License tag inserter (for twitterStyleTags).';
  this.client = new main.licenseTagInit();
- this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
+ this.twitterStyleTagsTagSelector = hooks.tagSelectors;
  this.install = install;
  this.uninstall = uninstall;
 }
