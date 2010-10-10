@@ -107,14 +107,13 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
       state.rightWidth = $(right).width();
       state.minLeft = minLeft;
       state.maxLeft = (state.leftWidth + state.rightWidth) - minRight;
-    }
-    else if (eType == 'dragupdate') {
+    } else if (eType == 'dragend' || eType == 'dragupdate') {
       var change = evt.pageX - state.startX;
 
       var leftWidth = state.leftWidth + change;
       if (leftWidth < state.minLeft) { leftWidth = state.minLeft; }
       if (leftWidth > state.maxLeft) { leftWidth = state.maxLeft; }
-      change = leftWidth - state.leftWidth;
+      
 
       var rightWidth = state.rightWidth - change;
       newSepWidth = sepWidth;
@@ -123,6 +122,19 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
       newSepOffset = sepOffset;
       if (newSepOffset == undefined)
         newSepOffset = 0;
+
+      if (change == 0) {
+	if (rightWidth != minRight || state.lastRightWidth == undefined) {
+	 console.log({rightWidth:rightWidth, minRight:minRight});
+	  state.lastRightWidth = rightWidth;
+	  rightWidth = minRight;
+        } else {
+	  rightWidth = state.lastRightWidth;
+ 	  state.lastRightWidth = minRight;
+        }
+	change = state.rightWidth - rightWidth;
+	leftWidth = change +  state.leftWidth;
+      }
 
       var totalWidth = leftWidth + newSepWidth + rightWidth;
       leftWidth = 100.0 * leftWidth / totalWidth;
