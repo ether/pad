@@ -78,10 +78,9 @@ function createCopy(localPadId, pad, clonePadId, cloneRevNum) {
   }, 'r');
 
   var author_list = formatAuthorData(cloneData.historicalAuthorData);
-  var header   = "This pad builds on a prior work created by " + author_list.join(" & ") + "\n";
-  var priorUrl = "http://" + request.host + "/ep/pad/view/"+clonePadId+"/rev."+cloneRevNum + "\n\n";
+  var header   = "This pad builds on [["+clonePadId+"/rev."+cloneRevNum + "]], created by " + author_list.join(" & ") + "\n\n";
 
-  pad.create(header + priorUrl + cloneData.padText);	    
+  pad.create(header + cloneData.padText);	    
   return;
 }
 

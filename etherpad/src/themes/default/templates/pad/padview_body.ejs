@@ -76,6 +76,11 @@ limitations under the License. */ %><%
       </span>
     </h1>
   </td>
+  <%: template.callHookStr('editBarItemsLeftPadView', {}, '', '', ''); %>
+<% return ejs_data; }); %>
+
+<% template.define('editBarItemsRight', function() { var ejs_data=''; %>
+  <%: template.callHookStr('editBarItemsRightPadView', {}, '', '', ''); %>
 <% return ejs_data; }); %>
 
 <% template.define('sideBar', function() { var ejs_data=''; %>

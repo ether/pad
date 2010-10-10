@@ -1,6 +1,20 @@
+<%
+  if (request.path.indexOf('/ep/pad/view') >= 0) {
+    padId = request.path.split('/ep/pad/view/', 2)[1].split('/rev.', 2);
+    padRev = padId[1];
+    padId = padId[0];
+  } else {
+    padRev = 'latest';
+    padId = request.path.split("/")[1];
+  }
+  params = ["old=" + padId];
+  if (padRev != 'latest')
+    params.push("old_rev=" + padRev);
+  params = params.join('&');
+%>
 <td>&nbsp;&nbsp;</td>
 <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
 <td id="editbarattach-outer" class="editbarbutton editbargroupsfirst">
-  <a href="/ep/copyPad?old=<%= request.path.split("/")[1] %>" title="Copy pad"><img src="/static/html/plugins/copyPad/editbar_copy.gif"></a>
+  <a href="/ep/copyPad?<%= params %>" title="Copy pad"><img src="/static/html/plugins/copyPad/editbar_copy.gif"></a>
 </td>
 <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>

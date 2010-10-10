@@ -81,7 +81,13 @@ function aceCreateDomLine(args) {
       /* At the same time we convert the name of the pad
        * into a proper URL.
        */
-      href = "/" + linktext;
+      if (linktext.indexOf("/") >= 0) {
+        href = "/ep/pad/view/" + linktext;
+      } else if (linktext.indexOf("ro.") == 0) {
+        href = "/ep/pad/view/" + linktext + "/latest";
+      } else {
+        href = "/" + linktext;
+      }
       return "wikilink";
     });
 
