@@ -52,10 +52,16 @@ a#backtoprosite { padding-left: 20px; left: 6px;
   background: url(/static/img/jun09/pad/protop.gif) no-repeat -5px -6px; }
 #accountnav { right: 10px; color: #fff; }
   
-#topbarcenter { margin-left: 150px; margin-right: 150px; }
+#topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
 a#topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
   position: relative; top: 3px; height: 0; padding-top: 20px;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -397px -3px; overflow: hidden; }
+/*  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -397px -3px; overflow: hidden; */
+}
+
+
+#topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
+#EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
+#Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
 
 .propad a#topbaretherpad { background: url(/static/img/jun09/pad/protop.gif) no-repeat -397px -3px; }
 

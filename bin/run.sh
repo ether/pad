@@ -24,7 +24,7 @@
 
 ETHERPADDIR="$(cd "$(dirname "$0")/.."; pwd)"
 source "$ETHERPADDIR/bin/exports.sh"
-
+source "$ETHERPADDIR/bin/ooffice.sh"
 cd "$ETHERPADDIR/etherpad"
 
 # the argument here is the maximum amount of RAM to allocate
