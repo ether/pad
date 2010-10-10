@@ -201,13 +201,14 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 .hidesidebar #padeditor { right: 0; }
 
 #vdraggie {
-  background: url(/static/img/jun09/pad/vdraggie.gif) no-repeat center center;
+  background: url(/static/img/jun09/pad/vdraggie.gif) no-repeat top center;
   cursor: W-resize;
   bottom:0;
   position:absolute;
-  right:290px;
+  right:268px;
   top:0;
-  width:10px;
+  width:56px;
+  z-index: 10;
 }
 
 #editbar { height: 36px;
@@ -242,7 +243,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 {
   position:absolute;
   top: 6px;
-  right: 7px;
+  right: 29px;
   height: 24px;
 }
 

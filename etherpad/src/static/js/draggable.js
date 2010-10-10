@@ -96,7 +96,7 @@ function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
   });
 }
 
-function makeResizableHPane(left, sep, right, minLeft, minRight) {
+function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOffset) {
   if (minLeft === undefined) minLeft = 0;
   if (minRight === undefined) minRight = 0;
 
@@ -117,17 +117,23 @@ function makeResizableHPane(left, sep, right, minLeft, minRight) {
       change = leftWidth - state.leftWidth;
 
       var rightWidth = state.rightWidth - change;
-      var sepWidth = $(sep).width();
+      newSepWidth = sepWidth;
+      if (newSepWidth == undefined)
+        newSepWidth = $(sep).width();
+      newSepOffset = sepOffset;
+      if (newSepOffset == undefined)
+        newSepOffset = 0;
 
-      var totalWidth = leftWidth + sepWidth + rightWidth;
+      var totalWidth = leftWidth + newSepWidth + rightWidth;
       leftWidth = 100.0 * leftWidth / totalWidth;
-      sepWidth = 100.0 * sepWidth / totalWidth;
+      newSepWidth = 100.0 * newSepWidth / totalWidth;
+      newSepOffset = 100.0 * newSepOffset / totalWidth;
       rightWidth = 100.0 * rightWidth / totalWidth;
 
       $(left).css('right', 'auto');
       $(left).css('width', leftWidth + "%");
-      $(sep).css('left', leftWidth + "%");
-      $(right).css('left', (leftWidth + sepWidth) + '%');
+      $(sep).css('left', (leftWidth + newSepOffset) + "%");
+      $(right).css('left', (leftWidth + newSepWidth) + '%');
       $(right).css('width', 'auto');
     }
   });
