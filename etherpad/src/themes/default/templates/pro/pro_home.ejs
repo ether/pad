@@ -11,24 +11,17 @@ distributed under the License is distributed on an "AS-IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + appjet.config.customBrandingName); %>
-      <p>Welcome to your <%= appjet.config.customBrandingName %> Beta Account!<% helpers.includeJQuery() %>
+<% helpers.includeJQuery() %>
 <% helpers.includeJs("etherpad.js") %>
 <% helpers.includeCss("pro/pro-home.css"); %>
 <% helpers.includeCss("pro/padlist.css"); %>
 
 <div class="fpcontent">
 
-  <div id="welcome-msg">
-    Welcome <%= account.fullName %>
-    <% if (account.isAdmin) { %>(Administrator)<% } %>
-    <br/>
-    <br/>
-  </div>
 
 
   <div id="homeright">
-    <a href="/ep/pad/newpad">
-      <img src="/static/img/davy/btn/createpad-small.gif" alt="Create new pad" />
+    <a href="/ep/pad/newpad" class="bigbuttonpro">Create a new pad
     </a>
 
     <% if (livePads.length > 0) { %>
@@ -53,6 +46,15 @@ limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + ap
 
   </div>
 
+<div id="welcome-msg">
+    Welcome <%= account.fullName %>
+    <% if (account.isAdmin) { %>(Administrator)<% } %>
+    <br/>
+    <br/>
+  </div>
+
+
+
   <div id="homeleft">
     <div id="homeleft-title">
       Latest News
@@ -60,27 +62,20 @@ limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + ap
 
     <div class="news-time-sep">
       <div class="date">
-        June 17th, 2009
+        Oct 10th, 2010
       </div>
       <div class="line"><!-- --></div>
     </div>
 
     <div class="news-item">
-      <p>Welcome to your EtherPad Beta Account!  Please report bugs by
-      sending email to <%= helpers.oemail("bugs") %>. You can also give us
-      feedback and feature suggestions via <a target="_blank"
-      href="http://uservoice.etherpad.com/">UserVoice</a>.</p>
+      <p>Welcome to your <%=appjet.config.customBrandingName%> Account! 
 
-      <p>If you have any questions, just email <%=
-      helpers.oemail("support") %> and
-      we will respond to your inquiries.</p>
-
-      <p>We hope you enjoy EtherPad!</p>
+      <p>We hope you enjoy <%=appjet.config.customBrandingName%></p>
 
       <p>Sincerely,</p>
 
-      <p>Aaron Iba<br/>
-      CEO, AppJet Inc.
+      <p>John McLear<br/>
+	Apple smasher.  The <a href="http://etherpad.org">Etherpad Foundation</a>
       </p>
     </div>
 
