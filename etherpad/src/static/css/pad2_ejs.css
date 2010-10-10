@@ -46,7 +46,7 @@ body.squish2width #padpage { width: 700px; }
 
 a#backtoprosite, #accountnav {
   display: block; position: absolute; height: 15px; line-height: 15px;
-  width: auto; top: 5px; font-size: 1.2em;
+  width: auto; top: 5px; font-size: 1.2em; display:none;
 }
 a#backtoprosite, #accountnav a { color: #cde7ff; text-decoration: underline; }
 
