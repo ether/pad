@@ -17,7 +17,8 @@
 package net.appjet.oui;
 
 import org.mozilla.javascript.{Context,Scriptable,ScriptableObject};
-import org.json.{JSONStringer,JSONObject,JSONArray};
+import net.sf.json.util.JSONStringer;
+import net.sf.json.{JSONObject,JSONArray};
 
 object FastJSON {
   def stringify(rhinoObj: Scriptable): String = {
@@ -118,9 +119,9 @@ class FastJSONParser(val ctx:ExecutionContext) {
 
   def parse(source: String): Scriptable = {
     if (source(0) == '[') {
-      jsonToRhino(new JSONArray(source)).asInstanceOf[Scriptable];
+      jsonToRhino(JSONArray.fromObject(source)).asInstanceOf[Scriptable];
     } else {
-      jsonToRhino(new JSONObject(source)).asInstanceOf[Scriptable];
+      jsonToRhino(JSONObject.fromObject(source)).asInstanceOf[Scriptable];
     }
   }
 
@@ -135,15 +136,15 @@ class FastJSONParser(val ctx:ExecutionContext) {
   private def jsonToRhino(json: Object): Object = {
     json match {
       case (o:JSONArray) => jsonArrayToRhino(o);
+      case (o:JSONObject) if (o.isNullObject()) => null;
       case (o:JSONObject) => jsonObjectToRhino(o);
-      case o if (o == JSONObject.NULL) => null;
       case o => o;
     }
   }
 
   private def jsonArrayToRhino(json: JSONArray): Scriptable = {
     val o:Scriptable = newArray();
-    for (i <- 0 until json.length()) {
+    for (i <- 0 until json.size()) {
       o.put(i, o, jsonToRhino(json.get(i)));
     }
     return o;
@@ -151,15 +152,14 @@ class FastJSONParser(val ctx:ExecutionContext) {
 
   private def jsonObjectToRhino(json: JSONObject): Scriptable = {
     val o:Scriptable = newObj();
-    val names:Array[String] = JSONObject.getNames(json);
+    val names:Array[Object] = json.names().toArray();
     if (names != null) {
       for (n <- names) {
-        val i = try { Some(n.toInt); } catch { case (e:NumberFormatException) => None };
+        val i = try { Some(n.asInstanceOf[String].toInt); } catch { case (e:NumberFormatException) => None };
         if (i.isDefined) {
-          o.put(i.get, o, jsonToRhino(json.get(n)));
-        }
-        else {
-          o.put(n, o, jsonToRhino(json.get(n)));
+           o.put(i.get, o, jsonToRhino(json.get(n.asInstanceOf[String])));
+        } else {
+          o.put(n.asInstanceOf[String], o, jsonToRhino(json.get(n.asInstanceOf[String])));
         }
       }
     }

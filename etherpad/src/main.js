@@ -43,7 +43,6 @@ import("etherpad.control.loadtestcontrol");
 import("etherpad.control.maincontrol");
 import("etherpad.control.pad.pad_control");
 import("etherpad.control.pne_manual_control");
-import("etherpad.control.pne_tracker_control");
 import("etherpad.control.pro.admin.license_manager_control");
 import("etherpad.control.pro_beta_control");
 import("etherpad.control.pro.pro_main_control");
@@ -62,7 +61,6 @@ import("etherpad.pro.pro_config");
 import("etherpad.collab.collabroom_server");
 import("etherpad.collab.collab_server");
 import("etherpad.collab.readonly_server");
-import("etherpad.collab.genimg");
 import("etherpad.pad.model");
 import("etherpad.pad.dbwriter");
 import("etherpad.pad.pad_migrations");
@@ -374,7 +372,6 @@ function handlePath() {
     ['/robots.txt', forward(static_control)],
     ['/crossdomain.xml', forward(static_control)],
     [PrefixMatcher('/static/'), forward(static_control)],
-    [PrefixMatcher('/ep/genimg/'), genimg.renderPath],
     [PrefixMatcher('/ep/pad/'), forward(pad_control)],
     [PrefixMatcher('/ep/script/'), forward(scriptcontrol)],
     [/^\/([^\/]+)$/, pad_control.render_pad],
@@ -395,7 +392,6 @@ function handlePath() {
     [DirMatcher('/ep/blog/'), forward(blogcontrol)],
     [DirMatcher('/ep/connection-diagnostics/'), forward(connection_diagnostics_control)],
     [DirMatcher('/ep/loadtest/'), forward(loadtestcontrol)],
-    [DirMatcher('/ep/tpne/'), forward(pne_tracker_control)],
     [DirMatcher('/ep/pro-account/'), forward(global_pro_account_control)],
     [/^\/ep\/pad\/history\/(\w+)\/(.*)$/, historycontrol.render_history],
     [PrefixMatcher('/ep/pad/slider/'), pad_control.render_slider],
