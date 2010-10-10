@@ -58,11 +58,9 @@ limitations under the License. */ %>
 	    <% 
 	// } 
 	} %>
+	<div id="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
 
 	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize" title="Toggle maximization"></a>
-               <!--
- <a href="/" id="topbaretherpad"><%= appjet.config.customBrandingName %></a>
-		-->
 	</div>
         <%: template.use('topBar'); %>
 	<div id="specialkeyarea"><!-- --></div>
