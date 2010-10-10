@@ -18,17 +18,10 @@ limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + ap
 
 <div class="fpcontent">
 
-  <div id="welcome-msg">
-    Welcome <%= account.fullName %>
-    <% if (account.isAdmin) { %>(Administrator)<% } %>
-    <br/>
-    <br/>
-  </div>
 
 
   <div id="homeright">
-    <a href="/ep/pad/newpad">
-      <img src="/static/img/davy/btn/createpad-small.gif" alt="Create new pad" />
+    <a href="/ep/pad/newpad" class="bigbuttonpro">Create a new pad
     </a>
 
     <% if (livePads.length > 0) { %>
@@ -52,6 +45,15 @@ limitations under the License. */ %><% helpers.setHtmlTitle(orgName + " - " + ap
     <% } %>
 
   </div>
+
+<div id="welcome-msg">
+    Welcome <%= account.fullName %>
+    <% if (account.isAdmin) { %>(Administrator)<% } %>
+    <br/>
+    <br/>
+  </div>
+
+
 
   <div id="homeleft">
     <div id="homeleft-title">
