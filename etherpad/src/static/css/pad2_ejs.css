@@ -33,10 +33,12 @@ body.squish2width #padpage { width: 700px; }
 #topbar { height: 25px; background: #326cbd url(/static/img/jun09/pad/padtopback2.gif) repeat-x left top;
   position: relative; }
 
-#topbarleft { float: left; height: 100%; overflow: hidden;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left top; width: 5px; }
+#topbarleft { float: left; height: 100%;  overflow: hidden;
+ background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left top; width: 5px; 
+
+ } 
 #topbarright { float: right; height: 100%; overflow: hidden;
-  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat right top; width: 5px; }
+ background: url(/static/img/jun09/pad/padtop5.gif) no-repeat right top; width: 5px; }
 
 .propad #topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
 .propad #topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
@@ -840,7 +842,7 @@ form#reconnectform { display: none; }
 #options-linenoslabel { position: absolute; left: 35px; top: 57px; }
 #options-fontlabel { position: absolute; left: 15px; top: 82px; }
 #viewfontmenu { position: absolute; top: 80px; left: 90px; width: 110px; }
-#options-viewexplain { position: absolute; left: 215px; top: 15px; width: 100px; height: 70px;
+#options-viewexplain { position: absolute; left: 215px; top: 15px; width: 100px; height: 70px; font-size: .7em;
   padding-left: 10px; padding-top: 10px; border-left: 1px solid #ccc;
   line-height: 20px; font-weight: bold; color: #999; }
 #options-close { display: block; position: absolute; right: 7px; bottom: 8px;
