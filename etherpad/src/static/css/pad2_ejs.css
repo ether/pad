@@ -46,7 +46,7 @@ body.squish2width #padpage { width: 700px; }
 
 a#backtoprosite, #accountnav {
   display: block; position: absolute; height: 15px; line-height: 15px;
-  width: auto; top: 5px; font-size: 1.2em;
+  width: auto; top: 5px; font-size: 1.2em; display:none;
 }
 a#backtoprosite, #accountnav a { color: #cde7ff; text-decoration: underline; }
 
@@ -849,7 +849,7 @@ form#reconnectform { display: none; }
 #options-close { display: block; position: absolute; right: 7px; bottom: 8px;
   width: auto; height: auto; font-size: 85%; color: #444; }
 
-#padsecurity { position: absolute; top: 0; left: 0; font-size: 1.2em;
+#padsecurity { position: absolute; top: 0; left: 0; font-size: 1.1em;
   color: #444; height: 100%; width: 100%; line-height: 15px; }
 #security-close { display: block; position: absolute; right: 7px; bottom: 8px;
   width: auto; height: auto; font-size: 85%; color: #444; }
