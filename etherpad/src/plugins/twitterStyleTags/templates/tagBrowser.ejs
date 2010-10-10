@@ -63,7 +63,8 @@ limitations under the License. */ %>
   <td>
     <h1>
       Query:
-      <% if (tags.length == 0 && antiTags.length == 0) { %>
+      <% var querySummary = template.callHook('querySummary', {}); %>
+      <% if (tags.length == 0 && antiTags.length == 0 && querySummary.length == 0) { %>
 	Latest changed pads
       <% } else { %>
 	<% for (i = 0; i < tags.length; i++) { %>
@@ -71,6 +72,9 @@ limitations under the License. */ %>
 	<% } %>
 	<% for (i = 0; i < antiTags.length; i++) { %>
 	  <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
+	<% } %>
+	<% for (i = 0; i < querySummary.length; i++) { %>
+	  <%= querySummary[i] %>
 	<% } %>
       <% } %>
     </h1>
@@ -81,15 +85,18 @@ limitations under the License. */ %>
   <div id="editorcontainer">
    <div class="query-refiner">
     <%: template.use('queryRefiner', function() { var ejs_data=''; %>
-     <h1>Search for pads that have the tag</h1>
-     <% for (i = 0; i < newTags.length; i++) { %>
-      <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags)}) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
-     <% } %>
+     <div>
+       <h1>Search for pads that have the tag</h1>
+       <% for (i = 0; i < newTags.length; i++) { %>
+	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags)}) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
+       <% } %>
 
-     <h1>Search for pads that <em>don't</em> have the tag</h1>
-     <% for (i = 0; i < newTags.length; i++) { %>
-      <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname]))}) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
-     <% } %>
+       <h1>Search for pads that <em>don't</em> have the tag</h1>
+       <% for (i = 0; i < newTags.length; i++) { %>
+	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname]))}) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
+       <% } %>
+     </div>
+     <%= template.callHookStr('queryRefiner', {}, '', '', '')  %>
     <% return ejs_data; }); %>
    </div>
 

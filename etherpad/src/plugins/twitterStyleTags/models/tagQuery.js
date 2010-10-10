@@ -172,7 +172,6 @@ function newTagsSql(querySql) {
   var queryNrSql = nrSql(querySql);
   info["query_nr_sql"] = queryNrSql.sql;
   queryNrParams = queryNrSql.params;
-
   return {
    sql: stringFormat('' +
     'select ' +
@@ -195,7 +194,7 @@ function newTagsSql(querySql) {
     ' abs(count(tp.PAD_ID) - (tn.total / 2)) asc ' +
     'limit 10 ' +
     '', info),
-   params: queryNrParams.concat(queryParams)};
+   params: queryNrParams.concat(queryParams.concat([]))};
 }
 
 /* Select the X last changed matching pads and some extra information
