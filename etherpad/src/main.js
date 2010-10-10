@@ -43,7 +43,6 @@ import("etherpad.control.loadtestcontrol");
 import("etherpad.control.maincontrol");
 import("etherpad.control.pad.pad_control");
 import("etherpad.control.pne_manual_control");
-import("etherpad.control.pne_tracker_control");
 import("etherpad.control.pro.admin.license_manager_control");
 import("etherpad.control.pro_beta_control");
 import("etherpad.control.pro.pro_main_control");
