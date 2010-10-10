@@ -849,7 +849,7 @@ form#reconnectform { display: none; }
 #options-close { display: block; position: absolute; right: 7px; bottom: 8px;
   width: auto; height: auto; font-size: 85%; color: #444; }
 
-#padsecurity { position: absolute; top: 0; left: 0; font-size: 1.2em;
+#padsecurity { position: absolute; top: 0; left: 0; font-size: 1.1em;
   color: #444; height: 100%; width: 100%; line-height: 15px; }
 #security-close { display: block; position: absolute; right: 7px; bottom: 8px;
   width: auto; height: auto; font-size: 85%; color: #444; }
