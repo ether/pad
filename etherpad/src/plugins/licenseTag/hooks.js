@@ -4,5 +4,5 @@ import("etherpad.utils.*");
 import("etherpad.globals.*");
 
 function tagSelectors(arg) {
-  return arg.template.include('licenseTagTagSelectors.ejs', undefined, ['licenseTag']);
+  return [arg.template.include('licenseTagTagSelectors.ejs', undefined, ['licenseTag'])];
 }
