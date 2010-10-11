@@ -233,7 +233,7 @@ class StreamingSocket(val id: String, handler: SocketConnectionHandler) {
   lazy val attributes = new HashMap[String, String] with SynchronizedMap[String, String];
   
   def channel(typ: String, create: Boolean, subType: String): Option[Channel] = {
-    val channelType = ChannelType.valueOf(typ);
+    val channelType = ChannelType.withNameOpt(typ);
     if (channelType.isEmpty) {
       streaminglog(Map(
         "type" -> "error",
@@ -311,7 +311,7 @@ class StreamingSocket(val id: String, handler: SocketConnectionHandler) {
       }
     }
   }
-  def getUnconfirmedMessages(channel: Channel): Collection[SocketMessage] = {
+  def getUnconfirmedMessages(channel: Channel): Iterable[SocketMessage] = {
     synchronized {
       if (currentChannel.isDefined && currentChannel.get == channel) {
         for (i <- lastConfirmedSeqNumber+1 until lastSentSeqNumber+1) 
@@ -337,7 +337,7 @@ class StreamingSocket(val id: String, handler: SocketConnectionHandler) {
   def useChannel(seqNo: Int, channelType0: String, req: HttpServletRequest) = synchronized {
     if (seqNo <= lastChannelUpdate) false else {
       lastChannelUpdate = seqNo;
-      val channelType = ChannelType.valueOf(channelType0);
+      val channelType = ChannelType.withNameOpt(channelType0);
       if (channelType.isDefined) {
         val channel = activeChannels.get(channelType.get);
         if (channel.isDefined) {
@@ -424,6 +424,10 @@ class StreamingSocket(val id: String, handler: SocketConnectionHandler) {
 
 object ChannelType extends Enumeration("shortpolling", "longpolling", "streaming") {
   val ShortPolling, LongPolling, Streaming = Value;
+
+  /* Enumeration.valueOf is deprecated in Scala 2.8, but the replacement (withName) is not suitable for the
+   * case where we don't know if an Enumeration exists with the provided name */
+  def withNameOpt(s: String): Option[ChannelType.Value] = values.find(_.toString == s)
 }
 
 object Channels {
@@ -789,7 +793,7 @@ class StreamingSocketServlet extends HttpServlet {
               "type" -> "event",
               "event" -> "restart-failure",
               "connection" -> socketId));
-            val failureChannel = ChannelType.valueOf(channelType).map(Channels.createNew(_, null, subType));
+            val failureChannel = ChannelType.withNameOpt(channelType).map(Channels.createNew(_, null, subType));
             if (failureChannel.isDefined) {
               failureChannel.get.sendRestartFailure(ec);
             } else {
