@@ -4,6 +4,7 @@ import("plugins.twitterStyleTags.models.tagQuery");
 import("sqlbase.sqlobj");
 import("etherpad.collab.server_utils");
 import("etherpad.utils");
+import("fastJSON");
 
 function padModelWriteToDB(args) {
   /* Update tags for the pad */
@@ -109,6 +110,12 @@ function queryFormat() {
 	if (request.acceptsGzip) {
 	  response.setGzip(true);
 	}
+      } else if (format == "json") {
+	response.setContentType("application/json; charset=utf-8");
+	response.write(fastJSON.stringify(info));
+	if (request.acceptsGzip) {
+	  response.setGzip(true);
+	}
       } else {
         throw new Error("Unknown format " + format);
       }
@@ -118,7 +125,8 @@ function queryFormat() {
 
   return [{'pads.html': createFormat('html'),
            'pads.rss': createFormat('rss'),
-           'pads.sitemap': createFormat('sitemap')
+           'pads.sitemap': createFormat('sitemap'),
+           'pads.json': createFormat('json')
          }];
 }
 
