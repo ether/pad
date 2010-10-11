@@ -107,7 +107,6 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
       state.rightWidth = $(right).width();
       state.minLeft = minLeft;
       state.maxLeft = (state.leftWidth + state.rightWidth) - minRight;
-      console.log({"Max left": state.maxLeft});
     } else if (eType == 'dragend' || eType == 'dragupdate') {
       var change = evt.pageX - state.startX;
 
@@ -126,7 +125,6 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
 
       if (change == 0) {
 	if (rightWidth != minRight || state.lastRightWidth == undefined) {
-	 console.log({rightWidth:rightWidth, minRight:minRight});
 	  state.lastRightWidth = rightWidth;
 	  rightWidth = minRight;
         } else {
