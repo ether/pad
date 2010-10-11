@@ -237,7 +237,7 @@ class ResponseWrapper(val res: HttpServletResponse) {
     headers += ((name, value, res => res.addHeader(name, value)));
   }
   def getHeader(name: String) = {
-    headers.filter(_._1 == name).map(_._2).toSeq.toArray;
+    headers.filter(_._1 == name).toArray.map(_._2);
   }
   def removeHeader(name: String) {
     headers.removeAll(name);
