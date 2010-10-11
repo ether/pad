@@ -1,0 +1,55 @@
+.padtag a,
+.padtag a:visited,
+a.padtag,
+a.padtag:visited,
+a.anti_padtag,
+a.anti_padtag:visited {
+ line-height: 1.7em;
+}
+
+dt {
+  padding-bottom: 2pt;
+}
+
+dd {
+  padding-left: 20pt;
+  padding-bottom: 10pt;
+}
+
+h1 {
+ font-size: 12pt;
+ margin-top: 5pt;
+}
+
+.label {
+ font-size: 14pt;
+}
+
+#editorcontainer {
+ padding: 5pt;
+ height: auto;
+}
+
+#editorcontainerbox {
+ overflow: auto;
+ height: auto;
+}
+
+
+.query-refiner {
+ float: right;
+ padding: 10pt;
+ margin-left: 5pt;
+ margin-bottom: 5pt;
+ border: 1px solid #9C9C9C;
+ width: 40%;
+}
+
+.query-refiner h1 {
+ margin-bottom: 2pt;
+ margin-top: 0;
+}
+
+#padchat iframe {
+ border: none;
+}

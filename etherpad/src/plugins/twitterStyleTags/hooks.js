@@ -1,11 +1,9 @@
 import("etherpad.log");
 import("dispatch.{Dispatcher,PrefixMatcher,forward}");
-import("plugins.twitterStyleTags.controllers.tagBrowser");
+import("plugins.twitterStyleTags.models.tagQuery");
 import("sqlbase.sqlobj");
-
-function handlePath() {
-  return [[PrefixMatcher('/ep/tag/'), forward(tagBrowser)]];
-}
+import("etherpad.collab.server_utils");
+import("etherpad.utils");
 
 function padModelWriteToDB(args) {
   /* Update tags for the pad */
@@ -46,14 +44,96 @@ function padModelWriteToDB(args) {
   }
 }
 
-function docbarItemsAll() {
- return ["<td class='docbarbutton highlight'><a href='/ep/tag/'><img src='/static/img/plugins/twitterStyleTags/icon_home.gif'>Home</a></td>"];
+function queryAccessSql(args) {
+  return [function (querySql) {
+    return tagQuery.getQueryToSql(['public'], [], querySql);
+  }];
 }
 
-function docbarItemsTagBrowser() {
- return ["<td class='docbarbutton'><a href='/ep/tag/'>Pads</a></td>"];
+function queryToSql(args) {
+  return [function (querySql) {
+    if (request.params.query == undefined || request.params.query == '') {
+      return querySql;
+    } else  {
+      var tags = tagQuery.queryToTags(request.params.query);
+
+      return tagQuery.getQueryToSql(tags.tags, tags.antiTags, querySql);
+    }
+  }];
+}
+
+function queryExtra() {
+  return [function (querySql, info, clientVars) {
+    var tags = tagQuery.queryToTags(request.params.query);
+
+    var queryNewTagsSql = tagQuery.newTagsSql(querySql);
+    var newTags = sqlobj.executeRaw(queryNewTagsSql.sql, queryNewTagsSql.params);
+
+    info.tagQuery = tagQuery;
+    info.tags = tags.tags;
+    info.antiTags = tags.antiTags;
+    info.newTags = newTags;
+    info.padIdToReadonly = server_utils.padIdToReadonly;
+  }];
+}
+
+function queryFormat() {
+  function createFormat(format) {
+    return function (querySql, info, clientVars) {
+      var tags = tagQuery.queryToTags(request.params.query);
+
+      var limit = 10;
+      if (format == 'sitemap')
+	limit = undefined;
+
+      padSql = tagQuery.padInfoSql(querySql, limit);
+      var matchingPads = sqlobj.executeRaw(padSql.sql, padSql.params);
+
+      for (i = 0; i < matchingPads.length; i++) {
+	matchingPads[i].TAGS = matchingPads[i].TAGS.split('#');
+      }
+      
+      info.matchingPads = matchingPads;
+
+      if (format == "html") {
+	utils.renderHtml("tagBrowser.ejs", info, ['twitterStyleTags', 'search']);
+      } else if (format == "rss") {
+	response.setContentType("application/xml; charset=utf-8");
+	response.write(utils.renderTemplateAsString("tagRss.ejs", info, ['twitterStyleTags', 'search']));
+	if (request.acceptsGzip) {
+	  response.setGzip(true);
+	}
+      } else if (format == "sitemap") {
+	response.setContentType("application/xml; charset=utf-8");
+	response.write(utils.renderTemplateAsString("tagSitemap.ejs", info, ['twitterStyleTags', 'search']));
+	if (request.acceptsGzip) {
+	  response.setGzip(true);
+	}
+      } else {
+        throw new Error("Unknown format " + format);
+      }
+      return true;
+    };
+  }
+
+  return [{'pads.html': createFormat('html'),
+           'pads.rss': createFormat('rss'),
+           'pads.sitemap': createFormat('sitemap')
+         }];
+}
+
+function querySummary(args) {
+ return [args.template.include("twitterStyleTagsQuerySummary.ejs", {}, ['twitterStyleTags'])];
+}
+
+function queryRefiner(args) {
+ return [args.template.include("twitterStyleTagsQueryRefiner.ejs", {}, ['twitterStyleTags'])];
+}
+
+function docbarItemsSearch() {
+ return ["<td class='docbarbutton'><a href='/ep/search?type=pads'>Pads</a></td>"];
 }
 
 function editBarItemsLeftPad(arg) {
-  return arg.template.include('twitterStyleTagsEditbarButtons.ejs', undefined, ['twitterStyleTags']);
+  return [arg.template.include('twitterStyleTagsEditbarButtons.ejs', undefined, ['twitterStyleTags'])];
 }

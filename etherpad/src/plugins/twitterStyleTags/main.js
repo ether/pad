@@ -5,16 +5,21 @@ import("sqlbase.sqlobj");
 import("sqlbase.sqlcommon");
 
 function twitterStyleTagsInit() {
- this.hooks = ['handlePath', 'aceGetFilterStack', 'aceCreateDomLine', 'padModelWriteToDB', 'docbarItemsAll', 'docbarItemsTagBrowser', 'editBarItemsLeftPad'];
+ this.hooks = ['aceGetFilterStack', 'aceCreateDomLine', 'padModelWriteToDB', 'docbarItemsSearch', 'editBarItemsLeftPad', 'queryToSql', 'queryExtra', 'querySummary', 'queryRefiner', 'queryFormat', 'queryAccessSql'];
  this.client = new main.twitterStyleTagsInit();
  this.description = 'Twitter-style tags allows the user to tag pads by writing #tagname anywhere in the pad text. Tags are automatically linked to searches for that tag in other pads. This plugin also provides an alternative home-page for Etherpad with a display of the last changed public pads as well as that information available as an RSS stream.';
  this.handlePath = hooks.handlePath;
  this.aceGetFilterStack = main.twitterStyleTagsInit.prototype.aceGetFilterStack;
  this.aceCreateDomLine = main.twitterStyleTagsInit.prototype.aceCreateDomLine;
  this.padModelWriteToDB = hooks.padModelWriteToDB;
- this.docbarItemsAll = hooks.docbarItemsAll;
- this.docbarItemsTagBrowser = hooks.docbarItemsTagBrowser;
+ this.docbarItemsSearch = hooks.docbarItemsSearch;
  this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
+ this.queryToSql = hooks.queryToSql;
+ this.queryExtra = hooks.queryExtra;
+ this.querySummary = hooks.querySummary;
+ this.queryRefiner = hooks.queryRefiner;
+ this.queryFormat = hooks.queryFormat;
+ this.queryAccessSql = hooks.queryAccessSql;
 
  this.install = install;
  this.uninstall = uninstall;

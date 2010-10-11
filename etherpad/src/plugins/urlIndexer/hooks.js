@@ -1,10 +1,37 @@
 import("etherpad.log");
 import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 import("sqlbase.sqlobj");
-import("plugins.urlIndexer.controllers.urlBrowser");
+import("etherpad.helpers");
+import("etherpad.collab.server_utils");
+import("etherpad.utils.*");
 
-function handlePath() {
-  return [[PrefixMatcher('/ep/url'), forward(urlBrowser)]];
+function urlSql(querySql, limit, offset) {
+  var sql = '' +
+   'select ' +
+   '  u.URL, ' +
+   '  m.id as ID, ' +
+   '  DATE_FORMAT(m.lastWriteTime, \'%a, %d %b %Y %H:%i:%s GMT\') as lastWriteTime, ' +
+   '  c.TAGS ' +
+   'from ' +
+      querySql.sql + ' as q ' +
+   '  join PAD_SQLMETA as m on ' +
+   '    m.id = q.ID ' +
+   '  join PAD_TAG_CACHE as c on ' +
+   '    c.PAD_ID = q.ID ' +
+   '  join PAD_URL as u on ' +
+   '    u.PAD_ID = q.ID ' +
+   'where ' +
+   '  m.id NOT LIKE \'%$%\'' +
+   'order by ' +
+   '  u.URL asc ';
+  if (limit != undefined)
+   sql += 'limit ' + limit + " ";
+  if (offset != undefined)
+   sql += 'offset ' + offset + " ";
+  return {
+   sql: sql,
+   params: querySql.params
+  };
 }
 
 REGEX_WORDCHAR = /[\u0030-\u0039\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF\u0100-\u1FFF\u3040-\u9FFF\uF900-\uFDFF\uFE70-\uFEFE\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFDC]/;
@@ -43,7 +70,29 @@ function padModelWriteToDB(args) {
   }
 }
 
-function docbarItemsTagBrowser() {
- return ["<td class='docbarbutton'><a href='/ep/url/'>URLs</a></td>"];
+function queryFormat() {
+ return [{'urls.html': function (querySql, info, clientVars) {
+   url = urlSql(querySql, 10);
+   var matchingUrls = sqlobj.executeRaw(url.sql, url.params);
+
+   for (i = 0; i < matchingUrls.length; i++) {
+     matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');
+   }
+
+   helpers.addClientVars(clientVars);
+
+   //info.tagQuery. = tagQuery;
+   info.padIdToReadonly = server_utils.padIdToReadonly;
+   info.matchingPads = [];
+   info.matchingUrls = matchingUrls;
+
+   renderHtml("urlBrowser.ejs", info, ['urlIndexer', 'search']);
+   return true;
+ }}];
+}
+
+
+function docbarItemsSearch() {
+ return ["<td class='docbarbutton'><a href='/ep/search?type=urls'>URLs</a></td>"];
 }
 
