@@ -76,8 +76,8 @@ class LoggableFromMap[T](
   extra: Option[scala.collection.Map[String, String]])
     extends LoggablePropertyBag {
   def this(map: scala.collection.Map[String, T]) = this(map, None);
-  val keys = map.keys.collect.toArray ++
-    extra.map(_.keys.collect.toArray).getOrElse(Array[String]());
+  val keys = map.keys.toArray ++
+    extra.map(_.keys.toArray).getOrElse(Array[String]());
   Sorting.quickSort(keys);
 
   def fillJson(json: JSONObject, 
@@ -121,7 +121,7 @@ class LoggableFromMap[T](
 class LoggableFromJson(val json: String) extends LoggablePropertyBag {
   val obj = JSONObject.fromObject(json);
   val date = new Date(obj.getLong("date"));
-  val keys = obj.keys().map(String.valueOf(_)).collect.toArray;
+  val keys = obj.keys().map(String.valueOf(_)).toArray;
   // FIXME: is now not sorted in any particular order.
   def value(k: String) = obj.get(k);
   val tabDelimited =
