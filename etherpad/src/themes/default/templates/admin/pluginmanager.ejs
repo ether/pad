@@ -31,24 +31,37 @@ limitations under the License. */ %>
    <table>
     <tr>
      <th>Module name</th>
+    <th>Description</th>
      <th>Status</th>
-     <th></th>
+     <th>Action</th>
     </tr>
     <% for (var plugin in plugin_registry.pluginModules) { %>
      <tr>
+<td style="font-weight:bold;">
+       <%= plugin %>
+
+<!--
       <td class="mousover_parent">
        <%= plugin %>
        <div class="mouseover_child">
 	<%= plugin_registry.pluginModules[plugin].description %>
+-->
        </div>
       </td>
-      <td>
-       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
-	Installed
-       <% } else { %>
-	Not installed
-       <% } %>
+	<td>
+        <%= plugin_registry.pluginModules[plugin].description %>
       </td>
+
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
+      <td class="installed">
+	Installed
+      </td>
+
+       <% } else { %>
+      <td class="notinstalled">
+	Not installed
+      </td>
+       <% } %>
       <td>
        <% if (plugin_registry.plugins[plugin] !== undefined) { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
