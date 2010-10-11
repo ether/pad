@@ -20,8 +20,6 @@ function urlSql(querySql, limit, offset) {
    '    c.PAD_ID = q.ID ' +
    '  join PAD_URL as u on ' +
    '    u.PAD_ID = q.ID ' +
-   'where ' +
-   '  m.id NOT LIKE \'%$%\'' +
    'order by ' +
    '  u.URL asc ';
   if (limit != undefined)
@@ -76,7 +74,9 @@ function queryFormat() {
    var matchingUrls = sqlobj.executeRaw(url.sql, url.params);
 
    for (i = 0; i < matchingUrls.length; i++) {
-     matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');
+     if (matchingUrls[i].TAGS != undefined) {
+       matchingUrls[i].TAGS = matchingUrls[i].TAGS.split('#');
+     }
    }
 
    helpers.addClientVars(clientVars);

@@ -4,6 +4,7 @@ import("plugins.twitterStyleTags.models.tagQuery");
 import("sqlbase.sqlobj");
 import("etherpad.collab.server_utils");
 import("etherpad.utils");
+import("etherpad.pad.padutils");
 import("fastJSON");
 
 function padModelWriteToDB(args) {

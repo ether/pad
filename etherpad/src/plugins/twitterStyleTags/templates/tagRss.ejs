@@ -50,6 +50,9 @@
 	   if (!inArray('writable', matchingPads[i].TAGS)) {
 	     matchingPadId = padIdToReadonly(matchingPads[i].ID);
 	     matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+	   } else if (padutils.isProPadId(matchingPadId)) {
+	     matchingPadId = padutils.globalToLocalId(matchingPadId);
+	     matchingPadUrl = matchingPadId;
 	   }
         %>
 	<item>

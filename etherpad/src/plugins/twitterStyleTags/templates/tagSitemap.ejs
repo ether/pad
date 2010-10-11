@@ -53,6 +53,8 @@
        var matchingPadId = matchingPads[i].ID;
        if (!inArray('writable', matchingPads[i].TAGS)) {
 	 matchingPadId = padIdToReadonly(matchingPads[i].ID);
+       } else if (padutils.isProPadId(matchingPadId)) {
+         matchingPadId = padutils.globalToLocalId(matchingPadId);
        }
        matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
     %>

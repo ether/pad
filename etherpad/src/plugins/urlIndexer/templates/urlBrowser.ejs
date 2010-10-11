@@ -37,6 +37,9 @@ limitations under the License. */ %>
       if (!inArray('writable', matchingUrls[i].TAGS)) {
 	matchingPadId = padIdToReadonly(matchingUrls[i].ID);
 	matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+      } else if (padutils.isProPadId(matchingPadId)) {
+        matchingPadId = padutils.globalToLocalId(matchingPadId);
+        matchingPadUrl = matchingPadId;
       }
  %>
   <dt><a href="<%= matchingUrls[i].URL %>"><%= matchingUrls[i].URL %></a><dt>

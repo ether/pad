@@ -24,6 +24,7 @@ import("etherpad.globals.*");
 import("etherpad.log");
 import("etherpad.pad.padusers");
 import("etherpad.pro.pro_utils");
+import("etherpad.pro.domains");
 import("etherpad.helpers");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("sqlbase.sqlbase");
@@ -45,7 +46,12 @@ function onRequest() {
   if (format == "sitemap")
     var limit = undefined;
 
-  var querySql = {'sql': '(select ID from PAD_META)', 'params': []}
+  var domainSql = "ID NOT LIKE '%$%'";
+  if (pro_utils.isProDomainRequest()) {
+   domainSql = "ID LIKE '" + domains.getRequestDomainRecord().id + "$%'";
+  }
+
+  var querySql = {'sql': "(select ID from PAD_META where " + domainSql + ")", 'params': []}
 
   var hooks = plugins.callHook('queryAccessSql');
   if (hooks.length == 0) {
@@ -73,6 +79,7 @@ function onRequest() {
   var info = {
     bodyClass: 'nonpropad',
     config: appjet.config,
+    padutils: padutils
   };
 
   var hooks = plugins.callHook('queryExtra');
