@@ -67,7 +67,7 @@ class JSCompileException(message: String, cause: org.mozilla.javascript.Evaluato
         val end_i = Math.min(errorLine+rad, code.length)-1;
         (start_i+1, end_i+1, code.slice(start_i, end_i+1));
       }
-    }).concat(List(super.frames: _*));
+    }) ++ super.frames;
 }
 
 private[bodylock] class InnerExecutable(val code: String, val script: Script) extends Executable {

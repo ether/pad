@@ -347,8 +347,8 @@ class FixedDiskLibrary(srcfile: JarOrNotFile) extends DiskLibrary(srcfile.name) 
 
 class VariableDiskLibrary(libName: String) extends DiskLibrary(libName) {
   lazy val files0 = 
-    Array.concat(Array(new MirroredJarOrNotFile(null, libName)),
-                 config.moduleRoots.map(f => new JarOrNotFile(f, libName)))
+    Array(new MirroredJarOrNotFile(null, libName)) ++
+                 config.moduleRoots.map(f => new JarOrNotFile(f, libName))
   files0.foreach(_.subscribe(this));
 
   override def files = files0;
