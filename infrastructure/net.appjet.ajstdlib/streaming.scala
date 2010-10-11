@@ -17,6 +17,7 @@
 package net.appjet.ajstdlib;
 
 import scala.collection.mutable.{Queue, HashMap, SynchronizedMap, ArrayBuffer};
+import scala.collection.JavaConversions.asIterator;
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpServlet};
 import org.mortbay.jetty.servlet.{ServletHolder, Context};
 import org.mortbay.jetty.{HttpConnection, Handler, RetryRequest};
@@ -30,7 +31,6 @@ import java.lang.ref.WeakReference;
 import org.mozilla.javascript.{Context => JSContext, Scriptable};
 
 import net.appjet.oui._;
-import net.appjet.oui.Util.enumerationToRichEnumeration;
 import net.appjet.common.util.HttpServletRequestFactory;
 
 trait SocketConnectionHandler {

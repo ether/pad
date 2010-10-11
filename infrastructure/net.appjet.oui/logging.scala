@@ -25,13 +25,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import scala.util.Sorting;
 import scala.ref.WeakReference;
 import scala.collection.mutable.{Map, HashMap};
-import scala.collection.jcl.{SetWrapper, Conversions};
 
 import net.sf.json.{JSONObject, JSONArray};
 import org.mozilla.javascript.{Scriptable, Context};
 
-import Util.iteratorToRichIterator;
-import scala.collection.jcl.Conversions._;
+import scala.collection.JavaConversions;
+import JavaConversions._;
 
 trait LoggablePropertyBag {
   def date: Date;
@@ -154,7 +153,7 @@ object GenericLoggerUtils {
   }
   
   val registeredWranglers = 
-    new ConcurrentHashMap[String, SetWrapper[WeakReference[LogWrangler]]];
+    new ConcurrentHashMap[String, scala.collection.mutable.Set[WeakReference[LogWrangler]]];
   def registerWrangler(name: String, wrangler: LogWrangler) {
     wranglers(name) += wrangler.ref;
   }
@@ -163,7 +162,7 @@ object GenericLoggerUtils {
   }
   def wranglers(name: String) = {
     if (! registeredWranglers.containsKey(name)) {
-      val set1 = Conversions.convertSet(
+      val set1 = JavaConversions.asSet(
         new CopyOnWriteArraySet[WeakReference[LogWrangler]]);
       val set2 = registeredWranglers.putIfAbsent(
         name, set1);
@@ -504,12 +503,12 @@ class TopNWrangler(n: Int, `type`: String,
   val entries = new ConcurrentHashMap[String, AtomicInteger]();
   def sortedEntries = {
     Sorting.stableSort(
-      convertMap(entries).toSeq, 
+      entries.toSeq, 
       (p1: (String, AtomicInteger), p2: (String, AtomicInteger)) => 
         p1._2.get() > p2._2.get());
   }
   def count = {
-    (convertMap(entries) :\ 0) { (x, y) => x._2.get() + y }
+    (entries :\ 0) { (x, y) => x._2.get() + y }
   }
   
   def topNItems(n: Int): Array[(String, Int)] = 

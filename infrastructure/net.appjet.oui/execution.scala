@@ -24,15 +24,14 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpServlet}
 
 import scala.collection.mutable.{ListBuffer, LinkedHashSet, HashMap, ArrayBuffer};
 import scala.collection.immutable.Map;
-import scala.collection.jcl.Conversions;
+import scala.collection.JavaConversions;
+import JavaConversions.asIterator;
 
 import org.mozilla.javascript.{Scriptable, Context, Function, ScriptableObject, JavaScriptException};
 import org.mortbay.jetty.RetryRequest;
 
 import net.appjet.bodylock.{BodyLock, Executable, JSRuntimeException, JSCompileException};
 import net.appjet.common.util.{HttpServletRequestFactory, BetterFile};
-
-import Util.enumerationToRichEnumeration;
 
 // Removed due to licensing issues; REMOVED_COS_OF_COS
 // import com.oreilly.servlet.MultipartFilter;
@@ -41,7 +40,7 @@ class RequestWrapper(val req: HttpServletRequest) {
   req.setCharacterEncoding("UTF-8");
 // REMOVED_COS_OF_COS ... ?
 //   private lazy val parameterNames =
-//     (for (i <- Conversions.convertSet(req.getParameterMap.keySet().asInstanceOf[java.util.Set[String]])) yield i).toList.toArray
+//     (for (i <- JavaConversions.asSet(req.getParameterMap.keySet().asInstanceOf[java.util.Set[String]])) yield i).toList.toArray
 //   private def parameterValues(k: String) = req.getParameterValues(k);
   def headerCapitalize(s: String) =
     s.split("-").map(
@@ -94,7 +93,7 @@ class RequestWrapper(val req: HttpServletRequest) {
       }
       req.getAttribute("ajcache_parameters").asInstanceOf[Map[String, Array[String]]];
     } else {
-      Conversions.convertMap(req.getParameterMap().asInstanceOf[java.util.Map[String, Array[String]]]);
+      JavaConversions.asMap(req.getParameterMap().asInstanceOf[java.util.Map[String, Array[String]]]): collection.Map[String, Array[String]];
     }
   }
   
@@ -561,11 +560,11 @@ object execution {
       if (currentContext != null) {
         currentContext.request;
       } else {
-        val fakeHeaders = scala.collection.jcl.Conversions.convertMap(
+        val fakeHeaders = JavaConversions.asMap(
           new java.util.HashMap[String, String]); 
         fakeHeaders("Host") = "unknown.local";
         new RequestWrapper(HttpServletRequestFactory.createRequest(
-            "/", fakeHeaders.underlying, "GET", null)) { 
+            "/", JavaConversions.asMap(fakeHeaders), "GET", null)) { 
           override val isFake = true;
         }
       }
@@ -609,11 +608,11 @@ object execution {
         if (currentContext != null) {
           currentContext.request;
         } else {
-          val fakeHeaders = scala.collection.jcl.Conversions.convertMap(
+          val fakeHeaders = JavaConversions.asMap(
             new java.util.HashMap[String, String]); 
           fakeHeaders("Host") = "unknown.local";
           new RequestWrapper(HttpServletRequestFactory.createRequest(
-              "/", fakeHeaders.underlying, "GET", null)) { 
+              "/", JavaConversions.asMap(fakeHeaders), "GET", null)) { 
             override val isFake = true;
           }
         }
