@@ -31,7 +31,7 @@ trait BucketMap extends scala.collection.mutable.Map[Int, BucketedLastHits] {
   }};
 }
 
-abstract class BucketKeeper[A, B](val size: Long, val numbuckets: int, val noUpdate: Boolean) {
+abstract class BucketKeeper[A: ClassManifest, B: ClassManifest](val size: Long, val numbuckets: Int, val noUpdate: Boolean) {
   def this(size: Long, noUpdate: Boolean) = 
     this(size, Math.max(100, if (noUpdate) 1 else (size/60000).toInt), noUpdate)
   def this(size: Long) = this(size, false);
