@@ -23,7 +23,8 @@ import java.io.{File, FileNotFoundException, FileInputStream, IOException, ByteA
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.WeakHashMap;
 
-import scala.collection.mutable.{Subscriber, Message, Reset=>SReset};
+import scala.collection.mutable.Subscriber;
+import scala.collection.script.{Message, Reset=>SReset}
 import scala.collection.JavaConversions._;
 
 trait WeakPublisher[A, This <: WeakPublisher[A, This]] { self: This => 
