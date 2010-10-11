@@ -23,12 +23,8 @@ import scala.util.Sorting;
 
 trait BucketMap extends scala.collection.mutable.Map[Int, BucketedLastHits] {
   def t = 1000*60;
-  override def apply(s: int) = synchronized { getOrElseUpdate(s, new BucketedLastHits(t)) };
-  def counts = { val p = this; new scala.collection.Map.Projection[int, int] {
-    def size = p.size;
-    def get(s: int) = p.get(s).map(_.count);
-    def elements = p.elements.map(o => (o._1, o._2.count));
-  }};
+  override def apply(s: Int) = synchronized { getOrElseUpdate(s, new BucketedLastHits(t)) };
+  def counts = mapValues(_.count)
 }
 
 abstract class BucketKeeper[A: ClassManifest, B: ClassManifest](val size: Long, val numbuckets: Int, val noUpdate: Boolean) {
