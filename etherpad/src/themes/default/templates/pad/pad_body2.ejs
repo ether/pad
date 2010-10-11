@@ -385,10 +385,6 @@ limitations under the License. */ %>
 
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
   <td class="editbarbutton editbargroupsfirst"><select id="viewzoommenu"><option value="z85">85%</option><option value="z100">100%</option><option value="z115">115%</option><option value="z150">150%</option><option value="z200">200%</option><option value="z300">300%</option></select></td>
-
-  <% if (appjet.config.themeShowReadOnlyLink == "true") { %>
-    <td class="editbarbutton"><a href="/ep/pad/view/<%= padIdReadonly %>/latest" title="Link to read only version"><img src="/static/img/jun09/pad/editbar_readonly.gif"></a></td>
-  <% } %>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
 <% return ejs_data; }); %>
 
