@@ -34,7 +34,17 @@ limitations under the License. */ %>
      <th>Status</th>
      <th></th>
     </tr>
-    <% for (var plugin in plugin_registry.pluginModules) { %>
+    <%
+      var plugins = [];
+      for (var plugin in plugin_registry.pluginModules) {
+        plugins.push(plugin);
+      }
+      plugins = plugins.sort();
+    %>
+    <%
+      for (var i = 0; i < plugins.length; i++) {
+        var plugin = plugins[i];
+    %>
      <tr>
       <td class="mousover_parent">
        <%= plugin %>
