@@ -41,7 +41,7 @@ def superpack(input: String): String = {
   val thingsToReplace:Seq[String] = estimatedSavings.map(_._1);
   assert(encodeNames.length >= thingsToReplace.length);
   
-  val replacements = Map(thingsToReplace.elements.zipWithIndex.map({
+  val replacements = Map(thingsToReplace.iterator.zipWithIndex.map({
     case (str, i) => (str, encodeNames(i));
   }).toSeq:_*);
   def encode(tk: String) = if (replacements.contains(tk)) replacements(tk) else tk;

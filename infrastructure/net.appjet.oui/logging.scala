@@ -447,7 +447,7 @@ object cometlatencies {
             }.asInstanceOf[Map[String, Int]]);
             eventlog.log(
               Map("type" -> "streaming-connection-count") ++ 
-              lastCount.get.elements.map(p => (p._1, String.valueOf(p._2))));
+                lastCount.get.iterator.map(p => (p._1, String.valueOf(p._2))));
           } catch {
             case e: Exception => {
               exceptionlog(e);
