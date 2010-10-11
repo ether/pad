@@ -104,7 +104,7 @@ extends BucketKeeper[Set[Any], Int](size, noUpdate) {
   }
   
   override def mergeBuckets(b: Seq[Set[Any]]) = {
-    b.foldLeft(scala.collection.immutable.Set[Any]())(_ ++ _).size;
+    b.foldLeft(collection.mutable.Set[Any]())(_ ++= _).size;
   }
   
   def hit(d: Date, value: Any): Unit = withSyncUpdate {
