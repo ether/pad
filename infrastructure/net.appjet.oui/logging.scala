@@ -88,8 +88,8 @@ class LoggableFromMap[T](
         case i: Int => json.put(k, i);
         case l: Long => json.put(k, l);
         case m: java.util.Map[_,_] => json.put(k, m);
-        case m: scala.collection.Map[String,T] => 
-          json.put(k, fillJson(new JSONObject(), m));
+        case m: scala.collection.Map[_,_] => 
+          json.put(k, fillJson(new JSONObject(), m.asInstanceOf[scala.collection.Map[String, T]]));
         case c: java.util.Collection[_] => json.put(k, c);
         case o: Object => json.put(k, o);
         case _ => {};
