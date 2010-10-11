@@ -24,7 +24,8 @@ import java.lang.annotation.Annotation;
 import java.text.SimpleDateFormat;
 
 import scala.collection.mutable.{HashMap, SynchronizedMap, HashSet};
-import scala.collection.jcl.{IterableWrapper, Conversions};
+import scala.collection.JavaConversions;
+import JavaConversions.asIterator
 
 import org.mortbay.thread.QueuedThreadPool;
 import org.mortbay.jetty.servlet.{Context, HashSessionIdManager, FilterHolder, ServletHolder};
@@ -38,8 +39,6 @@ import org.mortbay.servlet.GzipFilter;
 import net.appjet.common.util.{BetterFile, HttpServletRequestFactory};
 import net.appjet.common.cli._;
 import net.appjet.bodylock.JSCompileException;
-
-import Util.enumerationToRichEnumeration;
 
 object main {
   val startTime = new java.util.Date();
@@ -356,13 +355,13 @@ object main {
       }
       case e: org.mortbay.util.MultiException => {
         println("SERVER ERROR: Couldn't start server; multiple errors.");
-        for (i <- new IterableWrapper[Throwable] { override val underlying = e.getThrowables.asInstanceOf[java.util.List[Throwable]] }) {
+        for (i <- JavaConversions.asIterable(e.getThrowables)) {
           i match {
             case se: java.net.SocketException => {
               socketError(c, se);
             }
             case e => 
-              println("SERVER ERROR: Couldn't start server: "+i.getMessage());
+              println("SERVER ERROR: Couldn't start server: "+i.asInstanceOf[Throwable].getMessage());
           }
         }
         java.lang.Runtime.getRuntime().halt(1);
