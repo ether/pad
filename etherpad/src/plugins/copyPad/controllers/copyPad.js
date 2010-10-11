@@ -95,19 +95,13 @@ function onRequest() {
     if (pro_utils.isProDomainRequest()) {
       padId = pro_pad_db.getNextPadId();
     } else {
-      padId = randomUniquePadId();
+      padId = padutils.globalToLocalId(randomUniquePadId());
     }
-    padId = padutils.globalToLocalId(padId);
   }
 
   padutils.accessPadLocal(padId, function(pad) {
     createCopy(padId, pad, request.params.old, request.params.old_rev);
-
-    if (!pro_utils.isProDomainRequest()) {
-      response.redirect('/'+ padId);
-    } else {
-      throw new Error("Don't know how to redirect to a pro pad; bye");
-    }
+    response.redirect('/'+ padId);
   });
   return true;
 }
