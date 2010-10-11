@@ -61,3 +61,6 @@
 .mousover_parent:hover .mouseover_child {
  display: block;
 }
+
+#AdminWelcome
+{ font-size:1.4em;}
