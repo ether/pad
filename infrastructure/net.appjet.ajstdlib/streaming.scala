@@ -254,7 +254,7 @@ class StreamingSocket(val id: String, handler: SocketConnectionHandler) {
   var lastConfirmedSeqNumber = 0;
   
   // external API
-  def sendMessage(isControl: boolean, body: String) {
+  def sendMessage(isControl: Boolean, body: String) {
     if (hasConnected && ! shutdown) {
       synchronized {
         lastSentSeqNumber += 1;

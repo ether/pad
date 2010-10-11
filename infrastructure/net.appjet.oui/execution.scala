@@ -136,7 +136,7 @@ class RequestWrapper(val req: HttpServletRequest) {
 //    } else {
 //      val r = req.asInstanceOf[com.oreilly.servlet.MultipartWrapper];
 //      val fileScriptables = new HashMap[String, Scriptable]();
-//      val fileBytes = new HashMap[String, Array[byte]]();
+//      val fileBytes = new HashMap[String, Array[Byte]]();
 //      new ScriptableFromMapOfScriptableArrays(globalScope,
 //        r.getFileNames().asInstanceOf[Enumeration[String]].toList,
 //        name => {
@@ -164,7 +164,7 @@ class RequestWrapper(val req: HttpServletRequest) {
 
 class ResponseWrapper(val res: HttpServletResponse) {
   private lazy val outputStrings = new ListBuffer[String];
-  private lazy val outputBytes = new ListBuffer[Array[byte]];
+  private lazy val outputBytes = new ListBuffer[Array[Byte]];
   private var statusCode = 200;
   private var contentType = "text/html";
   private var redirect: String = null;
@@ -207,7 +207,7 @@ class ResponseWrapper(val res: HttpServletResponse) {
   }
   def getOutput() = outputStrings.mkString("");
   def writeBytes(bytes: String) {
-    val a = new Array[byte](bytes.length());
+    val a = new Array[Byte](bytes.length());
     bytes.getBytes(0, bytes.length(), a, 0);
     outputBytes += a;
   }

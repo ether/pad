@@ -21,7 +21,7 @@ import java.util.Date;
 import scala.collection.mutable.{HashMap, HashSet, Set, Map, ArrayBuffer};
 import scala.util.Sorting;
 
-trait BucketMap extends scala.collection.mutable.Map[int, BucketedLastHits] {
+trait BucketMap extends scala.collection.mutable.Map[Int, BucketedLastHits] {
   def t = 1000*60;
   override def apply(s: int) = synchronized { getOrElseUpdate(s, new BucketedLastHits(t)) };
   def counts = { val p = this; new scala.collection.Map.Projection[int, int] {
@@ -153,7 +153,7 @@ class BucketedLastHits(size: Long, noUpdate: Boolean)
 extends BucketKeeper[Int, Int](size, noUpdate) {
   def this(size: Long) = this(size, false);
       
-  override protected def bucketClear(index: int): Unit = {
+  override protected def bucketClear(index: Int): Unit = {
     buckets(index) = 0;
   }
 
@@ -212,9 +212,9 @@ extends BucketKeeper[ArrayBuffer[Int], Function1[Float, Int]](size, noUpdate) {
 }
 
 object appstats {
-  val minutelyStatus = new HashMap[int, BucketedLastHits] with BucketMap;
-  val hourlyStatus = new HashMap[int, BucketedLastHits] with BucketMap { override val t = 1000*60*60 };
-  val dailyStatus = new HashMap[int, BucketedLastHits] with BucketMap { override val t = 1000*60*60*24 };
-  val weeklyStatus = new HashMap[int, BucketedLastHits] with BucketMap { override val t = 1000*60*60*24*7 };
+  val minutelyStatus = new HashMap[Int, BucketedLastHits] with BucketMap;
+  val hourlyStatus = new HashMap[Int, BucketedLastHits] with BucketMap { override val t = 1000*60*60 };
+  val dailyStatus = new HashMap[Int, BucketedLastHits] with BucketMap { override val t = 1000*60*60*24 };
+  val weeklyStatus = new HashMap[Int, BucketedLastHits] with BucketMap { override val t = 1000*60*60*24*7 };
   val stati = Array(minutelyStatus, hourlyStatus, dailyStatus, weeklyStatus);
 }

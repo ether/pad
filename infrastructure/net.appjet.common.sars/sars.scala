@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 trait SarsMessageHandler {
   def handle(s: String): Option[String] = None;
-  def handle(b: Array[byte]): Option[Array[byte]] = None;
+  def handle(b: Array[Byte]): Option[Array[Byte]] = None;
 }
 
 class SarsException(m: String) extends RuntimeException(m);
@@ -44,7 +44,7 @@ private[sars] trait SarsMessageReaderWriter {
     if (messageType == byteArray) {
       try {
         val len = inputStream.readInt;
-        val bytes = new Array[byte](len);
+        val bytes = new Array[Byte](len);
         inputStream.readFully(bytes);
         Some(bytes);
       } catch {
@@ -64,11 +64,11 @@ private[sars] trait SarsMessageReaderWriter {
     val m = readMessage;
     m.filter(_.isInstanceOf[String]).asInstanceOf[Option[String]];
   }
-  def readBytes: Option[Array[byte]] = {
+  def readBytes: Option[Array[Byte]] = {
     val m = readMessage;
-    m.filter(_.isInstanceOf[Array[byte]]).asInstanceOf[Option[Array[byte]]];
+    m.filter(_.isInstanceOf[Array[Byte]]).asInstanceOf[Option[Array[Byte]]];
   }
-  def writeMessage(bytes: Array[byte]) {
+  def writeMessage(bytes: Array[Byte]) {
     outputStream.writeInt(byteArray);
     outputStream.writeInt(bytes.length);
     outputStream.write(bytes);
@@ -126,8 +126,8 @@ class SarsClient(authKey: String, host: String, port: Int) {
     def message(s: String): String =
       message[String](s, readerWriter.writeMessage, Unit => readerWriter.readString);
     
-    def message(b: Array[byte]): Array[byte] = 
-      message[Array[byte]](b, readerWriter.writeMessage, Unit => readerWriter.readBytes);
+    def message(b: Array[Byte]): Array[Byte] = 
+      message[Array[Byte]](b, readerWriter.writeMessage, Unit => readerWriter.readBytes);
 
     def close() {
       if (! s.isClosed) {
@@ -166,7 +166,7 @@ class SarsClient(authKey: String, host: String, port: Int) {
     client.message(q);
   }
   
-  def message(b: Array[byte]) = {
+  def message(b: Array[Byte]) = {
     if (! socket.isConnected || socket.isClosed) {
       connect();
     }
@@ -210,8 +210,8 @@ class SarsServer(authKey: String, handler: SarsMessageHandler, host: Option[Stri
               } else {
                 q.get match {
                   case s: String => readerWriter.writeMessage(handler.handle(s).getOrElse(""));
-                  case b: Array[byte] => 
-                    readerWriter.writeMessage(handler.handle(b).getOrElse(new Array[byte](0)));
+                  case b: Array[Byte] => 
+                    readerWriter.writeMessage(handler.handle(b).getOrElse(new Array[Byte](0)));
                   case x: AnyRef => throw new UnknownTypeException(x.getClass.getName);
                 }
               }
@@ -320,7 +320,7 @@ object test {
           None;
         }
       }
-      override def handle(b: Array[byte]) = {
+      override def handle(b: Array[Byte]) = {
         var actually = new String(b, "UTF-8");
         println("SERVER: "+actually);
         if (actually == "hello!") {

@@ -147,7 +147,7 @@ object BodyLock {
     compilationutils.compileToScript(source, sourceName, lineNumber, className);
   }
 
-  def executableFromBytes(bytes: Array[byte], className: String) =
+  def executableFromBytes(bytes: Array[Byte], className: String) =
     new InnerExecutable("(source not available)", compilationutils.bytesToScript(bytes, className));
   
   def unwrapExceptionIfNecessary(e: Throwable): Throwable = {
