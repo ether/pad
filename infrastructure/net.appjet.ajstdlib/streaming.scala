@@ -861,7 +861,7 @@ class StreamingSocketServlet extends HttpServlet {
                   val msgParts = msg.split(":");
                   socket.get.useChannel(java.lang.Integer.parseInt(msgParts(1)), msgParts(2), req);
                 } else if (msg.startsWith("kill")) {
-                  socket.get.kill("client request: "+msg.substring(Math.min(msg.length, "kill:".length)));
+                  socket.get.kill("client request: "+msg.substring(math.min(msg.length, "kill:".length)));
                 } else {
                   streaminglog(Map(
                     "type" -> "error",

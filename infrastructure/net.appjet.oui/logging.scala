@@ -315,7 +315,7 @@ object profiler extends GenericLogger("backend", "profile", false) {
   def apply(id: String, op: String, method: String, path: String, countAndNanos: (Long, Long)) {
     if (loggerThread != null)
       log(id+":"+op+":"+method+":"+path+":"+
-          Math.round(countAndNanos._2/1000)+
+          math.round(countAndNanos._2/1000)+
           (if (countAndNanos._1 > 1) ":"+countAndNanos._1 else ""));
   }
 //   def apply(state: RequestState, op: String, nanos: long) {
@@ -425,7 +425,7 @@ object cometlatencies {
             Sorting.quickSort(latArray);
             def pct(p: Int) =
               if (latArray.length > 0)
-                latArray(Math.floor((p/100.0)*latArray.length).toInt);
+                latArray(math.floor((p/100.0)*latArray.length).toInt);
               else
                 0;
             def s(a: Any) = String.valueOf(a);

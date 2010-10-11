@@ -29,7 +29,7 @@ trait BucketMap extends scala.collection.mutable.Map[Int, BucketedLastHits] {
 
 abstract class BucketKeeper[A: ClassManifest, B: ClassManifest](val size: Long, val numbuckets: Int, val noUpdate: Boolean) {
   def this(size: Long, noUpdate: Boolean) = 
-    this(size, Math.max(100, if (noUpdate) 1 else (size/60000).toInt), noUpdate)
+    this(size, math.max(100, if (noUpdate) 1 else (size/60000).toInt), noUpdate)
   def this(size: Long) = this(size, false);
 
   val buckets = new Array[A](numbuckets);
@@ -45,7 +45,7 @@ abstract class BucketKeeper[A: ClassManifest, B: ClassManifest](val size: Long, 
   
   protected def bucketAtTime(d: Date) = {
     val msAgo = lastSwitch - d.getTime();
-    val bucketsAgo = Math.floor(msAgo/millisPerBucket).asInstanceOf[Int];
+    val bucketsAgo = math.floor(msAgo/millisPerBucket).asInstanceOf[Int];
     if (bucketsAgo < numbuckets) {
       val bucket = (currentBucket - bucketsAgo + numbuckets) % numbuckets
       // println("Applying to old bucket: "+bucket+" / current: "+currentBucket+", old count: "+count);
@@ -76,7 +76,7 @@ abstract class BucketKeeper[A: ClassManifest, B: ClassManifest](val size: Long, 
   
   def history(bucketsPerSample: Int, numSamples: Int): Array[B] = withSyncUpdate {
     val bseq = bucketsInOrder.reverse.take(bucketsPerSample*numSamples);
-    val sampleCount = Math.min(numSamples, bseq.length);
+    val sampleCount = math.min(numSamples, bseq.length);
     val samples =
       for (i <- 0 until sampleCount) yield {
         mergeBuckets(bseq.slice(i*bucketsPerSample, (i+1)*bucketsPerSample));
@@ -181,7 +181,7 @@ extends BucketKeeper[ArrayBuffer[Int], Function1[Float, Int]](size, noUpdate) {
         0
       } else {
         elements(
-          Math.round(percentile/100.0f*(elements.length-1)));
+          math.round(percentile/100.0f*(elements.length-1)));
       }
     }    
   }
