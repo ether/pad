@@ -525,7 +525,7 @@ trait IFrameChannel extends StreamingChannel {
   
   def header(req: HttpServletRequest) = {
     val document_domain = 
-        "\""+req.getHeader("Host").split("\\.").slice(2).mkString(".").split(":")(0)+"\"";
+        "\""+req.getHeader("Host").split("\\.").take(2).mkString(".").split(":")(0)+"\"";
     """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html><head><title>f</title></head><body id="thebody" onload="(!parent.closed)&&d()"><script type="text/javascript">document.domain = """+document_domain+""";
