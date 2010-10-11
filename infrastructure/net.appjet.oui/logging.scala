@@ -178,7 +178,7 @@ object GenericLoggerUtils {
   def tellWranglers(name: String, lpb: LoggablePropertyBag) {
     for (w <- wranglers(name)) {
       w.get.foreach(_.tell(lpb));
-      if (! w.isValid) {
+      if (w.get.isEmpty) {
         wranglers(name) -= w;
       }
     }
