@@ -421,7 +421,7 @@ object cometlatencies {
           try {
             val oldLatencies = latencies;
             latencies = new java.util.concurrent.ConcurrentLinkedQueue[Int];
-            val latArray = oldLatencies.toArray().map(_.asInstanceOf[int]);
+            val latArray = asIterable(oldLatencies).toArray;
             Sorting.quickSort(latArray);
             def pct(p: Int) =
               if (latArray.length > 0)
