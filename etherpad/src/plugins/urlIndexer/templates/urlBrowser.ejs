@@ -29,6 +29,10 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>Browse URLs by tags</span></td>
 <% return ejs_data; }); %>
 
+<% template.define('querySummaryNoQuery', function() { var ejs_data=''; %>
+  Latest changed URLs
+<% return ejs_data; }); %>
+
 <% template.define('queryResult', function() { var ejs_data=''; %>
  <% for (i = 0; i < matchingUrls.length; i++) { %>
  <%

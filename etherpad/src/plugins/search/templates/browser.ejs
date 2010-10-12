@@ -57,7 +57,9 @@ limitations under the License. */ %>
   <% var querySummary = template.callHook('querySummary', {'template':template}); %>
   <% if (querySummary.length == 0) { %>
     <td class="editbarbutton editbargroupsfirst">
-      Latest changed pads
+      <%: template.use('querySummaryNoQuery', function() { var ejs_data=''; %>
+        Latest changed pads
+      <% return ejs_data; }); %>
     </td>
   <% } else { %>
     <td class="editbarbutton editbargroupsfirst">
