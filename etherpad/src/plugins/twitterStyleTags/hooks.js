@@ -132,7 +132,10 @@ function queryFormat() {
 }
 
 function querySummary(args) {
- return [args.template.include("twitterStyleTagsQuerySummary.ejs", {}, ['twitterStyleTags'])];
+  var res = args.template.include("twitterStyleTagsQuerySummary.ejs", {}, ['twitterStyleTags']);
+  if (res.replace(new RegExp("^[ \n]*"), "").replace(new RegExp("[ \n]*$"), "") == '')
+    return [];
+  return [res];
 }
 
 function queryRefiner(args) {

@@ -53,19 +53,26 @@ limitations under the License. */ %>
 <% return ejs_data; }); %>
 
 <% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
-  <td>
-    <h1>
+  <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>
+  <% var querySummary = template.callHook('querySummary', {'template':template}); %>
+  <% if (querySummary.length == 0) { %>
+    <td class="editbarbutton editbargroupsfirst">
+      Latest changed pads
+    </td>
+  <% } else { %>
+    <td class="editbarbutton editbargroupsfirst">
       Query:
-      <% var querySummary = template.callHook('querySummary', {'template':template}); %>
-      <% if (querySummary.length == 0) { %>
-	Latest changed pads
-      <% } else { %>
-	<% for (i = 0; i < querySummary.length; i++) { %>
-	  <%= querySummary[i] %>
-	<% } %>
-      <% } %>
-    </h1>
-  </td>
+    </td>
+    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>
+    <td>&nbsp; &nbsp;</td>
+    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>
+    <% for (i = 0; i < querySummary.length; i++) { %>
+      <td class="editbarbutton <%= i == 0 ? "editbargroupsfirst" : "" %>">
+	<%= querySummary[i] %>
+      </td>
+    <% } %>
+  <% } %>
+  <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>
 <% return ejs_data; }); %>
 
 <% template.define('contentArea', function() { var ejs_data=''; %>

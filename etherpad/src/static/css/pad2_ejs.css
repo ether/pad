@@ -258,16 +258,19 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border-bottom: 1px solid #8b9eba;
   border-left: 1px solid #758aa9;
   background-color: white;
+  padding: 0px 2px;
 }
 
 .editbarbutton img
 {
-  margin: 0px 2px;
   border: 0px;
   width: 16px;
   height: 16px;
 }
 
+.editbarbutton a {
+  text-decoration: none;
+}
 .editbarbutton a:active
 {
   position: relative;

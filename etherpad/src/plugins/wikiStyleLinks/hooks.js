@@ -80,7 +80,10 @@ function queryToSql(args) {
 }
 
 function querySummary() {
- return [utils.renderTemplateAsString("wikiStyleLinkQuerySummary.ejs", {}, ['wikiStyleLinks'])];
+  var res = utils.renderTemplateAsString("wikiStyleLinkQuerySummary.ejs", {}, ['wikiStyleLinks']);
+  if (res.replace(new RegExp("^[ \n]*"), "").replace(new RegExp("[ \n]*$"), "") == '')
+    return [];
+  return [res];
 }
 
 function queryRefiner() {
