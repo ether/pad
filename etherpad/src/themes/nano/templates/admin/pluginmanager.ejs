@@ -1,0 +1,76 @@
+<% /* Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */ %>
+<%
+ template.inherit('page.ejs');
+ helpers.setHtmlTitle("EtherPad: Manage plugins");
+ helpers.includeCss("admin/pluginmanager.css");
+
+ function inArray(item, arr) {
+   for (var i = 0; i < arr.length; i++)
+     if (arr[i] == item)
+       return true;
+   return false;
+ }
+
+ plugin_registry = plugins.loadPlugins();
+%>
+
+<% template.define('docBarTitle', function() { var ejs_data=''; %>
+  <td id="docbarpadtitle"><span>Plugin manager</span></td>
+<% return ejs_data; }); %>
+
+
+<% template.define('docBarItems', function() { var ejs_data=''; %>
+  <%: plugins.callHookStr('docbarItemsPluginManager', {}, '', '<td class="docbarbutton">', '</td>'); %>
+<% return ejs_data; }); %>
+
+<% template.define('contentArea', function() { var ejs_data=''; %>
+  <div id="editorcontainer">
+   <table>
+    <tr>
+     <th>Module name</th>
+     <th>Status</th>
+     <th></th>
+    </tr>
+    <% for (var plugin in plugin_registry.pluginModules) { %>
+     <tr>
+      <td class="mousover_parent">
+       <%= plugin %>
+       <div class="mouseover_child">
+	<%= plugin_registry.pluginModules[plugin].description %>
+       </div>
+      </td>
+      <td>
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
+	Installed
+       <% } else { %>
+	Not installed
+       <% } %>
+      </td>
+      <td>
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
+	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
+	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
+	<% if (plugin_registry.plugins[plugin].configLink !== undefined) { %>
+	 <a href="<%= plugin_registry.plugins[plugin].configLink %>">Configure</a>
+	<% } %>
+       <% } else { %>
+	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=install">Install</a>
+       <% } %>
+      </td>
+     </tr>
+    <% } %>
+   </table>
+  </div>
+<% return ejs_data; }); %>
