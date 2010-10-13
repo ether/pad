@@ -1,3 +1,9 @@
+etherpad (1.1) karmic; urgency=low
+
+  * New release
+
+ -- Etherpad Foundation (Packaging) <packaging@etherpad.org>  Wed, 13 Oct 2010 10:57:49 +0200
+
 etherpad (1.0.1) karmic; urgency=low
 
   * Changed maintainer to Packaging
