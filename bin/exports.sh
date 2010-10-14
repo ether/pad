@@ -39,11 +39,32 @@ if [ `uname` == "FreeBSD" ]; then
 else
         [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
         [ -e "/usr/lib/jvm/java-6-sun" ] && export JAVA_HOME="/usr/lib/jvm/java-6-sun"
+        [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_OPTS="-Xbootclasspath/p:../infrastructure/lib/rhino-js-1.7r1.jar:/usr/share/java/scala-library.jar" 
         export SCALA_HOME="/usr/share/java"
         export SCALA_LIBRARY_JAR="/usr/share/java/scala-library.jar"
         export MYSQL_CONNECTOR_JAR="/usr/share/java/mysql-connector-java.jar"
         export JAVA="$JAVA_HOME/bin/java"
         export SCALA="/usr/bin/scala"
         export PATH="$JAVA_HOME/bin:$PATH"
+fi
+
+if ! [ -e "$MYSQL_CONNECTOR_JAR" ]; then
+        echo "MySql Connector jar '$MYSQL_CONNECTOR_JAR' not found - Download it here: http://dev.mysql.com/downloads/connector/j/3.1.html"
+        exit 1
+fi
+
+if ! [ -e "$SCALA_LIBRARY_JAR" ]; then
+        echo "Scala Library cannot be found '$SCALA_LIBRARY_JAR' not found - Download it here: http://www.scala-lang.org/"
+        exit 1
+fi
+
+if ! [ -e "$JAVA" ]; then
+        echo "Java cannot be found '$JAVA' not found - Download it here: http://openjdk.java.net/"
+        exit 1
+fi
+
+if ! [ -e "$SCALA" ]; then
+        echo "Java cannot be found '$SCALA' not found - Download it here: http://www.scala-lang.org/"
+        exit 1
 fi
 

@@ -1,0 +1,12 @@
+<% helpers.includeCss("plugins/twitterStyleTags/pad.css"); %>
+<div>
+  <h1>Search for pads that have the tag</h1>
+  <% for (i = 0; i < newTags.length; i++) { %>
+   <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags)}) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
+  <% } %>
+
+  <h1>Search for pads that <em>don't</em> have the tag</h1>
+  <% for (i = 0; i < newTags.length; i++) { %>
+   <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname]))}) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
+  <% } %>
+</div>

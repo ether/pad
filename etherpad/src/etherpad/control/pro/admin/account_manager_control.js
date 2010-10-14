@@ -156,7 +156,7 @@ function render_new_post() {
 }
 
 function sendWelcomeEmail(account, tempPass) {
-  var subj = "Welcome to EtherPad on "+pro_utils.getFullProDomain()+"!";
+  var subj = "Welcome to "+ appjet.config.customBrandingName +" on "+pro_utils.getFullProDomain()+"!";
   var toAddr = account.email;
   var fromAddr = pro_utils.getEmailFromAddr();
 

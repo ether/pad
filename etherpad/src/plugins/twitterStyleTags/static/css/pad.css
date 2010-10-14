@@ -51,6 +51,11 @@ a.padtag_public:visited {
  border-right-color: #70aa70;
  border-top-color: #9caa9c;
  border-bottom-color: #60aa60;
+
+ padding-right: 16px;
+ background-repeat: no-repeat;
+ background-position: right;
+ background-image: url("/static/img/plugins/twitterStyleTags/tag_public.png");
 }
 
 .padtag_writable a,
@@ -67,4 +72,9 @@ a.padtag_writable:visited {
  border-right-color: #7070aa;
  border-top-color: #9c9caa;
  border-bottom-color: #6060aa;
+
+ padding-right: 16px;
+ background-repeat: no-repeat;
+ background-position: right;
+ background-image: url("/static/img/plugins/twitterStyleTags/tag_writable.png");
 }

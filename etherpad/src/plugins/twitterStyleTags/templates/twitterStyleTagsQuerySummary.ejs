@@ -1,0 +1,9 @@
+<% helpers.includeCss("plugins/twitterStyleTags/pad.css"); %>
+<% if (tags.length != 0 || antiTags.length != 0) { %>
+   <% for (i = 0; i < tags.length; i++) { %>
+     <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags)}) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
+   <% } %>
+   <% for (i = 0; i < antiTags.length; i++) { %>
+     <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
+   <% } %>
+<% } %>

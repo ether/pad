@@ -29,7 +29,6 @@ limitations under the License. */ %>
   helpers.includeJs("pad_editbar.js");
   helpers.includeJs("pad_docbar.js");
   helpers.includeJs("pad_modals.js");
-  helpers.includeJs("pad2.js");
   helpers.suppressGA();
   helpers.setRobotsPolicy({index: false, follow: false});
 
@@ -47,18 +46,23 @@ limitations under the License. */ %>
 	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
 	<% /* non-floated */ %>
 	<div id="topbarcenter">
-	  <a href="/" id="topbaretherpad">EtherPad</a>
+
+	  <a href="/" id="topbarBrand"><%= appjet.config.customBrandingName %></a>
+        <% /* Replace above with an image if you want */ %>
+
+            <% if (appjet.config.showLinkandLicense == "true") { 
+		//if (isloggedin == "true") {
+		// This bit needs doing
+		%>
+	  <a href="http://etherpad.org" id="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" id="Licensing">free software</a>
+	    <% 
+	// } 
+	} %>
+	<div id="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
+
+	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize" title="Toggle maximization"></a>
 	</div>
-	<% if (isProAccountHolder) { %>          
-	  <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
-	  <div id="accountnav"><%= toHTML(account.email) %>
-	    <a href="/ep/account/sign-out">(sign out)</a>
-	  </div>
-	<% } else if (isPro) { %>
-	  <div id="accountnav">
-	    <a href="<%= signinUrl %>">sign in</a>
-	  </div>
-	<% } %>
+        <%: template.use('topBar'); %>
 	<div id="specialkeyarea"><!-- --></div>
       </div>
       <div id="alertbar">
@@ -72,7 +76,7 @@ limitations under the License. */ %>
         <%: template.callHookStr('renderNavigation', {request: request}, '', '', ''); %>
       </div>
 
-      <div id="docbar">
+      <div id="docbar" class="menu">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
 	  <tr>
 	    <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
@@ -89,51 +93,47 @@ limitations under the License. */ %>
       </div><!-- /docbar -->
     </div>
 
-    <div id="padmain">
-      <div id="padsidebar"><%: template.use('sideBar'); %></div> 
+    <%: template.use('topArea'); %>
 
+    <div id="padmain">
+      <script>
+	$(document).ready(function () {
+	  makeResizableHPane("#padeditor", "#vdraggie", "#padsidebar", 0, 0, 10, -22);
+	});
+      </script>
       <div id="padeditor">
 	<div id="editbar" class="disabledtoolbar">
-	  <% /* floated left */ %>
-	  <div id="editbarleft"><!-- --></div>
-	  <% /* floated right */ %>
-	  <div id="editbarright"><!-- --></div>      
-	  <% /* non-floated */ %>
-	  <div id="editbarinner">
-	    <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
-              <tr>
-                <%: template.use('editBarItemsLeft'); %>
-	        <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
-	        <td width="100%">&nbsp;</td>
-  	      </tr>
-            </table>
-	    <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
-	      <tr>
-	        <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
-	        <%: template.use('editBarItemsRight'); %>
-	      </tr>
-	    </table>
-	    <%: template.callHookStr('editBarDropdownsAll', {}, '', '', ''); %>
-	    <%: template.use('editBarDropdowns'); %>
-	  </div>
+          <div id="editbarinner">
+	    <% /* floated left */ %>
+	    <div id="editbarleft"><!-- --></div>
+	    <% /* floated right */ %>
+	    <div id="editbarright"><!-- --></div>      
+	    <% /* non-floated */ %>
+	    <div id="editbarinner">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
+		<tr>
+		  <%: template.use('editBarItemsLeft'); %>
+		  <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
+		  <td width="100%">&nbsp;</td>
+		</tr>
+	      </table>
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
+		<tr>
+		  <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
+		  <%: template.use('editBarItemsRight'); %>
+		</tr>
+	      </table>
+	      <%: template.callHookStr('editBarDropdownsAll', {}, '', '', ''); %>
+	      <%: template.use('editBarDropdowns'); %>
+	    </div>
+          </div>
 	</div>
 	<div id="editorcontainerbox"><%: template.use('contentArea'); %></div>
       </div><!-- /padeditor -->
 
-      <div id="bottomarea">
-	<div id="viewbarcontents">
-	  <div id="viewzoomtitle">Zoom:</div>
-	  <select id="viewzoommenu"><option value="z85">85%</option><option value="z100">100%</option><option value="z115">115%</option><option value="z150">150%</option><option value="z200">200%</option><option value="z300">300%</option></select>
-	</div>
+      <div id="vdraggie"><!-- --></div>
 
-	<div id="widthprefcheck"
-	     class="<%= (prefs.isFullWidth?'widthprefchecked':'widthprefunchecked') %>"
-	     ><!-- --></div>
-	<div id="sidebarcheck"
-	     class="<%= (prefs.hideSidebar?'sidebarunchecked':'sidebarchecked') %>"
-	     ><!-- --></div>
-      </div>
-
+      <div id="padsidebar"><%: template.use('sideBar'); %></div> 
     </div><!-- /padmain -->
 
   </div><!-- /padpage -->

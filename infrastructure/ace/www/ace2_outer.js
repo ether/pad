@@ -67,14 +67,6 @@ function Ace2Editor() {
   };
   editor.getFrame = function() { return info.frame || null; };
   editor.focus = pendingInit(function() { info.ace_focus(); });
-  editor.adjustSize = pendingInit(function() {
-    var frameParent = info.frame.parentNode;
-    var parentHeight = frameParent.clientHeight;
-    // deal with case where iframe is hidden, no clientHeight
-    info.frame.style.height = (parentHeight ? parentHeight+"px" :
-			       frameParent.style.height);
-    info.ace_editorChangedSize();
-  });
   editor.setEditable = pendingInit(function(newVal) { info.ace_setEditable(newVal); });
   editor.getFormattedCode = function() { return info.ace_getFormattedCode(); };
   editor.setOnKeyPress = pendingInit(function (handler) { info.ace_setOnKeyPress(handler); });
@@ -234,8 +226,6 @@ function Ace2Editor() {
       editorDocument.open();
       editorDocument.write(outerHTML.join(''));
       editorDocument.close();
-
-      editor.adjustSize();
     })();
   };
 

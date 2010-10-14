@@ -6,7 +6,7 @@ function handlePath() {
   return [[PrefixMatcher('/ep/rtrc'), forward(rtrcBrowser)]];
 }
 
-function docbarItemsTagBrowser() {
+function docbarItemsSearch() {
  return ["<td class='docbarbutton'><a href='/ep/rtrc/'>RTRC</a></td>"];
 }
 

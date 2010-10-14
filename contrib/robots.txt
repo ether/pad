@@ -1,0 +1,5 @@
+Sitemap: /ep/tag/?format=sitemap
+User-agent: *
+Disallow: /
+Allow: /ep/tag/?format=sitemap
+Allow: /ep/pad/view

@@ -62,55 +62,90 @@ function makeDraggable(jqueryNodes, eventHandler) {
 function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
   if (minTop === undefined) minTop = 0;
   if (minBottom === undefined) minBottom = 0;
-  var totalHeight = $(top).height() + $(bottom).height();
-  var maxTop = totalHeight - minBottom;
 
   makeDraggable($(sep), function(eType, evt, state) {
     if (eType == 'dragstart') {
       state.startY = evt.pageY;
       state.topHeight = $(top).height();
       state.bottomHeight = $(bottom).height();
+      state.minTop = minTop;
+      state.maxTop = (state.topHeight + state.bottomHeight) - minBottom;
     }
     else if (eType == 'dragupdate') {
       var change = evt.pageY - state.startY;
 
       var topHeight = state.topHeight + change;
-      if (topHeight < minTop) {	topHeight = minTop; }
-      if (topHeight > maxTop) { topHeight = maxTop; }
+      if (topHeight < state.minTop) { topHeight = state.minTop; }
+      if (topHeight > state.maxTop) { topHeight = state.maxTop; }
       change = topHeight - state.topHeight;
 
       var bottomHeight = state.bottomHeight - change;
+      var sepHeight = $(sep).height();
 
-      $(top).height(topHeight);
-      $(bottom).height(bottomHeight);
+      var totalHeight = topHeight + sepHeight + bottomHeight;
+      topHeight = 100.0 * topHeight / totalHeight;
+      sepHeight = 100.0 * sepHeight / totalHeight;
+      bottomHeight = 100.0 * bottomHeight / totalHeight;
+
+      $(top).css('bottom', 'auto');
+      $(top).css('height', topHeight + "%");
+      $(sep).css('top', topHeight + "%");
+      $(bottom).css('top', (topHeight +  sepHeight) + '%');
+      $(bottom).css('height', 'auto');
     }
   });
 }
 
-function makeResizableHPane(left, sep, right, minLeft, minRight) {
+function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOffset) {
   if (minLeft === undefined) minLeft = 0;
   if (minRight === undefined) minRight = 0;
-  var totalWidth = $(left).width() + $(right).width();
-  var maxLeft = totalWidth - minRight;
 
   makeDraggable($(sep), function(eType, evt, state) {
     if (eType == 'dragstart') {
-      state.startY = evt.pageY;
+      state.startX = evt.pageX;
       state.leftWidth = $(left).width();
       state.rightWidth = $(right).width();
-    }
-    else if (eType == 'dragupdate') {
-      var change = evt.pageY - state.startY;
+      state.minLeft = minLeft;
+      state.maxLeft = (state.leftWidth + state.rightWidth) - minRight;
+    } else if (eType == 'dragend' || eType == 'dragupdate') {
+      var change = evt.pageX - state.startX;
 
       var leftWidth = state.leftWidth + change;
-      if (leftWidth < minLeft) {	leftWidth = minLeft; }
-      if (leftWidth > maxLeft) { leftWidth = maxLeft; }
+      if (leftWidth < state.minLeft) { leftWidth = state.minLeft; }
+      if (leftWidth > state.maxLeft) { leftWidth = state.maxLeft; }
       change = leftWidth - state.leftWidth;
 
       var rightWidth = state.rightWidth - change;
+      newSepWidth = sepWidth;
+      if (newSepWidth == undefined)
+        newSepWidth = $(sep).width();
+      newSepOffset = sepOffset;
+      if (newSepOffset == undefined)
+        newSepOffset = 0;
 
-      $(left).width(leftWidth);
-      $(right).width(rightWidth);
+      if (change == 0) {
+	if (rightWidth != minRight || state.lastRightWidth == undefined) {
+	  state.lastRightWidth = rightWidth;
+	  rightWidth = minRight;
+        } else {
+	  rightWidth = state.lastRightWidth;
+ 	  state.lastRightWidth = minRight;
+        }
+	change = state.rightWidth - rightWidth;
+	leftWidth = change +  state.leftWidth;
+      }
+
+      var totalWidth = leftWidth + newSepWidth + rightWidth;
+      leftWidth = 100.0 * leftWidth / totalWidth;
+      newSepWidth = 100.0 * newSepWidth / totalWidth;
+      newSepOffset = 100.0 * newSepOffset / totalWidth;
+      rightWidth = 100.0 * rightWidth / totalWidth;
+
+      $(left).css('right', 'auto');
+      $(left).css('width', leftWidth + "%");
+      $(sep).css('left', (leftWidth + newSepOffset) + "%");
+      $(right).css('left', (leftWidth + newSepWidth) + '%');
+      $(right).css('width', 'auto');
     }
   });
 }

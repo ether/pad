@@ -14,11 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
- template.inherit('tagBrowser.ejs');
- helpers.setHtmlTitle("EtherPad: Browse URLs by tags");
- helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
- helpers.includeCss("plugins/twitterStyleTags/pad.css");
- helpers.addToHead('\n<link rel="alternate" href="' + helpers.updateToUrl({format:'rss'}) + '" type="application/rss+xml" title="Query results as RSS" />\n');
+ template.inherit('browser.ejs');
+ helpers.setHtmlTitle("Search URLs");
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)
@@ -32,6 +29,10 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>Browse URLs by tags</span></td>
 <% return ejs_data; }); %>
 
+<% template.define('querySummaryNoQuery', function() { var ejs_data=''; %>
+  Latest changed URLs
+<% return ejs_data; }); %>
+
 <% template.define('queryResult', function() { var ejs_data=''; %>
  <% for (i = 0; i < matchingUrls.length; i++) { %>
  <%
@@ -40,13 +41,17 @@ limitations under the License. */ %>
       if (!inArray('writable', matchingUrls[i].TAGS)) {
 	matchingPadId = padIdToReadonly(matchingUrls[i].ID);
 	matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+      } else if (padutils.isProPadId(matchingPadId)) {
+        matchingPadId = padutils.globalToLocalId(matchingPadId);
+        matchingPadUrl = matchingPadId;
       }
  %>
   <dt><a href="<%= matchingUrls[i].URL %>"><%= matchingUrls[i].URL %></a><dt>
   <dd>
-   <a href="<%= matchingPadUrl %>"><%= matchingPadId %></a>:
-   <% for (j = 0; j < matchingUrls[i].TAGS.length; j++) { %>
-    <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingUrls[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingUrls[i].TAGS[j] %> matches">#<%= matchingUrls[i].TAGS[j] %></a>
+   <a href="<%= matchingPadUrl %>"><%= matchingPadId %></a><% if (matchingUrls[i].TAGS != undefined && typeof(tagQuery) != 'undefined') { %>:
+     <% for (j = 0; j < matchingUrls[i].TAGS.length; j++) { %>
+      <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingUrls[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingUrls[i].TAGS[j] %> matches">#<%= matchingUrls[i].TAGS[j] %></a>
+     <% } %>
    <% } %>
   </dd>
  <% } %>

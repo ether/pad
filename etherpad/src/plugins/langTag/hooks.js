@@ -3,6 +3,6 @@ import("faststatic");
 import("etherpad.utils.*");
 import("etherpad.globals.*");
 
-function editBarItemsLeftPad(arg) {
-  return arg.template.include('langTagEditbarButtons.ejs', undefined, ['langTag']);
+function tagSelectors(arg) {
+  return [arg.template.include('langTagTagSelectors.ejs', undefined, ['langTag'])];
 }

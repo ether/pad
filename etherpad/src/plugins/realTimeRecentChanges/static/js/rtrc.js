@@ -1,15 +1,15 @@
 /* Inspired by JUITTER 1.0.0 BY RODRIGO FANTE -- Thanks Mr. Juitter :)*/
 
-function runMainLoop(){
-//  alert("running main loop");
-  setTimeout('runMainLoop()', 5000);
-  $.getJSON("http://metameso.org:8080/ep/tag/?format=json",
+
+function RTRCrunMainLoop(){
+  setTimeout('RTRCrunMainLoop()', 5000);
+  $.getJSON("http://" + host + "/ep/search?format=json",
       function(data){
-        doSomethingWithJSON(data);
+        RTRCdoSomethingWithJSON(data);
   });
 }
 
-function doSomethingWithJSON(json){
+function RTRCdoSomethingWithJSON(json){
   if (json != undefined && json != ""){
     var msgNb = 0;
     var maxNumMessages = 10;
@@ -31,7 +31,7 @@ function doSomethingWithJSON(json){
                 for (j = 0; j < json.matchingPads[i].TAGS.length; j++){
 
                     tagString = tagString + '&nbsp; ' +
-                        '<a href=http://metameso.org:8080/ep/tag/?query=' +
+                        '<a href=http://' + host + '/ep/search?query=' +
                         json.matchingPads[i].TAGS[j] +
                         ' class="padtag" + title="' + json.matchingPads[i].TAGS[j] + 
                         ' matches">#' + json.matchingPads[i].TAGS[j] + '</a>';
@@ -39,7 +39,7 @@ function doSomethingWithJSON(json){
 
                 $("ul.allmatches").append(
                    '<li id="matchingpad' + msgNb + '">' +
-                   '<a href=http://metameso.org:8080/' + item.ID + '>' +
+                   '<a href=http://'+ host +'/' + item.ID + '>' +
                    item.ID + '</a>' +
                    '&nbsp; ' + item.lastWriteTime +
                    '<br>' + tagString + '<br><br>');
@@ -66,5 +66,4 @@ function doSomethingWithJSON(json){
   // do stuff to start things on client side
   // (set up the start, timer, all that stuff)
 $("div.realtimedata").empty();
-runMainLoop();
-
+RTRCrunMainLoop();

@@ -34,6 +34,7 @@ import("etherpad.log.{logRequest,logException}");
 import("etherpad.sessions");
 import("etherpad.sessions.getSession");
 import("etherpad.utils.*");
+import("etherpad.collab.server_utils");
 import("etherpad.pro.pro_padmeta");
 import("etherpad.pro.pro_pad_db");
 import("etherpad.pro.pro_utils");
@@ -370,6 +371,7 @@ function render_pad(localPadId) {
 
   renderHtml("pad/pad_body2.ejs",
              {localPadId:localPadId,
+	      padIdReadonly: server_utils.padIdToReadonly(localPadId),
               pageTitle:toHTML(proTitle || localPadId),
               initialTitle:toHTML(documentBarTitle),
               bodyClass: bodyClass,
@@ -393,8 +395,11 @@ function render_create_get() {
     "pad/create_body_rafter.ejs" :
     "pad/create_body.ejs";
   // </RAFTER>
-  renderFramed(template, {padId: padId,
-                          fullSuperdomain: pro_utils.getFullSuperdomainHost()});
+  renderHtml(template,
+   {config: appjet.config,
+    bodyClass: 'nonpropad',
+    padId: padId,
+    fullSuperdomain: pro_utils.getFullSuperdomainHost()});
 }
 
 function render_create_post() {
@@ -635,7 +640,7 @@ function render_emailinvite_post() {
              {toEmails: toEmails, padId: padId, username: username,
               subject: subject, message: message});
 
-  var fromAddr = '"EtherPad" <noreply@etherpad.com>';
+  var fromAddr = appjet.config.customEmailAddress;
   // client enforces non-empty subject and message
   var subj = '[EtherPad] '+subject;
   var body = renderTemplateAsString('email/padinvite.ejs',

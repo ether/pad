@@ -27,7 +27,7 @@ import scala.ref.WeakReference;
 import scala.collection.mutable.{Map, HashMap};
 import scala.collection.jcl.{SetWrapper, Conversions};
 
-import org.json.{JSONObject, JSONArray};
+import net.sf.json.{JSONObject, JSONArray};
 import org.mozilla.javascript.{Scriptable, Context};
 
 import Util.iteratorToRichIterator;
@@ -119,9 +119,10 @@ class LoggableFromMap[T](
 }
 
 class LoggableFromJson(val json: String) extends LoggablePropertyBag {
-  val obj = new JSONObject(json);
+  val obj = JSONObject.fromObject(json);
   val date = new Date(obj.getLong("date"));
-  val keys = obj.sortedKeys().map(String.valueOf(_)).collect.toArray;
+  val keys = obj.keys().map(String.valueOf(_)).collect.toArray;
+  // FIXME: is now not sorted in any particular order.
   def value(k: String) = obj.get(k);
   val tabDelimited =
     GenericLoggerUtils.dateString(date) + "\t"+

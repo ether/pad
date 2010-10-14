@@ -1,0 +1,12 @@
+<div>
+  <h1>Search for pads that link to the pad</h1>
+  <form action="" method="GET">
+    <% for (var name in request.params) { %>
+      <% if (name != 'linksto') { %>
+        <input type="hidden" name="<%= name %>" value="<%= request.params[name] %>">
+      <% } %>
+    <% } %>
+    <input type="text" name="linksto" value="<%= request.params.linksto %>">
+    <button type="submit">Go</button>
+  </form>
+</div>

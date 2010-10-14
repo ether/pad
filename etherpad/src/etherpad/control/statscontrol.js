@@ -720,8 +720,9 @@ function render_main() {
     categoriesToStats[catName] = statArray.map(_renderableStat);
   });
   
-  renderHtml('statistics/stat_page.ejs', 
-    {eachProperty: eachProperty,
+  renderHtml('admin/stat_page.ejs', 
+    {bodyClass: 'nonpropad',
+     eachProperty: eachProperty,
      statCategoryNames: keys(categoriesToStats),
      categoriesToStats: categoriesToStats,
      optionsForm: _optionsForm() });

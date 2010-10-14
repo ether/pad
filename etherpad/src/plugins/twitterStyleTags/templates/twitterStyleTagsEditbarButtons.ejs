@@ -1,0 +1,11 @@
+<% var tagSelectors = template.callHook('twitterStyleTagsTagSelector'); %>
+<% if (tagSelectors.length > 0) { %>
+  <td>&nbsp;&nbsp;</td>
+  <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+  <% for (var i = 0; i < tagSelectors.length; i++) { %>
+    <td class="editbarbutton <%= i == 0 ? 'editbargroupsfirst' : '' %>">
+      <%= tagSelectors[i] %>
+    </td>
+  <% } %>
+  <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+<% } %>

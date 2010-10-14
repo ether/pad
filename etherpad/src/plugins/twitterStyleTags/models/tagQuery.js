@@ -187,7 +187,6 @@ function newTagsSql(querySql) {
     'where ' +
     ' tp.TAG_ID = t.ID ' +
     ' and tp.PAD_ID in %(query_post_table)s ' +
-    ' and tp.PAD_ID NOT LIKE \'%$%\'' +
     'group by t.NAME, tn.total ' +
     'having ' +
     ' count(tp.PAD_ID) > 0 and count(tp.PAD_ID) < tn.total ' +
@@ -195,11 +194,11 @@ function newTagsSql(querySql) {
     ' abs(count(tp.PAD_ID) - (tn.total / 2)) asc ' +
     'limit 10 ' +
     '', info),
-   params: queryNrParams.concat(queryParams)};
+   params: queryNrParams.concat(queryParams.concat([]))};
 }
 
 /* Select the X last changed matching pads and some extra information
- * on them. Except the Pro Pads*/
+ * on them. */
 function padInfoSql(querySql, limit, offset) {
   var sql = '' +
    'select ' +
@@ -212,8 +211,6 @@ function padInfoSql(querySql, limit, offset) {
    '    m.id = q.ID ' +
    '  join PAD_TAG_CACHE as c on ' +
    '    c.PAD_ID = q.ID ' +
-   'where ' +
-   '  m.id NOT LIKE \'%$%\'' +
    'order by ' +
    '  m.lastWriteTime desc ';
   if (limit != undefined)

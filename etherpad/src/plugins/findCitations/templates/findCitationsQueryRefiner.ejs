@@ -1,0 +1,12 @@
+<div>
+  <h1>Search for pads that link to the webpage</h1>
+  <form action="" method="GET">
+    <% for (var name in request.params) { %>
+      <% if (name != 'url') { %>
+        <input type="hidden" name="<%= name %>" value="<%= request.params[name] %>">
+      <% } %>
+    <% } %>
+    <input type="text" name="url" value="<%= request.params.url %>">
+    <button type="submit">Go</button>
+  </form>
+</div>

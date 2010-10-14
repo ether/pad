@@ -33,6 +33,8 @@ import("etherpad.sessions.getSession");
 import("etherpad.utils.{render404,renderFramedError}");
 import("etherpad.collab.server_utils");
 
+jimport("org.apache.commons.fileupload");
+
 function _log(obj) {
   log.custom("import-export", obj);
 }
@@ -243,18 +245,29 @@ function render_import() {
     response.stop();
   }
 
-  var file = request.files.file;
+  /* Maybe we should encapsulate this a bit and put it in utils sometime? */
+  var file = null; 
+  var itemFactory = new fileupload.disk.DiskFileItemFactory();
+  var handler = new fileupload.servlet.ServletFileUpload(itemFactory);
+  var items = handler.parseRequest(request.underlying).toArray();
+  for (var i = 0; i < items.length; i++) {
+    if (!items[i].isFormField()) {
+      file = items[i];
+      break;
+    }
+  }
+
   if (! file) {
     _r('parent.pad.handleImportExportFrameCall("importFailed", "Please select a file to import.")');
   }
 
-  var bytes = file.bytes;
-  var type = _guessFileType(file.contentType, file.filesystemName);
+  var bytes = file.get();
+  var type = _guessFileType(file.getContentType(), file.name);
 
   _log({type: "request", direction: "import", format: type});
 
   if (! type) {
-    type = _getFileExtension(file.filesystemName, "no file extension found");
+    type = _getFileExtension(file.name, "no file extension found");
     _r('parent.pad.handleImportExportFrameCall("importFailed", "'+importexport.errorUnsupported(type)+'")');
   }
 

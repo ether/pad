@@ -207,10 +207,14 @@ PluginRegistry.prototype.registerClientHandlerJS = function () {
   for (pluginName in this.plugins) {
     var plugin = this.pluginModules[pluginName];
 
-    if (this.pluginModules[pluginName] === undefined)
-      throw new Error("this.pluginModules doesn't contain registered plugin " + pluginName);
-    if (this.pluginModules[pluginName].hooks === undefined)
-      throw new Error("plugin " + pluginName + " doesn't seem to be a plugin module");
+    if (this.pluginModules[pluginName] === undefined) {
+      log.logException("this.pluginModules doesn't contain registered plugin " + pluginName);
+      continue;
+    }
+    if (this.pluginModules[pluginName].hooks === undefined) {
+      log.logException("plugin " + pluginName + " doesn't seem to be a plugin module");
+      continue;
+    }
 
     if (plugin.client !== undefined) {
       helpers.includeJs("plugins/" + pluginName + "/main.js");
@@ -232,14 +236,22 @@ PluginRegistry.prototype.callHook = function (hookName, args) {
     var plugin = this.hooks[hookName][i];
 
     /* Just assert that the earth is still round sort of... */
-    if (this.pluginModules[plugin.plugin] === undefined) 
-      throw new Error("this.pluginModules doesn't contain registered plugin " + plugin.plugin);
-    if (this.pluginModules[plugin.plugin].hooks === undefined)
-      throw new Error("plugin " + plugin.plugin + " doesn't seem to be a plugin module");
-    if (this.pluginModules[plugin.plugin][plugin.original || hookName] === undefined) 
-      throw new Error("plugin " + plugin.plugin + " doesn't contain registered hook " + (plugin.original || hookName));
-    if (this.plugins[plugin.plugin] === undefined)
-      throw new Error("plugin " + plugin.plugin + " isn't registered, but has a registered hook: " + hookName);
+    if (this.pluginModules[plugin.plugin] === undefined) {
+     log.logException("this.pluginModules doesn't contain registered plugin " + plugin.plugin);
+      continue;
+    }
+    if (this.pluginModules[plugin.plugin].hooks === undefined) {
+      log.logException("plugin " + plugin.plugin + " doesn't seem to be a plugin module");
+      continue;
+    }
+    if (this.pluginModules[plugin.plugin][plugin.original || hookName] === undefined) {
+      log.logException("plugin " + plugin.plugin + " doesn't contain registered hook " + (plugin.original || hookName));
+      continue;
+    }
+    if (this.plugins[plugin.plugin] === undefined) {
+      log.logException("plugin " + plugin.plugin + " isn't registered, but has a registered hook: " + hookName);
+      continue;
+    }
 
     var pluginRes = this.pluginModules[plugin.plugin][plugin.original || hookName](args);
     if (pluginRes != undefined && pluginRes != null)

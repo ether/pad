@@ -1,0 +1,120 @@
+Plugins are hooks
+------------------
+
+The plugin infrastructure is really a hook infrastructure. It provides
+a way for code anywhere in EtherPad (including in other plugins) to
+create a hook call, and for plugins to register for such hooks to have
+their code run when the hook call is done.
+
+All the power of plugins comes from the hooks available to them.
+
+For details on how the plugin API works, please see the comments in
+the "test" plugin (etherpad/src/plugins/test).
+
+
+On the calling side
+--------------------
+
+To create a hook call, call plugins.callHook(hookName, args) where
+hookName is any descriptive string that can be used as a JavaScript
+function name, and args is a dictionary/object. This function will
+call any hooks registered with hookName with one parameter, args, and
+concatenate their result lists (each must return a list, see below).
+Note: if no plugins are registered for this hook, this function
+returns the empty list.
+
+There is also a helper function, callHookSt that returns a string,
+constructed by concatenating all strings in the returned lists. This
+is mainly usefull from within templates.
+
+
+On the plugin side
+-------------------
+
+Each plugin must contain a main.js module with an object constructor
+function named as the plugin but with "Init" appended. The returned
+object describes the plugin and declares hook registrations.
+
+Each hook function must take one parameter, an dictionary/object, and
+return a list of values. The properties available on the parameter
+object is dependent on the hook the function is registered for.
+
+
+Client side hooks
+------------------
+
+Etherpad runs a sizeable chunk of JavaScript code on the client side,
+that is, in the users' browsers. Because of this there is a need to be
+able to extend that code with plugins the same way that code on the
+server is extended.
+
+The hook system is replicated on the client side - there is a
+plugins.callHook() and plugins can register client side functions to
+be called when that hook is called for.
+
+This registration is done from a client side java script file called
+static/js/main.js. There is one major catch with this file: It runs
+both on the server and client! Beware!
+
+static/js/main.js is modelled after the main main.js, and imported by
+that one on the server. The descriptor object created by
+pluginNameInit() in static/js/main.js is also included as a property
+on the main plugin descriptor object described above,
+
+
+Hooks that plugins can provide
+-------------------------------
+
+All hooks must return either undefined/null or a list of return
+values. This list might contain any number of values, including none
+at all or just one.
+
+aceAttribsToClasses
+  Type: client, server
+adminMenu
+collectContentPost
+  Type: client, server
+collectContentPre 
+  Type: client, server
+docBarDropdownsAll
+docBarDropdownsPad
+docbarItemsAdmin
+docbarItemsAll
+docbarItemsPad
+docbarItemsPluginManager
+docbarItemsTagBrowser
+docbarItemsTagBrowserPad
+editBarDropdownsAll
+editBarDropdownsPad
+editBarItemsLeftAll
+editBarItemsLeftPad
+editBarItemsRightAll
+editBarItemsRightPad
+handleAdminPath
+handlePath
+  Registers new urls to serve
+  Type: server
+  Parameters: None
+  Returns: Parameter suitable for Dispatcher
+padModelWriteToDB
+renderNavigation
+renderPageBodyPre [DEPRECATED]
+  Adds extra html before the body of a page
+  Type: server
+  Parameters: bodyFileName, data, plugin
+  Returns: String(s) of html
+renderPageBodyPost [DEPRECATED]
+  Adds extra html after the body of a page
+  Type: server
+  Parameters: bodyFileName, data, plugin
+  Returns: String(s) of html
+serverShutdown
+  Run before server shutdown
+  Type: server
+  Parameters: None
+  Returns: None
+serverStartup
+  Run right after server startup
+  Type: server
+  Parameters: None
+  Returns: None

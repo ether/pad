@@ -1,0 +1,3 @@
+<% if (request.params.linksto != undefined && request.params.linksto != '') { %>
+  <a href="<%= helpers.updateToUrl({}, ["linksto"]) %>">links to: <%= request.params.linksto %></a>
+<% } %>

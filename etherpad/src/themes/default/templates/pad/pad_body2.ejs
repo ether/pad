@@ -17,7 +17,7 @@ limitations under the License. */ %>
 <%
   template.inherit('page.ejs');
 
-  helpers.setHtmlTitle("EtherPad: "+pageTitle);
+  helpers.setHtmlTitle(appjet.config.customBrandingName + ": " + pageTitle);
   helpers.includeJs("ace.js");
   helpers.includeJs("collab_client.js");
   helpers.includeJs("pad_userlist.js");
@@ -25,7 +25,9 @@ limitations under the License. */ %>
   helpers.includeJs("pad_impexp.js");
   helpers.includeJs("pad_savedrevs.js");
   helpers.includeJs("pad_connectionstatus.js");
+  helpers.includeJs("pad2.js");
 
+  var padUrlBase = request.url.split("?", 1)[0].split('/', 3).join('/');
   var padUrlAttrValue = request.url.split("?", 1)[0].replace(/\"/g, '&quot;');
 
   function exportLink(type, n, label, requiresOffice, url, title) {
@@ -52,6 +54,20 @@ limitations under the License. */ %>
     return pieces.join('');
   }
 %>
+
+
+<% template.define('topBar', function() { var ejs_data=''; %>
+  <% if (isProAccountHolder) { %>          
+    <a id="backtoprosite" href="/ep/padlist/">Return to pad list</a>
+    <div id="accountnav"><%= toHTML(account.email) %>
+      <a href="/ep/account/sign-out">(sign out)</a>
+    </div>
+  <% } else if (isPro) { %>
+    <div id="accountnav">
+      <a href="<%= signinUrl %>">sign in</a>
+    </div>
+  <% } %>
+<% return ejs_data; }); %>
 
 
 <% template.define('docBarTitle', function() { var ejs_data=''; %>
@@ -252,53 +268,12 @@ limitations under the License. */ %>
 
 
 <% template.define('sideBar', function() { var ejs_data=''; %>
+  <script>
+    $(document).ready(function () {
+      makeResizableVPane("#padusers", "#hdraggie", "#padchat", 75, 75);
+    });
+  </script>
   <div id="padusers">
-    <div id="connectionbox" class="cboxconnecting">
-      <div id="connectionboxinner">
-	<div class="connecting">
-	  Connecting...
-	</div>
-	<div class="reconnecting">
-	  Reestablishing connection...
-	</div>
-	<div class="disconnected">
-	  <h2 class="h2_disconnect">Disconnected.</h2>
-	  <h2 class="h2_userdup">Opened in another window.</h2>
-	  <h2 class="h2_unauth">No Authorization.</h2>
-	  <div id="disconnected_looping">
-	    <p><b>We're having trouble talking to the EtherPad synchronization server.</b>
-	      You may be connecting through an incompatible firewall or proxy server.</p>
-	  </div>
-	  <div id="disconnected_initsocketfail">
-	    <p><b>We were unable to connect to the EtherPad synchronization server.</b>
-	      This may be due to an incompatibility with your web
-	      browser or internet connection.</p>
-	  </div>
-	  <div id="disconnected_userdup">
-	    <p><b>You seem to have opened this pad in another browser window.</b>
-	      If you'd like to use this window instead, you can reconnect.</p>
-	  </div>
-	  <div id="disconnected_unknown">
-	    <p><b>Lost connection with the EtherPad synchronization
-		server.</b>  This may be due to a loss of network connectivity.</p>
-	  </div>
-	  <div id="disconnected_slowcommit">
-	    <p><b>Server not responding.</b>  This may be due to network connectivity issues or high load on the server.</p>
-	  </div>
-	  <div id="disconnected_unauth">
-	    <p>Your browser's credentials or permissions have changed while viewing this pad.  Try reconnecting.</p>
-	  </div>
-	  <div id="reconnect_advise">
-	    <p>If this continues to happen, please <a target="_blank" href="/ep/support">let us know</a>
-	      (opens in new window).</p>
-	  </div>
-	  <div id="reconnect_form">
-	    <button id="forcereconnect">Reconnect Now</button>
-	  </div>
-	</div>
-      </div>
-    </div>
-
     <div id="connectionstatus">
       <!-- -->
     </div>
@@ -389,27 +364,10 @@ limitations under the License. */ %>
 
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
   <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('insertunorderedlist'));" title="Toggle Bullet List"><img src="/static/img/jun09/pad/editbar_insertunorderedlist.gif"></a></td>
-  <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
-
-  <td>&nbsp;&nbsp;</td>
-
-  <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
-  <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('indent'));" title="Indent List"><img src="/static/img/jun09/pad/editbar_indent.gif"></a></td>
+  <td class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('indent'));" title="Indent List"><img src="/static/img/jun09/pad/editbar_indent.gif"></a></td>
   <td class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('outdent'));" title="Unindent List"><img src="/static/img/jun09/pad/editbar_outdent.gif"></a></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
 
-  <td>&nbsp;&nbsp;</td>
-
-  <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
-  <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('clearauthorship'));" title="Clear Authorship Colors"><img src="/static/img/jun09/pad/editbar_clearauthorship.gif"></a></td>
-  <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
-
-  <td>&nbsp;&nbsp;</td>
-
-  <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
-  <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('undo'));" title="Undo (ctrl-Z)"><img src="/static/img/jun09/pad/editbar_undo.gif"></a></td>
-  <td  class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('redo'));" title="Redo (ctrl-Y)"><img src="/static/img/jun09/pad/editbar_redo.gif"></a></td>
-  <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
   <%: template.callHookStr('editBarItemsLeftPad', {}, '', '', ''); %>
 <% return ejs_data; }); %>
 
@@ -417,7 +375,16 @@ limitations under the License. */ %>
 <% template.define('editBarItemsRight', function() { var ejs_data=''; %>
   <%: template.callHookStr('editBarItemsRightPad', {}, '', '', ''); %>
   <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
-  <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
+  <td class="editbarbutton editbargroupsfirst"><a href="javascript:void (window.pad&&pad.editbarClick('clearauthorship'));" title="Clear Authorship Colors"><img src="/static/img/jun09/pad/editbar_clearauthorship.gif"></a></td>
+  <td class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('undo'));" title="Undo (ctrl-Z)"><img src="/static/img/jun09/pad/editbar_undo.gif"></a></td>
+  <td class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('redo'));" title="Redo (ctrl-Y)"><img src="/static/img/jun09/pad/editbar_redo.gif"></a></td>
+  <td class="editbarbutton"><a href="javascript:void (window.pad&&pad.editbarClick('save'));" title="Save Revision"><img src="/static/img/jun09/pad/editbar_save.gif"></a></td>
+  <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+
+  <td>&nbsp;&nbsp;</td>
+
+  <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+  <td class="editbarbutton editbargroupsfirst"><select id="viewzoommenu"><option value="z85">85%</option><option value="z100">100%</option><option value="z115">115%</option><option value="z150">150%</option><option value="z200">200%</option><option value="z300">300%</option></select></td>
   <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
 <% return ejs_data; }); %>
 
@@ -437,6 +404,51 @@ limitations under the License. */ %>
   <div id="modaloverlay"><div id="modaloverlay-inner"><!-- --></div></div>
 
   <div id="mainmodals">
+    <div id="connectionbox" class="modaldialog">
+      <div id="connectionboxinner" class="modaldialog-inner">
+	<div class="connecting">
+	  Connecting...
+	</div>
+	<div class="reconnecting">
+	  Reestablishing connection...
+	</div>
+	<div class="disconnected">
+	  <h2 class="h2_disconnect">Disconnected.</h2>
+	  <h2 class="h2_userdup">Opened in another window.</h2>
+	  <h2 class="h2_unauth">No Authorization.</h2>
+	  <div id="disconnected_looping">
+	    <p><b>We're having trouble talking to the EtherPad synchronization server.</b>
+	      You may be connecting through an incompatible firewall or proxy server.</p>
+	  </div>
+	  <div id="disconnected_initsocketfail">
+	    <p><b>We were unable to connect to the EtherPad synchronization server.</b>
+	      This may be due to an incompatibility with your web
+	      browser or internet connection.</p>
+	  </div>
+	  <div id="disconnected_userdup">
+	    <p><b>You seem to have opened this pad in another browser window.</b>
+	      If you'd like to use this window instead, you can reconnect.</p>
+	  </div>
+	  <div id="disconnected_unknown">
+	    <p><b>Lost connection with the EtherPad synchronization
+		server.</b>  This may be due to a loss of network connectivity.</p>
+	  </div>
+	  <div id="disconnected_slowcommit">
+	    <p><b>Server not responding.</b>  This may be due to network connectivity issues or high load on the server.</p>
+	  </div>
+	  <div id="disconnected_unauth">
+	    <p>Your browser's credentials or permissions have changed while viewing this pad.  Try reconnecting.</p>
+	  </div>
+	  <div id="reconnect_advise">
+	    <p>If this continues to happen, please <a target="_blank" href="/ep/support">let us know</a>
+	      (opens in new window).</p>
+	  </div>
+	  <div id="reconnect_form">
+	    <button id="forcereconnect">Reconnect Now</button>
+	  </div>
+	</div>
+      </div>
+    </div>
     <div id="feedbackbox">
       <div id="feedbackbox-tl"><!-- --></div>
       <div id="feedbackbox-tr"><!-- --></div>
@@ -463,9 +475,9 @@ limitations under the License. */ %>
       </div>
       <a href="javascript:void(0)" id="feedbackbox-hide"><!-- --></a>
     </div>
-    <div id="sharebox">
-      <div id="sharebox-inner">
-	<a href="javascript:void(0)" id="sharebox-hide"><!-- --></a>
+    <div id="sharebox" class="modaldialog">
+      <div id="sharebox-inner" class="modaldialog-inner">
+	<a href="javascript:void(0)" id="sharebox-hide" class="modaldialog-hide"><!-- --></a>
 	<div id="sharebox-stripe" class="sharebox-stripe-private">
 	  <div class="public">
 	    <strong>Public Pad:</strong> This pad is accessible to anyone who
@@ -475,22 +487,30 @@ limitations under the License. */ %>
 	    <strong>Private Pad:</strong> This pad is only accessible to team account-holders.  To allow anyone to access it, <a href="javascript:void(0)" class="setsecurity">change security settings</a>.
 	  </div>
 	</div>
-	<div id="sharebox-forms">
-	  <div id="sharebox-pastelink">Paste link over email or IM:</div>
-	  <div id="sharebox-orsend">or send an email invitation...</div>
+	<div><label>Paste link over email or IM:</label></div>
+	<input class="sharebox-url" type="text" readonly="readonly" value="<%=padUrlAttrValue%>"/>
+	<div><label>...or for read only access paste this link:</label></div>
+	<input class="sharebox-url" type="text" readonly="readonly" value="<%= padUrlBase %>/ep/pad/view/<%= padIdReadonly %>/latest"/>
+	<h1><a class="expand-collapse" id="sharebox-sendmail-form-expander" href="javascript:" onclick="$('#sharebox-sendmail-form').toggle();$('#sharebox-sendmail-form-expander').toggleClass('expanded');">or send an email invitation...</a></h1>
+	<div id="sharebox-sendmail-form" style="display:none">
+          <table>
+            <tr>
+              <th><label>To:</label></th>
+              <td><input type="text" id="sharebox-to" class="modalfield" /></td>
+            </tr>
+            <tr>
+              <th><label>Subject:</label></th>
+              <td><input type="text" id="sharebox-subject" class="modalfield" /></td>
+            </tr>
+            <tr>
+              <th><label>Message:</label></th>
+              <td><textarea id="sharebox-message" rows="6" cols="40" class="modalfield"></textarea></td>
+            </tr>
+          </table>
 	  <a href="javascript:void(0)" id="sharebox-send"><!-- --></a>
-	  <input id="sharebox-url" type="text" readonly="readonly" value="<%=padUrlAttrValue%>"/>
-	  <input type="text" id="sharebox-to" class="modalfield" />
-	  <input type="text" id="sharebox-subject" class="modalfield" />
-	  <textarea id="sharebox-message" rows="6" cols="40" class="modalfield"></textarea>
-	  <div id="sharebox-fieldname-to">To</div>
-	  <div id="sharebox-fieldname-subject">Subject</div>
-	  <div id="sharebox-fieldname-message">Message</div>
-	  <div id="sharebox-dislink"><!-- --></div>
 	</div>
-	<div id="sharebox-shownwhenexpanded">
-	  <div id="sharebox-response"><!-- --></div>
-	</div>
+	<div id="sharebox-response"><!-- --></div>
+        <div style="clear: both;"></div>
       </div>
     </div>
   </div>

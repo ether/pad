@@ -20,7 +20,7 @@ twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
     var href;
     cls = args.cls.replace(/(^| )padtagsearch:(\S+)/g, function(x0, space, padtagsearch) {
       var tag = encodeURI(padtagsearch.substring(1));
-      href = '/ep/tag/?query=' + tag;
+      href = '/ep/search?query=' + tag;
       return space + "padtagsearch padtagsearch_" + tag;
     });
 
@@ -32,7 +32,7 @@ twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
     var href;
     cls = args.cls.replace(/(^| )padtag:(\S+)/g, function(x0, space, padtag) {
       var tag = encodeURI(padtag.substring(1));
-      href = '/ep/tag/?query=' + tag;
+      href = '/ep/search?query=' + tag;
       return space + "padtag padtag_" + tag;
     });
 

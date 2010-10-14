@@ -12,17 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
- template.inherit('page.ejs');
- helpers.setHtmlTitle("EtherPad: Manage plugins");
- helpers.includeCss("admin/pluginmanager.css");
-
- function inArray(item, arr) {
-   for (var i = 0; i < arr.length; i++)
-     if (arr[i] == item)
-       return true;
-   return false;
- }
-
+ template.inherit('admin/page.ejs');
+ helpers.setHtmlTitle(appjet.config.customBrandingName +": Manage plugins");
  plugin_registry = plugins.loadPlugins();
 %>
 
@@ -30,8 +21,8 @@ limitations under the License. */ %>
   <td id="docbarpadtitle"><span>Plugin manager</span></td>
 <% return ejs_data; }); %>
 
-
 <% template.define('docBarItems', function() { var ejs_data=''; %>
+  <%: plugins.callHookStr('docbarItemsAdmin', {}, '', '<td class="docbarbutton">', '</td>'); %>
   <%: plugins.callHookStr('docbarItemsPluginManager', {}, '', '<td class="docbarbutton">', '</td>'); %>
 <% return ejs_data; }); %>
 
@@ -40,24 +31,47 @@ limitations under the License. */ %>
    <table>
     <tr>
      <th>Module name</th>
+    <th>Description</th>
      <th>Status</th>
-     <th></th>
+     <th>Action</th>
     </tr>
-    <% for (var plugin in plugin_registry.pluginModules) { %>
+    <%
+      var plugins = [];
+      for (var plugin in plugin_registry.pluginModules) {
+        plugins.push(plugin);
+      }
+      plugins = plugins.sort();
+    %>
+    <%
+      for (var i = 0; i < plugins.length; i++) {
+        var plugin = plugins[i];
+    %>
      <tr>
+<td style="font-weight:bold;">
+       <%= plugin %>
+
+<!--
       <td class="mousover_parent">
        <%= plugin %>
        <div class="mouseover_child">
 	<%= plugin_registry.pluginModules[plugin].description %>
+-->
        </div>
       </td>
-      <td>
-       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
-	Installed
-       <% } else { %>
-	Not installed
-       <% } %>
+	<td>
+        <%= plugin_registry.pluginModules[plugin].description %>
       </td>
+
+       <% if (plugin_registry.plugins[plugin] !== undefined) { %>
+      <td class="installed">
+	Installed
+      </td>
+
+       <% } else { %>
+      <td class="notinstalled">
+	Not installed
+      </td>
+       <% } %>
       <td>
        <% if (plugin_registry.plugins[plugin] !== undefined) { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>

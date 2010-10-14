@@ -25,41 +25,23 @@ function onRequest() {
   var staticBase = '/static';
 
   var opts = {cache: isProduction()};
+  var serveCompressed = faststatic.compressedFileServer(opts);
 
   var disp = new Dispatcher();
 
-  /* FIXME: Is there a more effective way to do this? */
-  for (plugin in plugins.loadPlugins().plugins) {
-    disp.addLocations([
-      [PrefixMatcher('/static/js/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/js/', opts)],
-      [PrefixMatcher('/static/css/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/css/', opts)],
-      [PrefixMatcher('/static/swf/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/swf/', opts)],
-      [PrefixMatcher('/static/html/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/html/', opts)],
-      [PrefixMatcher('/static/zip/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/zip/', opts)]]);
-  }
-
-  var serveFavicon = faststatic.singleFileServer(staticBase + '/favicon.ico', opts);
-  var serveCrossDomain = faststatic.singleFileServer(staticBase + '/crossdomain.xml', opts);
-  var serveStaticDir = faststatic.directoryServer(staticBase, opts);
-  var serveCompressed = faststatic.compressedFileServer(opts);
-  var serveJs = faststatic.directoryServer(staticBase+'/js/', opts);
-  var serveCss = faststatic.directoryServer(staticBase+'/css/', opts);
-  var serveSwf = faststatic.directoryServer(staticBase+'/swf/', opts);
-  var serveHtml = faststatic.directoryServer(staticBase+'/html/', opts);
-  var serveZip = faststatic.directoryServer(staticBase+'/zip/', opts);
-
   disp.addLocations([
-    ['/favicon.ico', serveFavicon],
+    ['/favicon.ico', faststatic.singleFileServer(staticBase + '/favicon.ico', opts)],
     ['/robots.txt', serveRobotsTxt],
-    ['/crossdomain.xml', serveCrossDomain],
-    [PrefixMatcher('/static/html/'), serveHtml],
-    [PrefixMatcher('/static/js/'), serveJs],
-    [PrefixMatcher('/static/css/'), serveCss],
-    [PrefixMatcher('/static/swf/'), serveSwf],
-    [PrefixMatcher('/static/zip/'), serveZip],
-    [PrefixMatcher('/static/compressed/'), serveCompressed],
-    [PrefixMatcher('/static/'), serveStaticDir]
-  ]);
+    ['/crossdomain.xml', faststatic.singleFileServer(staticBase + '/crossdomain.xml', opts)],
+    [PrefixMatcher('/static/compressed/'), serveCompressed]])
+
+  for (fmt in {'js':0, 'css':0, 'swf':0, 'html':0, 'img':0, 'zip':0}) {
+    for (plugin in plugins.loadPlugins().plugins) {
+      disp.addLocations([[PrefixMatcher('/static/'+fmt+'/plugins/'+plugin+'/'), faststatic.directoryServer('/plugins/' + plugin + '/static/'+fmt+'/', opts)]]);
+    }
+    disp.addLocations([[PrefixMatcher('/static/'+fmt+'/'), faststatic.directoryServer(staticBase+'/'+fmt+'/', opts)]]);
+  }
+  disp.addLocations([[PrefixMatcher('/static/'), faststatic.directoryServer(staticBase, opts)]]);
 
   return disp.dispatch();
 }

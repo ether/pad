@@ -45,24 +45,12 @@ function onRequest() {
    clientIp: request.clientAddr,
    colorPalette: COLOR_PALETTE,
    serverTimestamp: +(new Date),
-   isProPad: pro_utils.isProDomainRequest(),
-   userIsGuest: padusers.isGuest(padusers.getUserId()),
-   userId: padusers.getUserId(),
   });
-
-
-  padutils.setOptsAndCookiePrefs(request);
-  var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth")
 
   renderHtml("admin/pluginmanager.ejs",
    {
-    prefs: prefs,
     config: appjet.config,
     bodyClass: 'nonpropad',
-    isPro: pro_utils.isProDomainRequest(),
-    isProAccountHolder: pro_utils.isProDomainRequest() && ! padusers.isGuest(padusers.getUserId()),
-    account: getSessionProAccount(), // may be falsy
    });
   return true;
 }

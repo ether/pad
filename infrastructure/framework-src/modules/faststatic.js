@@ -115,17 +115,10 @@ function manglePluginPath(localFile, fileType) {
 }
 
 function manglePluginPaths(localFile) {
-  return manglePluginPath(
-    manglePluginPath(
-      manglePluginPath(
-        manglePluginPath(
-	  manglePluginPath(
-	    localFile,
-	    'js'),
-          'css'),
-        'swf'),
-      'html'),
-    'zip');
+  for (fmt in {'js':0, 'css':0, 'swf':0, 'html':0, 'img':0, 'zip':0}) { 
+    localFile = manglePluginPath(localFile, fmt);
+  }
+  return localFile;
 }
 
 function _wrapFile(localFile) {
