@@ -46,27 +46,30 @@ function onRequest() {
   if (format == "sitemap")
     var limit = undefined;
 
-  var domainSql = "ID NOT LIKE '%$%'";
-  if (pro_utils.isProDomainRequest()) {
-   domainSql = "ID LIKE '" + domains.getRequestDomainRecord().id + "$%'";
+  /* Make the query */
+  var querySql = {sql:'PAD_META', 'params':[]};
+  var hooks = plugins.callHook('queryToSql');
+  for (i = 0; i < hooks.length; i++) {
+    querySql = hooks[i](querySql);
   }
 
-  var querySql = {'sql': "(select ID from PAD_META where " + domainSql + ")", 'params': []}
-
+  /* Filter based on access privileges */
   var hooks = plugins.callHook('queryAccessSql');
   if (hooks.length == 0) {
     if (appjet.config.defaultAccess == 'none')
-      querySql.sql = '(select ID from PAD_META where false)';
+     querySql = {'sql':'(select ID from PAD_META where false)', 'params': []};
   } else {
     for (i = 0; i < hooks.length; i++) {
       querySql = hooks[i](querySql);
     }
   }
 
-  var hooks = plugins.callHook('queryToSql');
-  for (i = 0; i < hooks.length; i++) {
-    querySql = hooks[i](querySql);
+  /* Filter for the right domain */
+  var domainSql = "ID NOT LIKE '%$%'";
+  if (pro_utils.isProDomainRequest()) {
+   domainSql = "ID LIKE '" + domains.getRequestDomainRecord().id + "$%'";
   }
+  querySql.sql = "(select ID from " + querySql.sql + " as p where " + domainSql + ")";
 
   var clientVars = {
     userAgent: request.headers["User-Agent"],
