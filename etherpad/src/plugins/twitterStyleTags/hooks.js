@@ -46,19 +46,25 @@ function padModelWriteToDB(args) {
   }
 }
 
+/* Don't do anything here, as we do it in queryToSql instead for
+ * performance reasons */
 function queryAccessSql(args) {
   return [function (querySql) {
-    return tagQuery.getQueryToSql(['public'], [], querySql);
+    return querySql;
   }];
 }
 
 function queryToSql(args) {
   return [function (querySql) {
-    if (request.params.query == undefined || request.params.query == '') {
+    if (   appjet.config.defaultAccess != 'none'
+	&& (request.params.query == undefined
+            || request.params.query == '')) {
       return querySql;
     } else  {
       var tags = tagQuery.queryToTags(request.params.query);
 
+      if (appjet.config.defaultAccess == 'none')
+        tags = {'tags':tags.tags.concat('public'), 'antiTags':tags.antiTags};
       return tagQuery.getQueryToSql(tags.tags, tags.antiTags, querySql);
     }
   }];

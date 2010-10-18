@@ -71,6 +71,8 @@ function onRequest() {
   }
   querySql.sql = "(select ID from " + querySql.sql + " as p where " + domainSql + ")";
 
+  log.info(querySql);
+
   var clientVars = {
     userAgent: request.headers["User-Agent"],
     debugEnabled: request.params.djs,
