@@ -301,6 +301,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   right: 0;
   top: 36px;
   zoom: 1;
+  z-index: 11;
 }
 
 #editorcontainer { height: 100%; }
@@ -317,6 +318,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   top: 0;
   width: 290px;
   overflow: hidden;
+  z-index: 11;
 }
 .hidesidebar #padsidebar { width: 0; overflow: hidden; }
 
