@@ -10,7 +10,3 @@ function handlePath() {
 function docbarItemsAll() {
  return ["<td class='docbarbutton highlight'><a href='/ep/search'><img src='/static/img/plugins/search/icon_home.gif'>Home</a></td>"];
 }
-
-function editBarItemsLeftPad(arg) {
-  return arg.template.include('searchEditbarButtons.ejs', undefined, ['search']);
-}
