@@ -14,7 +14,7 @@ limitations under the License. */ %><%
 
  template.inherit('page.ejs');
 
- helpers.setHtmlTitle("EtherPad: "+toHTML(padId + " / " + rlabel));
+ helpers.setHtmlTitle(customBrandingName ": "+toHTML(padId + " / " + rlabel));
 
  helpers.includeCss("broadcast.css");
  helpers.includeJs("broadcast_slider.js");
