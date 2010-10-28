@@ -241,7 +241,7 @@ object email {
           }
 
         msg.setSubject(subject);
-        msg.setContent(content, "text/plain");
+        msg.setContent(content, "text/plain; charset=utf-8");
         Transport.send(msg);
         "";
       }

@@ -46,8 +46,8 @@ var _contentTypes = {
   'jpg': 'image/jpeg',
   'jpeg': 'image/jpeg',
   'css': 'text/css',
-  'js': 'application/x-javascript',
-  'txt': 'text/plain',
+  'js': 'application/x-javascript; charset=utf-8',
+  'txt': 'text/plain; charset=utf-8',
   'html': 'text/html; charset=utf-8',
   'ico': 'image/x-icon',
   'swf': 'application/x-shockwave-flash',
@@ -63,7 +63,7 @@ var _gzipableTypes = {
 
 function _guessContentType(path) {
   var ext = path.split('.').pop().toLowerCase();
-  return _contentTypes[ext] || 'text/plain';
+  return _contentTypes[ext] || _contentTypes['txt'];
 }
 
 //----------------------------------------------------------------
