@@ -46,7 +46,7 @@ var _contentTypes = {
   'jpg': 'image/jpeg',
   'jpeg': 'image/jpeg',
   'css': 'text/css',
-  'js': 'application/x-javascript; charset=utf-8',
+  'js': 'application/x-javascript',
   'txt': 'text/plain; charset=utf-8',
   'html': 'text/html; charset=utf-8',
   'ico': 'image/x-icon',
