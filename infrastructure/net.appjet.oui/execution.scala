@@ -166,7 +166,7 @@ class ResponseWrapper(val res: HttpServletResponse) {
   private lazy val outputStrings = new ListBuffer[String];
   private lazy val outputBytes = new ListBuffer[Array[byte]];
   private var statusCode = 200;
-  private var contentType = "text/html";
+  private var contentType = "text/html; charset=utf-8";
   private var redirect: String = null;
   private lazy val headers = new LinkedHashSet[(String, String, HttpServletResponse => Unit)] {
     def removeAll(k: String) {

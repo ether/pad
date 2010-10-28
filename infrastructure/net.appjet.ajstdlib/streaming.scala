@@ -540,7 +540,7 @@ var d = parent.comet.disconnect;"""+(if(!config.devMode)"\nwindow.onerror = func
   
   override def handleNewConnection(req: HttpServletRequest, res: HttpServletResponse, out: StringBuilder) {
     super.handleNewConnection(req, res, out);
-    res.setContentType("text/html");
+    res.setContentType("text/html; charset=utf-8");
     out.append(header(req));
   }
 }
