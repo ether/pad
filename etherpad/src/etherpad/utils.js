@@ -144,7 +144,7 @@ Template.prototype.callHook = function (hookName, args) {
 
 Template.prototype.callHookStr = function (hookName, args, sep, pre, post) {
   var sendArgs = {template:this};
-  if (args != undefined)
+  if (typeof args !== 'undefined')
     for (var name in args)
       sendArgs[name] = args[name];
   return plugins.callHookStr(hookName, sendArgs, sep, pre, post);

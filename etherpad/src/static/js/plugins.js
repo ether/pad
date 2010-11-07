@@ -1,6 +1,6 @@
 plugins = {
   callHook: function (hookName, args) {
-  	var hook = clientVars.hooks[hookName];
+    var hook = clientVars.hooks[hookName];
     if (hook === undefined)
       return [];
     var res = [];

@@ -29,8 +29,8 @@ function tagsToQuery(tags, antiTags) {
 
 function queryToTags(query) {
   var tags = {
-    tags: new Array(),
-    antiTags: new Array()
+    tags: [],
+    antiTags: []
   };
 
   if (query != undefined && query != '') {
