@@ -4,7 +4,7 @@ function twitterStyleTagsInit() {
 
 twitterStyleTagsInit.prototype.aceInitInnerdocbodyHead = function(args) {
   args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/twitterStyleTags/pad.css"/>\'');
-}
+};
 
 twitterStyleTagsInit.prototype.aceGetFilterStack = function(args) {
   return [
@@ -13,7 +13,7 @@ twitterStyleTagsInit.prototype.aceGetFilterStack = function(args) {
     args.linestylefilter.getRegexpFilter(
       new RegExp("=[^#=\\s\"'][^#=\\s\"']*", "g"), 'padtagsearch')
   ];
-}
+};
 
 twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
   if (args.cls.indexOf('padtagsearch') >= 0) {
@@ -41,7 +41,7 @@ twitterStyleTagsInit.prototype.aceCreateDomLine = function(args) {
      extraOpenTags: '<a href="' + href.replace(/\"/g, '&quot;') + '">',
      extraCloseTags: '</a>'}];
   }
-}
+};
 
 /* used on the client side only */
 twitterStyleTags = new twitterStyleTagsInit();
