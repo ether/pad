@@ -144,7 +144,7 @@ get isPost() {
  */
 get scheme() {
   if (this.isDefined) {
-    return String(_cx().request().scheme());
+    return appjet.config.useHttpsUrls ? "https" : String(_cx().request().scheme());
   }
 },
 

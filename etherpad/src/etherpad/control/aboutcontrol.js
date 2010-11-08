@@ -181,7 +181,7 @@ function render_eepnet_pricing_contact_post() {
     '00N80000003FYuI': googleQuery,
     lead_source: 'EEPNET Pricing Inquiry',
     industry: data.industry,
-    retURL: 'http://'+request.host+'/ep/store/salesforce-web2lead-ok'
+    retURL: request.scheme+'://'+request.host+'/ep/store/salesforce-web2lead-ok'
   };
 
   var result = netutils.urlPost(

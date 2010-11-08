@@ -163,7 +163,7 @@ function render_main_post() {
   });
 
   if (ok) {
-    response.redirect('http://'+subdomain+"."+request.host+'/ep/finish-activation');
+    response.redirect(request.scheme+"://"+subdomain+"."+request.host+'/ep/finish-activation');
   } else {
     response.write("There was an error processing your request.");
   }
