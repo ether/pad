@@ -9,7 +9,7 @@ function padModelWriteToDB(args) {
   /* Update links for the pad */
 
   var new_links = args.pad.text().match(new RegExp("\\[\\[[^\\[\\]]*]]", "g"));
-  if (new_links == null) new_links = new Array();
+  if (new_links == null) new_links = [];
   for (i = 0; i < new_links.length; i++)
     new_links[i] = new_links[i].substring(2, new_links[i].length-2);
   var new_links_str = new_links.join(' ')
