@@ -111,7 +111,8 @@ var paduserlist = (function() {
     }
     function handleRowNode(tr, data) {
       if (data.titleText) {
-        tr.attr('title', data.titleText);
+        var titleText = data.titleText;
+        window.setTimeout(function() { tr.attr('title', titleText )}, 0);
       }
       else {
         tr.removeAttr('title');
