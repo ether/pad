@@ -364,7 +364,7 @@ function render_pad(localPadId) {
 
   padutils.setOptsAndCookiePrefs(request);
   var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth") +
+  var bodyClass = (prefs.isFullWidth ? "maximized" : "limwidth") +
     " "+(isPro ? "propad" : "nonpropad")+" "+
     (isProUser ? "prouser" : "nonprouser");
 
