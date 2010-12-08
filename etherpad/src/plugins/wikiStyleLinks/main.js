@@ -45,12 +45,12 @@ function install() {
 
  sqlobj.createTable('PAD_LINK', {
    PAD_ID: 'varchar(128) character set utf8 collate utf8_bin not null references PAD_META(ID)',
-   LINK: 'varchar(128) collate utf8_bin not null',
+   LINK: 'varchar(128) collate utf8_bin not null'
   });
 
  sqlobj.createTable('PAD_LINK_CACHE', {
    PAD_ID: 'varchar(128) character set utf8 collate utf8_bin unique not null references PAD_META(ID)',
-   LINKS: 'varchar(1024) collate utf8_bin not null',
+   LINKS: 'varchar(1024) collate utf8_bin not null'
   });
 
 }

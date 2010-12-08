@@ -44,13 +44,13 @@ function onRequest() {
    debugEnabled: request.params.djs,
    clientIp: request.clientAddr,
    colorPalette: COLOR_PALETTE,
-   serverTimestamp: +(new Date),
+   serverTimestamp: +(new Date)
   });
 
   renderHtml("admin/pluginmanager.ejs",
    {
     config: appjet.config,
-    bodyClass: 'nonpropad',
+    bodyClass: 'nonpropad'
    });
   return true;
 }

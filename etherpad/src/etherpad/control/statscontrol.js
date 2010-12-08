@@ -189,7 +189,7 @@ var statDisplays = {
         description: "Referers, number of hits over a %t period",
         type: "top",
         options: {showOthers: false},
-        stats: ["top_referers"] },
+        stats: ["top_referers"] }
     ],
   product: [
       { name: "pads",
@@ -242,7 +242,7 @@ var statDisplays = {
       { name: "stream post latencies",
         description: "Comet post latencies, percentiles in milliseconds over a %t period",
         type: "histogram",
-        stats: ["streaming_latencies"] },    
+        stats: ["streaming_latencies"] }
     ],
   health: [
       { name: "disconnect causes",
@@ -282,7 +282,7 @@ var statDisplays = {
                    color: "FFA928" },
                  { stat: "streaming_disconnects:total_disconnects",
                    description: "Total number of disconnects",
-                   color: "FF0000" } ] },  
+                   color: "FF0000" } ] }
   ]
 }
 

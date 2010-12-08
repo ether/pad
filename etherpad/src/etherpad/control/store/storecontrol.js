@@ -36,7 +36,7 @@ function onStartup() {}
 function onRequest() {
   var disp = new Dispatcher();
   disp.addLocations([
-    [DirMatcher('/ep/store/eepnet-checkout/'), forward(eepnet_checkout_control)],
+    [DirMatcher('/ep/store/eepnet-checkout/'), forward(eepnet_checkout_control)]
   ]);
   return disp.dispatch();
 }

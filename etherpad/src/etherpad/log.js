@@ -116,7 +116,7 @@ function _getRequestLogEntry() {
       query: request.query,
       referer: request.headers['Referer'],
       userAgent: request.headers['User-Agent'],
-      statusCode: response.getStatusCode(),
+      statusCode: response.getStatusCode()
     }
     if ('globalPadId' in request.cache) {
       logEntry.padId = request.cache.globalPadId;

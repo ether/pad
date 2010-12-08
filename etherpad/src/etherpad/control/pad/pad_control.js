@@ -356,7 +356,7 @@ function render_pad(localPadId) {
       userName: displayName,
       userColor: assignColorId(pad, userId),
       specialKey: specialKey,
-      specialKeyTranslation: collab_server.translateSpecialKey(specialKey),
+      specialKeyTranslation: collab_server.translateSpecialKey(specialKey)
     });
   });
 

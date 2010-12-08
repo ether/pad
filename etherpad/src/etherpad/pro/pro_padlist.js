@@ -160,7 +160,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('localPadId', {
-    title: "Path",
+    title: "Path"
   });
   addAvailableColumn('actions', {
     title: "",

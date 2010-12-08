@@ -78,7 +78,7 @@ function onRequest() {
     debugEnabled: request.params.djs,
     clientIp: request.clientAddr,
     colorPalette: COLOR_PALETTE,
-    serverTimestamp: +(new Date),
+    serverTimestamp: +(new Date)
   }
 
   var info = {

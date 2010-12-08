@@ -403,7 +403,7 @@ function handlePath() {
   var proDispatcher = new Dispatcher();
   proDispatcher.addLocations([
     ['/', pro_main_control.render_main],
-    [PrefixMatcher('/ep/'), forward(pro_main_control)],
+    [PrefixMatcher('/ep/'), forward(pro_main_control)]
   ]);
 
   // dispatching logic: first try common, then dispatch to

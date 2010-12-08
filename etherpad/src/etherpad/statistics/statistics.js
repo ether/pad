@@ -179,7 +179,7 @@ function _hitTracker(trackerType, timescaleType) {
   var conversionData = {
     total_f: "count",
     history_f: "history",
-    latest_f: "latest",   
+    latest_f: "latest"
   };
   switch (trackerType) {
     case HITS: case UNIQ:

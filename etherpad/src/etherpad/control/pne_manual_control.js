@@ -66,7 +66,7 @@ function _renderManualPage(p, data) {
     getContent: getContent,
     renderTopnav: function() { return _renderTopnav(p); },
     title: _getTitle(p),
-    id: p,
+    id: p
   });
   return true;
 }

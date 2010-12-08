@@ -44,7 +44,7 @@ function onRequest() {
   disp.addLocations([
     [DirMatcher('/ep/account/'), forward(account_control)],
     [DirMatcher('/ep/admin/'), forward(pro_admin_control)],
-    [DirMatcher('/ep/padlist/'), forward(pro_padlist_control)],
+    [DirMatcher('/ep/padlist/'), forward(pro_padlist_control)]
   ]);
   return disp.dispatch();
 }

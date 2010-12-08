@@ -27,6 +27,6 @@ function run() {
   sqlobj.createTable('checkout_pro_referral', {
     id: "VARCHAR(8) NOT NULL PRIMARY KEY",
     pctDiscount: "INT",
-    freeUsers: "INT",
+    freeUsers: "INT"
   });
 }
