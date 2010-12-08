@@ -104,7 +104,7 @@ class RequestWrapper(val req: HttpServletRequest) {
     false);
   def headers(globalScope: Scriptable) = new ScriptableFromMapOfStringArrays(
     globalScope, 
-    req.getHeaderNames().asInstanceOf[Enumeration[String]]
+    asIterator(req.getHeaderNames().asInstanceOf[Enumeration[String]])
       .map(headerCapitalize).toList,
     h => h match {
       case "Host" => Some(Array(host));

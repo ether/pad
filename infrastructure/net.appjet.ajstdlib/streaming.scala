@@ -817,7 +817,7 @@ class StreamingSocketServlet extends HttpServlet {
   def describeRequest(req: HttpServletRequest) {
     println(req.getMethod+" on "+req.getRequestURI()+"?"+req.getQueryString());
     for (pname <- 
-        req.getParameterNames.asInstanceOf[java.util.Enumeration[String]]) {
+        asIterator(req.getParameterNames.asInstanceOf[java.util.Enumeration[String]])) {
       println("  "+pname+" -> "+req.getParameterValues(pname).mkString("[", ",", "]"));
     }
   }

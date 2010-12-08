@@ -91,7 +91,7 @@ object main {
   }
 
   def extractOptions(props: Properties) {
-    for (k <- for (o <- props.propertyNames()) yield o.asInstanceOf[String]) {
+    for (k <- for (o <- asIterator(props.propertyNames())) yield o.asInstanceOf[String]) {
       config.values(k) = props.getProperty(k);
     }
   }
