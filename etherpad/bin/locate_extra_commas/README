@@ -1,0 +1,15 @@
+Trailing commas break IE, but not Firefox and Safari.  The symptom in etherpad is the browser displaying Loading... and getting no further.  There is an associated IE warning: "Expected identifier, string or number" (try Googling it for loads of people complaining about it).
+
+http://www.amaxus.com/cms-blog/automatically-finding-javascript-errors-ie7 describes the problem and how to automate finding them
+
+== installing rhino on ubuntu ==
+sudo apt-get install rhino
+
+== installing rhino on OS X ==
+1) download and unpack ftp://ftp.mozilla.org/pub/mozilla.org/js/rhino1_7R2.zip
+2) sudo mv rhino1_7R2 /usr/local
+3) edit scan_file_for_extra_comments.sh and switch which line is uncommented
+
+== running the diagnostic tool ==
+cd into this directory
+./locate_extra_commas.sh
