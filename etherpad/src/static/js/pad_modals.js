@@ -42,7 +42,7 @@ var padmodals = (function() {
     if (sendingInvite != v) {
       sendingInvite = v;
       if (v) {
-        $("#sharebox-send").css('opacity', 0.75);
+        $(".sharebox-send").css('opacity', 0.75);
       }
       else {
         $("#sharebox-send").css('opacity', 1);
