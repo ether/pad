@@ -30,6 +30,7 @@ import("fileutils.readFile");
 import("jsutils.{eachProperty,keys}");
 import("etherpad.collab.collabroom_server.*");
 import("etherpad.collab.readonly_server");
+import("etherpad.admin.plugins");
 jimport("java.util.concurrent.ConcurrentHashMap");
 
 var PADPAGE_ROOMTYPE = "padpage";
@@ -687,6 +688,22 @@ function _handleCometMessage(connection, msg) {
 
   if (msg.type == "USER_CHANGES") {
     try {
+	
+	var plugin_checks = plugins.callHook("collabServerUserChanges", {pad: _roomToPadId(connection.roomName), msg: msg});
+        var plugin_access=true;
+
+        plugin_checks.forEach(function(value) {
+            if(value==false)
+            {
+                plugin_access=false;
+            }
+        });
+
+        if(!plugin_access)
+        {
+            return false;
+        }
+    
       _accessConnectionPad(connection, "USER_CHANGES", function(pad) {
         var baseRev = msg.baseRev;
         var wireApool = (new AttribPool()).fromJsonable(msg.apool);
