@@ -40,7 +40,7 @@ function render_signup_post() {
   // record in sql: [id, email, activated=false, activationCode]
   // log to disk
 
-  var email = request.params.email;
+  var email = request.params.email.toLowerCase();
   if (!isValidEmail(email)) {
     getSession().betaSignupError = "Invalid email address.";
     response.redirect('/ep/beta-account/');

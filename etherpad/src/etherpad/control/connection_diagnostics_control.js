@@ -75,7 +75,7 @@ function render_submitemail_post() {
     response.write("Error retreiving diagnostics record.");
     response.stop();
   }
-  var email = request.params.email;
+  var email = request.params.email.toLowerCase();
   if (!isValidEmail(email)) {
     response.write("Invalid email address.");
     response.stop();

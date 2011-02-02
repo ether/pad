@@ -105,7 +105,7 @@ function render_update_info_get() {
 
 function render_update_info_post() {
   var fullName = request.params.fullName;
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
 
   getSession().tempFormData.email = email;
   getSession().tempFormData.fullName = fullName;
@@ -199,7 +199,7 @@ function _attemptInstantSignin(key) {
 }
 
 function render_sign_in_post() {
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
   var password = request.params.password;
 
   getSession().tempFormData.email = email;
@@ -299,7 +299,7 @@ function render_create_admin_account_get() {
 }
 
 function render_create_admin_account_post() {
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
   var password = request.params.password;
   var passwordConfirm = request.params.passwordConfirm;
   var fullName = request.params.fullName;
@@ -341,7 +341,7 @@ function render_forgot_password_get() {
 }
 
 function render_forgot_password_post() {
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
 
   getSession().tempFormData.email = email;
 

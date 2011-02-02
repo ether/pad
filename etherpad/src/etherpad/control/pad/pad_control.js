@@ -594,7 +594,7 @@ function render_feedback_post() {
   var localPadId = request.params.padId;
   var globalPadId = padutils.getGlobalPadId(localPadId);
   var username = request.params.username;
-  var email = request.params.email;
+  var email = request.params.email.toLowerCase();
   var subject = 'EtherPad Feedback from '+request.clientAddr+' / '+globalPadId+' / '+username;
 
   if (feedback.indexOf("@") > 0) {

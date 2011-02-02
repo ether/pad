@@ -165,7 +165,7 @@ function render_eepnet_recover_license_get() {
 }
 
 function render_eepnet_recover_license_post() {
-  var email = request.params.email;
+  var email = request.params.email.toLowerCase();
   if (!eepnet_trial.hasEmailAlreadyDownloaded(email) && !eepnet_trialhasEmailAlreadyPurchased(email)) {
     getSession().error = P("License not found for email: \"", email, "\".");
     response.redirect(request.path);

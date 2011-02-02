@@ -100,7 +100,7 @@ function _err(m) {
 function render_main_post() {
   var subdomain = trim(String(request.params.subdomain).toLowerCase());
   var fullName = request.params.fullName;
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
 
   // validate activation code
   var activationCode = getSession().betaActivationCode;
