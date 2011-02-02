@@ -60,7 +60,7 @@ function _billingForm() {
     countryList: fields.countryList,
     usaStateList: fields.usaStateList,
     getFullSuperdomainHost: pro_utils.getFullSuperdomainHost,
-    showCouponCode: true,
+    showCouponCode: true
   });
 }
 

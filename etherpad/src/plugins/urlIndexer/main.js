@@ -19,12 +19,12 @@ function install() {
 
  sqlobj.createTable('PAD_URL', {
    PAD_ID: 'varchar(128) character set utf8 collate utf8_bin not null references PAD_META(ID)',
-   URL: 'varchar(1024) character set utf8 collate utf8_bin not null',
+   URL: 'varchar(1024) character set utf8 collate utf8_bin not null'
   });
 
  sqlobj.createTable('PAD_URL_CACHE', {
    PAD_ID: 'varchar(128) character set utf8 collate utf8_bin unique not null references PAD_META(ID)',
-   URLS: 'text collate utf8_bin not null',
+   URLS: 'text collate utf8_bin not null'
   });
 }
 

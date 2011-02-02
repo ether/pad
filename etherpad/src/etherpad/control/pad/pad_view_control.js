@@ -162,7 +162,7 @@ function onRequest() {
       colorPalette: globals.COLOR_PALETTE,
       padIdForUrl: readOnlyIdOrLocalPadId,
       fullWidth: request.params.fullScreen == 1,
-      disableRightBar: request.params.sidebar == 0,
+      disableRightBar: request.params.sidebar == 0
     });
 
     var userId = padusers.getUserId();

@@ -356,7 +356,7 @@ function render_pad(localPadId) {
       userName: displayName,
       userColor: assignColorId(pad, userId),
       specialKey: specialKey,
-      specialKeyTranslation: collab_server.translateSpecialKey(specialKey),
+      specialKeyTranslation: collab_server.translateSpecialKey(specialKey)
     });
   });
 
@@ -364,7 +364,7 @@ function render_pad(localPadId) {
 
   padutils.setOptsAndCookiePrefs(request);
   var prefs = helpers.getClientVar('cookiePrefsToSet');
-  var bodyClass = (prefs.isFullWidth ? "fullwidth" : "limwidth") +
+  var bodyClass = (prefs.isFullWidth ? "maximized" : "limwidth") +
     " "+(isPro ? "propad" : "nonpropad")+" "+
     (isProUser ? "prouser" : "nonprouser");
 

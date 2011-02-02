@@ -76,7 +76,7 @@ function setAutoSigninCookie(rememberMe) {
     value: (rememberMe ? "T" : "F"),
     path: "/",
     domain: request.domain,
-    expires: new Date(32503708800000), // year 3000
+    expires: new Date(32503708800000) // year 3000
   });
 
   if (!rememberMe) {

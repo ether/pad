@@ -68,7 +68,7 @@ function onRequest() {
    serverTimestamp: +(new Date),
    isProPad: isPro,
    userIsGuest: padusers.isGuest(userId),
-   userId: userId,
+   userId: userId
   });
 
   var isProUser = (isPro && ! padusers.isGuest(userId));

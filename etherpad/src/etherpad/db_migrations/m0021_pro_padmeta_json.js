@@ -46,7 +46,7 @@ function migrateRecord(r) {
   editors.sort();
 
   var proAttrs = {
-    editors: editors,
+    editors: editors
   };
 
   var proAttrsJson = fastJSON.stringify(proAttrs);

@@ -204,7 +204,7 @@ var countryList = [
   ["VN", "Vietnam"],
   ["WF", "Wallis and Futuna Islands"],
   ["YE", "Yemen"],
-  ["ZM", "Zambia"],
+  ["ZM", "Zambia"]
 ];
 
 var usaStateList = [

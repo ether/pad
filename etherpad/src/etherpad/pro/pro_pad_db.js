@@ -76,7 +76,7 @@ function onCreatePad(pad) {
   var data = {
     domainId: padutils.getDomainId(pad.getId()),
     localPadId: padutils.getLocalPadId(pad),
-    createdDate: new Date(),
+    createdDate: new Date()
   };
 
   if (getSessionProAccount()) {

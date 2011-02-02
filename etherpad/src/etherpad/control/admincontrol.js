@@ -134,7 +134,7 @@ function render_main() {
   renderHtml("admin/page.ejs",
    {
     config: appjet.config,
-    bodyClass: 'nonpropad',
+    bodyClass: 'nonpropad'
    });
 }
 

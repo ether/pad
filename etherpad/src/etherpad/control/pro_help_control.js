@@ -20,7 +20,7 @@ import("etherpad.billing.team_billing");
 
 var _helpTopics = [
 /*  ['essentials', "EtherPad Essentials"], */
-  ['billing', "Account Quotas and Billing"],
+  ['billing', "Account Quotas and Billing"]
 /*  ['guests', "Collaborating with Teammates and Guests"] */
 ];
 

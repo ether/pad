@@ -568,7 +568,7 @@ function _handlePaypalNotification() {
       email: eepnetPurchase.emails,
       customerId: eepnetPurchase.id,
       userCount: eepnetPurchase.numUsers,
-      receiptEmail: eepnetPurchase.receiptEmail,
+      receiptEmail: eepnetPurchase.receiptEmail
     }
     eepnet_checkout.generateLicenseKey(fakeCart);
     eepnet_checkout.sendReceiptEmail(fakeCart);
@@ -625,7 +625,7 @@ function _generatePurchaseRecord() {
     referral: cart.couponCode,
     cents: cart.total*100, // cents here.
     numUsers: cart.userCount,
-    purchaseType: cart.billingPurchaseType,
+    purchaseType: cart.billingPurchaseType
   }
   cart.customerId = _recordPurchase(purchase);
   return purchase;

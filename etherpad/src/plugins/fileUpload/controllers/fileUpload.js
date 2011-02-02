@@ -44,7 +44,7 @@ function onRequest() {
     serverTimestamp: +(new Date),
     isProPad: isPro,
     userIsGuest: padusers.isGuest(userId),
-    userId: userId,
+    userId: userId
   });
 
   var isProUser = (isPro && ! padusers.isGuest(userId));
@@ -66,7 +66,7 @@ function onRequest() {
           uploads: uploads,
 	  isPro: isPro,
 	  isProAccountHolder: isProUser,
-	  account: getSessionProAccount(), // may be falsy
+	  account: getSessionProAccount() // may be falsy
         },
        ['fileUpload']));
     if (request.acceptsGzip) {
@@ -78,7 +78,7 @@ function onRequest() {
       {
         isPro: isPro,
         isProAccountHolder: isProUser,
-        account: getSessionProAccount(), // may be falsy
+        account: getSessionProAccount() // may be falsy
       },
       ['fileUpload']);
   }

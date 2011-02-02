@@ -52,7 +52,7 @@ function _getLeftnavItems() {
       [_PRO, "recover-padtext", "Recover Pad Text"],
       [_PRO, null, "Configuration"],
       [_PRO, [[_PNE_ONLY, "pne-config", "Private Server Configuration"],
-              [_PRO, "pro-config", "Application Configuration"]]],
+              [_PRO, "pro-config", "Application Configuration"]]]
     ]
   ];
   return nav;
@@ -121,7 +121,7 @@ function renderAdminPage(p, data) {
   renderFramed('pro/admin/admin-template.ejs', {
     getAdminContent: getAdminContent,
     renderAdminLeftNav: renderAdminLeftNav,
-    validLicense: pne_utils.isServerLicensed(),
+    validLicense: pne_utils.isServerLicensed()
   });
 }
 
@@ -133,7 +133,7 @@ function onRequest() {
     [DirMatcher(license_manager_control.getPath()), forward(license_manager_control)],
     [DirMatcher('/ep/admin/account-manager/'), forward(account_manager_control)],
     [DirMatcher('/ep/admin/pro-config/'), forward(pro_config_control)],
-    [DirMatcher('/ep/admin/billing/'), forward(team_billing_control)],
+    [DirMatcher('/ep/admin/billing/'), forward(team_billing_control)]
   ]);
 
   if (disp.dispatch()) {
