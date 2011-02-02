@@ -71,6 +71,20 @@ object config {
   @ConfigParam("Directory to use for storing appserver logs. Defaults to [appjetHome]/log/appserver")
               { val argName = "directory" }
   def logDir = stringOrElse("logDir", "[appjetHome]/log/appserver");
+
+  @ConfigParam("Bla bla")
+              { val argName = "" }
+  def logInclude = stringOrElse("logInclude", "");
+
+  @GeneratedConfigParam
+  def logIncludeLst = if (logInclude != "") logInclude.split(",") else null;
+  
+  @ConfigParam("Bla bla")
+              { val argName = "" }
+  def logExclude = stringOrElse("logExclude", "");
+
+  @GeneratedConfigParam
+  def logExcludeLst = if (logExclude != "") logExclude.split(",") else null;
   
   @ConfigParam("Optional alternative directory to load built-in libraries from.  Used by AppJet platform hackers to develop and debug built-in libraries.  Default: use built-in libraries.")
 	      { val argName = "directory" }

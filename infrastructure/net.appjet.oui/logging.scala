@@ -266,22 +266,27 @@ class GenericLogger(path: String, logName: String, rotateDaily: Boolean) {
   }
 
   def start() {
-    initLogWriter(new Date());
+    if (   (   config.logIncludeLst != null
+            && config.logIncludeLst.indexOf(logName) != -1)
+	|| (   config.logExcludeLst != null
+            && config.logExcludeLst.indexOf(logName) == -1)) {
+      initLogWriter(new Date());
 
-    loggerThread = new Thread("GenericLogger "+logName) {
-      this.setDaemon(true);
-      override def run() {
-        while (true) {
-          if (queue.isEmpty()) {
-            Thread.sleep(500);
-          } else {
-            flush(1000);
-          }
-        }
+      loggerThread = new Thread("GenericLogger "+logName) {
+	this.setDaemon(true);
+	override def run() {
+	  while (true) {
+	    if (queue.isEmpty()) {
+	      Thread.sleep(500);
+	    } else {
+	      flush(1000);
+	    }
+	  }
+	}
       }
+      main.loggers += this;
+      loggerThread.start();
     }
-    main.loggers += this;
-    loggerThread.start();
   }
 
   def log(lpb: LoggablePropertyBag) {
