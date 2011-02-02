@@ -149,6 +149,7 @@ limitations under the License. */ %>
 		</span>
 	      </div>
 	    </form>
+	    <%: template.callHookStr('padImportForm', {}, '', '<div>', '</div>'); %>
 	  </div><!-- /impexp-import -->
 	  <div id="impexp-export">
 	    <div id="impexp-exportlabel"><b>Export</b> current pad as:</div>
@@ -160,6 +161,7 @@ limitations under the License. */ %>
 	      <%= exportLink('pdf', 5, 'PDF', true) %>
 	      <%= exportLink('odt', 6, 'OpenDocument', true) %>
 	    </div>
+	    <%: template.callHookStr('padExportForm', {}, '', '<div>', '</div>'); %>
 	  </div><!-- /impexp-export -->
 	  <div id="impexp-divider"><!-- --></div>
 	  <div id="impexp-disabled-clickcatcher"><!-- --></div>
@@ -401,9 +403,6 @@ limitations under the License. */ %>
 
 
 <% template.define('modals', function() { var ejs_data=''; %>
-  <div id="modaloverlay"><div id="modaloverlay-inner"><!-- --></div></div>
-
-  <div id="mainmodals">
     <div id="connectionbox" class="modaldialog">
       <div id="connectionboxinner" class="modaldialog-inner">
 	<div class="connecting">
@@ -514,7 +513,9 @@ limitations under the License. */ %>
       </div>
     </div>
   </div>
+<% return ejs_data; }); %>
 
+<% template.define('pageBottom', function() { var ejs_data=''; %>
   <% if (request.params.djs) { %>
     <div id="djs"><!-- --></div>
   <% } %>
@@ -529,5 +530,4 @@ limitations under the License. */ %>
 	   name="diagnosticInfo" />
     <input type="hidden" class="missedChanges" name="missedChanges" />
   </form>
-
 <% return ejs_data; }); %>

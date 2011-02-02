@@ -138,6 +138,13 @@ limitations under the License. */ %>
 
   </div><!-- /padpage -->
 
-  <%: template.use('modals'); %>
+  <div id="modaloverlay"><div id="modaloverlay-inner"><!-- --></div></div>
+    <div id="mainmodals">
+      <%: template.use('modals'); %>
+      <%: template.callHookStr('modals', {}, '', '', ''); %>
+    </div>
+  </div>
+
+  <%: template.use('pageBottom'); %>
 
 <% return ejs_data; }); %>
