@@ -1016,7 +1016,7 @@ function OUTER(gscope) {
     //if (! top.BEFORE) top.BEFORE = [];
     //top.BEFORE.push(magicdom.root.dom.innerHTML);
 
-    if (! isEditable) return; // and don't reschedule
+    //if (! isEditable) return; // and don't reschedule
 
     if (inInternationalComposition) {
       // don't do idle input incorporation during international input composition

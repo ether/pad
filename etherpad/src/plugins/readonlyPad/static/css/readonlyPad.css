@@ -1,0 +1,26 @@
+div.readonlyPadHidden {
+    display: none;
+}
+
+div#readonlyPad {
+    position: absolute;
+    left: 15px;
+}
+
+div#readonlyPad strong {
+    font-weight: normal;
+    padding-right: 10px;
+    color: #444444;
+}
+
+div#readonlyPad input {
+    position: absolute;
+    left: 10px;
+}
+
+div#readonlyPad label {
+    position: absolute;
+    left: 30px;
+    width: 260px;
+    color: #999999;
+}
