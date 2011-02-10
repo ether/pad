@@ -533,7 +533,7 @@ function render_padinspector_get() {
       config: appjet.config,
       bodyClass: 'nonpropad',
       title: 'Pad inspector',
-      content: DIV(body, script)
+      content: DIV(div, script)
      });
   }, "r");
 }
