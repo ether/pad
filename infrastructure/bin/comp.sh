@@ -157,7 +157,7 @@ cacheonfiles ajstdlib "$AJSTDLIBFILES $AJSTDLIBJAVAFILES" genajstdlib
 
 EPFILES=`find com.etherpad -name '*.scala'`
 function genetherpad {
-    echo "compilng etherpad..."
+    echo "compiling etherpad..."
     $CC \
 	-classpath $CP \
 	-d $1 \
