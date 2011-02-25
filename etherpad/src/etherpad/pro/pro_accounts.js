@@ -560,24 +560,22 @@ function getAllAccountsWithEmail(email) {
 }
 
 function getEtherpadAdminAccount() {
+
   try {
-    return {
-      id: 0,
-      isAdmin: true,
-      fullName: "ETHERPAD ADMIN",
-      email: "support@etherpad.com",
-      domainId: domains.getRequestDomainId(),
-      isDeleted: false
-    };
-  } catch (e) {}
+    var domainId = domains.getRequestDomainId();
+  }
+  catch (e) {
+    var domainId = null;
+  }
+
   return {
     id: 0,
     isAdmin: true,
     fullName: "ETHERPAD ADMIN",
     email: "support@etherpad.com",
-    domainId: undefined,
+    domainId: domainId,
     isDeleted: false
-  }
+  };
 }
 
 function getCachedActiveCount(domainId) {
