@@ -1,0 +1,37 @@
+<% /* 
+Copyright 2009 Google Inc.
+Copyright 2010 Pita, Peter Martischka <petermartischka@googlemail.com>
+Copyright 2010 Egil Möller <egil.moller@piratpartiet.se>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */ %>
+<%
+ template.inherit('admin/page.ejs');
+ helpers.setHtmlTitle(appjet.config.customBrandingName +": Manage plugins");
+ plugin_registry = plugins.loadPlugins();
+%>
+
+<% template.define('docBarTitle', function() { var ejs_data=''; %>
+  <td id="docbarpadtitle"><span>Permanently delete a pad</span></td>
+<% return ejs_data; }); %>
+
+<% template.define('contentArea', function() { var ejs_data=''; %>
+  <div id="editorcontainer">
+    <form method="post">
+      Pad id: <input type="text" name="pad_id"><br>
+      <br>
+      <em>Yes, I have read and understood that I'm about to permanently stuff something up, and I still want to do it!</em><br>
+      <br>
+      <button type="submit">Yes, really do delete that pad</button>
+    </form>
+  </div>
+<% return ejs_data; }); %>
