@@ -29,6 +29,7 @@ import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.pro.pro_padmeta");
 import("etherpad.pro.pro_utils");
 import("etherpad.pro.pro_utils.isProDomainRequest");
+import("etherpad.pro.pro_config");
 import("etherpad.pad.noprowatcher");
 
 //--------------------------------------------------------------------------------
@@ -176,7 +177,14 @@ function _checkGuestSecurity(globalPadId) {
   // returns either "allow", "ask", or "deny"
   var guestPolicy = model.accessPadGlobal(globalPadId, function(p) {
     if (!p.exists()) {
-      return "deny";
+      if(pro_config.getConfig().openByGuestsAllowed)
+      {
+        return "allow";
+      }
+      else
+      {
+        return "deny";
+      }
     } else {
       return p.getGuestPolicy();
     }

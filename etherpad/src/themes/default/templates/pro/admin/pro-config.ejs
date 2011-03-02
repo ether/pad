@@ -35,6 +35,14 @@ limitations under the License. */ %>
              <%= config.alwaysHttps ? 'checked="on"' : '' %> />
     </td>
   </tr>
+  
+  <tr>
+    <th valign="top">Allow guests to open a group pad?</th>
+    <td valign="top">
+      <input type="checkbox" id="openByGuestsAllowed" name="openByGuestsAllowed"
+             <%= config.openByGuestsAllowed ? 'checked="on"' : '' %> />
+    </td>
+  </tr>
 
   <tr>
     <th valign="top">Default pad text:</th>
