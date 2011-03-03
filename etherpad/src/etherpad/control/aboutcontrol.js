@@ -211,7 +211,7 @@ function render_eepnet_pricing_contact_post() {
 function render_pricing_interest_signup() {
   response.setContentType('text/plain; charset=utf-8');
 
-  var email = request.params.email;
+  var email = request.params.email.toLowerCase();
   var interestedNet = request.params.interested_net;
   var interestedHosted = request.params.interested_hosted;
 

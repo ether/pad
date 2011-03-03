@@ -128,6 +128,7 @@ function _noteImportFailure() {
 // handles /ep/pad/export/*
 function renderExport() {
   var parts = request.path.split('/');
+  var shownPadID = parts[4];
   var padId = server_utils.parseUrlId(parts[4]).localPadId;
   var revisionId = parts[5];
   var rev = null;
@@ -142,7 +143,7 @@ function renderExport() {
     request.cache.skipAccess = true;
   }
   
-  var result = _exportToFormat(padId, revisionId, (rev || {}).revNum, format);
+  var result = _exportToFormat(padId, shownPadID, revisionId, (rev || {}).revNum, format);
   if (result === true) {
     response.stop();
   } else {
@@ -151,7 +152,7 @@ function renderExport() {
   return true;
 }
 
-function _exportToFormat(padId, revisionId, revNum, format) {
+function _exportToFormat(padId, shownPadID, revisionId, revNum, format) {
   var bytes = _doExportConversion(format,
     function() { return _getPadTextBytes(padId, revNum); },
     function(noDocType) { return _getPadHtmlBytes(padId, revNum, noDocType); });
@@ -161,7 +162,7 @@ function _exportToFormat(padId, revisionId, revNum, format) {
     return bytes
   } else {
     response.setContentType(importexport.formats[format]);
-    response.setHeader("Content-Disposition", "attachment; filename=\""+padId+"-"+revisionId+"."+format+"\"");
+    response.setHeader("Content-Disposition", "attachment; filename=\""+shownPadID+"-"+revisionId+"."+format+"\"");
     response.writeBytes(bytes);
     return true;
   }

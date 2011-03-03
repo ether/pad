@@ -64,7 +64,7 @@ function render_sign_in_get() {
 
 
 function render_sign_in_post() {
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
   var password = request.params.password;
   var subDomain = request.params.subDomain;
 
@@ -107,7 +107,7 @@ function render_recover_post() {
       encodeURIComponent(accountRecord.email));
   }
 
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
 
   // lookup all domains associated with this email
   var accountList = pro_accounts.getAllAccountsWithEmail(email);

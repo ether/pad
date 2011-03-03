@@ -119,7 +119,7 @@ function render_new_post() {
   _ensureBillingOK();
 
   var fullName = request.params.fullName;
-  var email = trim(request.params.email);
+  var email = trim(request.params.email).toLowerCase();
   var tempPass = request.params.tempPass;
   var makeAdmin = !!request.params.makeAdmin;
 
