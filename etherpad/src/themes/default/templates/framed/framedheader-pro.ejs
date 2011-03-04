@@ -55,6 +55,7 @@ limitations under the License. */ %><% helpers.addBodyClass("pro-withtopbar"); %
     if (account && account.isAdmin) {
       links.push(['/ep/admin/', 'Admin', 'admin']);
     }
+    links.push(['/ep/account/sign-out', 'Sign out', 'signout']);
     var ul = UL();
     links.forEach(function(l) {
       var c = l[2];

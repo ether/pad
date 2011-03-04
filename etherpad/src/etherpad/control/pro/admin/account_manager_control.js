@@ -88,6 +88,14 @@ function render_main() {
 }
 
 function render_new_get() {
+  if(request.params.fullName)
+  {
+    getSession().accountManagerFormData = {
+	fullName: request.params.fullName,
+	email: request.params.email,
+    };
+  }	
+
   pro_admin_control.renderAdminPage('new-account', {
     oldData: getSession().accountManagerFormData || {},
     stringutils: stringutils,

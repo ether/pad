@@ -58,6 +58,18 @@ function _redirOnError(m, clearQuery) {
   }
 }
 
+function _redirOnNotice(m, clearQuery) {
+  if (m) {
+    setSigninNotice(m);
+
+    var dest = request.url;
+    if (clearQuery) {
+      dest = request.path;
+    }
+    response.redirect(dest);
+  }
+}
+
 function setSigninNotice(m) {
   getSession().accountSigninNotice = m;
 }
@@ -209,6 +221,59 @@ function render_sign_in_post() {
   pro_account_auto_signin.setAutoSigninCookie(request.params.rememberMe);
   _redirectToPostSigninDestination();
 }
+
+function render_request_account_get() {
+    _renderTemplate('requestaccount', {
+    domain: pro_utils.getFullProDomain(),
+    siteName: toHTML(pro_config.getConfig().siteName),
+    fullname: getSession().tempFormData.fullname || "",
+    email: getSession().tempFormData.email || "",
+    noticeDiv: _signinNoticeDiv,
+    });
+}
+
+function render_request_account_post() {
+    var domainId = domains.getRequestDomainId();
+
+    var fullname = trim(request.params.fullname);
+    var email = trim(request.params.email).toLowerCase();
+    
+    getSession().tempFormData.fullname = fullname;
+    getSession().tempFormData.email = email;
+    
+    var accountExists = pro_accounts.getAccountByEmail(email, domainId);
+    if(typeof accountExists == "undefined")
+    {
+	var admins = pro_accounts.listAllDomainAdmins(domainId);
+	
+	admins.forEach(function(admin) {
+	    var subj = "Account request on "+ appjet.config.customBrandingName +" for "+pro_utils.getFullProDomain()+"!";
+	    var toAddr = admin.email;
+	    var fromAddr = pro_utils.getEmailFromAddr();
+	    
+	    var body = renderTemplateAsString('pro/account/request-account-email.ejs', {
+	        signinLink: pro_accounts.getTempRequestAccountUrl(fullname, email),
+	        fullname: fullname,
+	        email: email,
+	        toFullName: admin.fullName,
+	    	toEmail: toAddr,
+		siteName: pro_utils.getFullProDomain()
+	    });
+	    
+	    try {
+		sendEmail(toAddr, fromAddr, subj, {}, body);
+	    } catch (ex) {
+		_redirOnError("Warning: unable to send request account email!");
+	    }
+	    _redirOnNotice("Account requested! You will get an email on success!");
+	});
+    }
+    else
+    {
+	_redirOnError("Email account already exists!");
+    }
+}
+
 
 function render_guest_sign_in_get() {
   var localPadId = request.params.padId;

@@ -293,7 +293,8 @@ function requireAccount(message) {
       (request.path == "/ep/account/sign-out") ||
       (request.path == "/ep/account/guest-sign-in") ||
       (request.path == "/ep/account/guest-knock") ||
-      (request.path == "/ep/account/forgot-password")) {
+      (request.path == "/ep/account/forgot-password") ||
+      (request.path == "/ep/account/request-account")) {
     return;
   }
 
@@ -522,6 +523,20 @@ function getTempSigninUrl(account, tempPass) {
       'uid=', account.id, '&tp=', tempPass
     ].join('');
 }
+
+function getTempRequestAccountUrl(fullName, email) {
+  if(appjet.config.listenSecurePort != 0 || appjet.config.useHttpsUrls)
+    return [
+      'https://', httpsHost(pro_utils.getFullProHost()), '/ep/admin/account-manager/new?',
+      'email=', encodeURIComponent(email), '&fullName=', encodeURIComponent(fullName)
+    ].join('');
+  else
+    return [
+      'http://', httpHost(pro_utils.getFullProHost()), '/ep/admin/account-manager/new?',
+      'email=', encodeURIComponent(email), '&fullName=', encodeURIComponent(fullName)
+    ].join('');
+}
+
 
 
 // TODO: this session account object storage / dirty cache is a
