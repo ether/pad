@@ -1,0 +1,59 @@
+<% /* Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. */ %><% helpers.includeJQuery() %>
+<% helpers.includeJs("pro/signin-client.js") %>
+<% helpers.includeCss("pro/account.css") %>
+<% helpers.setHtmlTitle(appjet.config.customBrandingName +": Sign In") %>
+
+
+<div class="fpcontent">
+  <div class="account-container">
+
+  <form id="signin-form" action="<%= request.path %>" method="post">
+  <div class="bb bb-signin">
+    <div class="bb-top">
+      <div class="bb-topleft"><!-- --></div>
+      <div class="bb-topright"><!-- --></div>
+      <div class="bb-title">Request account for <%= siteName %> <%= appjet.config.customBrandingName %></div>
+    </div>
+    <div class="bb-in">
+      <%= errorDiv() %>
+      <%= noticeDiv() %>
+      <div>
+        <label for="fullname" id="email-label">Full name</label>
+        <input class="textin" type="text" name="fullname" id="fullname" value="<%= fullname
+        %>" />
+        <%= helpers.clearFloats() %>
+      </div>
+      
+      <div>
+        <label for="email" id="email-label">Email</label>
+        <input class="textin" type="text" name="email" id="email" value="<%= email
+        %>" />
+        <%= helpers.clearFloats() %>
+      </div>
+
+
+        <button type="submit" class="bluebutton bluebutton120" id="signInButton">
+	    Request
+        </button>
+        <%= helpers.clearFloats() %>
+      </div>
+
+    </div>
+  </div>
+  </form>
+
+  </div>
+</div>
+
