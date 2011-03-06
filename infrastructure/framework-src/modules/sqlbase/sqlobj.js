@@ -72,18 +72,19 @@ function _bq(x) { return btquote(x); }
 function _qdebug(q) {
   if (appjet.config.debugSQL) {
     println(q);
+    log.info(q);
   }
 }
 
 /** executeFn is either "execute" or "executeUpdate" "executeQuery" */
 function _execute(stmnt, executeFn) {
+  _qdebug(stmnt);
   if (!executeFn) {
     executeFn = 'execute';
   }
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
-      _qdebug(stmnt);
       return pstmnt[executeFn]();
     });
   });
@@ -218,11 +219,11 @@ function insert(tableName, obj) {
   stmnt += keyList.map(function(k) { return '?'; }).join(', ');
   stmnt += ")";
 
+  _qdebug(stmnt);
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt, Statement.RETURN_GENERATED_KEYS);
     return closing(pstmnt, function() {
       _setPreparedValues(tableName, pstmnt, keyList, obj, 0);
-      _qdebug(stmnt);
       pstmnt.executeUpdate();
       var rs = pstmnt.getGeneratedKeys();
       if (rs != null) {
@@ -254,11 +255,11 @@ function selectSingle(tableName, constraints) {
     stmnt += ' LIMIT 1';
   }
 
+  _qdebug(stmnt);
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
       _setPreparedValues(tableName, pstmnt, keyList, constraints, 0);
-      _qdebug(stmnt);
       var resultSet = pstmnt.executeQuery();
       return closing(resultSet, function() {
         if (!resultSet.next()) {
@@ -321,6 +322,7 @@ function selectMulti(tableName, constraints, options) {
     stmnt += " LIMIT "+options.limit;
   }
 
+  _qdebug(stmnt);
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
@@ -328,7 +330,6 @@ function selectMulti(tableName, constraints, options) {
         tableName, pstmnt, constraintKeys, 
         _preparedValuesConstraints(constraints), 0);
 
-      _qdebug(stmnt);
       var resultSet = pstmnt.executeQuery();
       var resultArray = [];
 
@@ -344,6 +345,7 @@ function selectMulti(tableName, constraints, options) {
 }
 
 function executeRaw(stmnt, params) {
+  _qdebug(stmnt);
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
@@ -369,7 +371,6 @@ function executeRaw(stmnt, params) {
 	}
       }
 
-      _qdebug(stmnt);
       var resultSet = pstmnt.executeQuery();
       var resultArray = [];
 
@@ -395,12 +396,12 @@ function update(tableName, constraints, obj) {
   stmnt += constraintKeys.map(function(k) { return '('+_bq(k)+' = ?)'; }).join(' AND ');
   stmnt += ')';
 
+  _qdebug(stmnt);
   return withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     return closing(pstmnt, function() {
       _setPreparedValues(tableName, pstmnt, objKeys, obj, 0);
       _setPreparedValues(tableName, pstmnt, constraintKeys, constraints, objKeys.length);
-      _qdebug(stmnt);
       return pstmnt.executeUpdate();
     });
   });
@@ -418,11 +419,12 @@ function deleteRows(tableName, constraints) {
   var stmnt = "DELETE FROM "+_bq(tableName)+" WHERE (";
   stmnt += constraintKeys.map(function(k) { return '('+_bq(k)+' = ?)'; }).join(' AND ');
   stmnt += ')';
+
+  _qdebug(stmnt);
   withConnection(function(conn) {
     var pstmnt = conn.prepareStatement(stmnt);
     closing(pstmnt, function() {
       _setPreparedValues(tableName, pstmnt, constraintKeys, constraints);
-      _qdebug(stmnt);
       pstmnt.executeUpdate();
     });
   })
@@ -524,9 +526,9 @@ function getTableEngine(tableName) {
 
   withConnection(function(conn) {
     var stmnt = "show table status";
+    _qdebug(stmnt);
     var pstmnt = conn.prepareStatement(stmnt);
     closing(pstmnt, function() {
-      _qdebug(stmnt);
       var resultSet = pstmnt.executeQuery();
       closing(resultSet, function() {
         while (resultSet.next()) {
