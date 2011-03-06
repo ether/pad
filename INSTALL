@@ -2,15 +2,15 @@ INSTALLATION INSTRUCTIONS
 
 OPTION #1. INSTALLING ON POSIX COMPATIBLE SYSTEMS
 
-* Install the dependencies: Scala 2.7, Sun Java JDK 6, libmysql-java
+* Install the dependencies: Scala 2.7, Sun Java JDK 6 or OpenJDK 6, libmysql-java
 
 * Uninstall gcj if it's installed as it seems to interfere with the
   Scala compiler.  You can safely reinstall it after compiling Etherpad
   if you want to.
 
-* Edit the file bin/exports.sh (and optionally
-  etherpad/bin/etherpad.default) and change the paths to
-  match your system.
+* You might want to edit the file bin/exports.sh (and optionally
+  etherpad/bin/etherpad.default) and change the paths to match your system
+  but important paths are already autodetected.
 
 * Run bin/build.sh
 
