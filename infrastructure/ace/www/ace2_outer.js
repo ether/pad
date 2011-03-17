@@ -128,20 +128,46 @@ function Ace2Editor() {
   // and compressed, putting the compressed code from the named file directly into the
   // source here.
 
+
+  var tagInclude = function(fileName, prefix, suffix){
+	if(!fileName) return false;
+	var lists = fileName.split(" ");
+	var str = "";
+	var path =  "/static/js/";
+	for(var i = 0, len = lists.length; i < len; i++){
+		str += prefix + path + lists[i] + suffix;	
+	}
+	str = "'" + str + "'";
+	return str;
+  }
+	
+ 
+  var IncludeScript = function(fileName){
+    return tagInclude(fileName,'\\x3cscript type=text/javascript src=', '>\\x3c/script>');
+  }
+
+  var IncludeCSS = function(fileName){
+
+  }
+
   var $$INCLUDE_CSS = function(fileName) {
-    return '<link rel="stylesheet" type="text/css" href="'+fileName+'"/>';
+//    return tagInclude(fileName,'\\x3clink type="stylesheet" type="text/css" href="', '"/>');
+    return '<link rel="stylesheet" type="text/css" href="/static/js/'+fileName+'"/>';
   };
   var $$INCLUDE_JS = function(fileName) {
-    return '\x3cscript type="text/javascript" src="'+fileName+'">\x3c/script>';
+    return IncludeScript(fileName);
+    return '\x3cscript type=text/javascript src='+fileName+'>\x3c/script>';
   };
   var $$INCLUDE_JS_DEV = $$INCLUDE_JS;
   var $$INCLUDE_CSS_DEV = $$INCLUDE_CSS;
 
   var $$INCLUDE_CSS_Q = function(fileName) {
+    return tagInclude(fileName,'<link type="stylesheet" type="text/css" href="', '"/>');
     return '\'<link rel="stylesheet" type="text/css" href="'+fileName+'"/>\'';
   };
   var $$INCLUDE_JS_Q = function(fileName) {
-    return '\'\\x3cscript type="text/javascript" src="'+fileName+'">\\x3c/script>\'';
+    return IncludeScript(fileName);
+    return '\'\\x3cscript type=text/javascript src='+fileName+'>\\x3c/script>\'';
   };
   var $$INCLUDE_JS_Q_DEV = $$INCLUDE_JS_Q;
   var $$INCLUDE_CSS_Q_DEV = $$INCLUDE_CSS_Q;
@@ -178,6 +204,7 @@ function Ace2Editor() {
       //iframeHTML.push(INCLUDE_JS_Q_DEV("profiler.js"));
       iframeHTML.push($$INCLUDE_JS_Q("ace2_common.js skiplist.js virtual_lines.js easysync2.js cssmanager.js colorutils.js undomodule.js contentcollector.js changesettracker.js linestylefilter.js domline.js"));
       iframeHTML.push($$INCLUDE_JS_Q("ace2_inner.js"));
+//      iframeHTML.push('\'\\n<script>\\x3c/script>\\n\'');
       iframeHTML.push('\'\\n<style type="text/css" title="dynamicsyntax"></style>\\n\'');
       iframeHTML.push('\'</head><body id="innerdocbody" class="syntax" spellcheck="false">&nbsp;</body></html>\'');
 
@@ -202,7 +229,9 @@ function Ace2Editor() {
 	// (throbs busy while typing)
 	'<link rel="stylesheet" type="text/css" href="data:text/css,"/>',
 	'\x3cscript>', outerScript, '\x3c/script>',
-	'</head><body id="outerdocbody"><div id="sidediv"><!-- --></div><div id="linemetricsdiv">x</div><div id="overlaysdiv"><!-- --></div></body></html>'];
+	'</head><body id="outerdocbody"><div id="sidediv"><!-- --></div><div id="linemetricsdiv">x</div><div id="overlaysdiv"><!-- --></div>',
+
+        '</body></html>'];
 
 
       if (!Array.prototype.map) Array.prototype.map = function(fun) { //needed for IE
