@@ -1,19 +1,19 @@
 function openingDesignInit() {
-  this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine'];
-  this.aceAttribsToClasses = aceAttribsToClasses;
-  this.aceCreateDomLine = aceCreateDomLine;
+  this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
 }
 
-function aceAttribsToClasses(args) {
+openingDesignInit.prototype.aceInitInnerdocbodyHead = function(args) {
+  args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/openingDesign/ace.css"/>\'');
+};
+
+openingDesignInit.prototype.aceAttribsToClasses = function(args) {
   if (args.key == 'openingDesignIsImage' && args.value != "")
     return ["openingDesignIsImage"];
   else if (args.key.indexOf('openingDesignImageObject') == 0)
     return [args.key + ":" + args.value];
 }
 
-
-
-function aceCreateDomLine(args) {
+openingDesignInit.prototype.aceCreateDomLine = function(args) {
   if (args.cls.indexOf('openingDesignIsImage') >= 0) {
    var clss = [];
    var imageObjects = {};
@@ -26,12 +26,11 @@ function aceCreateDomLine(args) {
      }
    });
 
-
-   return [{cls: args.cls, extraOpenTags: '<span style="border: 5px solid red">', extraCloseTags: '</span>'}];
+   return [{cls: args.cls, extraOpenTags: '', extraCloseTags: ''}];
   }
 }
 
-function openingDesignclicked(event) {
+openingDesignInit.prototype.insertImage = function(event) {
   padeditor.ace.callWithAce(function (ace) {
     rep = ace.ace_getRep();
 

@@ -1,0 +1,7 @@
+.openingDesignIsImage {
+  background: url("/static/html/plugins/openingDesign/icon.png") repeat scroll 0 0 transparent;
+  display: inline-block;
+  font-size: 0;
+  height: 32px;
+  width: 32px;
+}
