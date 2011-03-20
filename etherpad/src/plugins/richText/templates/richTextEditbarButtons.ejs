@@ -1,15 +1,29 @@
 <td>&nbsp;&nbsp;</td>
-<td></td>
+<td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
+<td class="editbarbutton editbargroupsfirst">
+  <a href="javascript:void()" title="Heading1"><img src="/static/img/plugins/richText/justifyleft.gif"></a>
+</td>
+<%
+   var lists = [ "justifyright.gif", "justifycenter.gif", "justifyfull.gif",
+		 "brush.gif", "Eraser.gif", "image.gif", "link.gif"];
+%>
+<% for(var i = 0, len = lists.length; i < len; i++){%>
+	<td class="editbarbutton">
+	  <a href="javascript:void()" title="<%=lists[i].replace(".gif","")%>"><img src="/static/img/plugins/richText/<%=lists[i]%>" /></a>
+	</td>
+<%}%>
+<td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
+<td>&nbsp;&nbsp;</td>
 <td>
         <span id="textColorPalette">
 		<span id = "textCPplaceholder"></span>
         </span>
-	 <span id="bgColorPalette">
+	<span id="bgColorPalette">
 		<span id = "bgCPplaceholder"></span>
         </span>
-	<span id="fontfamilyplaceholder" style="width:100px;">
-	</span>
 	<span id="fontsizeplaceholder">
+	</span>
+	<span id="fontfamilyplaceholder" style="width:100px;">
 	</span>
 </td>
 <td></td>

@@ -22,7 +22,7 @@ function colorPalette(name, img, callback){
         var Button = new dijit.form.ComboButton({
                    label: "<span style='position:relative'><img src=' " + img + "' />\
 			<span id='"+ name +"ColorIndicator'style='background-color:#000;display:block;\
-			 position:absolute;height:5px; top:15px; width:100%'>&nbsp;</span></span>",
+			 position:absolute;height:5px; top:11px; width:100%'>&nbsp;</span></span>",
                    name: name + "cp",
     	           value : "#000000",
                    dropDown: Palette,
@@ -36,8 +36,8 @@ function colorPalette(name, img, callback){
         dojo.byId(name + "ColorPalette").appendChild(Button.domNode);
 }
 function buildColorPalette(){ //build text-color and background-color palette
-	colorPalette("text", "textcolor.gif", function(val){ alert(val)});
-	colorPalette("bg", "bgcolor.gif", function(val){ alert(val)});
+	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){ alert(val)});
+	colorPalette("bg", "/static/img/plugins/richText/bgcolor.gif", function(val){ alert(val)});
 }
 
 function styleMenuList(name, style, values, callback, selectedIndex){
