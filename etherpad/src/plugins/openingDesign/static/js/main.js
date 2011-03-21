@@ -1,5 +1,6 @@
 function openingDesignInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
+  this.images = {};
   this.currentImage = {id: undefined, link: undefined};
 }
 
@@ -32,16 +33,18 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
      }
    });
 
+   this.images[imageId] = imageObjects;
    if (this.currentImage.id == imageId) {
-     this.updateImageFromPad(imageObjects);
+     this.updateImageFromPad();
    }
 
    return [{cls: clss.join(" "), extraOpenTags: '<a class="openingDesignImageLink">', extraCloseTags: '</a>'}];
   }
 }
 
-openingDesignInit.prototype.updateImageFromPad = function(imageObjects) {
-  console.log({updateImageFromPad:imageObjects});
+openingDesignInit.prototype.updateImageFromPad = function() {
+  if (this.currentImage.id != undefined)
+    console.log({updateImageFromPad:this.images[this.currentImage.id]});
 }
 
 openingDesignInit.prototype.selectImage = function(imageLink) {
@@ -52,8 +55,14 @@ openingDesignInit.prototype.selectImage = function(imageLink) {
       imageId = parts[1];
   });
 
-  console.log({imageId:imageId});
+  /*
+  if (this.currentImage.link != undefined) {
+    $(this.currentImage.link).removeClass("selected");
+  }
+  $(imageLink).addClass("selected");
+  */
   this.currentImage = {'id': imageId, 'link': imageLink};
+  this.updateImageFromPad();
 }
 
 openingDesignInit.prototype.insertImage = function(event) {
