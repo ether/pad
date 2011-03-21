@@ -33,7 +33,7 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
        } else if (key == "openingDesignImageObject") {
 	 var objId = val.substr(0, val.indexOf(":"));
 	 var properties = val.substr(val.indexOf(":")+1);	 
-	 imageObjects[objId] = dojo.fromJson(unescape(properties));
+	 imageObjects[objId] = unescape(properties);
        } else {
          clss.push(cls);
        }
@@ -60,13 +60,8 @@ openingDesignInit.prototype.updateImageFromPad = function() {
 
     for (var objId in currentImage) {
       var obj = currentImage[objId];
-      if (obj.type == 'circle') {
 
-        var shape = openingDesign.editorArea.surface.createCircle(obj.params)
-	  .setFill(obj.fill)
- 	  .setStroke(obj.stroke);
-
-      }
+      dojox.gfx.utils.fromJson(openingDesign.editorArea.surface, obj);
     }
   }
 }
@@ -98,12 +93,7 @@ openingDesignInit.prototype.insertImage = function(event) {
     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
 						  [["openingDesignIsImage", "myId"],
 						   ["openingDesignImageObject:foo",
-						    escape(dojo.toJson({
-						        type:'circle',
-							params:{cx:100, cy:100, r:50},
-							fill:[255, 0, 0, 1.0],
-							stroke: {color: [255, 0, 0, 1.0],
-							         width: 2}}))]						  
+						    escape('{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":255,"g":0,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}')]						  
 						   ]);
   }, "openingDesign", true);
 }
