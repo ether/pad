@@ -1,14 +1,11 @@
-function snipp(){
-  var x = 0;
-  return function() {
-   x += 1;
-   return x;
-  };
-};
+// This is a hack to get around ACEs brain-dead limit on onClick on
+// links inside the ACE domlines...
 
-snopp = snipp();
+$(document).ready(function () {
+  $("body").click(function (event) {
+    if (event.target.classList.contains("openingDesignImageLink")) {
+      top.openingDesign.selectImage(event.target.parentNode);
+    }
+  });
+});
 
-function snapp() {
- alert($); 
- setTimeout( function(){document.getElementById('snappider').onclick = snopp();}, 1000);
-}
