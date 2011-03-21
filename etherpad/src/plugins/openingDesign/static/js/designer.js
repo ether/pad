@@ -39,6 +39,8 @@ function initGfx(){
 
 
    var editorArea = top.openingDesign.editorArea;
+
+/*
    var minR = 10, maxR = editorArea.surface_size.width / 3;
    for(var j = 0; j < 5; ++j){
 	   var r = getRandSkewed(minR, maxR),
@@ -50,6 +52,8 @@ function initGfx(){
 			   ;
 	   new dojox.gfx.Moveable(shape);
    }
+*/
+
 }
 
 dojo.addOnLoad(initGfx);

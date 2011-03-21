@@ -23,11 +23,21 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
    var imageObjects = {};
    var imageId = undefined;
    $.each(args.cls.split(" "), function (i, cls) {
-     var parts = cls.split(":");
-     if (cls.indexOf("openingDesignImageId:") == 0) {
-       imageId = parts[1];
-     } if (cls.indexOf("openingDesignImageObject:") == 0) {
-       imageObjects[parts[1]] = parts[2];
+     if (cls.indexOf(":") != -1) {
+       var key = cls.substr(0, cls.indexOf(":"));
+       var val = cls.substr(cls.indexOf(":")+1);
+
+       if (key == "openingDesignImageId") {
+         clss.push(cls);
+	 imageId = val;
+       } else if (key == "openingDesignImageObject") {
+	 var id = val.substr(0, val.indexOf(":"));
+	 var properties = val.substr(val.indexOf(":")+1);	 
+	 imageObjects[id] = dojo.fromJson(unescape(properties));
+       } else {
+         clss.push(cls);
+       }
+
      } else {
        clss.push(cls);
      }
@@ -43,8 +53,19 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
 }
 
 openingDesignInit.prototype.updateImageFromPad = function() {
-  if (this.currentImage.id != undefined)
-    console.log({updateImageFromPad:this.images[this.currentImage.id]});
+  if (this.currentImage.id != undefined) {
+    var currentImage = this.images[this.currentImage.id];
+
+    console.log({updateImageFromPad:currentImage});
+
+/*
+
+shape = openingDesign.editorArea.surface.createCircle({cx: cx, cy: cy, r: r})
+			   .setFill(randColor(true))
+			   .setStroke({color: randColor(true), width: getRand(0, 3)})
+
+*/
+  }
 }
 
 openingDesignInit.prototype.selectImage = function(imageLink) {
@@ -73,8 +94,7 @@ openingDesignInit.prototype.insertImage = function(event) {
     ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
 						  [["openingDesignIsImage", "myId"],
-						   ["openingDesignImageObject:foo1", "xyzzy"],
-						   ["openingDesignImageObject:bar2", "naja"],
+						   ["openingDesignImageObject:foo", escape(dojo.toJson({type:'circle', x:100, y:100, r:50, fill:[255, 0, 0, 1.0]}))]						  
 						   ]);
   }, "openingDesign", true);
 }
