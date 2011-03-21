@@ -1,7 +1,8 @@
 function openingDesignInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
   this.images = {};
-  this.currentImage = {id: undefined, link: undefined};
+  this.padDocument = undefined;
+  this.currentImage = undefined;
 }
 
 openingDesignInit.prototype.aceInitInnerdocbodyHead = function(args) {
@@ -28,7 +29,7 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
        var val = cls.substr(cls.indexOf(":")+1);
 
        if (key == "openingDesignImageId") {
-         clss.push(cls);
+         clss.push("openingDesignImageId_" + val);
 	 imageId = val;
        } else if (key == "openingDesignImageObject") {
 	 var objId = val.substr(0, val.indexOf(":"));
@@ -44,7 +45,7 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
    });
 
    this.images[imageId] = imageObjects;
-   if (this.currentImage.id == imageId) {
+   if (this.currentImage == imageId) {
      this.updateImageFromPad();
    }
 
@@ -53,8 +54,8 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
 }
 
 openingDesignInit.prototype.updateImageFromPad = function() {
-  if (this.currentImage.id != undefined) {
-    var currentImage = this.images[this.currentImage.id];
+  if (this.currentImage != undefined) {
+    var currentImage = this.images[this.currentImage];
 
     var visited = {};
 
@@ -80,6 +81,13 @@ openingDesignInit.prototype.updateImageFromPad = function() {
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
+	shape.moveable = new dojox.gfx.Moveable(shape);
+	
+	handle = dojo.connect(shape.moveable, "onMoveStop", this, function (mover) {
+          openingDesign.saveShapeToStr(mover.host.shape);
+	  openingDesign.updatePadFromImage();
+        });
+
         shape.objId = objId;
         shape.strRepr = objStr;
 	visited[objId] = shape;
@@ -92,21 +100,58 @@ openingDesignInit.prototype.updateImageFromPad = function() {
   }
 }
 
+openingDesignInit.prototype.saveShapeToStr = function(shape) {
+  var parent = null;
+  if (shape.parent.objId != undefined)
+    parent = shape.parent.objId;
+  console.log("saveShapeToStr");
+
+  shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
+}
+
+openingDesignInit.prototype.updatePadFromImage = function() {
+  if (this.currentImage != undefined) {
+   console.log("updatePadFromImage");
+    var currentImage = this.images[this.currentImage];
+   xxxx = this.padDocument;
+   console.log(".openingDesignImageId_" + this.currentImage);
+    var imageLink = $(this.padDocument).find(".openingDesignImageId_" + this.currentImage)[0];
+
+    var visited = {};
+    var update = [];
+
+    dojox.gfx.utils.forEach(openingDesign.editorArea.surface, function (shape) {
+      if (shape === openingDesign.editorArea.surface) return;
+      if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
+        update.push(["openingDesignImageObject:" + shape.objId, escape(shape.strRepr)]);
+      }
+      visited[shape.objId] = shape;
+    });
+
+    for (var objId in currentImage)
+      if (visited[objId] === undefined)
+        update.push(["openingDesignImageObject:" + shape.objId, ""]);
+
+
+    padeditor.ace.callWithAce(function (ace) {
+      ace.ace_performDocumentApplyAttributesToRange(ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
+						    ace.ace_getLineAndCharForPoint({node: imageLink, index:1, maxIndex:1}),
+						    update);
+    }, "updatePadFromImage", true);
+
+  }
+}
+
 openingDesignInit.prototype.selectImage = function(imageLink) {
   var imageId;
   $.each(imageLink.classList, function (idx, cls) {
-    var parts = cls.split(":");
+    var parts = cls.split("_");
     if (parts[0] == "openingDesignImageId")
       imageId = parts[1];
   });
 
-  /*
-  if (this.currentImage.link != undefined) {
-    $(this.currentImage.link).removeClass("selected");
-  }
-  $(imageLink).addClass("selected");
-  */
-  this.currentImage = {'id': imageId, 'link': imageLink};
+  this.padDocument = imageLink.ownerDocument;
+  this.currentImage = imageId;
   this.updateImageFromPad();
 }
 
