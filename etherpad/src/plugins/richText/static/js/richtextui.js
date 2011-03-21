@@ -36,8 +36,12 @@ function colorPalette(name, img, callback){
         dojo.byId(name + "ColorPalette").appendChild(Button.domNode);
 }
 function buildColorPalette(){ //build text-color and background-color palette
-	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){ alert(val)});
-	colorPalette("bg", "/static/img/plugins/richText/bgcolor.gif", function(val){ alert(val)});
+	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){
+          richTextexecCommand("color", val);
+     });
+	colorPalette("bg", "/static/img/plugins/richText/bgcolor.gif", function(val){
+          richTextexecCommand("backgroundColor", val);
+     });
 }
 
 function styleMenuList(name, style, values, callback, selectedIndex){

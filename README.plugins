@@ -71,6 +71,13 @@ at all or just one.
 
 aceAttribsToClasses
   Type: client, server
+aceCreateDomLine
+aceCreateStructDomLine
+  new version of aceCreateDomLine
+  (more parameters and new document constraint for rich text editing) 
+  parameter : {domline, cls, attributes} 
+aceGetFilterStack
+aceInitInnerdocbodyHead
 adminMenu
 collectContentPost
   Type: client, server

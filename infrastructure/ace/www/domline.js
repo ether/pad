@@ -59,7 +59,10 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     result.node = {innerHTML: '', className: ''};
   }
 
-  var html = [];
+  var html = [];  //html content include all blockref content
+  var blockHTML = [];
+  /**@pram{Array} a set of options {tag, {attrs}} */
+  var noderef = [], blockref = [];
   var preHtml, postHtml;
   var curHTML = null;
   function processSpaces(s) {
@@ -69,13 +72,72 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
   var perTextNodeProcess = (doesWrap ? identity : processSpaces);
   var perHtmlLineProcess = (doesWrap ? processSpaces : identity);
   var lineClass = 'ace-line';
-  result.appendSpan = function(txt, cls) {
-    if (cls.indexOf('list') >= 0) {
+
+  function attr2String(attrs){
+     var str = "";
+     for(var i in attrs){
+       str += " "+ i + attrs[i]; 
+     }
+     return str;
+  }
+
+  function ref2html(ref){
+      var ret = {preHtml:"", postHtml:""};
+      for(var i = 0, len = ref.length; i < len; i++){
+            ret.preHtml += "<" + ref[i].tag + attr2String(ref[i].attrs) + ">";
+            ret.postHtml = "</" + ref[i].tag + ">" + ref.postHtml;
+      }
+      return ret;
+  }
+
+  function flushBlock(){ //tag order ?
+       var br = ref2html(blockref);
+       html.push(br.preHtml + blockHTML.join("") + br.postHtml);
+       blockref = [];
+       blockHTML = [];
+  }
+  /**
+   * add two more parameters
+   * @param{string} txt current working text
+   * @param{string} cls classname
+   * @param{Array} attributes text attributes
+   * @param{boolean} flush block 
+   *
+   * e.g
+   * <div class="ace-line"><!--node reference-->
+   *   some text here <!-- block reference && text content -->
+   * </div>
+   * <div class="ace-line"><!--node reference-->
+   *    <ol>
+   *        <li><!--block reference>
+   *            <h1>Title Here</h1><--text content-->
+   *        </li>
+   *        <li><!--block reference-->
+   *            Some text here <--text content-->
+   *        </li>
+   *    </ol>
+   * </div>
+   *
+   * using classname as the parameters for building dom line is deprecated, 
+   * attributes may be a better choice.
+   * Blockref and noderef used to solve the problem which is first in h1 and ol
+   * h1 works in block reference, so it can only change current block
+   * however, ol works in node reference, it will influence all the content 
+   * This also means noderef(ol) has a high priority than blockref(h1)
+   * blockref may be equal to noderef in most cases, except in the above case.
+   * In order to easy to manipaulate the ordered list, we put multi lists in one line,  
+   * which were put in multilines in the origin ace editor.
+   * */
+  result.appendSpan = function(txt, cls, attributes, flush) {  
+    if(flush){
+        flushBlock();
+    }
+    if (cls.indexOf('list') >= 0) { 
       var listType = /(?:^| )list:(\S+)/.exec(cls);
       if (listType) {
         listType = listType[1];
         if (listType) {
-          preHtml = '<ul class="list-'+listType+'"><li>';
+          preHtml = '<ul class="list-'+listType+'"><li>'; //FIXME new document style used
           postHtml = '</li></ul>';
         }
         result.lineMarker += txt.length;
@@ -86,15 +148,15 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     var simpleTags = null;
     if (cls.indexOf('url') >= 0) {
       cls = cls.replace(/(^| )url:(\S+)/g, function(x0, space, url) {
-	href = url;
-	return space+"url";
+         href = url;
+      	 return space+"url";
       });
     }
     if (cls.indexOf('tag') >= 0) {
       cls = cls.replace(/(^| )tag:(\S+)/g, function(x0, space, tag) {
-	if (! simpleTags) simpleTags = [];
-	simpleTags.push(tag.toLowerCase());
-	return space+tag;
+    	if (! simpleTags) simpleTags = [];
+    	simpleTags.push(tag.toLowerCase());
+    	return space+tag;
       });
     }
 
@@ -116,22 +178,37 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
       extraCloseTags = modifier.extraCloseTags+extraCloseTags;
     });
 
+    var attStr = "";
+    plugins_.callHook(
+        "aceCreateStructDomLine", {domline:domline, cls:cls, attributes: attributes}
+    ).map(function(modifier){ 
+        if(modifier.attStr !== undefined){
+            attStr += modifier.attStr; 
+        }
+        if(modifier.noderef){
+            noderef.push(modifier.noderef);
+        }
+        if(modifier.blockref){
+            blockref.push(modifier.noderef);
+        }
+    });
+
     if ((! txt) && cls) {
       lineClass = domline.addToLineClass(lineClass, cls);
     }
     else if (txt) {
       if (href) {
-	extraOpenTags = extraOpenTags+'<a href="'+
-	  href.replace(/\"/g, '&quot;')+'">';
-	extraCloseTags = '</a>'+extraCloseTags;
+        extraOpenTags = extraOpenTags+'<a href="'+
+    	  href.replace(/\"/g, '&quot;')+'">';
+	    extraCloseTags = '</a>'+extraCloseTags;
       }
       if (simpleTags) {
-	simpleTags.sort();
-	extraOpenTags = extraOpenTags+'<'+simpleTags.join('><')+'>';
-	simpleTags.reverse();
-	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
+    	simpleTags.sort();
+    	extraOpenTags = extraOpenTags+'<'+simpleTags.join('><')+'>';
+	    simpleTags.reverse();
+    	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
       }
-      html.push('<span class="',cls||'','">',extraOpenTags,
+      blockHTML.push('<span class="',cls||'','"'+ attStr +'>',extraOpenTags,
 		perTextNodeProcess(domline.escapeHTML(txt)),
                 extraCloseTags,'</span>');
     }
@@ -142,6 +219,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     result.lineMarker = 0;
   };
   function writeHTML() {
+    flushBlock();
     var newHTML = perHtmlLineProcess(html.join(''));
     if (! newHTML) {
       if ((! document) || (! optBrowser)) {
@@ -154,6 +232,9 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     if (nonEmpty) {
       newHTML = (preHtml||'')+newHTML+(postHtml||'');
     }
+    var ret = ref2html(noderef);
+    newHTML = ret.preHtml + newHTML + ret.postHtml;
+    noderef = [];
     html = preHtml = postHtml = null; // free memory
     if (newHTML !== curHTML) {
       curHTML = newHTML;

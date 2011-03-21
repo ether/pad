@@ -1573,23 +1573,23 @@ function OUTER(gscope) {
       var entry;
       p2.mark("findEntry");
       if (lastEntry) {
-	// optimization to avoid recalculation
-	var next = rep.lines.next(lastEntry);
-	if (next && next.key == key) {
-	  entry = next;
-	  lineStartOffset += lastEntry.width;
-	}
-      }
-      if (! entry) {
-	p2.literal(1, "nonopt");
-	entry = rep.lines.atKey(key);
-	lineStartOffset = rep.lines.offsetOfKey(key);
-      }
-      else p2.literal(0, "nonopt");
+	    // optimization to avoid recalculation
+	    var next = rep.lines.next(lastEntry);
+    	if (next && next.key == key) {
+	        entry = next;
+	        lineStartOffset += lastEntry.width;
+    	}
+     }
+     if (! entry) {
+    	p2.literal(1, "nonopt");
+    	entry = rep.lines.atKey(key);
+    	lineStartOffset = rep.lines.offsetOfKey(key);
+     }
+     else p2.literal(0, "nonopt");
       lastEntry = entry;
       p2.mark("spans");
-      getSpansForLine(entry, function (tokenText, tokenClass) {
-	info.appendSpan(tokenText, tokenClass);
+      getSpansForLine(entry, function (tokenText, tokenClass, attributes, flush) {
+        	info.appendSpan(tokenText, tokenClass, attributes, flush);
       }, lineStartOffset, isTimeUp());
       //else if (entry.text.length > 0) {
 	//info.appendSpan(entry.text, 'dirty');
@@ -2056,11 +2056,12 @@ function OUTER(gscope) {
   }
   editorInfo.ace_setAttributeOnSelection = setAttributeOnSelection;
 
-  function toggleAttributeOnSelection(attributeName) {
+  function toggleAttributeOnSelection(attributeName, value) {
     if (!(rep.selStart && rep.selEnd)) return;
 
     var selectionAllHasIt = true;
-    var withIt = Changeset.makeAttribsString('+', [[attributeName, 'true']], rep.apool);
+    value = (value !== undefined)?  value : 'true';
+    var withIt = Changeset.makeAttribsString('+', [[attributeName, value]], rep.apool);
     var withItRegex = new RegExp(withIt.replace(/\*/g,'\\*')+"(\\*|$)");
     function hasIt(attribs) { return withItRegex.test(attribs); }
 
@@ -2072,26 +2073,26 @@ function OUTER(gscope) {
       var selectionStartInLine = 0;
       var selectionEndInLine = rep.lines.atIndex(n).text.length; // exclude newline
       if (n == selStartLine) {
-	selectionStartInLine = rep.selStart[1];
+    	selectionStartInLine = rep.selStart[1];
       }
       if (n == selEndLine) {
-	selectionEndInLine = rep.selEnd[1];
+    	selectionEndInLine = rep.selEnd[1];
       }
       while (opIter.hasNext()) {
-	var op = opIter.next();
-	var opStartInLine = indexIntoLine;
-	var opEndInLine = opStartInLine + op.chars;
-	if (! hasIt(op.attribs)) {
-	  // does op overlap selection?
-	  if (! (opEndInLine <= selectionStartInLine || opStartInLine >= selectionEndInLine)) {
-	    selectionAllHasIt = false;
-	    break;
-	  }
-	}
-	indexIntoLine = opEndInLine;
+    	var op = opIter.next();
+    	var opStartInLine = indexIntoLine;
+    	var opEndInLine = opStartInLine + op.chars;
+    	if (! hasIt(op.attribs)) {
+    	  // does op overlap selection?
+    	  if (! (opEndInLine <= selectionStartInLine || opStartInLine >= selectionEndInLine)) {
+    	    selectionAllHasIt = false;
+    	    break;
+    	  }
+    	}
+	    indexIntoLine = opEndInLine;
       }
       if (! selectionAllHasIt) {
-	break;
+    	break;
       }
     }
 
@@ -2101,7 +2102,7 @@ function OUTER(gscope) {
     }
     else {
       performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
-					    [[attributeName,'true']]);
+					    [[attributeName, value]]);
     }
   }
   editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;

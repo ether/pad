@@ -1,7 +1,7 @@
 <td>&nbsp;&nbsp;</td>
 <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
 <td class="editbarbutton editbargroupsfirst">
-  <a href="javascript:void()" title="Heading1"><img src="/static/img/plugins/richText/justifyleft.gif"></a>
+  <a href="javascript:richTextexecCommand('justifyleft')" title="Heading1"><img src="/static/img/plugins/richText/justifyleft.gif"></a>
 </td>
 <%
    var lists = [ "justifyright.gif", "justifycenter.gif", "justifyfull.gif",
@@ -9,7 +9,7 @@
 %>
 <% for(var i = 0, len = lists.length; i < len; i++){%>
 	<td class="editbarbutton">
-	  <a href="javascript:void()" title="<%=lists[i].replace(".gif","")%>"><img src="/static/img/plugins/richText/<%=lists[i]%>" /></a>
+	  <a href="javascript:richTextexecCommand('<%=lists[i].replace(".gif","")%>')" title="<%=lists[i].replace(".gif","")%>"><img src="/static/img/plugins/richText/<%=lists[i]%>" /></a>
 	</td>
 <%}%>
 <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
