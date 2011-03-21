@@ -1776,6 +1776,7 @@ function OUTER(gscope) {
       return [lineNum, col];
     }
   }
+  editorInfo.ace_getLineAndCharForPoint = getLineAndCharForPoint;
 
   function createDomLineEntry(lineString) {
     var info = doCreateDomLine(lineString.length > 0);
