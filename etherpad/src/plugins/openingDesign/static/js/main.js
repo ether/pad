@@ -56,13 +56,39 @@ openingDesignInit.prototype.updateImageFromPad = function() {
   if (this.currentImage.id != undefined) {
     var currentImage = this.images[this.currentImage.id];
 
-    console.log({updateImageFromPad:currentImage});
+    var visited = {};
 
-    for (var objId in currentImage) {
-      var obj = currentImage[objId];
+    dojox.gfx.utils.forEach(openingDesign.editorArea.surface, function (shape) {
+      if (shape === openingDesign.editorArea.surface) return;
+      if (currentImage[shape.objId] === undefined) {
+       shape.removeShape();
+      } else {
+        if (shape.strRepr == currentImage[shape.objId]) {
+          visited[shape.objId] = shape;
+        } else {
+	  shape.removeShape();
+        }
+      }
+    });
 
-      dojox.gfx.utils.fromJson(openingDesign.editorArea.surface, obj);
+    function materialize (objId) {
+      if (visited[objId] === undefined) {
+        var objStr = currentImage[objId];
+        var obj = dojo.fromJson(objStr);
+
+	var parent = openingDesign.editorArea.surface;
+	if (obj.parent) parent = materialize(obj.parent);
+
+        var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
+        shape.objId = objId;
+        shape.strRepr = objStr;
+	visited[objId] = shape;
+      }
+      return visited[objId];
     }
+
+    for (var objId in currentImage)
+      materialize(objId);
   }
 }
 
@@ -93,7 +119,7 @@ openingDesignInit.prototype.insertImage = function(event) {
     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
 						  [["openingDesignIsImage", "myId"],
 						   ["openingDesignImageObject:foo",
-						    escape('{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":255,"g":0,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}')]						  
+						    escape('{parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":255,"g":0,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}}')]
 						   ]);
   }, "openingDesign", true);
 }
