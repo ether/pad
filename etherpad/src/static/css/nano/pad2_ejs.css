@@ -146,18 +146,18 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #padeditor { zoom: 1; }
 .hidesidebar #padeditor { margin-right: 0; display:none;}
 
-#editbar { height: 36px;
+.editbar { height: 36px;
 /*  background: #a5bfe2 url(/static/img/jun09/pad/editbar_background.gif)* repeat-x; */
 position: relative; 
 display:none;
 }
 
-#editbarleft { float: left; height: 100%; overflow: hidden;
+.editbarleft { float: left; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_left.gif) no-repeat left top; width: 2px; display:none;}
-#editbarright { float: right; height: 100%; overflow: hidden;
+.editbarright { float: right; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_right.gif) no-repeat right top; width: 2px; display:none;}
 
-#editbartable
+.editbartable
 {
   position:absolute;
   top: 6px;
@@ -169,7 +169,7 @@ padding-right:-7px;
   width:100%;
 }
 
-#editbarsavetable
+.editbarsavetable
 {
   position:absolute;
   top: 6px;
@@ -178,7 +178,7 @@ padding-right:-7px;
   width:23px;
 }
 
-#editbarsavetable td, #editbartable td
+.editbarsavetable td, .editbartable td
 {
   white-space: nowrap;
 }

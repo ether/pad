@@ -102,22 +102,22 @@ limitations under the License. */ %>
 	});
       </script>
       <div id="padeditor">
-	<div id="editbar" class="disabledtoolbar">
-          <div id="editbarinner">
+	<div id="editbar" class="editbar disabledtoolbar">
+          <div id="editbarinner" class="editbarinner">
 	    <% /* floated left */ %>
-	    <div id="editbarleft"><!-- --></div>
+	    <div id="editbarleft" class="editbarleft"><!-- --></div>
 	    <% /* floated right */ %>
-	    <div id="editbarright"><!-- --></div>      
+	    <div id="editbarright" class="editbarright"><!-- --></div>      
 	    <% /* non-floated */ %>
-	    <div id="editbarinner">
-	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
+	    <div id="editbarinner" class="editbarinner">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable" class="editbartable">
 		<tr>
 		  <%: template.use('editBarItemsLeft'); %>
 		  <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
 		  <td width="100%">&nbsp;</td>
 		</tr>
 	      </table>
-	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable" class="editbarsavetable">
 		<tr>
 		  <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
 		  <%: template.use('editBarItemsRight'); %>

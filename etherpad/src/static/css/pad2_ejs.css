@@ -211,7 +211,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   z-index: 10;
 }
 
-#editbar { height: 36px;
+.editbar { height: 36px;
   background: #a5bfe2 url(/static/img/jun09/pad/editbar_background.gif) repeat-x; 
   height:36px;
   left:0;
@@ -221,16 +221,16 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   color: #444444;
 }
 
-#editbarinner {
+.editbarinner {
   overflow: hidden;
 }
 
-#editbarleft { float: left; height: 100%; overflow: hidden;
+.editbarleft { float: left; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_left.gif) no-repeat left top; width: 2px; }
-#editbarright { float: right; height: 100%; overflow: hidden;
+.editbarright { float: right; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_right.gif) no-repeat right top; width: 2px; }
 
-#editbartable
+.editbartable
 {
   position:absolute;
   top: 6px;
@@ -239,7 +239,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   height: 24px;
 }
 
-#editbarsavetable
+.editbarsavetable
 {
   position:absolute;
   top: 6px;
@@ -247,7 +247,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   height: 24px;
 }
 
-#editbarsavetable td, #editbartable td
+.editbarsavetable td, .editbartable td
 {
   white-space: nowrap;
 }
@@ -283,10 +283,10 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border-left-width: 0px !important;
 }
 
-#editbar #syncstatussyncing { position: absolute; height: 26px; width: 26px;
+.editbar #syncstatussyncing { position: absolute; height: 26px; width: 26px;
   background: url(/static/img/jun09/pad/syncing2.gif) no-repeat center center;
   right: 38px; top: 5px; display: none; }
-#editbar #syncstatusdone { position: absolute; height: 26px; width: 26px;
+.editbar #syncstatusdone { position: absolute; height: 26px; width: 26px;
   background: url(/static/img/jun09/pad/syncdone.gif) no-repeat center center;
   right: 38px; top: 5px; display: none; }
   

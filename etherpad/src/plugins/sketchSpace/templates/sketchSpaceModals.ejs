@@ -1,7 +1,48 @@
 <style>
  #sketchSpaceDebug {
-  position: absolute; left: 0; top: 0; border: 1px solid red; width: 300px; height: 300px; background: white;
+  position: absolute; left: 0; top: 36px; border: 1px solid #C4C4C4; width: 300px; height: 300px; background: white;
+ }
+ #sketchSpaceEditBar {
+  position: absolute; left: 0; top: 0; width: 302px; height: 36px; background: white;
  }
 </style>
 
 <div id="sketchSpaceDebug"></div>
+
+<div id="sketchSpaceEditBar">
+  <div class="editbar enabledtoolbar" id="editbar">
+    <div class="editbarinner" id="editbarinner">
+      <div class="editbarleft" id="editbarleft"><!-- --></div>
+      <div class="editbarright" id="editbarright"><!-- --></div>      
+      <div class="editbarinner" id="editbarinner">
+	<table border="0" cellspacing="0" cellpadding="0" class="editbartable" id="editbartable">
+	  <tbody><tr>
+
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>
+	    <td class="editbarbutton editbargroupsfirst" unselectable="on"><a title="Bold (ctrl-B)" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('bold'));"><img src="/static/img/jun09/pad/editbar_bold.gif"></a></td>
+	    <td class="editbarbutton" unselectable="on"> <a title="Italics (ctrl-I)" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('italic'));"><img src="/static/img/jun09/pad/editbar_italic.gif"></a></td>
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>
+
+	    <td>&nbsp;&nbsp;</td>
+
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>
+	    <td class="editbarbutton editbargroupsfirst" unselectable="on"><a title="Toggle Bullet List" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('insertunorderedlist'));"><img src="/static/img/jun09/pad/editbar_insertunorderedlist.gif"></a></td>
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>
+
+	    <td width="100%">&nbsp;</td>
+	  </tr></tbody>
+        </table>
+	<table border="0" cellspacing="0" cellpadding="0" class="editbarsavetable" id="editbarsavetable">
+	  <tbody><tr>
+
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>
+	    <td class="editbarbutton editbargroupsfirst" unselectable="on"><a title="Clear Authorship Colors" href="javascript:void (window.pad&amp;&amp;pad.editbarClick('clearauthorship'));"><img src="/static/img/jun09/pad/editbar_clearauthorship.gif"></a></td>
+	    <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>
+
+	  </tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
