@@ -75,18 +75,15 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
     function materialize (objId) {
       if (visited[objId] === undefined) {
         var objStr = currentImage[objId];
+	// FIXME: Handle that objStr is undefined here... can happen
+	// if stuff changed between the loop above and this function.
         var obj = dojo.fromJson(objStr);
 
 	var parent = sketchSpace.editorArea.surface;
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
-	shape.moveable = new dojox.gfx.Moveable(shape);
-	
-	handle = dojo.connect(shape.moveable, "onMoveStop", this, function (mover) {
-          sketchSpace.saveShapeToStr(mover.host.shape);
-	  sketchSpace.updatePadFromImage();
-        });
+	sketchSpace.editorShapeMakeMoveable(shape);
 
         shape.objId = objId;
         shape.strRepr = objStr;
@@ -135,6 +132,38 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
     }, "updatePadFromImage", true);
 
   }
+}
+
+sketchSpaceInit.prototype.editorGetShapeByObjId = function(objId) {
+  if (objId == null) return sketchSpace.editorArea.surface;
+  var res = undefined;
+  dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
+    if (shape === sketchSpace.editorArea.surface) return;
+    if (shape.objId == objId) res = shape;
+  });
+  return res;
+}
+
+sketchSpaceInit.prototype.editorShapeMakeMoveable = function(shape) {
+  shape.moveable = new dojox.gfx.Moveable(shape);
+  shape.shapeMovedSignalHandle = dojo.connect(shape.moveable, "onMoveStop", this, this.editorCallbackShapeMoved);
+}
+
+sketchSpaceInit.prototype.editorCallbackShapeMoved = function(mover) {
+  sketchSpace.saveShapeToStr(mover.host.shape);
+  sketchSpace.updatePadFromImage();
+}
+
+sketchSpaceInit.prototype.editorAddShape = function(shapeDescription) {
+  var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
+  shape.objId = dojox.uuid.generateRandomUuid();
+  this.editorShapeMakeMoveable(shape);
+  this.saveShapeToStr(shape);
+  sketchSpace.updatePadFromImage();
+}
+
+sketchSpaceInit.prototype.editorAddCircle = function() {
+  this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
 }
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
