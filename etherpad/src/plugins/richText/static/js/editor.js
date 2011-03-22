@@ -17,7 +17,8 @@ var richTextClient = {
     parseCommand : function(args){
         if(!args) return ;
         var attributes = args.attributes;
-        var attStr = "", noderef = [], blockref = [], style = {};
+        var attStr = "", noderef = [], blockref = [], style = {}, temp = {},
+               cmd = "", value = "";
         if(attributes && attributes.length){
             for(var i = 0, len = attributes.length; i < len; i++){
                 var pool = attributes[i];
@@ -28,11 +29,27 @@ var richTextClient = {
                     case "backgroundColor":
                         style["background-color"] = pool[1];
                         break;
+                    case "fontSize":
+                        style["font-size"] = pool[1];
+                        break;
+                    case "fontFamily":
+                        style["font-family"] = pool[1];
+                        break;
+                    case "textAlign":
+                        temp = {
+                            tag : "div", 
+                            attrs : {
+                                style : {}
+                            }
+                        };
+                        temp.attrs.style = {"text-align" : pool[1]};
+                        blockref.push(temp);
+                        break;
                 } 
             }
             var styleStr = richTextClient.joinStyle(style);
             attStr += styleStr;
         }
-        return [ {attStr : attStr}];
+        return [ {attStr : attStr, noderef: noderef, blockref : blockref}];
     }
 }

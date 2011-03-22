@@ -11,6 +11,15 @@ function richTextInit() {
 
 //rich text command entry
 function richTextexecCommand(cmd, value){
+    switch(cmd){
+        case "justifyleft":
+        case "justifyright":
+        case "justifycenter":
+        case "justifyjustify":
+            value = cmd.replace("justify", "");             
+            cmd = "textAlign";
+            break; 
+    }
     richTextClient.execCommand(cmd, value);
 }
 

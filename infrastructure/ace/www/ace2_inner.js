@@ -595,8 +595,8 @@ function OUTER(gscope) {
   function setTextSize(size) {
     textSize = size;
     root.style.fontSize = textSize+"px";
-    root.style.lineHeight = textLineHeight()+"px";
-    sideDiv.style.lineHeight = textLineHeight()+"px";
+//    root.style.lineHeight = textLineHeight()+"px"; //modified for dynamic font size
+//    sideDiv.style.lineHeight = textLineHeight()+"px";
     lineMetricsDiv.style.fontSize = textSize+"px";
     scheduler.setTimeout(function() {
       setUpTrackingCSS();

@@ -76,16 +76,57 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
   function attr2String(attrs){
      var str = "";
      for(var i in attrs){
-       str += " "+ i + attrs[i]; 
+       str += " "+ i + "='";
+       if(typeof attrs[i] == "object"){ 
+          //may only used for style
+          var temp = "";
+          for(var j in attrs[i]){
+            temp = j + ":" + attrs[i][j] + ";";
+          }  
+          str += temp;
+       }else{
+           str += attrs[i];
+       } 
+       str += "'"
      }
      return str;
   }
 
+  function mergeRef(ref){
+        //combine same ref element
+        var map = {}, index = -1; 
+        var ret = [];
+        for(var i = 0, len = ref.length; i < len; i++){
+            if(!ref[i].tag) continue;
+            ref[i].tag = ref[i].tag.toLowerCase();
+            index = map[ref[i].tag]; 
+            if(isNaN(index)){
+                //create new item 
+                index = ret.push(ref[i]) - 1;
+                map[ref[i].tag] = index;
+            }else{
+                //merge attributes
+                var localAttrs = {}, attr;
+                for(var j in ref[i].attrs){
+                  if(ret[index].attrs[j] === undefined || (typeof ret[index].attrs[j] != "object")){
+                     ret[index].attrs[j] = ref[i].attrs[j];
+                  }else{
+                     for(var m in ref[i].attrs[j]){
+                        ret[index].attrs[j][m] = ref[i].attrs[j][m];
+                     }
+                  } 
+                }
+            }
+        }
+        return ret;
+  }
+
   function ref2html(ref){
       var ret = {preHtml:"", postHtml:""};
+      ref = mergeRef(ref);
       for(var i = 0, len = ref.length; i < len; i++){
             ret.preHtml += "<" + ref[i].tag + attr2String(ref[i].attrs) + ">";
-            ret.postHtml = "</" + ref[i].tag + ">" + ref.postHtml;
+            ret.postHtml = "</" + ref[i].tag + ">" + ret.postHtml;
       }
       return ret;
   }
@@ -186,10 +227,10 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
             attStr += modifier.attStr; 
         }
         if(modifier.noderef){
-            noderef.push(modifier.noderef);
+           noderef = noderef.concat(modifier.noderef);
         }
         if(modifier.blockref){
-            blockref.push(modifier.noderef);
+           blockref = blockref.concat(modifier.blockref);
         }
     });
 

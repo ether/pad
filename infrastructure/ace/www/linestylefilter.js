@@ -60,7 +60,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     var curIndex = 0;
     var extraClasses;
     var leftInAuthor;
-    var localApool = [];
+    var localApool = [], tempApool = [];
     var flushblock = false;
    
     function checkFlushBlock(key, value){
@@ -68,11 +68,11 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     }
     function attribsToClasses(attribs) {
         var classes = '';
-        localApool = [];
+        tempApool = [];
         Changeset.eachAttribNumber(attribs, function(n) {
             var key = apool.getAttribKey(n);
     	    if (key) {
-                 localApool.push(apool.getAttrib(n));
+                 tempApool.push(apool.getAttrib(n));
 	             var value = apool.getAttribValue(n);
                  checkFlushBlock(key, value); 
     	         if (value) {
@@ -95,18 +95,22 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     }
 
     var attributionIter = Changeset.opIterator(aline);
-    var nextOp, nextOpClasses;
+    var nextOp, nextOpClasses, nextAttribs;
     function goNextOp() {
       nextOp = attributionIter.next();
       nextOpClasses = (nextOp.opcode && attribsToClasses(nextOp.attribs));
+      nextAttribs = nextOp.attribs;
     }
     goNextOp();
     function nextClasses() {
       if (curIndex < lineEnd) {
     	extraClasses = nextOpClasses;
     	leftInAuthor = nextOp.chars;
+        extraAttribs = nextAttribs;
+        localApool = tempApool;
+        tempApool= [];
 	    goNextOp();
-    	while (nextOp.opcode && nextOpClasses == extraClasses) {
+    	while (nextOp.opcode && nextOpClasses == extraClasses && extraAttribs == nextAttribs) { 
 	      leftInAuthor += nextOp.chars;
     	  goNextOp();
 	    }
