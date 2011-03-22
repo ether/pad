@@ -104,17 +104,13 @@ openingDesignInit.prototype.saveShapeToStr = function(shape) {
   var parent = null;
   if (shape.parent.objId != undefined)
     parent = shape.parent.objId;
-  console.log("saveShapeToStr");
 
   shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
 }
 
 openingDesignInit.prototype.updatePadFromImage = function() {
   if (this.currentImage != undefined) {
-   console.log("updatePadFromImage");
     var currentImage = this.images[this.currentImage];
-   xxxx = this.padDocument;
-   console.log(".openingDesignImageId_" + this.currentImage);
     var imageLink = $(this.padDocument).find(".openingDesignImageId_" + this.currentImage)[0];
 
     var visited = {};
@@ -131,7 +127,6 @@ openingDesignInit.prototype.updatePadFromImage = function() {
     for (var objId in currentImage)
       if (visited[objId] === undefined)
         update.push(["openingDesignImageObject:" + shape.objId, ""]);
-
 
     padeditor.ace.callWithAce(function (ace) {
       ace.ace_performDocumentApplyAttributesToRange(ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
@@ -162,9 +157,9 @@ openingDesignInit.prototype.insertImage = function(event) {
     ace.ace_replaceRange(rep.selStart, rep.selEnd, "I");
     ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
-						  [["openingDesignIsImage", "myId"],
-						   ["openingDesignImageObject:foo",
-						    escape('{parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":255,"g":0,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}}')]
+						  [["openingDesignIsImage", dojox.uuid.generateRandomUuid()],
+						   ["openingDesignImageObject:" + dojox.uuid.generateRandomUuid(),
+						    escape('{parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}}')]
 						   ]);
   }, "openingDesign", true);
 }
