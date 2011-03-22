@@ -1,25 +1,25 @@
-function openingDesignInit() {
+function sketchSpaceInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
   this.images = {};
   this.padDocument = undefined;
   this.currentImage = undefined;
 }
 
-openingDesignInit.prototype.aceInitInnerdocbodyHead = function(args) {
-  args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/openingDesign/ace.css"/>\'');
+sketchSpaceInit.prototype.aceInitInnerdocbodyHead = function(args) {
+  args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/sketchSpace/ace.css"/>\'');
   args.iframeHTML.push('\'\\x3cscript type="text/javascript" src="/static/js/jquery-1.3.2.js">\\x3c/script>\'');
-  args.iframeHTML.push('\'\\x3cscript type="text/javascript" src="/static/js/plugins/openingDesign/ace_inner.js">\\x3c/script>\'');
+  args.iframeHTML.push('\'\\x3cscript type="text/javascript" src="/static/js/plugins/sketchSpace/ace_inner.js">\\x3c/script>\'');
 };
 
-openingDesignInit.prototype.aceAttribsToClasses = function(args) {
-  if (args.key == 'openingDesignIsImage' && args.value != "")
-    return ["openingDesignIsImage", "openingDesignImageId:" + args.value];
-  else if (args.key.indexOf('openingDesignImageObject') == 0)
+sketchSpaceInit.prototype.aceAttribsToClasses = function(args) {
+  if (args.key == 'sketchSpaceIsImage' && args.value != "")
+    return ["sketchSpaceIsImage", "sketchSpaceImageId:" + args.value];
+  else if (args.key.indexOf('sketchSpaceImageObject') == 0)
     return [args.key + ":" + args.value];
 }
 
-openingDesignInit.prototype.aceCreateDomLine = function(args) {
-  if (args.cls.indexOf('openingDesignIsImage') >= 0) {
+sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
+  if (args.cls.indexOf('sketchSpaceIsImage') >= 0) {
    var clss = [];
    var imageObjects = {};
    var imageId = undefined;
@@ -28,10 +28,10 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
        var key = cls.substr(0, cls.indexOf(":"));
        var val = cls.substr(cls.indexOf(":")+1);
 
-       if (key == "openingDesignImageId") {
-         clss.push("openingDesignImageId_" + val);
+       if (key == "sketchSpaceImageId") {
+         clss.push("sketchSpaceImageId_" + val);
 	 imageId = val;
-       } else if (key == "openingDesignImageObject") {
+       } else if (key == "sketchSpaceImageObject") {
 	 var objId = val.substr(0, val.indexOf(":"));
 	 var properties = val.substr(val.indexOf(":")+1);	 
 	 imageObjects[objId] = unescape(properties);
@@ -49,18 +49,18 @@ openingDesignInit.prototype.aceCreateDomLine = function(args) {
      this.updateImageFromPad();
    }
 
-   return [{cls: clss.join(" "), extraOpenTags: '<a class="openingDesignImageLink">', extraCloseTags: '</a>'}];
+   return [{cls: clss.join(" "), extraOpenTags: '<a class="sketchSpaceImageLink">', extraCloseTags: '</a>'}];
   }
 }
 
-openingDesignInit.prototype.updateImageFromPad = function() {
+sketchSpaceInit.prototype.updateImageFromPad = function() {
   if (this.currentImage != undefined) {
     var currentImage = this.images[this.currentImage];
 
     var visited = {};
 
-    dojox.gfx.utils.forEach(openingDesign.editorArea.surface, function (shape) {
-      if (shape === openingDesign.editorArea.surface) return;
+    dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
+      if (shape === sketchSpace.editorArea.surface) return;
       if (currentImage[shape.objId] === undefined) {
        shape.removeShape();
       } else {
@@ -77,15 +77,15 @@ openingDesignInit.prototype.updateImageFromPad = function() {
         var objStr = currentImage[objId];
         var obj = dojo.fromJson(objStr);
 
-	var parent = openingDesign.editorArea.surface;
+	var parent = sketchSpace.editorArea.surface;
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
 	shape.moveable = new dojox.gfx.Moveable(shape);
 	
 	handle = dojo.connect(shape.moveable, "onMoveStop", this, function (mover) {
-          openingDesign.saveShapeToStr(mover.host.shape);
-	  openingDesign.updatePadFromImage();
+          sketchSpace.saveShapeToStr(mover.host.shape);
+	  sketchSpace.updatePadFromImage();
         });
 
         shape.objId = objId;
@@ -100,7 +100,7 @@ openingDesignInit.prototype.updateImageFromPad = function() {
   }
 }
 
-openingDesignInit.prototype.saveShapeToStr = function(shape) {
+sketchSpaceInit.prototype.saveShapeToStr = function(shape) {
   var parent = null;
   if (shape.parent.objId != undefined)
     parent = shape.parent.objId;
@@ -108,25 +108,25 @@ openingDesignInit.prototype.saveShapeToStr = function(shape) {
   shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
 }
 
-openingDesignInit.prototype.updatePadFromImage = function() {
+sketchSpaceInit.prototype.updatePadFromImage = function() {
   if (this.currentImage != undefined) {
     var currentImage = this.images[this.currentImage];
-    var imageLink = $(this.padDocument).find(".openingDesignImageId_" + this.currentImage)[0];
+    var imageLink = $(this.padDocument).find(".sketchSpaceImageId_" + this.currentImage)[0];
 
     var visited = {};
     var update = [];
 
-    dojox.gfx.utils.forEach(openingDesign.editorArea.surface, function (shape) {
-      if (shape === openingDesign.editorArea.surface) return;
+    dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
+      if (shape === sketchSpace.editorArea.surface) return;
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
-        update.push(["openingDesignImageObject:" + shape.objId, escape(shape.strRepr)]);
+        update.push(["sketchSpaceImageObject:" + shape.objId, escape(shape.strRepr)]);
       }
       visited[shape.objId] = shape;
     });
 
     for (var objId in currentImage)
       if (visited[objId] === undefined)
-        update.push(["openingDesignImageObject:" + shape.objId, ""]);
+        update.push(["sketchSpaceImageObject:" + shape.objId, ""]);
 
     padeditor.ace.callWithAce(function (ace) {
       ace.ace_performDocumentApplyAttributesToRange(ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
@@ -137,11 +137,11 @@ openingDesignInit.prototype.updatePadFromImage = function() {
   }
 }
 
-openingDesignInit.prototype.selectImage = function(imageLink) {
+sketchSpaceInit.prototype.selectImage = function(imageLink) {
   var imageId;
   $.each(imageLink.classList, function (idx, cls) {
     var parts = cls.split("_");
-    if (parts[0] == "openingDesignImageId")
+    if (parts[0] == "sketchSpaceImageId")
       imageId = parts[1];
   });
 
@@ -150,19 +150,19 @@ openingDesignInit.prototype.selectImage = function(imageLink) {
   this.updateImageFromPad();
 }
 
-openingDesignInit.prototype.insertImage = function(event) {
+sketchSpaceInit.prototype.insertImage = function(event) {
   padeditor.ace.callWithAce(function (ace) {
     rep = ace.ace_getRep();
 
     ace.ace_replaceRange(rep.selStart, rep.selEnd, "I");
     ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
-						  [["openingDesignIsImage", dojox.uuid.generateRandomUuid()],
-						   ["openingDesignImageObject:" + dojox.uuid.generateRandomUuid(),
+						  [["sketchSpaceIsImage", dojox.uuid.generateRandomUuid()],
+						   ["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(),
 						    escape('{parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}}')]
 						   ]);
-  }, "openingDesign", true);
+  }, "sketchSpace", true);
 }
 
 /* used on the client side only */
-openingDesign = new openingDesignInit();
+sketchSpace = new sketchSpaceInit();

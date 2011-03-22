@@ -1,11 +1,11 @@
 import("etherpad.log");
-import("plugins.openingDesign.hooks");
-import("plugins.openingDesign.static.js.main");
+import("plugins.sketchSpace.hooks");
+import("plugins.sketchSpace.static.js.main");
 
-function openingDesignInit() {
+function sketchSpaceInit() {
  this.hooks = ['editBarItemsLeftPad', 'aceAttribsToClasses', 'aceCreateDomLine', 'modals'];
- this.description = 'openingDesign';
- this.client = new main.openingDesignInit();
+ this.description = 'sketchSpace';
+ this.client = new main.sketchSpaceInit();
  this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
  this.aceAttribsToClasses = main.aceAttribsToClasses;
  this.aceCreateDomLine = main.aceCreateDomLine;
@@ -15,10 +15,10 @@ function openingDesignInit() {
 }
 
 function install() {
- log.info("Installing openingDesign");
+ log.info("Installing sketchSpace");
 }
 
 function uninstall() {
- log.info("Uninstalling openingDesign");
+ log.info("Uninstalling sketchSpace");
 }
 

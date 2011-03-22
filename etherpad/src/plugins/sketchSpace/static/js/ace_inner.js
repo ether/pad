@@ -3,8 +3,8 @@
 
 $(document).ready(function () {
   $("body").click(function (event) {
-    if (event.target.classList.contains("openingDesignImageLink")) {
-      top.openingDesign.selectImage(event.target.parentNode);
+    if (event.target.classList.contains("sketchSpaceImageLink")) {
+      top.sketchSpace.selectImage(event.target.parentNode);
     }
   });
 });
