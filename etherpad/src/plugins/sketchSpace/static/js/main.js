@@ -3,6 +3,7 @@ function sketchSpaceInit() {
   this.images = {};
   this.padDocument = undefined;
   this.currentImage = undefined;
+  this.selection = {objects:{}, parent: undefined, outline:undefined};
 }
 
 sketchSpaceInit.prototype.aceInitInnerdocbodyHead = function(args) {
@@ -60,7 +61,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
     var visited = {};
 
     dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
-      if (shape === sketchSpace.editorArea.surface) return;
+      if (shape === sketchSpace.editorArea.surface || shape.objId === undefined) return;
       if (currentImage[shape.objId] === undefined) {
        shape.removeShape();
       } else {
@@ -114,7 +115,7 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
     var update = [];
 
     dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
-      if (shape === sketchSpace.editorArea.surface) return;
+      if (shape === sketchSpace.editorArea.surface || shape.objId === undefined) return;
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
         update.push(["sketchSpaceImageObject:" + shape.objId, escape(shape.strRepr)]);
       }
@@ -147,11 +148,17 @@ sketchSpaceInit.prototype.editorGetShapeByObjId = function(objId) {
 sketchSpaceInit.prototype.editorShapeMakeMoveable = function(shape) {
   shape.moveable = new dojox.gfx.Moveable(shape);
   shape.shapeMovedSignalHandle = dojo.connect(shape.moveable, "onMoveStop", this, this.editorCallbackShapeMoved);
+  shape.clickSignalHandle = shape.connect("onclick", shape, function (event) { sketchSpace.editorCallbackShapeClick(this, event); });
 }
 
 sketchSpaceInit.prototype.editorCallbackShapeMoved = function(mover) {
-  sketchSpace.saveShapeToStr(mover.host.shape);
-  sketchSpace.updatePadFromImage();
+  this.saveShapeToStr(mover.host.shape);
+  this.updatePadFromImage();
+}
+
+sketchSpaceInit.prototype.editorCallbackShapeClick = function(shape, event) {
+  if (event.ctrlKey)
+    this.editorShapeToggleSelection(shape);
 }
 
 sketchSpaceInit.prototype.editorAddShape = function(shapeDescription) {
@@ -159,11 +166,106 @@ sketchSpaceInit.prototype.editorAddShape = function(shapeDescription) {
   shape.objId = dojox.uuid.generateRandomUuid();
   this.editorShapeMakeMoveable(shape);
   this.saveShapeToStr(shape);
-  sketchSpace.updatePadFromImage();
+  this.updatePadFromImage();
 }
 
 sketchSpaceInit.prototype.editorAddCircle = function() {
   this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
+}
+
+sketchSpaceInit.prototype.mergeBbox = function(bbox1, bbox2) {
+  var res = {};
+  res.x = min(bbox1.x, bbox2.x);
+  res.y = min(bbox1.y, bbox2.y);
+
+  res.width = max(bbox1.x + bbox1.width, bbox2.x + bbox2.with) - res.x;
+  res.height = max(bbox1.y + bbox1.height, bbox2.y + bbox2.height) - res.y;
+  return res;
+}
+
+sketchSpaceInit.prototype.bboxAddPoints = function(bbox, points) {
+  var res = undefined;
+  if (bbox !== undefined) {
+    res = {x:bbox.x, y:bbox.y, width:bbox.width, height:bbox.height};
+  }
+  $.each(points, function (index, point) {
+    if (res === undefined) {
+      res = {x:point.x, y:point.y, width:0, height:0};
+    } else {
+      if (point.x < res.x) {
+        res.width += res.x - point.x;
+        res.x = point.x;
+      } else if (point.x > res.x + res.width) {
+        res.width = point.x - res.x;
+      }
+      if (point.y < res.y) {
+        res.height += res.y - point.y;
+        res.y = point.y;
+      } else if (point.y > res.y + res.height) {
+        res.height = point.y - res.y;
+      }
+    }
+  });
+  return res;
+}
+
+sketchSpaceInit.prototype.editorSelectionBbox = function() {
+  var bbox = undefined;
+  for (objId in this.selection.objects) {
+    bbox = this.bboxAddPoints(bbox, this.selection.objects[objId].getTransformedBoundingBox());
+  }
+  return bbox;
+}
+
+sketchSpaceInit.prototype.editorSelectionUpdateOutline = function() {
+  var bbox = this.editorSelectionBbox();
+
+  if (this.selection.outline !== undefined) {
+    this.selection.outline.removeShape();
+    this.selection.outline = undefined;
+  }
+
+  if (bbox !== undefined) {
+    this.selection.outline = this.editorArea.surface.createGroup();
+
+    this.selection.outline.setTransform(dojox.gfx.matrix.translate(bbox.x, bbox.y));
+
+    this.selection.outline.outlineRect = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:0, y:0, width:bbox.width, height:bbox.height}, stroke:{color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}});
+
+    this.selection.outline.outlineCornerTL = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
+    this.selection.outline.outlineCornerBL = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
+    this.selection.outline.outlineCornerTH = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:bbox.width-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
+    this.selection.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
+  }
+}
+
+sketchSpaceInit.prototype.editorShapeAddToSelection = function(shape) {
+  if (shape.objId === undefined) return;
+  if (this.selection.parent !== shape.parent) {
+    this.selection.objects = {};
+    this.selection.parent = shape.parent;
+  }
+  this.selection.objects[shape.objId] = shape;
+  this.editorSelectionUpdateOutline();
+}
+
+sketchSpaceInit.prototype.editorShapeRemoveFromSelection = function(shape) {
+  if (shape.objId === undefined || this.selection.objects[shape.objId] === undefined) return;
+  delete this.selection.objects[shape.objId];
+  this.editorSelectionUpdateOutline();
+}
+
+sketchSpaceInit.prototype.editorShapeToggleSelection = function(shape) {
+  if (shape.objId === undefined) return;
+  if (this.selection.objects[shape.objId] === undefined)
+    this.editorShapeAddToSelection(shape);
+  else
+    this.editorShapeRemoveFromSelection(shape);
+}
+
+sketchSpaceInit.prototype.editorShapeClearSelection = function () {
+  this.selection.objects = {};
+  this.editorSelectionUpdateOutline();
 }
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {

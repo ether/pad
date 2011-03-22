@@ -1,6 +1,7 @@
 dojo.require("dojox.gfx");
 dojo.require("dojox.gfx.move");
 dojo.require("dojox.gfx.utils");
+dojo.require("dojox.gfx.matrix");
 dojo.require("dojox.uuid.generateRandomUuid");
 
 function initGfx(){
