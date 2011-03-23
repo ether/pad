@@ -1,9 +1,6 @@
 function sketchSpaceInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
-  this.images = {};
   this.padDocument = undefined;
-  this.currentImage = undefined;
-  this.selection = {objects:{}, parent: undefined, outline:undefined};
 }
 
 sketchSpaceInit.prototype.aceInitInnerdocbodyHead = function(args) {
@@ -45,8 +42,8 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
      }
    });
 
-   this.images[imageId] = imageObjects;
-   if (this.currentImage == imageId) {
+   this.editorArea.images[imageId] = imageObjects;
+   if (this.editorArea.currentImage == imageId) {
      this.updateImageFromPad();
    }
 
@@ -55,8 +52,8 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 }
 
 sketchSpaceInit.prototype.updateImageFromPad = function() {
-  if (this.currentImage != undefined) {
-    var currentImage = this.images[this.currentImage];
+  if (this.editorArea.currentImage != undefined) {
+    var currentImage = this.editorArea.images[this.editorArea.currentImage];
 
     var visited = {};
 
@@ -84,7 +81,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
-	sketchSpace.editorShapeMakeMoveable(shape);
+	sketchSpace.editorArea.editorShapeMakeMoveable(shape);
 
         shape.objId = objId;
         shape.strRepr = objStr;
@@ -98,18 +95,10 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
   }
 }
 
-sketchSpaceInit.prototype.saveShapeToStr = function(shape) {
-  var parent = null;
-  if (shape.parent.objId != undefined)
-    parent = shape.parent.objId;
-
-  shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
-}
-
 sketchSpaceInit.prototype.updatePadFromImage = function() {
-  if (this.currentImage != undefined) {
-    var currentImage = this.images[this.currentImage];
-    var imageLink = $(this.padDocument).find(".sketchSpaceImageId_" + this.currentImage)[0];
+  if (this.editorArea.currentImage != undefined) {
+    var currentImage = this.editorArea.images[this.editorArea.currentImage];
+    var imageLink = $(this.padDocument).find(".sketchSpaceImageId_" + this.editorArea.currentImage)[0];
 
     var visited = {};
     var update = [];
@@ -135,156 +124,6 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
   }
 }
 
-sketchSpaceInit.prototype.editorGetShapeByObjId = function(objId) {
-  if (objId == null) return sketchSpace.editorArea.surface;
-  var res = undefined;
-  dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
-    if (shape === sketchSpace.editorArea.surface) return;
-    if (shape.objId == objId) res = shape;
-  });
-  return res;
-}
-
-sketchSpaceInit.prototype.editorShapeMakeMoveable = function(shape) {
-  shape.moveable = new dojox.gfx.Moveable(shape);
-  shape.shapeMovedSignalHandle = dojo.connect(shape.moveable, "onMoveStop", this, this.editorCallbackShapeMoved);
-  shape.clickSignalHandle = shape.connect("onclick", shape, function (event) { sketchSpace.editorCallbackShapeClick(this, event); });
-}
-
-sketchSpaceInit.prototype.editorCallbackShapeMoved = function(mover) {
-  this.saveShapeToStr(mover.host.shape);
-  this.updatePadFromImage();
-}
-
-sketchSpaceInit.prototype.editorCallbackShapeClick = function(shape, event) {
-  this.editorShapeToggleSelection(shape, !event.ctrlKey);
-}
-
-sketchSpaceInit.prototype.editorShapeRemove = function(shape) {
-  shape.removeShape();
-  this.updatePadFromImage();
-}
-
-sketchSpaceInit.prototype.editorAddShape = function(shapeDescription) {
-  var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
-  shape.objId = dojox.uuid.generateRandomUuid();
-  this.editorShapeMakeMoveable(shape);
-  this.saveShapeToStr(shape);
-  this.updatePadFromImage();
-}
-
-sketchSpaceInit.prototype.editorAddCircle = function() {
-  this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
-}
-
-sketchSpaceInit.prototype.mergeBbox = function(bbox1, bbox2) {
-  var res = {};
-  res.x = min(bbox1.x, bbox2.x);
-  res.y = min(bbox1.y, bbox2.y);
-
-  res.width = max(bbox1.x + bbox1.width, bbox2.x + bbox2.width) - res.x;
-  res.height = max(bbox1.y + bbox1.height, bbox2.y + bbox2.height) - res.y;
-  return res;
-}
-
-sketchSpaceInit.prototype.bboxAddPoints = function(bbox, points) {
-  var res = undefined;
-  if (bbox !== undefined) {
-    res = {x:bbox.x, y:bbox.y, width:bbox.width, height:bbox.height};
-  }
-  $.each(points, function (index, point) {
-    if (res === undefined) {
-      res = {x:point.x, y:point.y, width:0, height:0};
-    } else {
-      if (point.x < res.x) {
-        res.width += res.x - point.x;
-        res.x = point.x;
-      } else if (point.x > res.x + res.width) {
-        res.width = point.x - res.x;
-      }
-      if (point.y < res.y) {
-        res.height += res.y - point.y;
-        res.y = point.y;
-      } else if (point.y > res.y + res.height) {
-        res.height = point.y - res.y;
-      }
-    }
-  });
-  return res;
-}
-
-sketchSpaceInit.prototype.editorSelectionBbox = function() {
-  var bbox = undefined;
-  for (objId in this.selection.objects) {
-    bbox = this.bboxAddPoints(bbox, this.selection.objects[objId].getTransformedBoundingBox());
-  }
-  return bbox;
-}
-
-sketchSpaceInit.prototype.editorSelectionUpdateOutline = function() {
-  var bbox = this.editorSelectionBbox();
-
-  if (this.selection.outline !== undefined) {
-    this.selection.outline.removeShape();
-    this.selection.outline = undefined;
-  }
-
-  if (bbox !== undefined) {
-    this.selection.outline = this.editorArea.surface.createGroup();
-
-    this.selection.outline.setTransform(dojox.gfx.matrix.translate(bbox.x, bbox.y));
-
-    this.selection.outline.outlineRect = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:0, y:0, width:bbox.width, height:bbox.height}, stroke:{color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}});
-
-    this.selection.outline.outlineCornerTL = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
-    this.selection.outline.outlineCornerBL = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
-    this.selection.outline.outlineCornerTH = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:bbox.width-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
-    this.selection.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.selection.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
-  }
-}
-
-sketchSpaceInit.prototype.editorShapeAddToSelection = function(shape) {
-  if (shape.objId === undefined) return;
-  if (this.selection.parent !== shape.parent) {
-    this.selection.objects = {};
-    this.selection.parent = shape.parent;
-  }
-  this.selection.objects[shape.objId] = shape;
-  this.editorSelectionUpdateOutline();
-}
-
-sketchSpaceInit.prototype.editorShapeIsSelected = function(shape) {
-  return shape.objId !== undefined && this.selection.objects[shape.objId] !== undefined;
-}
-
-sketchSpaceInit.prototype.editorShapeRemoveFromSelection = function(shape) {
-  if (shape.objId === undefined || this.selection.objects[shape.objId] === undefined) return;
-  delete this.selection.objects[shape.objId];
-  this.editorSelectionUpdateOutline();
-}
-
-sketchSpaceInit.prototype.editorShapeToggleSelection = function(shape, clearOthers) {
-  var isSelected = this.editorShapeIsSelected(shape);
-  if (clearOthers)
-    this.editorShapeClearSelection();
-  if (isSelected)
-    this.editorShapeRemoveFromSelection(shape);
-  else
-    this.editorShapeAddToSelection(shape);
-}
-
-sketchSpaceInit.prototype.editorShapeClearSelection = function () {
-  this.selection.objects = {};
-  this.editorSelectionUpdateOutline();
-}
-
-sketchSpaceInit.prototype.editorSelectionShapeRemove = function() {
-  for (objId in this.selection.objects) {
-    this.editorShapeRemove(this.selection.objects[objId]);
-  }
-  this.editorShapeClearSelection();
-}
-
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
   var imageId;
   $.each(imageLink.classList, function (idx, cls) {
@@ -294,7 +133,7 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
   });
 
   this.padDocument = imageLink.ownerDocument;
-  this.currentImage = imageId;
+  this.editorArea.currentImage = imageId;
   this.updateImageFromPad();
 }
 
