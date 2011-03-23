@@ -1,5 +1,7 @@
 dojo.provide("sketchSpaceDesigner.designer");
 
+dojo.require("sketchSpaceDesigner.designer.bbox");
+dojo.require("sketchSpaceDesigner.designer.selection");
 dojo.require("dojox.gfx");
 dojo.require("dojox.gfx.move");
 dojo.require("dojox.gfx.utils");
@@ -14,7 +16,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     this.images = {};
     this.currentImage = undefined;
-    this.selection = {objects:{}, parent: undefined, outline:undefined};
+    this.selection = new sketchSpaceDesigner.designer.selection.Selection();
 
     dojo.connect(this.container, "ondragstart",   dojo, "stopEvent");
     dojo.connect(this.container, "onselectstart", dojo, "stopEvent");
@@ -75,46 +77,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
   },
 
-  mergeBbox: function(bbox1, bbox2) {
-    var res = {};
-    res.x = min(bbox1.x, bbox2.x);
-    res.y = min(bbox1.y, bbox2.y);
-
-    res.width = max(bbox1.x + bbox1.width, bbox2.x + bbox2.width) - res.x;
-    res.height = max(bbox1.y + bbox1.height, bbox2.y + bbox2.height) - res.y;
-    return res;
-  },
-
-  bboxAddPoints: function(bbox, points) {
-    var res = undefined;
-    if (bbox !== undefined) {
-      res = {x:bbox.x, y:bbox.y, width:bbox.width, height:bbox.height};
-    }
-    $.each(points, function (index, point) {
-      if (res === undefined) {
-	res = {x:point.x, y:point.y, width:0, height:0};
-      } else {
-	if (point.x < res.x) {
-	  res.width += res.x - point.x;
-	  res.x = point.x;
-	} else if (point.x > res.x + res.width) {
-	  res.width = point.x - res.x;
-	}
-	if (point.y < res.y) {
-	  res.height += res.y - point.y;
-	  res.y = point.y;
-	} else if (point.y > res.y + res.height) {
-	  res.height = point.y - res.y;
-	}
-      }
-    });
-    return res;
-  },
-
   editorSelectionBbox: function() {
-    var bbox = undefined;
+    var bbox = new sketchSpaceDesigner.designer.bbox.Bbox();
     for (objId in this.selection.objects) {
-      bbox = this.bboxAddPoints(bbox, this.selection.objects[objId].getTransformedBoundingBox());
+      bbox.addPoints(this.selection.objects[objId].getTransformedBoundingBox());
     }
     return bbox;
   },
@@ -127,7 +93,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       this.selection.outline = undefined;
     }
 
-    if (bbox !== undefined) {
+    if (bbox.x !== undefined) {
       this.selection.outline = this.surface.createGroup();
 
       this.selection.outline.setTransform(dojox.gfx.matrix.translate(bbox.x, bbox.y));
