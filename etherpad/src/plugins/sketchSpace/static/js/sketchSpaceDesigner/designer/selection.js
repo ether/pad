@@ -19,8 +19,6 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
   },
 
   editorSelectionUpdateOutline: function() {
-    var selection = this;
-
     var bbox = this.editorSelectionBbox();
 
     if (this.outline !== undefined) {
@@ -42,13 +40,37 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
       this.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
 
       this.moveable = new dojox.gfx.Moveable(this.outline);
-      this.movedSignalHandle = dojo.connect(this.moveable, "onMoveStop", this, this.movedCallback);
-      this.clickSignalHandle = this.outline.connect("onclick", this.outline, function (event) { selection.clickCallback(this, event); });
+      this.isMoving = false;
+      this.onMoveStartSignalHandle = dojo.connect(this.moveable, "onFirstMove", this, this.onFirstMove);
+      this.onMoveStopSignalHandle = dojo.connect(this.moveable, "onMoveStop", this, this.onMoveStop);
+      this.enableClick();
     }
   },
 
-  movedCallback: function(mover) {
-   var matrix = dojox.gfx.matrix.multiply(this.outline.matrix, dojox.gfx.matrix.invert(this.outline.originalMatrix));
+  enableClick: function () {
+    var selection = this;
+    this.clickSignalHandle = this.outline.connect("onclick", this.outline, function (event) { selection.onClick(this, event); });
+  },
+
+  disableClick: function () {
+    dojo.disconnect(this.clickSignalHandle);
+  },
+
+  onFirstMove: function() {
+    this.disableClick();
+    this.isMoving = true;
+  },
+
+  onMoveStop: function(mover) {
+    if (!this.isMoving) return;
+    this.isMoving = false;
+    this.onMove(mover);
+    var selection = this;
+    setTimeout(function () { selection.enableClick(); }, 1);
+  },
+
+  onMove: function(mover) {
+    var matrix = dojox.gfx.matrix.multiply(this.outline.matrix, dojox.gfx.matrix.invert(this.outline.originalMatrix));
     this.outline.originalMatrix = this.outline.matrix;
 
     for (objId in this.objects) {
@@ -58,7 +80,8 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
     this.designer.imageUpdated();
   },
 
-  clickCallback: function(shape, event) {
+  onClick: function(shape, event) {
+    console.log("CLICK");
   },
 
   editorShapeAddToSelection: function(shape) {
