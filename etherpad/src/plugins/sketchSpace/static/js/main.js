@@ -81,7 +81,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
-	sketchSpace.editorArea.editorShapeMakeMoveable(shape);
+	sketchSpace.editorArea.registerObjectShape(shape);
 
         shape.objId = objId;
         shape.strRepr = objStr;

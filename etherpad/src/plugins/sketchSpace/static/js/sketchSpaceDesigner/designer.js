@@ -44,7 +44,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     return res;
   },
 
-  editorShapeMakeMoveable: function(shape) {
+  registerObjectShape: function(shape) {
     var designer = this;
     shape.moveable = new dojox.gfx.Moveable(shape);
     shape.shapeMovedSignalHandle = dojo.connect(shape.moveable, "onMoveStop", this, this.editorCallbackShapeMoved);
@@ -68,7 +68,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   editorAddShape: function(shapeDescription) {
     var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
     shape.objId = dojox.uuid.generateRandomUuid();
-    this.editorShapeMakeMoveable(shape);
+    this.registerObjectShape(shape);
     this.saveShapeToStr(shape);
     this.imageUpdated();
   },
