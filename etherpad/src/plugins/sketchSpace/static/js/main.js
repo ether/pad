@@ -124,7 +124,7 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 
     for (var objId in currentImage)
       if (visited[objId] === undefined)
-        update.push(["sketchSpaceImageObject:" + shape.objId, ""]);
+        update.push(["sketchSpaceImageObject:" + objId, ""]);
 
     padeditor.ace.callWithAce(function (ace) {
       ace.ace_performDocumentApplyAttributesToRange(ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
@@ -157,8 +157,12 @@ sketchSpaceInit.prototype.editorCallbackShapeMoved = function(mover) {
 }
 
 sketchSpaceInit.prototype.editorCallbackShapeClick = function(shape, event) {
-  if (event.ctrlKey)
-    this.editorShapeToggleSelection(shape);
+  this.editorShapeToggleSelection(shape, !event.ctrlKey);
+}
+
+sketchSpaceInit.prototype.editorShapeRemove = function(shape) {
+  shape.removeShape();
+  this.updatePadFromImage();
 }
 
 sketchSpaceInit.prototype.editorAddShape = function(shapeDescription) {
@@ -249,23 +253,36 @@ sketchSpaceInit.prototype.editorShapeAddToSelection = function(shape) {
   this.editorSelectionUpdateOutline();
 }
 
+sketchSpaceInit.prototype.editorShapeIsSelected = function(shape) {
+  return shape.objId !== undefined && this.selection.objects[shape.objId] !== undefined;
+}
+
 sketchSpaceInit.prototype.editorShapeRemoveFromSelection = function(shape) {
   if (shape.objId === undefined || this.selection.objects[shape.objId] === undefined) return;
   delete this.selection.objects[shape.objId];
   this.editorSelectionUpdateOutline();
 }
 
-sketchSpaceInit.prototype.editorShapeToggleSelection = function(shape) {
-  if (shape.objId === undefined) return;
-  if (this.selection.objects[shape.objId] === undefined)
-    this.editorShapeAddToSelection(shape);
-  else
+sketchSpaceInit.prototype.editorShapeToggleSelection = function(shape, clearOthers) {
+  var isSelected = this.editorShapeIsSelected(shape);
+  if (clearOthers)
+    this.editorShapeClearSelection();
+  if (isSelected)
     this.editorShapeRemoveFromSelection(shape);
+  else
+    this.editorShapeAddToSelection(shape);
 }
 
 sketchSpaceInit.prototype.editorShapeClearSelection = function () {
   this.selection.objects = {};
   this.editorSelectionUpdateOutline();
+}
+
+sketchSpaceInit.prototype.editorSelectionShapeRemove = function() {
+  for (objId in this.selection.objects) {
+    this.editorShapeRemove(this.selection.objects[objId]);
+  }
+  this.editorShapeClearSelection();
 }
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
