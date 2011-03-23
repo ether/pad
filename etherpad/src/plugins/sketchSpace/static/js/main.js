@@ -178,7 +178,7 @@ sketchSpaceInit.prototype.mergeBbox = function(bbox1, bbox2) {
   res.x = min(bbox1.x, bbox2.x);
   res.y = min(bbox1.y, bbox2.y);
 
-  res.width = max(bbox1.x + bbox1.width, bbox2.x + bbox2.with) - res.x;
+  res.width = max(bbox1.x + bbox1.width, bbox2.x + bbox2.width) - res.x;
   res.height = max(bbox1.y + bbox1.height, bbox2.y + bbox2.height) - res.y;
   return res;
 }
