@@ -166,8 +166,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
    * however, ol works in node reference, it will influence all the content 
    * This also means noderef(ol) has a high priority than blockref(h1)
    * blockref may be equal to noderef in most cases, except in the above case.
-   * In order to easy to manipaulate the ordered list, we put multi lists in one line,  
-   * which were put in multilines in the origin ace editor.
+   * the elements in reference are order-independent
    * */
   result.appendSpan = function(txt, cls, attributes, flush) {  
     if(flush){

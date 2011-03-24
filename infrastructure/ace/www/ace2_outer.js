@@ -162,7 +162,7 @@ function Ace2Editor() {
   var $$INCLUDE_CSS_DEV = $$INCLUDE_CSS;
 
   var $$INCLUDE_CSS_Q = function(fileName) {
-    return tagInclude(fileName,'<link type="stylesheet" type="text/css" href="', '"/>');
+    return tagInclude(fileName,'<link type="text/css" rel="stylesheet" href="', '"/>');
     return '\'<link rel="stylesheet" type="text/css" href="'+fileName+'"/>\'';
   };
   var $$INCLUDE_JS_Q = function(fileName) {

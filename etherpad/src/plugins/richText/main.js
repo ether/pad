@@ -15,10 +15,10 @@ function richTextInit() {
 }
 
 function install() {
-    log.info("Installing heading1");
+    log.info("Installing richText");
 }
 
 function uninstall() {
-    log.info("Uninstalling heading1");
+    log.info("Uninstalling richText");
 }
 
