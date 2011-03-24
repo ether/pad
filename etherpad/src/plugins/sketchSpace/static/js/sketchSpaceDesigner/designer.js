@@ -24,16 +24,24 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     this.modeStack = [];
     this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
+
+    this.stroke = {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4};
+    this.fill = {"r":255,"g":0,"b":0,"a":1};
   },
 
   pushMode: function (mode) {
+    if (this.modeStack.length > 0)
+      this.getCurrentMode().disable();
     mode.designer = this;
     this.modeStack.push(mode);
-    mode.enable();
+    this.getCurrentMode().enable();
   },
 
   popMode: function () {
-    this.modeStack.pop().disable();
+    this.getCurrentMode().disable();
+    this.modeStack.pop();
+    if (this.modeStack.length > 0)
+      this.getCurrentMode().enable();
   },
 
   getCurrentMode: function () {
@@ -70,7 +78,9 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   },
 
   registerObjectShape: function(shape) {
-   console.log(this);
+    if (shape.objId === undefined) {
+      shape.objId = dojox.uuid.generateRandomUuid();
+    }
     this.getCurrentMode().enableShape(shape);
   },
 
@@ -86,7 +96,6 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   editorAddShape: function(shapeDescription) {
     var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
-    shape.objId = dojox.uuid.generateRandomUuid();
     this.registerObjectShape(shape);
     this.saveShapeToStr(shape);
     this.imageUpdated();
@@ -94,6 +103,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   editorAddCircle: function() {
     this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
+  },
+
+  addRect: function() {
+    this.pushMode(new sketchSpaceDesigner.designer.modes.AddRect());
   },
 
 
