@@ -1,5 +1,6 @@
 dojo.provide("sketchSpaceDesigner.designer");
 
+dojo.require("sketchSpaceDesigner.designer.modes");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 dojo.require("sketchSpaceDesigner.designer.selection");
 dojo.require("dojox.gfx");
@@ -9,7 +10,7 @@ dojo.require("dojox.gfx.matrix");
 dojo.require("dojox.uuid.generateRandomUuid");
 
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
- constructor: function (container, width, height) {
+  constructor: function (container, width, height) {
     this.container = container;
     this.surface = dojox.gfx.createSurface(this.container, width, height);
     this.surface_size = {width: width, height: height};
@@ -20,6 +21,23 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     dojo.connect(this.container, "ondragstart",   dojo, "stopEvent");
     dojo.connect(this.container, "onselectstart", dojo, "stopEvent");
+
+    this.modeStack = [];
+    this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
+  },
+
+  pushMode: function (mode) {
+    mode.designer = this;
+    this.modeStack.push(mode);
+    mode.enable();
+  },
+
+  popMode: function () {
+    this.modeStack.pop().disable();
+  },
+
+  getCurrentMode: function () {
+    return this.modeStack[this.modeStack.length - 1];
   },
 
   saveShapeToStr: function(shape) {
@@ -44,23 +62,24 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     return res;
   },
 
+  forEachObjectShape: function(fn) {
+    dojox.gfx.utils.forEach(this.surface, function (shape) {
+      if (shape.objId === undefined) return;
+      return fn(shape);
+    });
+  },
+
   registerObjectShape: function(shape) {
-    var designer = this;
-    shape.moveable = new dojox.gfx.Moveable(shape);
-    shape.shapeMovedSignalHandle = dojo.connect(shape.moveable, "onMoveStop", this, this.editorCallbackShapeMoved);
-    shape.clickSignalHandle = shape.connect("onclick", shape, function (event) { designer.editorCallbackShapeClick(this, event); });
+   console.log(this);
+    this.getCurrentMode().enableShape(shape);
   },
 
-  editorCallbackShapeMoved: function(mover) {
-    this.saveShapeToStr(mover.host.shape);
-    this.imageUpdated();
-  },
-
-  editorCallbackShapeClick: function(shape, event) {
-    this.selection.editorShapeToggleSelection(shape, !event.ctrlKey);
+  unregisterObjectShape: function(shape) {
+    this.getCurrentMode().disableShape(shape);
   },
 
   editorShapeRemove: function(shape) {
+    this.unregisterObjectShape(shape);
     shape.removeShape();
     this.imageUpdated();
   },

@@ -57,8 +57,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 
     var visited = {};
 
-    dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
-      if (shape === sketchSpace.editorArea.surface || shape.objId === undefined) return;
+    this.editorArea.forEachObjectShape(function (shape) {
       if (currentImage[shape.objId] === undefined) {
        shape.removeShape();
       } else {
@@ -103,8 +102,7 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
     var visited = {};
     var update = [];
 
-    dojox.gfx.utils.forEach(sketchSpace.editorArea.surface, function (shape) {
-      if (shape === sketchSpace.editorArea.surface || shape.objId === undefined) return;
+    this.editorArea.forEachObjectShape(function (shape) {
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
         update.push(["sketchSpaceImageObject:" + shape.objId, escape(shape.strRepr)]);
       }
