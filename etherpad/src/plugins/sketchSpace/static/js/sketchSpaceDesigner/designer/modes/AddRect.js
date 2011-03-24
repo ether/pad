@@ -49,7 +49,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
         shapeData.height = this.shape.origY - event.layerY;
       }
       this.shape.setShape(shapeData);
-      console.log(["MOVE", event]);
     }
   },
   onKeyUp: function (event) {
