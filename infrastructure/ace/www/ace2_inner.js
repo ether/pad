@@ -4192,6 +4192,64 @@ function OUTER(gscope) {
   }
   editorInfo.ace_doInsertUnorderedList = doInsertUnorderedList;
 
+
+  function  setLineAttribute(target, attributeName, value){
+        var loc = [0, 0];
+        var builder = Changeset.builder(rep.lines.totalWidth());
+        for(var i = 0, len = target.length; i < len; i++){
+           var lineNum = target[i]; 
+           buildKeepRange(builder, loc, (loc = [lineNum,0]));
+           builder.insert('', [['author', thisAuthor],
+                               [attributeName, value]], rep.apool)
+        }   
+        var cs = builder.toString();
+        if (! Changeset.isIdentity(cs)) {
+          performDocumentApplyChangeset(cs);
+        }
+  }
+
+  function  getLineAttribute(lineNum, attributeName){
+        var value = "";
+        var aline = rep.alines[lineNum];
+        if (aline) {
+          var opIter = Changeset.opIterator(aline);
+          if (opIter.hasNext()) { //all line attribute were put in the first attribute 
+            return Changeset.opAttributeValue(opIter.next(), attributeName, rep.apool) || '';
+          }
+        }
+        return '';
+  }
+
+  function toggleAttributeOnLine(attributeName, value){
+    if (! (rep.selStart && rep.selEnd)) {
+      return;
+    }
+
+    var firstLine, lastLine;
+    firstLine = rep.selStart[0];
+    lastLine = Math.max(firstLine,
+                        rep.selEnd[0] - ((rep.selEnd[1] == 0) ? 1 : 0));
+    var changes = [], unchanges = [],  attribute = "";
+    for(var i = firstLine; i <= lastLine; i++){
+       attribute = getLineAttribute(i, attributeName); 
+       if(attribute != value){
+         changes.push(i);
+       }else{
+         unchanges.push(i);
+       }
+    }
+    var target;
+    if(changes.length == 0){
+        target = unchanges;
+        value = "" ; //all the same attribute, just remove this attribute
+    } else {
+        target = changes; //set attribute for all line
+    }
+    setLineAttribute(target, attributeName, value);
+  }
+ 
+  editorInfo.ace_toggleAttributeOnLine = toggleAttributeOnLine;
+
   var mozillaFakeArrows = (browser.mozilla && (function() {
     // In Firefox 2, arrow keys are unstable while DOM-manipulating
     // operations are going on.  Specifically, if an operation

@@ -1,8 +1,15 @@
 var richTextClient = {
     execCommand : function(cmd, value){
-         padeditor.ace.callWithAce(function (ace) {
-            ace.ace_toggleAttributeOnSelection(cmd, value);
-        }, cmd, true);
+         switch(cmd){
+             case "textAlign":
+                padeditor.ace.callWithAce(function (ace) {
+                    ace.ace_toggleAttributeOnLine(cmd, value);
+                 }, cmd, true);
+              default:
+                padeditor.ace.callWithAce(function (ace) {
+                    ace.ace_toggleAttributeOnSelection(cmd, value);
+                 }, cmd, true);
+         }
     },
     joinStyle : function(style){
         var str = "";
