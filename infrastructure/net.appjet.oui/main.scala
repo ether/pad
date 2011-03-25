@@ -51,8 +51,10 @@ object main {
   def setupFilesystem() {
     val logdir = new File(config.logDir+"/backend/access");
     if (! logdir.isDirectory())
-      if (! logdir.mkdirs())
+      if (! logdir.mkdirs()) {
+        println("Error: Could not create file system " + config.logDir+"/backend/access");
         quit(1);
+      }
   }
 
   val options =
