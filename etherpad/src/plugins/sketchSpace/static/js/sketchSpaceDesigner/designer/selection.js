@@ -8,6 +8,8 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
     this.objects = {};
     this.parent = undefined;
     this.outline = undefined;
+    this.zoomHandle = dojo.connect(this.designer.surface_transform, "setTransform", this, this.editorSelectionUpdateOutline);
+    this.imageUpdatedHandle = dojo.connect(this.designer, "imageUpdated", this, this.editorSelectionUpdateOutline);
   },
 
   editorSelectionBbox: function() {

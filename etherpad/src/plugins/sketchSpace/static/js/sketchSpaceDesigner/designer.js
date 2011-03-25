@@ -13,6 +13,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   constructor: function (container, width, height) {
     this.container = container;
     this.surface = dojox.gfx.createSurface(this.container, width, height);
+    this.surface_transform = this.surface.createGroup();
     this.surface_size = {width: width, height: height};
 
     this.images = {};
@@ -61,17 +62,17 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   editorGetShapeByObjId: function(objId) {
     var designer = this;
-    if (objId == null) return this.surface;
+    if (objId == null) return this.surface_transform;
     var res = undefined;
-    dojox.gfx.utils.forEach(this.surface, function (shape) {
-      if (shape === designer.surface) return;
+    dojox.gfx.utils.forEach(this.surface_transform, function (shape) {
+      if (shape === designer.surface_transform) return;
       if (shape.objId == objId) res = shape;
     });
     return res;
   },
 
   forEachObjectShape: function(fn) {
-    dojox.gfx.utils.forEach(this.surface, function (shape) {
+    dojox.gfx.utils.forEach(this.surface_transform, function (shape) {
       if (shape.objId === undefined) return;
       return fn(shape);
     });

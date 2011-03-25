@@ -76,7 +76,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	// if stuff changed between the loop above and this function.
         var obj = dojo.fromJson(objStr);
 
-	var parent = sketchSpace.editorArea.surface;
+	var parent = sketchSpace.editorArea.surface_transform;
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
