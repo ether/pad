@@ -102,12 +102,12 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.imageUpdated();
   },
 
-  editorAddCircle: function() {
-    this.editorAddShape({parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}});
-  },
-
   addRect: function() {
     this.pushMode(new sketchSpaceDesigner.designer.modes.AddRect());
+  },
+
+  addCircle: function() {
+    this.pushMode(new sketchSpaceDesigner.designer.modes.AddCircle());
   },
 
 
