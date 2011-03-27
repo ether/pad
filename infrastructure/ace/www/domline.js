@@ -142,7 +142,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
    * @param{string} txt current working text
    * @param{string} cls classname
    * @param{Array} attributes text attributes
-   * @param{boolean} flush block 
+   * @param{boolean} is the txt is marker for line or .. 
    *
    * e.g
    * <div class="ace-line"><!--node reference-->
@@ -168,20 +168,27 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
    * blockref may be equal to noderef in most cases, except in the above case.
    * the elements in reference are order-independent
    * */
-  result.appendSpan = function(txt, cls, attributes, flush) {  
-    if(flush){
-        flushBlock();
+  result.appendSpan = function(txt, cls, attributes, marker) {  
+    if(marker){
+        result.lineMarker +=txt.length;
+        txt = "";
     }
     if (cls.indexOf('list') >= 0) { 
       var listType = /(?:^| )list:(\S+)/.exec(cls);
       if (listType) {
         listType = listType[1];
+        if(top.XM){
+            listType += " second";
+        }else{
+            listType += " first";
+            top.XM=true;
+        }
         if (listType) {
           preHtml = '<ul class="list-'+listType+'"><li>'; //FIXME new document style used
           postHtml = '</li></ul>';
         }
         result.lineMarker += txt.length;
-        return; // don't append any text
+//      return; // don't append any text
       }
     }
     var href = null;

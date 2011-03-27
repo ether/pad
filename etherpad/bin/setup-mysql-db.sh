@@ -15,7 +15,7 @@
 #  limitations under the License.
 
 db="etherpad"
-
+mysql=${mysql:-mysql}
 echo "Creating etherpad ${db}..."
 echo "create database ${db};" | ${mysql} -u root -p
 

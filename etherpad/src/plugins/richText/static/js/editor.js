@@ -5,11 +5,13 @@ var richTextClient = {
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnLine(cmd, value);
                  }, cmd, true);
+                break;
               default:
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnSelection(cmd, value);
                  }, cmd, true);
          }
+         padeditor.ace.focus();
     },
     joinStyle : function(style){
         var str = "";

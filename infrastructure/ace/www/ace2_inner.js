@@ -38,6 +38,7 @@ function OUTER(gscope) {
   var editorInfo = parent.editorInfo;
 
   var iframe = window.frameElement;
+  var lineMarker = '*';
   var outerWin = iframe.ace_outerWin;
   iframe.ace_outerWin = null; // prevent IE 6 memory leak
   var sideDiv = iframe.nextSibling;
@@ -1101,8 +1102,12 @@ function OUTER(gscope) {
     // tokenFunc function; accesses current value of lineEntry and curDocChar,
     // also mutates curDocChar
     var curDocChar;
-    var tokenFunc = function(tokenText, tokenClass) {
-      lineEntry.domInfo.appendSpan(tokenText, tokenClass);
+    var tokenFunc = function(tokenText, tokenClass, attribs, pos) {
+       var marker = false;
+       if(isMarkerToken(tokenText, pos)){
+                marker = true;
+       } 
+       lineEntry.domInfo.appendSpan(tokenText, tokenClass, attribs, marker);
     };
     if (optModFunc) {
       var f = tokenFunc;
@@ -1553,6 +1558,10 @@ function OUTER(gscope) {
     return (!! STYLE_ATTRIBS[aname]) || (!! OTHER_INCORPED_ATTRIBS[aname]);
   }
 
+  function isMarkerToken(txt, pos){
+        return (pos == 1 && txt && (txt == lineMarker));
+  }
+
   function insertDomLines(nodeToAddAfter, infoStructs, isTimeUp) {
     isTimeUp = (isTimeUp || function() { return false; });
 
@@ -1588,8 +1597,12 @@ function OUTER(gscope) {
      else p2.literal(0, "nonopt");
       lastEntry = entry;
       p2.mark("spans");
-      getSpansForLine(entry, function (tokenText, tokenClass, attributes, flush) {
-        	info.appendSpan(tokenText, tokenClass, attributes, flush);
+      getSpansForLine(entry, function (tokenText, tokenClass, attributes, pos) {
+            var marker = false;
+            if(isMarkerToken(tokenText, pos)){
+                marker = true;
+            } 
+        	info.appendSpan(tokenText, tokenClass, attributes, marker);
       }, lineStartOffset, isTimeUp());
       //else if (entry.text.length > 0) {
 	//info.appendSpan(entry.text, 'dirty');
@@ -4114,13 +4127,7 @@ function OUTER(gscope) {
 
   function getLineListType(lineNum) {
     // get "list" attribute of first char of line
-    var aline = rep.alines[lineNum];
-    if (aline) {
-      var opIter = Changeset.opIterator(aline);
-      if (opIter.hasNext()) {
-        return Changeset.opAttributeValue(opIter.next(), 'list', rep.apool) || '';
-      }
-    }
+    var ret = getLineAttribute(lineNum, "list");
     return '';
   }
 
@@ -4152,7 +4159,7 @@ function OUTER(gscope) {
         // currently no line marker
         if (listType) {
           // add a line marker
-          builder.insert('*', [['author', thisAuthor],
+          builder.insert(lineMarker, [['author', thisAuthor],
                                ['insertorder', 'first'],
                                ['list', listType]], rep.apool);
         }
@@ -4197,10 +4204,20 @@ function OUTER(gscope) {
         var loc = [0, 0];
         var builder = Changeset.builder(rep.lines.totalWidth());
         for(var i = 0, len = target.length; i < len; i++){
-           var lineNum = target[i]; 
+           var lineNum = target[i], style; 
            buildKeepRange(builder, loc, (loc = [lineNum,0]));
-           builder.insert('', [['author', thisAuthor],
-                               [attributeName, value]], rep.apool)
+           style = getLineAttribute(lineNum, attributeName); 
+           switch(style){
+                case "ace-none-linestyle":
+                    builder.insert(lineMarker, [['author', thisAuthor],
+                               [attributeName, value]], rep.apool);
+                    break;
+                case "ace-linestyle":
+                default:
+                    buildKeepRange(builder, loc, (loc = [lineNum,1]),
+                             [[attributeName, value]], rep.apool);
+                    break;
+           }
         }   
         var cs = builder.toString();
         if (! Changeset.isIdentity(cs)) {
@@ -4209,15 +4226,23 @@ function OUTER(gscope) {
   }
 
   function  getLineAttribute(lineNum, attributeName){
-        var value = "";
+        var value = "", ret = "ace-none-linestyle", op;
         var aline = rep.alines[lineNum];
         if (aline) {
           var opIter = Changeset.opIterator(aline);
           if (opIter.hasNext()) { //all line attribute were put in the first attribute 
-            return Changeset.opAttributeValue(opIter.next(), attributeName, rep.apool) || '';
+            op = opIter.next();
+            ret = Changeset.opAttributeValue(op, attributeName, rep.apool);
+            if(!ret){
+               if(op.chars == 1){
+                   ret = "ace-linestyle";
+                }else{
+                   ret = "ace-none-linestyle";
+                }
+            }
           }
         }
-        return '';
+        return ret;
   }
 
   function toggleAttributeOnLine(attributeName, value){
@@ -4650,6 +4675,7 @@ function OUTER(gscope) {
 try{
 	OUTER(this);
 } catch(e){
+    alert(e);
 	window.onload = function(){
 		OUTER(this);
 	}

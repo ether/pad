@@ -61,11 +61,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     var extraClasses;
     var leftInAuthor;
     var localApool = [], tempApool = [];
-    var flushblock = false;
    
-    function checkFlushBlock(key, value){
-        flushblock = false;
-    }
     function attribsToClasses(attribs) {
         var classes = '';
         tempApool = [];
@@ -74,7 +70,6 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     	    if (key) {
                  tempApool.push(apool.getAttrib(n));
 	             var value = apool.getAttribValue(n);
-                 checkFlushBlock(key, value); 
     	         if (value) {
         	       if (key == 'author') {
 	                  classes += ' '+linestylefilter.getAuthorClassName(value);
@@ -122,7 +117,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
       while (txt.length > 0) {
     	if (leftInAuthor <= 0) {
     	  // prevent infinite loop if something funny's going on
-    	  return nextAfterAuthorColors(txt, cls, localApool, flushblock);
+    	  return nextAfterAuthorColors(txt, cls, localApool, leftInAuthor);
     	}
     	var spanSize = txt.length;
     	if (spanSize > leftInAuthor) {
@@ -130,7 +125,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     	}
     	var curTxt = txt.substring(0, spanSize);
        	txt = txt.substring(spanSize);
-    	nextAfterAuthorColors(curTxt, (cls&&cls+" ")+extraClasses, localApool, flushblock);
+    	nextAfterAuthorColors(curTxt, (cls&&cls+" ")+extraClasses, localApool, leftInAuthor);
     	curIndex += spanSize;
     	leftInAuthor -= spanSize;
     	if (leftInAuthor == 0) {

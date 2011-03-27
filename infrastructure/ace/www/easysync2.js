@@ -267,7 +267,7 @@ Changeset.smartOpAssembler = function() {
 
   function append(op) {
     if (! op.opcode) return;
-    if (! op.chars && !op.attribs) return;
+    if (! op.chars) return;
 
     if (op.opcode == '-') {
       if (lastOpcode == '=') {
@@ -390,7 +390,7 @@ else {
       }
     }
     function append(op) {
-      if (op.chars > 0 || op.attribs) {
+      if (op.chars > 0) {
         if (bufOp.opcode == op.opcode && bufOp.attribs == op.attribs) {
           if (op.lines > 0) {
             // bufOp and additional chars are all mergeable into a multi-line op
@@ -875,14 +875,13 @@ Changeset.composeAttributes = function(att1, att2, resultIsMutation, pool) {
     for(var i=0;i<atts.length;i++) {
       var oldPair = atts[i];
       if (oldPair[0] == pair[0]) {
-	if (pair[1] || resultIsMutation) {
-	  oldPair[1] = pair[1];
-	}
-	else {
-	  atts.splice(i, 1);
-	}
-	found = true;
-	break;
+	   if (pair[1] || resultIsMutation) {
+    	    oldPair[1] = pair[1];
+	    } else {
+	        atts.splice(i, 1);
+	    }
+        found = true;
+    	break;
       }
     }
     if ((! found) && (pair[1] || resultIsMutation)) {
