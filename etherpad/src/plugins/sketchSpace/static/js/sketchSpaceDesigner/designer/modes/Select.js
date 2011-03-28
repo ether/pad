@@ -53,7 +53,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
       this.outline.outlineCornerTH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
       this.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
 
-      this.onMouseUpHandle = this.outline.connect("onmouseup", this, this.onMouseUp);
       this.onMouseDownHandle = this.outline.connect("onmousedown", this, this.onMouseDown);
     }
   },
@@ -71,10 +70,12 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   },
 
   onShapeMouseUp: function (shape, event) {
-    this.designer.selection.toggleShape(shape, !event.ctrlKey);
+    if (!this.isMoving)
+      this.designer.selection.toggleShape(shape, !event.ctrlKey);
   },
 
   onShapeMouseDown: function (shape, event) {
+    this.onMouseDown(event);
   },
 
   onKeyUp: function (event) {
@@ -83,7 +84,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   },
 
   getCurrentMouse: function (event) {
-    var screenToObjMatrix = dojox.gfx.matrix.invert(this.outline.parent._getRealMatrix());
+    var screenToObjMatrix = dojox.gfx.matrix.invert(this.designer.surface._getRealMatrix());
     var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
     return mouse;
   },
@@ -104,16 +105,17 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   },
 
   onMouseDown: function(event) {
+    this.isMouseDown = true;
     this.orig = this.getCurrentMouse(event);
+    if (!this.outline) return;
     this.outline.originalMatrix = this.outline.matrix;
     this.designer.selection.applyToShapes(function () {
       this.originalMatrix = this.matrix;
     });
-    this.isMouseDown = true;
   },
 
   onMouseMove: function(event) {
-    if (!this.isMouseDown) return;
+    if (!this.isMouseDown || !this.outline) return;
     this.isMoving = true;
     var move = this.getCurrentMove(event);
     this.outline.setTransform(dojox.gfx.matrix.multiply(this.outline.originalMatrix, move));
