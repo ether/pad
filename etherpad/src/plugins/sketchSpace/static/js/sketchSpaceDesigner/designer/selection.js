@@ -18,7 +18,7 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
       var objects = {};
       this.designer.forEachObjectShape(function (shape) {
 	if (selection.objects[shape.objId] !== undefined)
-	  objects[shape.ObjId] = shape;
+	  objects[shape.objId] = shape;
       });
       this.objects = objects;
     }
@@ -76,13 +76,16 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
     var arg = Array.prototype.slice.call(arguments, 1, arguments.length);
 
     for (objId in this.objects) {
-      if (op == "removeShape") {
+      if (typeof(op) == "function") {
+        op.apply(this.objects[objId], arg);
+      } else if (op == "removeShape") {
         this.designer.editorShapeRemove(this.objects[objId]);
+      } else if (op == "save") {
+        this.designer.saveShapeToStr(this.objects[objId]);
       } else {
         this.objects[objId][op].apply(this.objects[objId], arg);
         this.designer.saveShapeToStr(this.objects[objId]);
       }
     }
   }
-
 });

@@ -3,6 +3,8 @@ dojo.provide("sketchSpaceDesigner.designer.modes.Select");
 dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Zoom], {
+  isMouseDown: false,
+  isMoving: false,
   enable: function () {
     var mode = this;
     this.inherited(arguments);
@@ -10,9 +12,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.enableOutline();
     this.selectionUpdatedHandle = dojo.connect(this.designer.selection, "selectionUpdated", this, this.updateOutline);
     this.zoomHandle = dojo.connect(this.designer.surface_transform, "setTransform", this, this.updateOutline);
+    this.onMouseMoveHandle = dojo.connect(this.designer.container, "onmousemove", this, this.onMouseMove);
+    this.onMouseUpHandle = dojo.connect(this.designer.container, "onmouseup", this, this.onMouseUp);
   },
 
   disable: function () {
+    dojo.disconnect(this.onMouseUpHandle);
+    dojo.disconnect(this.onMouseMoveHandle);
     dojo.disconnect(this.zoomHandle);
     dojo.disconnect(this.selectionUpdatedHandle);
     this.disableOutline();
@@ -22,20 +28,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   enableShape: function (shape) {
     var mode = this;
-    shape.onShapeClickHandle = shape.connect("onclick", shape, function (event) { mode.onShapeClick(shape, event); });
+    shape.onMouseUpHandle = shape.connect("onmouseup", shape, function (event) { mode.onShapeMouseUp(shape, event); });
+    shape.onMouseDownHandle = shape.connect("onmousedown", shape, function (event) { mode.onShapeMouseDown(shape, event); });
   },
 
   disableShape: function (shape) {
-    dojo.disconnect(shape.onClickHandle);
-  },
-
-  onShapeClick: function (shape, event) {
-    this.designer.selection.toggleShape(shape, !event.ctrlKey);
-  },
-
-  onKeyUp: function (event) {
-    if (event.keyCode == 46)
-     this.designer.selection.applyToShapes("removeShape");
+    dojo.disconnect(shape.onMouseUpHandle);
+    dojo.disconnect(shape.onMouseDownHandle);
   },
 
   enableOutline: function() {
@@ -54,11 +53,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
       this.outline.outlineCornerTH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
       this.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
 
-      this.moveable = new dojox.gfx.Moveable(this.outline);
-      this.isMoving = false;
-      this.onMoveStartSignalHandle = dojo.connect(this.moveable, "onFirstMove", this, this.onFirstMove);
-      this.onMoveStopSignalHandle = dojo.connect(this.moveable, "onMoveStop", this, this.onMoveStop);
-      this.enableClick();
+      this.onMouseUpHandle = this.outline.connect("onmouseup", this, this.onMouseUp);
+      this.onMouseDownHandle = this.outline.connect("onmousedown", this, this.onMouseDown);
     }
   },
 
@@ -74,36 +70,56 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.enableOutline();
   },
 
-  enableClick: function () {
-    var selection = this;
-    this.clickSignalHandle = this.outline.connect("onclick", this.outline, function (event) { selection.onClick(this, event); });
+  onShapeMouseUp: function (shape, event) {
+    this.designer.selection.toggleShape(shape, !event.ctrlKey);
   },
 
-  disableClick: function () {
-    dojo.disconnect(this.clickSignalHandle);
+  onShapeMouseDown: function (shape, event) {
   },
 
-  onFirstMove: function() {
-    this.disableClick();
-    this.isMoving = true;
+  onKeyUp: function (event) {
+    if (event.keyCode == 46)
+      this.designer.selection.applyToShapes("removeShape");
   },
 
-  onMoveStop: function(mover) {
-    if (!this.isMoving) return;
+  getCurrentMouse: function (event) {
+    var screenToObjMatrix = dojox.gfx.matrix.invert(this.outline.parent._getRealMatrix());
+    var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
+    return mouse;
+  },
+
+  getCurrentMove: function (event) {
+    var mouse = this.getCurrentMouse(event);
+    return dojox.gfx.matrix.translate(mouse.x - this.orig.x, mouse.y - this.orig.y);
+  },
+
+  onMouseUp: function(event) {
+    if (!this.isMoving) {
+      console.log("CLICK");
+    } else {
+      this.designer.selection.applyToShapes("save", this.getCurrentMove(event));
+    }
     this.isMoving = false;
-    this.onMove(mover);
-    var selection = this;
-    setTimeout(function () { selection.enableClick(); }, 1);
+    this.isMouseDown = false;
   },
 
-  onMove: function(mover) {
-    var matrix = dojox.gfx.matrix.multiply(this.outline.matrix, dojox.gfx.matrix.invert(this.outline.originalMatrix));
+  onMouseDown: function(event) {
+    this.orig = this.getCurrentMouse(event);
     this.outline.originalMatrix = this.outline.matrix;
-    this.designer.selection.applyToShapes("applyLeftTransform", matrix);
+    this.designer.selection.applyToShapes(function () {
+      this.originalMatrix = this.matrix;
+    });
+    this.isMouseDown = true;
   },
 
-  onClick: function(shape, event) {
-    console.log("CLICK");
+  onMouseMove: function(event) {
+    if (!this.isMouseDown) return;
+    this.isMoving = true;
+    var move = this.getCurrentMove(event);
+    this.outline.setTransform(dojox.gfx.matrix.multiply(this.outline.originalMatrix, move));
+    this.designer.selection.applyToShapes(function () {
+      this.setTransform(dojox.gfx.matrix.multiply(this.originalMatrix, move));
+    });
   },
 
 });
