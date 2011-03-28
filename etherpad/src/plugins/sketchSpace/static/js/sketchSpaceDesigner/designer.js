@@ -55,6 +55,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       parent = shape.parent.objId;
 
     shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
+    this.imageUpdated();
   },
 
   /* Use this to listen for changes */
@@ -99,7 +100,6 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
     this.registerObjectShape(shape);
     this.saveShapeToStr(shape);
-    this.imageUpdated();
   },
 
   addRect: function() {
