@@ -1,0 +1,15 @@
+This is a init-script and sysconfig-file to start etherpad on redhat.
+
+I recommend installing openoffice >= 3.2.1.
+You can get the package from http://download.services.openoffice.org/files/stable/3.2.1/OOo_3.2.1_Linux_x86-64_install-rpm_en-US.tar.gz
+Package openoffice.org-ure-1.6.1-9502.x86_64.rpm is important to install.
+
+Scala < 2.8 should also be installed. You can get the package from http://www.scala-lang.org/sites/default/files/linuxsoft_archives/downloads/distrib/files/scala-2.7.7.final.tgz
+
+You should also install jdk and mysql-connector-java in the appropriate version (>5.0.4).
+
+After checking out etherpad from git, please adjust the bin/exports.sh file to the folders where jdk, mysql-connector-java and scala is installed.
+For me these are the values in the etherpad.sysconfig file.
+
+When etherpad is installed, please copy the etherpad.sysconfig file to /etc/sysconfig/etherpad and the etherpad.init file to /etc/init.d/etherpad.
+You can now start etherpad using "service etherpad start" and stop using "service etherpad stop".
