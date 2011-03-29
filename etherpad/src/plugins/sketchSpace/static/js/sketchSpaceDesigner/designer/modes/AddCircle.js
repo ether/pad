@@ -22,12 +22,11 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
       this.shape.removeShape();
     }
   },
-  onMouseDown: function (event) {
-    var screenToObjMatrix = dojox.gfx.matrix.invert(this.designer.surface_transform._getRealMatrix());
-    var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
+  getContainerShape: function () { return this.designer.surface_transform; },
 
-    this.shape = dojox.gfx.utils.deserialize(this.designer.surface_transform, {shape:{type:"circle", cx:mouse.x, cy:mouse.y, r:1}, stroke:this.designer.stroke, fill:this.designer.fill});
-    this.shape.orig = mouse;
+  onMouseDown: function (event) {
+    this.orig = this.getCurrentMouse(event);
+    this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"circle", cx:this.orig.x, cy:this.orig.y, r:1}, stroke:this.designer.stroke, fill:this.designer.fill});
   },
   onMouseUp: function (event) {
     this.designer.registerObjectShape(this.shape);
@@ -37,12 +36,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
   },
   onMouseMove: function (event) {
     if (this.shape !== undefined) {
-      var screenToObjMatrix = dojox.gfx.matrix.invert(this.designer.surface_transform._getRealMatrix());
-
-      var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
+      var mouse = this.getCurrentMouse(event);
 
       var shapeData = this.shape.getShape();
-      shapeData.r = Math.pow(Math.pow(Math.abs(mouse.x - this.shape.orig.x), 2) + Math.pow(Math.abs(mouse.y - this.shape.orig.y), 2), 1/2);
+      shapeData.r = Math.pow(Math.pow(Math.abs(mouse.x - this.orig.x), 2) + Math.pow(Math.abs(mouse.y - this.orig.y), 2), 1/2);
       this.shape.setShape(shapeData);
     }
   },

@@ -83,16 +83,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
       this.designer.selection.applyToShapes("removeShape");
   },
 
-  getCurrentMouse: function (event) {
-    var screenToObjMatrix = dojox.gfx.matrix.invert(this.designer.surface._getRealMatrix());
-    var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
-    return mouse;
-  },
-
-  getCurrentMove: function (event) {
-    var mouse = this.getCurrentMouse(event);
-    return dojox.gfx.matrix.translate(mouse.x - this.orig.x, mouse.y - this.orig.y);
-  },
+  getContainerShape: function () { return this.designer.surface; },
 
   onMouseUp: function(event) {
     if (!this.isMoving) {

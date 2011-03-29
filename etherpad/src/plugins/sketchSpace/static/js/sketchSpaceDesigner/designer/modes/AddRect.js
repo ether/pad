@@ -22,10 +22,12 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
       this.shape.removeShape();
     }
   },
+
+  getContainerShape: function () { return this.designer.surface_transform; },
+
   onMouseDown: function (event) {
-    this.shape = dojox.gfx.utils.deserialize(this.designer.surface_transform, {shape:{type:"rect", x:event.layerX, y:event.layerY, width:1, height:1}, stroke:this.designer.stroke, fill:this.designer.fill});
-    this.shape.origX = event.layerX;
-    this.shape.origY = event.layerY;
+    this.orig = this.getCurrentMouse(event);
+    this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"rect", x:this.orig.x, y:this.orig.y, width:1, height:1}, stroke:this.designer.stroke, fill:this.designer.fill});
   },
   onMouseUp: function (event) {
     this.designer.registerObjectShape(this.shape);
@@ -35,25 +37,22 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
   },
   onMouseMove: function (event) {
     if (this.shape !== undefined) {
-      var screenToObjMatrix = dojox.gfx.matrix.invert(this.shape._getRealMatrix());
-
-      var mouse = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, event.layerX, event.layerY);
-      var orig = dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, this.shape.origX, this.shape.origY);
+      var mouse = this.getCurrentMouse(event);
 
       var shapeData = this.shape.getShape();
-      if (mouse.x >= orig.x) {
-        shapeData.x = orig.x;
-        shapeData.width = mouse.x - orig.x;
+      if (mouse.x >= this.orig.x) {
+        shapeData.x = this.orig.x;
+        shapeData.width = mouse.x - this.orig.x;
       } else {
         shapeData.x = mouse.x;
-        shapeData.width = orig.x - mouse.x;
+        shapeData.width = this.orig.x - mouse.x;
       }
-      if (mouse.y >= orig.y) {
-        shapeData.y = orig.y;
-        shapeData.height = mouse.y - orig.y;
+      if (mouse.y >= this.orig.y) {
+        shapeData.y = this.orig.y;
+        shapeData.height = mouse.y - this.orig.y;
       } else {
         shapeData.y = mouse.y;
-        shapeData.height = orig.y - mouse.y;
+        shapeData.height = this.orig.y - mouse.y;
       }
       this.shape.setShape(shapeData);
     }
