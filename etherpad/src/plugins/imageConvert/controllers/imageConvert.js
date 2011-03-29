@@ -92,14 +92,6 @@ function onRequest() {
 
   }
 
-/*
-  response.setContentType(faststatic.guessContentType(path));
-
-  var file = FileInputStream(File(path));
-  response.writeBytes(BetterFile.getStreamBytes(file));
-  file.close();
-*/
-
   if (request.acceptsGzip) {
     response.setGzip(true);
   }
