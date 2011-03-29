@@ -8,6 +8,9 @@ dojo.require("dojox.gfx.move");
 dojo.require("dojox.gfx.utils");
 dojo.require("dojox.gfx.matrix");
 dojo.require("dojox.uuid.generateRandomUuid");
+dojo.require("dojo.parser");
+//dojo.require("dijit.popup");
+dojo.require("dojox.widget.ColorPicker");
 
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   constructor: function (container, width, height) {
@@ -111,9 +114,55 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   },
 
 
+  /* refactor out this code and put it somewhere else... */
+  foregroundColorPickerPopup: function() {
+    this.foregroundColorPicker.popup();
+  },
+
+  backgroundColorPickerPopup: function() {
+    this.backgroundColorPicker.popup();
+  },
+
+});
+
+dojo.declare("sketchSpaceDesigner.designer.ColorPickerPopup", [dojox.widget.ColorPicker], {
+  create: function () {
+    this.inherited(arguments);
+    dijit.popup.moveOffScreen(this.domNode);
+  },
+  popup: function () {
+    var widget = this;
+    dijit.popup.open({
+      parent: null,
+      popup: widget,
+      around: widget.popupFor,
+      orient: {'BR':'TR', 'BL':'TL', 'TR':'BR', 'TL':'BL'},
+      onExecute: function(){
+	dijit.popup.close(widget);
+        widget.setColor(widget.attr("value"));
+      },
+      onCancel: function(){ dijit.popup.close(widget); },
+      onClose: function(){}
+    });
+    this.focus();
+  },
+  setColor: function(colorHex) {
+    this.inherited(arguments);
+    dojo.style(this.popupFor, "background", colorHex);
+  },
+  onBlur: function () {
+    this.inherited(arguments);
+    this.onCancel();
+  },
+  onCancel: function () {},
 });
 
 dojo.addOnLoad(function (){
   sketchSpace.editorArea = new sketchSpaceDesigner.designer.Designer(dojo.byId("sketchSpaceDebug"), 300, 300);
   dojo.connect(sketchSpace.editorArea, "imageUpdated", sketchSpace, sketchSpace.updatePadFromImage);
+
+  sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
+  dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.stroke.color = dojo.colorFromHex(colorHex); });
+  sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
+  dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.fill = dojo.colorFromHex(colorHex); });
 });
