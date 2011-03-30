@@ -5,6 +5,7 @@ dojo.require("sketchSpaceDesigner.designer.modes.Mode");
 dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.designer.modes.Mode], {
   zoomFactor: 0.15,
   mouseFactor: 0.3,
+  mouseDown: undefined,
   enable: function () {
     this.inherited(arguments);
     var mode = this;
@@ -14,11 +15,17 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
       mode.onMouseWheel(e, scroll);
     });
     this.onKeyUpHandle = dojo.connect(document, "onkeyup", this, function (event) { mode.onKeyUp(event); });
+    this.onMouseMoveHandle = dojo.connect(this.designer.container, "onmousemove", this, this.onMouseMove);
+    this.onMouseUpHandle = dojo.connect(this.designer.container, "onmouseup", this, this.onMouseUp);
+    this.onMouseDownHandle = dojo.connect(this.designer.container, "onmousedown", this, this.onMouseDown);
   },
   disable: function () {
-    this.inherited(arguments);
+    dojo.disconnect(this.onMouseDownHandle);
+    dojo.disconnect(this.onMouseUpHandle);
+    dojo.disconnect(this.onMouseMoveHandle);
     dojo.disconnect(this.onKeyUpHandle);
     dojo.disconnect(this.onMouseWheelHandle);
+    this.inherited(arguments);
   },
   onMouseWheel: function (event, scroll) {
     scroll *= this.mouseFactor;
@@ -43,5 +50,21 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
 
     var mouse = dojox.gfx.matrix.multiplyPoint(screenToCurrentZoomMatrix, x, y);
     this.designer.surface_transform.applyTransform(dojox.gfx.matrix.scaleAt(zoom, zoom, mouse.x, mouse.y));
-  }
+  },
+  onMouseMove: function(event) {
+    if (this.mouseDown !== undefined && this.mouseDown.button == 1 && !this.mouseDown.ctrlKey && !this.mouseDown.altKey && !this.mouseDown.shiftKey) {
+       var orig = this.getCurrentMouse(this.mouseDown, this.designer.surface);
+       var mouse = this.getCurrentMouse(event, this.designer.surface);
+       var move = dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);
+       this.designer.surface_transform.setTransform(dojox.gfx.matrix.multiply(move, this.panOriginalMatrix));
+    }
+  },
+  onMouseUp: function(event) {
+    this.mouseDown = undefined;
+  },
+  onMouseDown: function(event) {
+    this.mouseDown = event;
+    this.panOrig = this.getCurrentMouse(this.mouseDown, this.designer.surface);
+    this.panOriginalMatrix = this.designer.surface_transform.getTransform();
+  },
 });

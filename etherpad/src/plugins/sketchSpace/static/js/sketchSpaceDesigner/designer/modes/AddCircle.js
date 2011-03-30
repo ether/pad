@@ -6,18 +6,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
   enable: function () {
     this.inherited(arguments);
     var mode = this;
-    this.onMouseDownHandle = this.designer.surface.connect("onmousedown", this, function (event) { mode.onMouseDown(event); });
-    this.onMouseUpHandle = this.designer.surface.connect("onmouseup", this, function (event) { mode.onMouseUp(event); });
-    this.onMouseMoveHandle = this.designer.surface.connect("onmousemove", this, function (event) { mode.onMouseMove(event); });
-    this.onKeyUpHandle = dojo.connect(document, "onkeyup", this, function (event) { mode.onKeyUp(event); });
     this.shape = undefined;
   },
   disable: function () {
     this.inherited(arguments);
-    dojo.disconnect(this.onMouseDownHandle);
-    dojo.disconnect(this.onMouseUpHandle);
-    dojo.disconnect(this.onMouseMoveHandle);
-    dojo.disconnect(this.onKeyUpHandle);
     if (this.shape !== undefined) {
       this.shape.removeShape();
     }
@@ -25,16 +17,23 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
   getContainerShape: function () { return this.designer.surface_transform; },
 
   onMouseDown: function (event) {
-    this.orig = this.getCurrentMouse(event);
-    this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"circle", cx:this.orig.x, cy:this.orig.y, r:1}, stroke:this.designer.stroke, fill:this.designer.fill});
+    this.inherited(arguments);
+    if (event.button == 0 && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+      this.orig = this.getCurrentMouse(event);
+      this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"circle", cx:this.orig.x, cy:this.orig.y, r:1}, stroke:this.designer.stroke, fill:this.designer.fill});
+    }
   },
   onMouseUp: function (event) {
-    this.designer.registerObjectShape(this.shape);
-    this.designer.saveShapeToStr(this.shape);
-    this.designer.imageUpdated();
-    this.shape = undefined;
+    this.inherited(arguments);
+    if (this.shape !== undefined) {
+      this.designer.registerObjectShape(this.shape);
+      this.designer.saveShapeToStr(this.shape);
+      this.designer.imageUpdated();
+      this.shape = undefined;
+    }
   },
   onMouseMove: function (event) {
+    this.inherited(arguments);
     if (this.shape !== undefined) {
       var mouse = this.getCurrentMouse(event);
 
@@ -44,6 +43,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
     }
   },
   onKeyUp: function (event) {
+    this.inherited(arguments);
     if (event.keyCode == 27)
       this.designer.popMode();
   }

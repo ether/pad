@@ -117,7 +117,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   },
 
   editorAddShape: function(shapeDescription) {
-    var shape = dojox.gfx.utils.deserialize(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
+    var shape = this.deserializeShape(this.editorGetShapeByObjId(shapeDescription.parent), shapeDescription.shape);
     this.registerObjectShape(shape);
     this.saveShapeToStr(shape);
   },
