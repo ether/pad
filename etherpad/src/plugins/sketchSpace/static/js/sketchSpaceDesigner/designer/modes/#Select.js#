@@ -8,7 +8,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   enable: function () {
     var mode = this;
     this.inherited(arguments);
-//  this.onKeyUpHandle = dojo.connect(document, "onkeyup", this, function (event) { mode.onKeyUp(event); });
     this.enableOutline();
     this.selectionUpdatedHandle = dojo.connect(this.designer.selection, "selectionUpdated", this, this.updateOutline);
     this.zoomHandle = dojo.connect(this.designer.surface_transform, "setTransform", this, this.updateOutline);
@@ -22,7 +21,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     dojo.disconnect(this.zoomHandle);
     dojo.disconnect(this.selectionUpdatedHandle);
     this.disableOutline();
-//  dojo.disconnect(this.onKeyUpHandle);
     this.inherited(arguments);
   },
 

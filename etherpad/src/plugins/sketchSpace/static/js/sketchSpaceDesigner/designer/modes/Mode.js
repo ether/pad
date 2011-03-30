@@ -16,18 +16,20 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   disableShape: function (shape) {
   },
 
-  screenToLocalCoord: function (p) {
-    var screenToObjMatrix = dojox.gfx.matrix.invert(this.getContainerShape()._getRealMatrix());
+  screenToLocalCoord: function (p, container) {
+    if (container === undefined) container = this.getContainerShape();
+    var screenToObjMatrix = dojox.gfx.matrix.invert(container._getRealMatrix());
     return dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, p.x, p.y);
   },
 
-  getCurrentMouse: function (event) {
-    return this.screenToLocalCoord({x:event.layerX, y:event.layerY});
+   getCurrentMouse: function (event, container) {
+   return this.screenToLocalCoord({x:event.layerX, y:event.layerY}, container);
   },
 
-  getCurrentMove: function (event) {
-    var mouse = this.getCurrentMouse(event);
-    return dojox.gfx.matrix.translate(mouse.x - this.orig.x, mouse.y - this.orig.y);
+  getCurrentMove: function (event, container, orig) {
+    var mouse = this.getCurrentMouse(event, container);
+    if (orig === undefined) orig = this.orig;
+    return dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);
   },
 
 });
