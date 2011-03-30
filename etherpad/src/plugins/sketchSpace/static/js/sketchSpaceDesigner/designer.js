@@ -165,8 +165,8 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     return image;
   },
 
-  addImg: function() {
-    var shape = this.createImage(this.surface_transform, "uSr65K1Bmkxm2kTCjA3CjxBqd8E-.jpg");
+  addImg: function(imageName) {
+    var shape = this.createImage(this.surface_transform, imageName);
 /*
     this.designer.registerObjectShape(shape);
     this.designer.saveShapeToStr(shape);
@@ -225,4 +225,22 @@ dojo.addOnLoad(function (){
   dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.stroke.color = dojo.colorFromHex(colorHex); });
   sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.fill = dojo.colorFromHex(colorHex); });
+
+  $(function(){  
+    var info = {  
+      action: '/ep/fileUpload/',
+      name: 'uploadfile',  
+      onSubmit: function(file, ext){
+      //console.log('Starting...');
+      },  
+      onComplete: function(file, response){
+        var path = eval(response)[0].split("/");
+	sketchSpace.editorArea.addImg(path[path.length-1]);
+      }
+    }
+
+    new AjaxUpload($('#sketchSpaceAddImage'), info);  
+    new AjaxUpload($('#sketchSpaceAddImage img'), info);
+  });
+
 });
