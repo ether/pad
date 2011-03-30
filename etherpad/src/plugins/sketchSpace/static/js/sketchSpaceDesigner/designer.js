@@ -113,6 +113,66 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.pushMode(new sketchSpaceDesigner.designer.modes.AddCircle());
   },
 
+  createImage: function(parent, imageName) {
+    var designer = this;
+
+    var image = parent.createGroup();
+    image.currentDisplay = image.createImage();
+    image.imageName = imageName;
+    image.updateDisplay = function () {
+      if (this.pointSize === undefined) {
+        var image = this;
+	dojo.xhrGet({
+	  url: "/ep/imageConvert/" + this.imageName + "?action=getSize",
+	  handleAs: "json",
+	  load: function(data){
+	    image.pointSize = data;
+	    image.updateDisplay();
+	  }
+	});
+      } else {
+	var objToScreenMatrix = this._getRealMatrix();
+	var screenToObjMatrix = dojox.gfx.matrix.invert(objToScreenMatrix);
+
+	var screenBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:designer.surface_size.width, height:designer.surface_size.height}).transform(screenToObjMatrix);
+	var objBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:this.pointSize.w, height:this.pointSize.h});
+
+	var displayBboxOnObj = objBboxOnObj.copy().intersection(screenBboxOnObj);
+	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix);
+
+	this.currentDisplay.setShape({
+	  x:displayBboxOnObj.x,
+	  y:displayBboxOnObj.y,
+	  width:displayBboxOnObj.width,
+	  height:displayBboxOnObj.height,
+	  src: "/ep/imageConvert/" + this.imageName + "?p=0&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
+	});
+      }
+    }
+    image.updateDisplayLazy = function () {
+      if (this.updateDisplayTimout !== undefined) return;
+      var image = this;
+      this.updateDisplayTimout = window.setTimeout(function () {
+	image.updateDisplay();
+	image.updateDisplayTimout = undefined;
+      }, 500);
+    }
+
+    image.updateDisplay();
+    image.zoomHandle = dojo.connect(designer.surface_transform, "setTransform", image, image.updateDisplayLazy);
+    image.updateHandle = dojo.connect(designer, "imageUpdated", image, image.updateDisplayLazy);
+
+    return image;
+  },
+
+  addImg: function() {
+    var shape = this.createImage(this.surface_transform, "uSr65K1Bmkxm2kTCjA3CjxBqd8E-.jpg");
+/*
+    this.designer.registerObjectShape(shape);
+    this.designer.saveShapeToStr(shape);
+    this.designer.imageUpdated();
+*/
+  },
 
   /* refactor out this code and put it somewhere else... */
   foregroundColorPickerPopup: function() {
