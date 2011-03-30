@@ -79,7 +79,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	var parent = sketchSpace.editorArea.surface_transform;
 	if (obj.parent) parent = materialize(obj.parent);
 
-        var shape = dojox.gfx.utils.deserialize(parent, obj.shape);
+        var shape = sketchSpace.editorArea.deserializeShape(parent, obj.shape);
 	sketchSpace.editorArea.registerObjectShape(shape);
 
         shape.objId = objId;

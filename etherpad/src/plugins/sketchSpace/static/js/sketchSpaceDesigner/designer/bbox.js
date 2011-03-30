@@ -90,16 +90,21 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     return this;
   },
 
+  corners: function () {
+    var x = [this.x, this.x + this.width];
+    var y = [this.y, this.y + this.height];
+    return [{x:x[0], y:y[0]},
+	    {x:x[0], y:y[1]},
+	    {x:x[1], y:y[0]},
+	    {x:x[1], y:y[1]}];
+  },
+
   transform: function (matrix) {
     if (!this.isEmpty()) {
-      var x = [this.x, this.x + this.width];
-      var y = [this.y, this.y + this.height];
+      var corners = this.corners();
       this.makeEmpty();
       this.addPoints($.map(
-	[{x:x[0], y:y[0]},
-	 {x:x[0], y:y[1]},
-	 {x:x[1], y:y[0]},
-	 {x:x[1], y:y[1]}],
+        corners,
 	function (p) {
 	  return dojox.gfx.matrix.multiplyPoint(matrix, p.x, p.y);
 	}

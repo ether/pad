@@ -52,12 +52,29 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     return this.modeStack[this.modeStack.length - 1];
   },
 
+  deserializeShape: function(parent, shape) {
+    if (shape.extType == "zimage") {
+      return this.createImage(parent, shape.imageName).setTransform(shape.transform);
+    } else {
+      return dojox.gfx.utils.deserialize(parent, shape);
+    }
+  },
+
+  serializeShape: function(shape) {
+    /* FIXME: Remove "children" from serialized groups */
+    if (shape.extType == "zimage") {
+      return {extType: "zimage", imageName: shape.imageName, transform:shape.getTransform()};
+    } else {
+      return dojox.gfx.utils.serialize(shape);
+    }
+  },
+
   saveShapeToStr: function(shape) {
     var parent = null;
     if (shape.parent.objId != undefined)
       parent = shape.parent.objId;
 
-    shape.strRepr = dojo.toJson({parent:parent, shape:dojox.gfx.utils.serialize(shape)});
+    shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape)});
     this.imageUpdated();
   },
 
@@ -117,6 +134,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     var designer = this;
 
     var image = parent.createGroup();
+    image.extType = "zimage";
     image.currentDisplay = image.createImage();
     image.imageName = imageName;
     image.updateDisplay = function () {
@@ -157,6 +175,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	image.updateDisplayTimout = undefined;
       }, 500);
     }
+    image.getTransformedBoundingBox = function () {
+      var objToScreenMatrix = this._getRealMatrix();
+      return new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:this.pointSize.w, height:this.pointSize.h}).transform(objToScreenMatrix).corners();
+    }
 
     image.updateDisplay();
     image.zoomHandle = dojo.connect(designer.surface_transform, "setTransform", image, image.updateDisplayLazy);
@@ -167,11 +189,9 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   addImg: function(imageName) {
     var shape = this.createImage(this.surface_transform, imageName);
-/*
-    this.designer.registerObjectShape(shape);
-    this.designer.saveShapeToStr(shape);
-    this.designer.imageUpdated();
-*/
+    this.registerObjectShape(shape);
+    this.saveShapeToStr(shape);
+    this.imageUpdated();
   },
 
   /* refactor out this code and put it somewhere else... */
