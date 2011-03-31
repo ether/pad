@@ -138,8 +138,8 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     image.currentDisplay = image.createImage();
     image.imageName = imageName;
     image.updateDisplay = function () {
+      var image = this;
       if (this.pointSize === undefined) {
-        var image = this;
 	dojo.xhrGet({
 	  url: "/ep/imageConvert/" + this.imageName + "?action=getSize",
 	  handleAs: "json",
@@ -171,7 +171,12 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	var oldShape = this.currentDisplay.getShape()
 
 	if (oldShape.src != newShape.src) {
+	  var lastDisplay = this.currentDisplay;
+	  this.currentDisplay = image.createImage();
   	  this.currentDisplay.setShape(newShape);
+	  this.currentDisplayTimout = window.setTimeout(function () {
+            lastDisplay.removeShape();
+	  }, 500);
         }
       }
     }
