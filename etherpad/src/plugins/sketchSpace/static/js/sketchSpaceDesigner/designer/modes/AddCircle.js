@@ -5,7 +5,6 @@ dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigner.designer.modes.Zoom], {
   enable: function () {
     this.inherited(arguments);
-    var mode = this;
     this.shape = undefined;
   },
   disable: function () {
