@@ -155,8 +155,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	var screenBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:designer.surface_size.width, height:designer.surface_size.height}).transform(screenToObjMatrix);
 	var objBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:this.pointSize.w, height:this.pointSize.h});
 
-	var displayBboxOnObj = objBboxOnObj.copy().intersection(screenBboxOnObj);
-	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix);
+	var displayBboxOnObj = objBboxOnObj.copy().intersection(screenBboxOnObj).powround({x:2, y:2}, {x:8, y:8});
+	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix).powroundSize({x:2, y:2}, {x:8, y:8});
+
+	//console.log("zoom: " + displayBboxOnObj.toString() + " @ " + displayBboxOnScreen.width + ":" + displayBboxOnScreen.height);
 
 	this.currentDisplay.setShape({
 	  x:displayBboxOnObj.x,

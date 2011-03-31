@@ -3,6 +3,14 @@ dojo.provide("sketchSpaceDesigner.designer.bbox");
 dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
   constructor: function (copyFrom) {
     if (copyFrom === undefined) copyFrom = {};
+    if (typeof(copyFrom) == "string") {
+      copyFrom = copyFrom.split(":");
+      copyFrom = copyFrom[0].split(",").concat(copyFrom[1].split(","));
+      copyFrom = {x:parseFloat(copyFrom[0]),
+		  y:parseFloat(copyFrom[1]),
+		  width:parseFloat(copyFrom[2]),
+		  height:parseFloat(copyFrom[3])};
+    }
     this.x = copyFrom.x;
     this.y = copyFrom.y;
     this.width = copyFrom.width;
@@ -111,5 +119,53 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
       ));
     }
     return this;
-  }
+  },
+
+  round: function (precission) {
+    /* Expands a bbox to have all four corners on multiples of
+     * precission.x respectively precission.y pixels. The maximum
+     * expansion is thus 2*precission.x-1 resp. 2*precission.y-1 */
+
+    var old = {x:this.x, y:this.y}
+
+    this.x = Math.floor(this.x / precission.x) * precission.x;
+    this.y = Math.floor(this.y / precission.y) * precission.y;
+    
+    this.width = Math.ceil((old.x + this.width) / precission.x) * precission.x - this.x;
+    this.height = Math.ceil((old.y + this.height) / precission.y) * precission.y - this.y;
+    return this;
+  },
+
+  powround: function (base, factor) {
+    /* Like round, but sets the precission to the nearest lower power
+     * of base to the width(height) of the bbox, or to the width
+     * divided by factor. */
+    if (factor === undefined) factor = {x:1, y:1};
+    return this.round({x:Math.pow(base.x, Math.floor(Math.log(this.width/factor.x)/Math.log(base.x))),
+                       y:Math.pow(base.y, Math.floor(Math.log(this.height/factor.y)/Math.log(base.y)))});
+  },
+
+  roundSize: function (precission) {
+    /* Expands a bbox to have width/height be multiples of
+     * precission.x respectively precission.y pixels. The maximum
+     * expansion is thus precission.x-1 resp. precission.y-1 */
+
+    this.width = Math.ceil(this.width / precission.x) * precission.x;
+    this.height = Math.ceil(this.height / precission.y) * precission.y;
+    return this;
+  },
+
+   powroundSize: function (base, factor) {
+     /* Like roundSize, but sets the precission to the nearest lower
+      * power of base to the width(height) of the bbox, or to the
+      * width divided by factor. */
+     if (factor === undefined) factor = {x:1, y:1};
+     return this.roundSize({x:Math.pow(base.x, Math.floor(Math.log(this.width/factor.x)/Math.log(base.x))),
+                            y:Math.pow(base.y, Math.floor(Math.log(this.height/factor.y)/Math.log(base.y)))});
+  },
+
+  toString: function () {
+    return "" + this.x + "," + this.y + ":" + this.width + "," + this.height;
+  },
+
 });
