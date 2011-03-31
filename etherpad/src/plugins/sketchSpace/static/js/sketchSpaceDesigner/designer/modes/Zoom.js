@@ -35,8 +35,21 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
   },
   onMouseMove: function(event) {
     this.inherited(arguments);
-    mouseDown = this.inputState.mouse[1];
-    if (mouseDown != undefined && !mouseDown.ctrlKey && !mouseDown.altKey && !mouseDown.shiftKey) {
+    var mouse = this.inputState.mouse;
+    var key = this.inputState.keyboard;
+    if (   (    mouse[1] != undefined
+            && !mouse[1].ctrlKey
+	    && !mouse[1].altKey
+            && !mouse[1].shiftKey)
+	|| (    key[32] != undefined
+	    &&  mouse[0] != undefined
+            && !mouse[0].ctrlKey
+	    && !mouse[0].altKey
+            && !mouse[0].shiftKey
+            && !key[32].ctrlKey
+	    && !key[32].altKey
+	    && !key[32].shiftKey)) {
+       var mouseDown = mouse[1] || mouse[0];
        var orig = this.getCurrentMouse(mouseDown, this.designer.surface);
        var mouse = this.getCurrentMouse(event, this.designer.surface);
        var move = dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);
