@@ -94,7 +94,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   forEachObjectShape: function(fn) {
     dojox.gfx.utils.forEach(this.surface_transform, function (shape) {
-      if (shape.objId === undefined) return;
+      if (shape === undefined || shape.objId === undefined) return;
       return fn(shape);
     });
   },
@@ -128,6 +128,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   addCircle: function() {
     this.pushMode(new sketchSpaceDesigner.designer.modes.AddCircle());
+  },
+
+  addPath: function() {
+    this.pushMode(new sketchSpaceDesigner.designer.modes.AddPath());
   },
 
   createImage: function(parent, imageName) {
