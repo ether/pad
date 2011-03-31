@@ -42,7 +42,7 @@ function getImageSize(filename, page) {
   var proc;
   if (filename.split(".").pop().toLowerCase() == 'pdf') {
     proc = ProcessBuilder("src/plugins/imageConvert/identifyImage.sh",
-			  filename, page).start();
+			  filename, page + 1).start();
   } else {
     proc = ProcessBuilder("identify",
 			  "-format",
@@ -64,7 +64,7 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
     proc = ProcessBuilder("src/plugins/imageConvert/convertImage.sh",
 			  inFileName,
 			  outFileName,
-			  page,
+			  page + 1,
 			  dpix, dpiy,
 			  offset.x, offset.y,
 			  offset.x + size.w, offset.y + size.h);
@@ -82,20 +82,19 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
 
 function onRequest() {
   var path = "src/plugins/fileUpload/upload/" + request.path.toString().slice("/ep/imageConvert/".length);  
+  var page = request.params.p === undefined ? 0 : parseInt(request.params.p);
+  var offset = {x:(request.params.x === undefined) ? 0 : parseInt(request.params.x),
+		y:(request.params.y === undefined) ? 0 : parseInt(request.params.y)};
+  var size = {w:(request.params.w === undefined) ? 0 : parseInt(request.params.w),
+	      h:(request.params.h === undefined) ? 0 : parseInt(request.params.h)};
+  var pixelSize = {w:(request.params.pw === undefined) ? 0 : parseInt(request.params.pw),
+		   h:(request.params.ph === undefined) ? 0 : parseInt(request.params.ph)};
 
   if (request.params.action == "getSize") {
-    var imageSize = getImageSize(path, 0);
+    var imageSize = getImageSize(path, page);
     response.setContentType("text/plain");
     response.write(fastJSON.stringify(imageSize));
   } else {
-    var page = request.params.p === undefined ? 0 : parseInt(request.params.p);
-    var offset = {x:(request.params.x === undefined) ? 0 : parseInt(request.params.x),
-		  y:(request.params.y === undefined) ? 0 : parseInt(request.params.y)};
-    var size = {w:(request.params.w === undefined) ? 0 : parseInt(request.params.w),
-		h:(request.params.h === undefined) ? 0 : parseInt(request.params.h)};
-    var pixelSize = {w:(request.params.pw === undefined) ? 0 : parseInt(request.params.pw),
-		     h:(request.params.ph === undefined) ? 0 : parseInt(request.params.ph)};
-
     var outFileName = path.split(".");
     var extension = outFileName.pop();
     outFileName.push("" + page + ":" + offset.x + "," +  offset.y + ":" + size.w + "," +  size.h + ":" + pixelSize.w + "," +  pixelSize.h);
