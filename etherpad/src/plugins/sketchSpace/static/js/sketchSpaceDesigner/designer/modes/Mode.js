@@ -46,6 +46,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.inputState.keyboard[event.keyCode] = event;
   },
   onKeyUp: function (event) {
+    console.log([event.keyCode, event]);
     delete this.inputState.keyboard[event.keyCode];
   },
   onMouseDown: function(event) {

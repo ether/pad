@@ -7,6 +7,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
     this.inherited(arguments);
     this.shape = undefined;
     this.smothenessFactor = 6;
+    this.isClosed = false;
+    this.isLine = false;
   },
   disable: function () {
     this.inherited(arguments);
@@ -15,10 +17,29 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
     }
   },
   getContainerShape: function () { return this.designer.surface_transform; },
-
+  onKeyUp: function (event) {
+    this.inherited(arguments);
+    if (event.keyCode == 38 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=UP */
+      this.smothenessFactor = Math.max(4, this.smothenessFactor + 3);
+      this.redrawShape();
+    } else if (event.keyCode == 40 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=DOWN */
+      this.smothenessFactor = Math.max(4, this.smothenessFactor - 3);
+      this.redrawShape();
+    } else if (event.keyCode == 67 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=c */
+      this.isClosed = !this.isClosed;
+      this.redrawShape();
+    } else if (event.keyCode == 76 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=l */
+      this.isLine = !this.isLine;
+      this.redrawShape();
+    } else if (event.keyCode == 27) {
+      this.designer.popMode();
+    }
+  },
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == 0 && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+    if (event.button == 0) {
+      this.isLine = event.ctrlKey;
+      this.isClosed = event.altKey;
       this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"path", path:""}, stroke:this.designer.stroke, fill:this.designer.fill});
       this.points = [this.getCurrentMouse(event)];
       this.redrawShape();
@@ -40,30 +61,36 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
       this.redrawShape();
     }
   },
-  onKeyUp: function (event) {
-    this.inherited(arguments);
-    if (event.keyCode == 27)
-      this.designer.popMode();
-  },
   redrawShape: function () {
+    var point;
+    var prevPoint;
+
     var halfStep = Math.floor(this.smothenessFactor / 2);
     this.shape.setShape({path: ""});
     this.shape.setAbsoluteMode(true);
 
     this.shape.moveTo(this.points[0].x, this.points[0].y);
 
-    for (var i = this.smothenessFactor; i < this.points.length; i += this.smothenessFactor) {
-      var point = this.points[i];
-      var prevPoint = this.points[i - halfStep];
+    if (this.isLine) {
+      point = this.points[this.points.length - 1];
+      this.shape.lineTo(point.x, point.y);
+    } else {
+      for (var i = this.smothenessFactor; i < this.points.length; i += this.smothenessFactor) {
+	point = this.points[i];
+	prevPoint = this.points[i - halfStep];
+	this.shape.smoothCurveTo(prevPoint.x, prevPoint.y, point.x, point.y);
+      }
+
+      if (this.isClosed) {
+        point = this.points[0];
+      } else {
+        point = this.points[this.points.length - 1];
+      }
+      prevPoint = this.points[Math.min(i - halfStep, this.points.length - 1)];
       this.shape.smoothCurveTo(prevPoint.x, prevPoint.y, point.x, point.y);
-      // this.shape.qSmoothCurveTo(point.x, point.y);
     }
-
-    var point = this.points[0];
-    var prevPoint = this.points[Math.min(i - halfStep, this.points.length - 1)];
-    this.shape.smoothCurveTo(prevPoint.x, prevPoint.y, point.x, point.y);
-    // this.shape.qSmoothCurveTo(point.x, point.y);
-
-    this.shape.closePath();
+    if (this.isClosed) {
+      this.shape.closePath();
+    }
   }
 });
