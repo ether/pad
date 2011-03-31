@@ -39,10 +39,16 @@ jimport("java.io.File",
 
 
 function getImageSize(filename, page) {
-  var proc = ProcessBuilder("identify",
-			    "-format",
-			    "%[fx:w]\n%[fx:h]",
-			    filename + "[" + page + "]").start();
+  var proc;
+  if (filename.split(".").pop().toLowerCase() == 'pdf') {
+    proc = ProcessBuilder("src/plugins/imageConvert/identifyImage.sh",
+			  filename, page).start();
+  } else {
+    proc = ProcessBuilder("identify",
+			  "-format",
+			  "%[fx:w]\n%[fx:h]",
+			  filename + "[" + page + "]").start();
+  }
   var procStdout = BufferedReader(new InputStreamReader(proc.getInputStream()));
   var w = parseFloat(procStdout.readLine());
   var h = parseFloat(procStdout.readLine());
@@ -51,13 +57,27 @@ function getImageSize(filename, page) {
 }
 
 function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
-  ProcessBuilder("convert",
-		 "-crop",
-		 "" + size.w + "x" + size.h + "+" + offset.x + "+" + offset.y,
-		 "-scale",
-		 "" + pixelSize.w + "x" + pixelSize.w,
-		 inFileName + "["+page+"]",
-		 outFileName).start().waitFor();
+  var proc;
+  if (inFileName.split(".").pop().toLowerCase() == 'pdf') {
+    var dpix = pixelSize.w * 72.0 / size.w;
+    var dpiy = pixelSize.h * 72.0 / size.h;
+    proc = ProcessBuilder("src/plugins/imageConvert/convertImage.sh",
+			  inFileName,
+			  outFileName,
+			  page,
+			  dpix, dpiy,
+			  offset.x, offset.y,
+			  offset.x + size.w, offset.y + size.h);
+  } else {
+    proc = ProcessBuilder("convert",
+			  "-crop",
+			  "" + size.w + "x" + size.h + "+" + offset.x + "+" + offset.y,
+			  "-scale",
+			  "" + pixelSize.w + "x" + pixelSize.w,
+			  inFileName + "["+page+"]",
+			  outFileName);
+  }
+  proc.start().waitFor();
 }
 
 function onRequest() {
