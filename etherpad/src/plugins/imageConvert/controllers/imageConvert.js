@@ -57,6 +57,7 @@ function getImageSize(filename, page) {
 }
 
 function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
+  if (File(outFileName).exists()) return;
   var proc;
   if (inFileName.split(".").pop().toLowerCase() == 'pdf') {
     var dpix = pixelSize.w * 72.0 / size.w;

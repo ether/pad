@@ -160,13 +160,19 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
 	//console.log("zoom: " + displayBboxOnObj.toString() + " @ " + displayBboxOnScreen.width + ":" + displayBboxOnScreen.height);
 
-	this.currentDisplay.setShape({
+	var newShape = {
 	  x:displayBboxOnObj.x,
 	  y:displayBboxOnObj.y,
 	  width:displayBboxOnObj.width,
 	  height:displayBboxOnObj.height,
 	  src: "/ep/imageConvert/" + this.imageName + "?p=0&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
-	});
+        };
+
+	var oldShape = this.currentDisplay.getShape()
+
+	if (oldShape.src != newShape.src) {
+  	  this.currentDisplay.setShape(newShape);
+        }
       }
     }
     image.updateDisplayLazy = function () {
