@@ -185,12 +185,22 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	var oldShape = this.currentDisplay.getShape()
 
 	if (oldShape.src != newShape.src) {
-	  var lastDisplay = this.currentDisplay;
-	  this.currentDisplay = image.createImage();
-  	  this.currentDisplay.setShape(newShape);
-	  this.currentDisplayTimout = window.setTimeout(function () {
-            lastDisplay.removeShape();
-	  }, 500);
+
+	  image.newShape = newShape;
+
+	  // Preload the image to the cache...
+	  dojo.xhrGet({
+	    url: newShape.src,
+	    load: function(data){
+	      /* Now when the image is in the cache, "load" the image */
+	      /* We've already zoomed more, forget about it... */
+ 	      if (image.newShape != newShape) return;
+	      var lastDisplay = this.currentDisplay;
+	      image.currentDisplay = image.createImage();
+	      image.currentDisplay.setShape(newShape);
+	      if (lastDisplay) lastDisplay.removeShape();
+	    }
+	  });
         }
       }
     }
