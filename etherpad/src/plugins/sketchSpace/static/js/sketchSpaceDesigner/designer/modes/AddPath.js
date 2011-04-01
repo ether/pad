@@ -6,18 +6,18 @@ ALT=18
 dojo.provide("sketchSpaceDesigner.designer.modes.AddPath");
 
 dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
+dojo.require("sketchSpaceDesigner.utils");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
   constructor: function (mode) {
     this.mode = mode;
     this.sections = [];
     this.options = {};
-    this.shape = dojox.gfx.utils.deserialize(mode.getContainerShape(), {shape:{type:"path", path:""}, stroke:mode.designer.stroke, fill:mode.designer.fill});
-    this.setOptions(mode.options);
+    this.shape = dojox.gfx.utils.deserialize(mode.getContainerShape(), {shape:{type:"path", path:""}});
+    this.setOptions(mode.designer.options);
   },
   setOptions: function (options) {
-    for (name in options)
-      this.options[name] = options[name];
+    sketchSpaceDesigner.utils.setObject(this.options, options);
     var section = this.getLastSection();
     if (section !== undefined)
       section.setOptions(options);
@@ -38,7 +38,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
     this.renderToShape();
   },
   renderToShape: function () {
-    this.shape.setShape({path: ""});
+   this.shape.setShape({path: ""}).setStroke(this.options.doStroke ? this.options.stroke : undefined).setFill(this.options.doFill ? this.options.fill : undefined);
+
     this.shape.setAbsoluteMode(true);
 
     if (this.sections.length > 0 && this.sections[0].points.length > 0) {
@@ -63,8 +64,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
     this.points = [];
   },
   setOptions: function (options) {
-    for (name in options)
-      this.options[name] = options[name];
+    sketchSpaceDesigner.utils.setObject(this.options, options);
   },
   addPoint: function (p) {
     this.points.push(p);
@@ -103,11 +103,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.designer.modes.Zoom], {
   enable: function () {
     this.inherited(arguments);
-    this.path = undefined;
-    this.options = {};
-    this.options.smothenessFactor = 6;
-    this.options.isClosed = false;
-    this.options.isLine = false;
+    this.designer.setOptions({smothenessFactor: 6, isClosed: false, isLine: false}, true);
   },
   disable: function () {
     this.inherited(arguments);
@@ -119,36 +115,34 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
   onKeyDown: function (event) {
     this.inherited(arguments);
     if (event.keyCode == 17) { /* key=CTRL */
-      this.setOptions({isLine: true});
+      this.designer.setOptions({isLine: true});
     } else if (event.keyCode == 18) { /* key=ALT */
-      this.setOptions({isClosed: true});
+      this.designer.setOptions({isClosed: true});
     }
   },
   onKeyUp: function (event) {
     this.inherited(arguments);
     if (event.keyCode == 38 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=UP */
-      this.setOptions({smothenessFactor: Math.max(4, this.options.smothenessFactor + 3)});
+      this.designer.setOptions({smothenessFactor: Math.max(4, this.designer.options.smothenessFactor + 3)});
     } else if (event.keyCode == 40 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=DOWN */
-      this.setOptions({smothenessFactor: Math.max(4, this.options.smothenessFactor - 3)});
+      this.designer.setOptions({smothenessFactor: Math.max(4, this.designer.options.smothenessFactor - 3)});
     } else if (event.keyCode == 67 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=c */
-      this.setOptions({isClosed: !this.options.isClosed});
+      this.designer.setOptions({isClosed: !this.designer.options.isClosed});
     } else if (event.keyCode == 76 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=l */
-      this.setOptions({isLine: !this.options.isLine});
-   } else if (event.keyCode == 17) { /* key=CTRL */
-      this.setOptions({isLine: false});
+      this.designer.setOptions({isLine: !this.designer.options.isLine});
+    } else if (event.keyCode == 17) { /* key=CTRL */
+      this.designer.setOptions({isLine: false});
     } else if (event.keyCode == 18) { /* key=ALT */
-      this.setOptions({isClosed: false});
+      this.designer.setOptions({isClosed: false});
     } else if (event.keyCode == 13 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=ENTER */
       this.done();
     } else if (event.keyCode == 27) {
       this.designer.popMode();
     }
   },
-  setOptions: function (options) {
-    for (name in options)
-      this.options[name] = options[name];
+  onSetOptions: function () {
     if (this.path !== undefined)
-      this.path.setOptions(this.options);
+      this.path.setOptions(this.designer.options);
   },
   onMouseDown: function (event) {
     this.inherited(arguments);

@@ -22,11 +22,14 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.onMouseMoveHandle = dojo.connect(this.designer.container, "onmousemove", this, this.onMouseMove);
     this.onActivateHandle = dojo.connect(this.designer.container, "activate", this, this.onActivate);
     this.onContextMenuHandle = dojo.connect(this.designer.container, "contextmenu", this, this.onContextMenu);
+    this.setOptionsHandle = dojo.connect(this.designer, "setOptions", this, this.onSetOptions);
   },
   disable: function () {
     var mode = this;
+    dojo.disconnect(this.setOptionsHandle);
     dojo.disconnect(this.onContextMenuHandle);
     dojo.disconnect(this.onActivateHandle);
+    dojo.disconnect(this.onMouseDownHandle);
     dojo.disconnect(this.onMouseUpHandle);
     dojo.disconnect(this.onMouseMoveHandle);
     dojo.disconnect(this.onKeyUpHandle);
@@ -44,6 +47,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
   onActivate: function  (event) { dojo.stopEvent(event); },
   onContextMenu: function  (event) { dojo.stopEvent(event); },
+  onSetOptions: function () {},
   onMouseWheel: function (event, scroll) {
   },
   onKeyDown: function (event) {
@@ -51,6 +55,11 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
   onKeyUp: function (event) {
     console.log([event.keyCode, event]);
+    if (event.keyCode == 83) { /* key=s */
+      this.designer.setOptions({doStroke: !this.designer.options.doStroke});
+    } else if (event.keyCode == 70) { /* key=f */
+      this.designer.setOptions({doFill: !this.designer.options.doFill});
+    }
     delete this.inputState.keyboard[event.keyCode];
   },
   onMouseDown: function(event) {

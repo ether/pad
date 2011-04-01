@@ -1,5 +1,6 @@
 dojo.provide("sketchSpaceDesigner.designer");
 
+dojo.require("sketchSpaceDesigner.utils");
 dojo.require("sketchSpaceDesigner.designer.modes");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 dojo.require("sketchSpaceDesigner.designer.selection");
@@ -29,8 +30,17 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.modeStack = [];
     this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
 
-    this.stroke = {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4};
-    this.fill = {"r":255,"g":0,"b":0,"a":1};
+    this.options = {};
+    this.setOptions({
+      doStroke: true,
+      doFill: true,
+      stroke: {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},
+      fill: {"r":255,"g":0,"b":0,"a":1}
+    });
+  },
+
+  setOptions: function (options, onlyDefault) {
+    sketchSpaceDesigner.utils.setObject(this.options, options, onlyDefault);
   },
 
   pushMode: function (mode) {
@@ -259,9 +269,9 @@ dojo.addOnLoad(function (){
   dojo.connect(sketchSpace.editorArea, "imageUpdated", sketchSpace, sketchSpace.updatePadFromImage);
 
   sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
-  dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.stroke.color = dojo.colorFromHex(colorHex); });
+  dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({stroke:{color:dojo.colorFromHex(colorHex)}}); });
   sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
-  dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.fill = dojo.colorFromHex(colorHex); });
+  dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({fill:dojo.colorFromHex(colorHex)}); });
 
   $(function(){  
     var info = {  

@@ -16,11 +16,17 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
 
   getContainerShape: function () { return this.designer.surface_transform; },
 
+  onSetOptions: function () {
+    if (this.shape !== undefined) {
+      this.shape.setStroke(this.designer.options.doStroke ? this.designer.options.stroke : undefined).setFill(this.designer.options.doFill ? this.designer.options.fill : undefined);
+    }
+  },
   onMouseDown: function (event) {
     this.inherited(arguments);
     if (event.button == 0 && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.orig = this.getCurrentMouse(event);
-      this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"rect", x:this.orig.x, y:this.orig.y, width:1, height:1}, stroke:this.designer.stroke, fill:this.designer.fill});
+      this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"rect", x:this.orig.x, y:this.orig.y, width:1, height:1}});
+      this.onSetOptions();
     }
   },
   onMouseUp: function (event) {
