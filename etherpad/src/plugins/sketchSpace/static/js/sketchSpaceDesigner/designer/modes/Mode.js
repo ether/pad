@@ -20,10 +20,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.onMouseDownHandle = dojo.connect(this.designer.container, "onmousedown", this, this.onMouseDown);
     this.onMouseUpHandle = dojo.connect(this.designer.container, "onmouseup", this, this.onMouseUp);
     this.onMouseMoveHandle = dojo.connect(this.designer.container, "onmousemove", this, this.onMouseMove);
+    this.onActivateHandle = dojo.connect(this.designer.container, "activate", this, this.onActivate);
+    this.onContextMenuHandle = dojo.connect(this.designer.container, "contextmenu", this, this.onContextMenu);
   },
   disable: function () {
     var mode = this;
-    dojo.disconnect(this.onMouseDownHandle);
+    dojo.disconnect(this.onContextMenuHandle);
+    dojo.disconnect(this.onActivateHandle);
     dojo.disconnect(this.onMouseUpHandle);
     dojo.disconnect(this.onMouseMoveHandle);
     dojo.disconnect(this.onKeyUpHandle);
@@ -39,7 +42,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(shape.onMouseUpHandle);
     dojo.disconnect(shape.onMouseDownHandle);
   },
-
+  onActivate: function  (event) { dojo.stopEvent(event); },
+  onContextMenu: function  (event) { dojo.stopEvent(event); },
   onMouseWheel: function (event, scroll) {
   },
   onKeyDown: function (event) {
