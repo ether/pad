@@ -109,6 +109,7 @@ function onRequest() {
     convertImage(path, page, outFileName, offset, size, pixelSize);
 
     response.setContentType("image/png");
+    response.alwaysCache();
 
     var file = FileInputStream(File(outFileName));
     response.writeBytes(BetterFile.getStreamBytes(file));
