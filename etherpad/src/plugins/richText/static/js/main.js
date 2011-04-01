@@ -34,9 +34,9 @@ function aceCreateStructDomLine(args){
 }
 
 function collectContentPre(args) {
-// if (args.tname == "h1") {
-//   args.cc.doAttrib(args.state, "heading1");
-// }
+    if (args.tname == "span") {
+       args.cc.doAttrib(args.state, "bold");
+    }
 }
 
 function collectContentPost(args) {

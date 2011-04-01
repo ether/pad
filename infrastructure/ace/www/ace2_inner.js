@@ -1388,37 +1388,37 @@ function OUTER(gscope) {
 			   getCleanNodeByKey(rep.lines.atIndex(b).key).previousSibling);
       lastDirtyNode = (lastDirtyNode && isNodeDirty(lastDirtyNode) && lastDirtyNode);
       if (firstDirtyNode && lastDirtyNode) {
-	var cc = makeContentCollector(isStyled, browser, rep.apool, null,
+    	var cc = makeContentCollector(isStyled, browser, rep.apool, null,
                                      className2Author);
-	cc.notifySelection(selection);
-	var dirtyNodes = [];
-	for(var n = firstDirtyNode; n && ! (n.previousSibling &&
+	    cc.notifySelection(selection);
+    	var dirtyNodes = [];
+    	for(var n = firstDirtyNode; n && ! (n.previousSibling &&
 					    n.previousSibling == lastDirtyNode);
-	    n = n.nextSibling) {
+	                                       n = n.nextSibling) {
           if (browser.msie) {
             // try to undo IE's pesky and overzealous linkification
             try { n.createTextRange().execCommand("unlink", false, null); }
             catch (e) {}
           }
-	  cc.collectContent(n);
-	  dirtyNodes.push(n);
-	}
-	cc.notifyNextNode(lastDirtyNode.nextSibling);
-	var lines = cc.getLines();
-	if ((lines.length <= 1 || lines[lines.length-1] !== "")
-          && lastDirtyNode.nextSibling) {
-	  // dirty region doesn't currently end a line, even taking the following node
-	  // (or lack of node) into account, so include the following clean node.
-	  // It could be SPAN or a DIV; basically this is any case where the contentCollector
-	  // decides it isn't done.
-	  // Note that this clean node might need to be there for the next dirty range.
-	  //console.log("inclusive of "+lastDirtyNode.next().dom.tagName);
-	  b++;
-	  var cleanLine = lastDirtyNode.nextSibling;
-	  cc.collectContent(cleanLine);
-	  toDeleteAtEnd.push(cleanLine);
-	  cc.notifyNextNode(cleanLine.nextSibling);
-	}
+    	  cc.collectContent(n);
+	      dirtyNodes.push(n);
+    	}
+	    cc.notifyNextNode(lastDirtyNode.nextSibling);
+    	var lines = cc.getLines();
+	    if ((lines.length <= 1 || lines[lines.length-1] !== "")
+              && lastDirtyNode.nextSibling) {
+    	  // dirty region doesn't currently end a line, even taking the following node
+	      // (or lack of node) into account, so include the following clean node.
+    	  // It could be SPAN or a DIV; basically this is any case where the contentCollector
+    	  // decides it isn't done.
+	      // Note that this clean node might need to be there for the next dirty range.
+    	  //console.log("inclusive of "+lastDirtyNode.next().dom.tagName);
+	      b++;
+	      var cleanLine = lastDirtyNode.nextSibling;
+    	  cc.collectContent(cleanLine);
+    	  toDeleteAtEnd.push(cleanLine);
+	      cc.notifyNextNode(cleanLine.nextSibling);
+	   }   
 
         var ccData = cc.finish();
         var ss = ccData.selStart;
@@ -1427,36 +1427,35 @@ function OUTER(gscope) {
         var lineAttribs = ccData.lineAttribs;
         var linesWrapped = ccData.linesWrapped;
 
-	if (linesWrapped > 0) {
-	  doAlert("Editor warning: "+linesWrapped+" long line"+
-		  (linesWrapped == 1 ? " was" : "s were")+" hard-wrapped into "+
-                  ccData.numLinesAfter
-		  +" lines.");
-	}
+    	if (linesWrapped > 0) {
+	      doAlert("Editor warning: "+linesWrapped+" long line"+
+		      (linesWrapped == 1 ? " was" : "s were")+" hard-wrapped into "+
+                      ccData.numLinesAfter +" lines.");
+	    }
 
-	if (ss[0] >= 0) selStart = [ss[0]+a+netNumLinesChangeSoFar, ss[1]];
-	if (se[0] >= 0) selEnd = [se[0]+a+netNumLinesChangeSoFar, se[1]];
+    	if (ss[0] >= 0) selStart = [ss[0]+a+netNumLinesChangeSoFar, ss[1]];
+	    if (se[0] >= 0) selEnd = [se[0]+a+netNumLinesChangeSoFar, se[1]];
 
-	var entries = [];
-	var nodeToAddAfter = lastDirtyNode;
-	var lineNodeInfos = new Array(lines.length);
+    	var entries = [];
+	    var nodeToAddAfter = lastDirtyNode;
+    	var lineNodeInfos = new Array(lines.length);
         for(var k=0;k<lines.length;k++) {
           var lineString = lines[k];
-	  var newEntry = createDomLineEntry(lineString);
-	  entries.push(newEntry);
-	  lineNodeInfos[k] = newEntry.domInfo;
-	}
-	//var fragment = magicdom.wrapDom(document.createDocumentFragment());
-	domInsertsNeeded.push([nodeToAddAfter, lineNodeInfos]);
-	forEach(dirtyNodes, function (n) { toDeleteAtEnd.push(n); });
-	var spliceHints = {};
-	if (selStart) spliceHints.selStart = selStart;
-	if (selEnd) spliceHints.selEnd = selEnd;
-	splicesToDo.push([a+netNumLinesChangeSoFar, b-a, entries, lineAttribs, spliceHints]);
-	netNumLinesChangeSoFar += (lines.length - (b-a));
+	      var newEntry = createDomLineEntry(lineString);
+    	  entries.push(newEntry);
+	      lineNodeInfos[k] = newEntry.domInfo;
+    	}
+    	//var fragment = magicdom.wrapDom(document.createDocumentFragment());
+	    domInsertsNeeded.push([nodeToAddAfter, lineNodeInfos]);
+    	forEach(dirtyNodes, function (n) { toDeleteAtEnd.push(n); });
+	    var spliceHints = {};
+    	if (selStart) spliceHints.selStart = selStart;
+	    if (selEnd) spliceHints.selEnd = selEnd;
+    	splicesToDo.push([a+netNumLinesChangeSoFar, b-a, entries, lineAttribs, spliceHints]);
+	    netNumLinesChangeSoFar += (lines.length - (b-a));
       }
       else if (b > a) {
-	splicesToDo.push([a+netNumLinesChangeSoFar, b-a, [], []]);
+       	splicesToDo.push([a+netNumLinesChangeSoFar, b-a, [], []]);
       }
       i++;
     }
@@ -2162,11 +2161,11 @@ function OUTER(gscope) {
     var selStartHintChar, selEndHintChar;
     if (hints && hints.selStart) {
       selStartHintChar = rep.lines.offsetOfIndex(hints.selStart[0]) + hints.selStart[1] -
-	oldRegionStart;
+        	oldRegionStart;
     }
     if (hints && hints.selEnd) {
       selEndHintChar = rep.lines.offsetOfIndex(hints.selEnd[0]) + hints.selEnd[1] -
-	oldRegionStart;
+        	oldRegionStart;
     }
 
     var newText = map(newLineEntries, function (e) { return e.text+'\n'; }).join('');
@@ -2174,7 +2173,7 @@ function OUTER(gscope) {
     var oldAttribs = rep.alines.slice(startLine, startLine+deleteCount).join('');
     var newAttribs = lineAttribs.join('|1+1')+'|1+1'; // not valid in a changeset
     var analysis = analyzeChange(oldText, newText, oldAttribs, newAttribs,
-      selStartHintChar, selEndHintChar);
+              selStartHintChar, selEndHintChar);
     var commonStart = analysis[0];
     var commonEnd = analysis[1];
     var shortOldText = oldText.substring(commonStart, oldText.length - commonEnd);
@@ -2186,7 +2185,7 @@ function OUTER(gscope) {
     // adjust the splice to not involve the final newline of the document;
     // be very defensive
     if (shortOldText.charAt(shortOldText.length-1) == '\n' &&
-	shortNewText.charAt(shortNewText.length-1) == '\n') {
+    	shortNewText.charAt(shortNewText.length-1) == '\n') {
       // replacing text that ends in newline with text that also ends in newline
       // (still, after analysis, somehow)
       shortOldText = shortOldText.slice(0,-1);
@@ -2195,7 +2194,7 @@ function OUTER(gscope) {
       commonEnd++;
     }
     if (shortOldText.length == 0 && spliceStart == rep.alltext.length
-	&& shortNewText.length > 0) {
+    	&& shortNewText.length > 0) {
       // inserting after final newline, bad
       spliceStart--;
       spliceEnd--;
@@ -2206,10 +2205,10 @@ function OUTER(gscope) {
        shortNewText.length == 0) {
       // deletion at end of rep.alltext
       if (rep.alltext.charAt(spliceStart-1) == '\n') {
-	// (if not then what the heck?  it will definitely lead
-	// to a rep.alltext without a final newline)
-	spliceStart--;
-	spliceEnd--;
+    	// (if not then what the heck?  it will definitely lead
+	    // to a rep.alltext without a final newline)
+    	spliceStart--;
+	    spliceEnd--;
       }
     }
 
@@ -2220,92 +2219,89 @@ function OUTER(gscope) {
       var spliceStartLine = rep.lines.indexOfOffset(spliceStart);
       var spliceStartLineStart = rep.lines.offsetOfIndex(spliceStartLine);
       function startBuilder() {
-	var builder = Changeset.builder(oldLen);
-	builder.keep(spliceStartLineStart, spliceStartLine);
-	builder.keep(spliceStart - spliceStartLineStart);
-	return builder;
+    	var builder = Changeset.builder(oldLen);
+    	builder.keep(spliceStartLineStart, spliceStartLine);
+    	builder.keep(spliceStart - spliceStartLineStart);
+	    return builder;
       }
 
       function eachAttribRun(attribs, func/*(startInNewText, endInNewText, attribs)*/) {
-	var attribsIter = Changeset.opIterator(attribs);
-	var textIndex = 0;
-	var newTextStart = commonStart;
-	var newTextEnd = newText.length - commonEnd - (shiftFinalNewlineToBeforeNewText ? 1 : 0);
-	while (attribsIter.hasNext()) {
-	  var op = attribsIter.next();
-	  var nextIndex = textIndex + op.chars;
-	  if (!(nextIndex <= newTextStart || textIndex >= newTextEnd)) {
-	    func(Math.max(newTextStart, textIndex), Math.min(newTextEnd, nextIndex), op.attribs);
-	  }
-	  textIndex = nextIndex;
-	}
-      }
-
-      var justApplyStyles = (shortNewText == shortOldText);
-      var theChangeset;
-
-      if (justApplyStyles) {
-	// create changeset that clears the incorporated styles on
-	// the existing text.  we compose this with the
-	// changeset the applies the styles found in the DOM.
-	// This allows us to incorporate, e.g., Safari's native "unbold".
-
-	var incorpedAttribClearer = cachedStrFunc(function (oldAtts) {
-	  return Changeset.mapAttribNumbers(oldAtts, function(n) {
-	    var k = rep.apool.getAttribKey(n);
-	    if (isStyleAttribute(k)) {
-	      return rep.apool.putAttrib([k,'']);
+    	var attribsIter = Changeset.opIterator(attribs);
+    	var textIndex = 0;
+	    var newTextStart = commonStart;
+    	var newTextEnd = newText.length - commonEnd - (shiftFinalNewlineToBeforeNewText ? 1 : 0);
+	    while (attribsIter.hasNext()) {
+    	  var op = attribsIter.next();
+	      var nextIndex = textIndex + op.chars;
+    	  if (!(nextIndex <= newTextStart || textIndex >= newTextEnd)) {
+	        func(Math.max(newTextStart, textIndex), Math.min(newTextEnd, nextIndex), op.attribs);
+    	  }
+	      textIndex = nextIndex;
 	    }
-	    return false;
-	  });
-	});
+     }
 
-	var builder1 = startBuilder();
-	if (shiftFinalNewlineToBeforeNewText) {
-	  builder1.keep(1, 1);
-	}
-	eachAttribRun(oldAttribs, function(start, end, attribs) {
-	  builder1.keepText(newText.substring(start, end), incorpedAttribClearer(attribs));
-	});
-	var clearer = builder1.toString();
+     var justApplyStyles = (shortNewText == shortOldText);
+     var theChangeset;
 
-	var builder2 = startBuilder();
-	if (shiftFinalNewlineToBeforeNewText) {
-	  builder2.keep(1, 1);
-	}
-	eachAttribRun(newAttribs, function(start, end, attribs) {
-	  builder2.keepText(newText.substring(start, end), attribs);
-	});
-	var styler = builder2.toString();
+     if (justApplyStyles) {
+    	// create changeset that clears the incorporated styles on
+    	// the existing text.  we compose this with the
+    	// changeset the applies the styles found in the DOM.
+    	// This allows us to incorporate, e.g., Safari's native "unbold".
 
-	theChangeset = Changeset.compose(clearer, styler, rep.apool);
-      }
-      else {
-	var builder = startBuilder();
+    	var incorpedAttribClearer = cachedStrFunc(function (oldAtts) {
+	          return Changeset.mapAttribNumbers(oldAtts, function(n) {
+                	    var k = rep.apool.getAttribKey(n);
+                	    if (isStyleAttribute(k)) {
+                 	        return rep.apool.putAttrib([k,'']);
+	                    }
+                	    return false;
+	            });
+    	});
 
-	var spliceEndLine = rep.lines.indexOfOffset(spliceEnd);
-	var spliceEndLineStart = rep.lines.offsetOfIndex(spliceEndLine);
-	if (spliceEndLineStart > spliceStart) {
-	  builder.remove(spliceEndLineStart - spliceStart, spliceEndLine - spliceStartLine);
-	  builder.remove(spliceEnd - spliceEndLineStart);
-	}
-	else {
-	  builder.remove(spliceEnd - spliceStart);
-	}
+    	var builder1 = startBuilder();
+	    if (shiftFinalNewlineToBeforeNewText) {
+    	  builder1.keep(1, 1);
+    	}
+    	eachAttribRun(oldAttribs, function(start, end, attribs) {
+    	  builder1.keepText(newText.substring(start, end), incorpedAttribClearer(attribs));
+    	});
+    	var clearer = builder1.toString();
+
+	    var builder2 = startBuilder();
+    	if (shiftFinalNewlineToBeforeNewText) {
+	      builder2.keep(1, 1);
+    	}
+	    eachAttribRun(newAttribs, function(start, end, attribs) {
+    	  builder2.keepText(newText.substring(start, end), attribs);
+	    });
+    	var styler = builder2.toString();
+    
+	    theChangeset = Changeset.compose(clearer, styler, rep.apool);
+    } else {
+	    var builder = startBuilder();
+
+    	var spliceEndLine = rep.lines.indexOfOffset(spliceEnd);
+	    var spliceEndLineStart = rep.lines.offsetOfIndex(spliceEndLine);
+    	if (spliceEndLineStart > spliceStart) {
+	      builder.remove(spliceEndLineStart - spliceStart, spliceEndLine - spliceStartLine);
+    	  builder.remove(spliceEnd - spliceEndLineStart);
+	    } else {
+    	  builder.remove(spliceEnd - spliceStart);
+	    }
 
         var isNewTextMultiauthor = false;
-	var authorAtt = Changeset.makeAttribsString(
-	  '+', (thisAuthor ? [['author', thisAuthor]] : []), rep.apool);
-	var authorizer = cachedStrFunc(function(oldAtts) {
+    	var authorAtt = Changeset.makeAttribsString(
+	          '+', (thisAuthor ? [['author', thisAuthor]] : []), rep.apool);
+    	var authorizer = cachedStrFunc(function(oldAtts) {
           if (isNewTextMultiauthor) {
             // prefer colors from DOM
-	    return Changeset.composeAttributes(authorAtt, oldAtts, true, rep.apool);
-          }
-          else {
+	        return Changeset.composeAttributes(authorAtt, oldAtts, true, rep.apool);
+          } else {
             // use this author's color
-	    return Changeset.composeAttributes(oldAtts, authorAtt, true, rep.apool);
+    	    return Changeset.composeAttributes(oldAtts, authorAtt, true, rep.apool);
           }
-	});
+	    });
 
         var foundDomAuthor = '';
         eachAttribRun(newAttribs, function(start, end, attribs) {
@@ -2318,17 +2314,17 @@ function OUTER(gscope) {
               isNewTextMultiauthor = true; // multiple authors in DOM!
             }
           }
-	});
+    	});
 
-	if (shiftFinalNewlineToBeforeNewText) {
-	  builder.insert('\n', authorizer(''));
-	}
-
-	eachAttribRun(newAttribs, function(start, end, attribs) {
-	  builder.insert(newText.substring(start, end), authorizer(attribs));
-	});
-	theChangeset = builder.toString();
-      }
+    	if (shiftFinalNewlineToBeforeNewText) {
+	      builder.insert('\n', authorizer(''));
+    	}
+    
+	    eachAttribRun(newAttribs, function(start, end, attribs) {
+	        builder.insert(newText.substring(start, end), authorizer(attribs));
+    	});
+	    theChangeset = builder.toString();
+     }
 
       //dmesg(htmlPrettyEscape(theChangeset));
 

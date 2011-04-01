@@ -242,15 +242,19 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       endPoint = selection.endPoint;
     }
   };
-  cc.doAttrib = function(state, na) {
+  cc.doAttrib = function(state, na, val) {
+    val = (val === undefined) ? true : val;
     state.localAttribs = (state.localAttribs || []);
     state.localAttribs.push(na);
+    state.localValues = (state.localValues || []);
+    state.localValues.push(val);
     cc.incrementAttrib(state, na);
   };
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
-	       localAttribs: null,
+	           localAttribs: null,
+               localValues : null, /*works with localAttribs*/
                attribs: {/*name -> nesting counter*/},
                attribString: ''};
     }
@@ -297,7 +301,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
           // spaces instead of removing them, because in other cases
           // removing "\n" from pasted HTML will collapse words together.
           txt2 = "";
-        }
+        
         var atBeginningOfLine = lines.textOfLine(lines.length()-1).length == 0;
         if (atBeginningOfLine) {
           // newlines in the source mustn't become spaces at beginning of line box
@@ -334,22 +338,22 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         var oldListTypeOrNull = null;
         var oldAuthorOrNull = null;
         if (collectStyles) {
-	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+    	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
           if (tname == "b" || (styl && /\bfont-weight:\s*bold\b/i.exec(styl)) ||
               tname == "strong") {
-	    cc.doAttrib(state, "bold");
+	        cc.doAttrib(state, "bold");
           }
           if (tname == "i" || (styl && /\bfont-style:\s*italic\b/i.exec(styl)) ||
               tname == "em") {
-	    cc.doAttrib(state, "italic");
+	        cc.doAttrib(state, "italic");
           }
           if (tname == "u" || (styl && /\btext-decoration:\s*underline\b/i.exec(styl)) ||
               tname == "ins") {
-	    cc.doAttrib(state, "underline");
+    	    cc.doAttrib(state, "underline");
           }
           if (tname == "s" || (styl && /\btext-decoration:\s*line-through\b/i.exec(styl)) ||
               tname == "del") {
-	   cc.doAttrib(state, "strikethrough");
+	       cc.doAttrib(state, "strikethrough");
           }
           if (tname == "ul") {
             var type;
