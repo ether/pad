@@ -29,6 +29,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
   },
   removeSection: function () {
     this.sections.pop();
+    this.renderToShape();
   },
   getLastSection: function () {
     return this.sections[this.sections.length-1];
@@ -45,8 +46,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
     if (this.sections.length > 0 && this.sections[0].points.length > 0) {
       this.shape.moveTo(this.sections[0].points[0].x, this.sections[0].points[0].y);
 
+      this.shape.lastPoint = this.sections[0].points[0];
       dojo.forEach(this.sections, function(section, i) {
-	section.renderToShape(this.shape);
+	section.renderToShape();
       });
     }
 
@@ -78,7 +80,20 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
 
     if (this.options.isLine) {
       point = this.points[this.points.length - 1];
-      this.path.shape.lineTo(point.x, point.y);
+
+      if (this.options.isStraight) {
+        prevPoint = this.path.shape.lastPoint;
+        if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
+ 	  point.y = prevPoint.y;
+        } else {
+ 	  point.x = prevPoint.x;
+        }
+        this.path.shape.lineTo(point.x, point.y);
+        this.path.shape.lastPoint = point;
+      } else {
+        this.path.shape.lineTo(point.x, point.y);
+        this.path.shape.lastPoint = point;
+      }
     } else {
       var i;
  
@@ -96,6 +111,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
       prevPoint = this.points[Math.min(i - halfStep, this.points.length - 1)];
 
       this.path.shape.smoothCurveTo(prevPoint.x, prevPoint.y, point.x, point.y);
+      this.path.shape.lastPoint = point;
     }
   }
 });
@@ -103,7 +119,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.designer.modes.Zoom], {
   enable: function () {
     this.inherited(arguments);
-    this.designer.setOptions({smothenessFactor: 6, isClosed: false, isLine: false}, true);
+    this.designer.setOptions({smothenessFactor: 6, isClosed: false, isLine: false, isStraight:false}, true);
   },
   disable: function () {
     this.inherited(arguments);
@@ -114,7 +130,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
   getContainerShape: function () { return this.designer.surface_transform; },
   onKeyDown: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 17) { /* key=CTRL */
+    if (event.keyCode == 16) { /* key=SHIFT */
+      this.designer.setOptions({isStraight: true});
+    } else if (event.keyCode == 17) { /* key=CTRL */
       this.designer.setOptions({isLine: true});
     } else if (event.keyCode == 18) { /* key=ALT */
       this.designer.setOptions({isClosed: true});
@@ -130,6 +148,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
       this.designer.setOptions({isClosed: !this.designer.options.isClosed});
     } else if (event.keyCode == 76 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=l */
       this.designer.setOptions({isLine: !this.designer.options.isLine});
+    } else if (event.keyCode == 16) { /* key=SHIFT */
+      this.designer.setOptions({isStraight: false});
     } else if (event.keyCode == 17) { /* key=CTRL */
       this.designer.setOptions({isLine: false});
     } else if (event.keyCode == 18) { /* key=ALT */
