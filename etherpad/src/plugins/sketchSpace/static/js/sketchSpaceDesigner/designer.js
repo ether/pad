@@ -66,7 +66,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   deserializeShape: function(parent, shape) {
     if (shape.extType == "zimage") {
-      var imgShape = this.createImage(parent, shape.imageName)
+     var imgShape = this.createImage(parent, shape.imageName, shape.page);
       if (shape.transform !== undefined)
         imgShape.setTransform(shape.transform);
       return imgShape;
@@ -78,7 +78,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   serializeShape: function(shape) {
     /* FIXME: Remove "children" from serialized groups */
     if (shape.extType == "zimage") {
-      return {extType: "zimage", imageName: shape.imageName, transform:shape.getTransform()};
+      return {extType: "zimage", imageName: shape.imageName, page:shape.page, transform:shape.getTransform()};
     } else {
       return dojox.gfx.utils.serialize(shape);
     }
@@ -158,18 +158,19 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.pushMode(new sketchSpaceDesigner.designer.modes.AddPath());
   },
 
-  createImage: function(parent, imageName) {
+  createImage: function(parent, imageName, page) {
     var designer = this;
 
     var image = parent.createGroup();
     image.extType = "zimage";
     image.currentDisplay = image.createImage();
     image.imageName = imageName;
+    image.page = page ? page : 0;
     image.updateDisplay = function () {
       var image = this;
       if (this.pointSize === undefined) {
 	dojo.xhrGet({
-	  url: "/ep/imageConvert/" + this.imageName + "?action=getSize",
+	  url: "/ep/imageConvert/" + this.imageName + "?action=getSize&p=" + image.page,
 	  handleAs: "json",
 	  load: function(data){
 	    image.pointSize = data;
@@ -193,7 +194,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	  y:displayBboxOnObj.y,
 	  width:displayBboxOnObj.width,
 	  height:displayBboxOnObj.height,
-	  src: "/ep/imageConvert/" + this.imageName + "?p=0&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
+	  src: "/ep/imageConvert/" + this.imageName + "?p=" + image.page + "&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
         };
 
 	var oldShape = this.currentDisplay.getShape()
@@ -319,11 +320,22 @@ dojo.addOnLoad(function (){
       var path = eval(response)[0].split("/");
       var filename = path[path.length-1];
      
-      padeditor.ace.callWithAce(function (ace) {
-	var imageId = sketchSpace.ace_insertImage(ace);
-	var rep = ace.ace_getRep();
-	ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(), escape(dojo.toJson({parent:null, shape: {extType: "zimage", imageName: filename}}))]]);
-      }, "sketchSpace", true);
+      dojo.xhrGet({
+	url: "/ep/imageConvert/" + filename + "?action=getPages",
+	handleAs: "json",
+	load: function(data){
+          padeditor.ace.callWithAce(function (ace) {
+  	    for (var page = 0; page < data.pages; page++) {
+
+	      var imageId = sketchSpace.ace_insertImage(ace);
+	      var rep = ace.ace_getRep();
+	      ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(), escape(dojo.toJson({parent:null, shape: {extType: "zimage", imageName: filename, page:page}}))]]);
+	      ace.ace_performSelectionChange(rep.selEnd, rep.selEnd, false);
+
+	    }
+	  }, "sketchSpace", true)
+	}
+      });
 
     }
   }
