@@ -14,12 +14,14 @@ dojo.require("dojo.parser");
 dojo.require("dojox.widget.ColorPicker");
 
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
-  constructor: function (container, width, height) {
+ constructor: function (container, width, height, userId) {
     this.container = container;
+    this.surface_size = {width: width, height: height};
+    this.userId = userId;
+
     this.surface = dojox.gfx.createSurface(this.container, width, height);
     this.surface_transform = this.surface.createGroup();
-    this.surface_size = {width: width, height: height};
-
+    
     this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, function () { this.viewUpdated(); });
 
     this.images = {};
@@ -89,7 +91,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     if (shape.parent.objId != undefined)
       parent = shape.parent.objId;
 
-    shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape)});
+    shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape), userId:shape.userId});
     this.imageUpdatedByUs();
   },
 
@@ -126,6 +128,9 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   registerObjectShape: function(shape) {
     if (shape.objId === undefined) {
       shape.objId = dojox.uuid.generateRandomUuid();
+    }
+    if (shape.userId === undefined) {
+      shape.userId = this.userId;
     }
     this.getCurrentMode().enableShape(shape);
   },
@@ -288,7 +293,7 @@ dojo.declare("sketchSpaceDesigner.designer.ColorPickerPopup", [dojox.widget.Colo
 });
 
 dojo.addOnLoad(function (){
-  sketchSpace.editorArea = new sketchSpaceDesigner.designer.Designer(dojo.byId("sketchSpaceDebug"), 300, 300);
+  sketchSpace.editorArea = new sketchSpaceDesigner.designer.Designer(dojo.byId("sketchSpaceDebug"), 300, 300, pad.getUserId());
   dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
 
   sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});

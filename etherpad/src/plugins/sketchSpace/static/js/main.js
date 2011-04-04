@@ -96,6 +96,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	if (obj.parent) parent = materialize(obj.parent);
 
         var shape = sketchSpace.editorArea.deserializeShape(parent, obj.shape);
+	shape.userId = obj.userId;
 	sketchSpace.editorArea.registerObjectShape(shape);
 
         shape.objId = objId;
