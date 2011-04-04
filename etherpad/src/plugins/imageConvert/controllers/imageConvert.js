@@ -38,7 +38,7 @@ jimport("java.io.File",
 	);
 
 
-function getImagePages(filename) {
+function getPages(filename) {
   var proc;
   proc = ProcessBuilder("src/plugins/imageConvert/getPages.sh", filename).start();
   var procStdout = BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -47,17 +47,9 @@ function getImagePages(filename) {
   return {pages:pages};
 }
 
-function getImageSize(filename, page) {
+function getSize(filename, page) {
   var proc;
-  if (filename.split(".").pop().toLowerCase() == 'pdf') {
-    proc = ProcessBuilder("src/plugins/imageConvert/identifyImage.sh",
-			  filename, page + 1).start();
-  } else {
-    proc = ProcessBuilder("identify",
-			  "-format",
-			  "%[fx:w]\n%[fx:h]",
-			  filename + "[" + page + "]").start();
-  }
+  proc = ProcessBuilder("src/plugins/imageConvert/getSize.sh", filename, page + 1).start();
   var procStdout = BufferedReader(new InputStreamReader(proc.getInputStream()));
   var w = parseFloat(procStdout.readLine());
   var h = parseFloat(procStdout.readLine());
@@ -70,7 +62,7 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
   var proc;
   if (inFileName.split(".").pop().toLowerCase() == 'pdf') {
     // PDF is upside down
-    var pageSize = getImageSize(inFileName, page);
+    var pageSize = getSize(inFileName, page);
     offset.y = pageSize.h - offset.y;
 
     var dpix = pixelSize.w * 72.0 / size.w;
@@ -105,11 +97,11 @@ function onRequest() {
 		   h:(request.params.ph === undefined) ? 0 : parseInt(request.params.ph)};
 
   if (request.params.action == "getPages") {
-    var pages = getImagePages(path);
+    var pages = getPages(path);
     response.setContentType("text/plain");
     response.write(fastJSON.stringify(pages));
   } else if (request.params.action == "getSize") {
-    var imageSize = getImageSize(path, page);
+    var imageSize = getSize(path, page);
     response.setContentType("text/plain");
     response.write(fastJSON.stringify(imageSize));
   } else {
