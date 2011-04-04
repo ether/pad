@@ -38,6 +38,15 @@ jimport("java.io.File",
 	);
 
 
+function getImagePages(filename) {
+  var proc;
+  proc = ProcessBuilder("src/plugins/imageConvert/getPages.sh", filename).start();
+  var procStdout = BufferedReader(new InputStreamReader(proc.getInputStream()));
+  var pages = parseInt(procStdout.readLine());
+  proc.waitFor();
+  return {pages:pages};
+}
+
 function getImageSize(filename, page) {
   var proc;
   if (filename.split(".").pop().toLowerCase() == 'pdf') {
@@ -95,7 +104,11 @@ function onRequest() {
   var pixelSize = {w:(request.params.pw === undefined) ? 0 : parseInt(request.params.pw),
 		   h:(request.params.ph === undefined) ? 0 : parseInt(request.params.ph)};
 
-  if (request.params.action == "getSize") {
+  if (request.params.action == "getPages") {
+    var pages = getImagePages(path);
+    response.setContentType("text/plain");
+    response.write(fastJSON.stringify(pages));
+  } else if (request.params.action == "getSize") {
     var imageSize = getImageSize(path, page);
     response.setContentType("text/plain");
     response.write(fastJSON.stringify(imageSize));
