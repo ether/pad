@@ -9,11 +9,11 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.inherited(arguments);
     this.enableOutline();
     this.selectionUpdatedHandle = dojo.connect(this.designer.selection, "selectionUpdated", this, this.updateOutline);
-    this.zoomHandle = dojo.connect(this.designer.surface_transform, "setTransform", this, this.updateOutline);
+    this.viewUpdatedHandle = dojo.connect(this.designer, "viewUpdated", this, this.updateOutline);
   },
 
   disable: function () {
-    dojo.disconnect(this.zoomHandle);
+    dojo.disconnect(this.viewUpdatedHandle);
     dojo.disconnect(this.selectionUpdatedHandle);
     this.disableOutline();
     this.inherited(arguments);

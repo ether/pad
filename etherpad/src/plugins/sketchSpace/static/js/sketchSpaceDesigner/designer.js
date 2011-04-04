@@ -20,6 +20,8 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.surface_transform = this.surface.createGroup();
     this.surface_size = {width: width, height: height};
 
+    this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, this.viewUpdated);
+
     this.images = {};
     this.currentImage = undefined;
     this.selection = new sketchSpaceDesigner.designer.selection.Selection(this);
@@ -85,11 +87,20 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       parent = shape.parent.objId;
 
     shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape)});
-    this.imageUpdated();
+    this.imageUpdatedByUs();
   },
 
   /* Use this to listen for changes */
-  imageUpdated: function () {},
+  imageUpdatedByUs: function () { this.imageUpdated(); },
+  imageUpdatedByOthers: function () { this.imageUpdated(); },
+
+  imageUpdated: function () { this.viewUpdated(); },
+
+  viewUpdated: function () {},
+
+  selectImage: function (imageId) {
+    this.currentImage = imageId;
+  },
 
   editorGetShapeByObjId: function(objId) {
     var designer = this;
@@ -123,7 +134,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   editorShapeRemove: function(shape) {
     this.unregisterObjectShape(shape);
     shape.removeShape();
-    this.imageUpdated();
+    this.imageUpdatedByUs();
   },
 
   editorAddShape: function(shapeDescription) {
@@ -218,8 +229,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     }
 
     image.updateDisplay();
-    image.zoomHandle = dojo.connect(designer.surface_transform, "setTransform", image, image.updateDisplayLazy);
-    image.updateHandle = dojo.connect(designer, "imageUpdated", image, image.updateDisplayLazy);
+    image.updateHandle = dojo.connect(designer, "viewUpdated", image, image.updateDisplayLazy);
 
     return image;
   },
@@ -228,7 +238,6 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     var shape = this.createImage(this.surface_transform, imageName);
     this.registerObjectShape(shape);
     this.saveShapeToStr(shape);
-    this.imageUpdated();
   },
 
   /* refactor out this code and put it somewhere else... */
@@ -276,7 +285,7 @@ dojo.declare("sketchSpaceDesigner.designer.ColorPickerPopup", [dojox.widget.Colo
 
 dojo.addOnLoad(function (){
   sketchSpace.editorArea = new sketchSpaceDesigner.designer.Designer(dojo.byId("sketchSpaceDebug"), 300, 300);
-  dojo.connect(sketchSpace.editorArea, "imageUpdated", sketchSpace, sketchSpace.updatePadFromImage);
+  dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
 
   sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({stroke:{color:dojo.colorFromHex(colorHex)}}); });

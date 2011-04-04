@@ -55,22 +55,35 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 }
 
 sketchSpaceInit.prototype.updateImageFromPad = function() {
-  if (this.editorArea.currentImage != undefined) {
+  if (this.editorArea.currentImage !== undefined) {
     var currentImage = this.editorArea.images[this.editorArea.currentImage];
 
+    /* Some debug info printing:
+    console.log("Image:");
+    sketchSpace.editorArea.forEachObjectShape(function (shape) { console.log(shape.objId); })
+    console.log("Pad:");
+    for (name in currentImage)
+      console.log(name);
+    */
+
     var visited = {};
+    var toDelete = {};
 
     this.editorArea.forEachObjectShape(function (shape) {
       if (currentImage[shape.objId] === undefined) {
-       shape.removeShape();
+        toDelete[shape.objId] = shape;
       } else {
         if (shape.strRepr == currentImage[shape.objId]) {
           visited[shape.objId] = shape;
         } else {
-	  shape.removeShape();
+          toDelete[shape.objId];
         }
       }
     });
+
+    for (objId in toDelete) {
+      toDelete[objId].removeShape();
+    }
 
     function materialize (objId) {
       if (visited[objId] === undefined) {
@@ -94,11 +107,13 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 
     for (var objId in currentImage)
       materialize(objId);
+
+    this.editorArea.imageUpdatedByOthers();
   }
 }
 
 sketchSpaceInit.prototype.updatePadFromImage = function() {
-  if (this.editorArea.currentImage != undefined) {
+  if (this.editorArea.currentImage !== undefined) {
     var currentImage = this.editorArea.images[this.editorArea.currentImage];
     var imageLink = $(this.padDocument).find(".sketchSpaceImageId_" + this.editorArea.currentImage)[0];
 
@@ -134,7 +149,7 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
   });
 
   this.padDocument = imageLink.ownerDocument;
-  this.editorArea.currentImage = imageId;
+  this.editorArea.selectImage(imageId);
   this.updateImageFromPad();
 }
 
