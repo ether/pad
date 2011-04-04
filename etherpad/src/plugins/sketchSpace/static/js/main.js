@@ -21,7 +21,10 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
    var clss = [];
    var imageObjects = {};
    var imageId = undefined;
-   $.each(args.cls.split(" "), function (i, cls) {
+   var argClss = args.cls.split(" ");
+
+   for (var i = 0; i < argClss.length; i++) {
+     var cls = argClss[i];
      if (cls.indexOf(":") != -1) {
        var key = cls.substr(0, cls.indexOf(":"));
        var val = cls.substr(cls.indexOf(":")+1);
@@ -40,7 +43,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
      } else {
        clss.push(cls);
      }
-   });
+   }
 
    this.editorArea.images[imageId] = imageObjects;
    if (this.editorArea.currentImage == imageId) {
