@@ -20,7 +20,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.surface_transform = this.surface.createGroup();
     this.surface_size = {width: width, height: height};
 
-    this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, this.viewUpdated);
+    this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, function () { this.viewUpdated(); });
 
     this.images = {};
     this.currentImage = undefined;
@@ -99,7 +99,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   imageUpdated: function () { this.viewUpdated(); },
 
-  viewUpdated: function () {},
+  viewUpdated: function () { },
 
   selectImage: function (imageId) {
     this.currentImage = imageId;
