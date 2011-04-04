@@ -6,6 +6,18 @@ var richTextClient = {
                     ace.ace_toggleAttributeOnLine(cmd, value);
                  }, cmd, true);
                 break;
+              case "image":
+                rtImgDlg.show();
+                break;
+              case "insertImage":
+                alert(value.url);
+                break; 
+              case "link":
+                rtLinkDlg.show();
+                break;
+              case "insertLink":
+                alert(value.url+ " : " + value.text);
+                break;
               default:
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnSelection(cmd, value);

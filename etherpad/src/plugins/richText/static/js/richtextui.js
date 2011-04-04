@@ -2,6 +2,8 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.Menu");
 dojo.require("dijit.ColorPalette");
 dojo.require('dijit.form.Select');
+dojo.require("dijit.Dialog");
+dojo.require("dijit.form.ValidationTextBox");
 
 
 
@@ -135,8 +137,118 @@ function buildFontStyle(){
           richTextexecCommand("fontFamily", val);
     });
 }
-	
+
+function isFunction(func){
+     return (func instanceof Function);
+}
+
+var fsxGetUniqueString=(function (){
+        var seed_map=[];
+        return function(seed){
+            if(!seed_map[seed])
+                seed_map[seed]=1;
+             return seed+seed_map[seed]++;
+       }
+})();
+
+function fsxGetUniqueID(seed,_doc){
+     seed=seed||"FSX_UNIQUE_ID_";
+     var id=fsxGetUniqueString(seed);
+     var doc=_doc||document;
+     while(doc.getElementById(id)){
+         id=fsxGetUniqueString(seed);
+     }
+    return id;
+}
+
+var confirmDialog = (function(){
+    
+    function buildHolderString(id, lists){
+        var elem = document.createElement("div");
+        elem.id = id;
+        elem.style.display = "none";
+        var str = "";
+        for(var i = 0, len = lists.length; i < len; i++){
+            str += "<div style='margin-bottom:0.2em; font-size:1.2em'><label>" + lists[i].name + " : </label><span id=" + id + "input_" + i + "></span></div>" 
+        }
+        var foot = "<div id="+ id+"_bar" +" class=dijitDialogPaneActionBar></div>";
+        str += foot;
+        elem.innerHTML = str;
+        document.body.appendChild(elem);
+    }    
+
+    return function(title, lists, config){
+       config = config || {};
+       this.id = fsxGetUniqueID("ep_dialog_");
+       buildHolderString(this.id, lists);
+       this.dlg = new dijit.Dialog({
+                     title: "Insert Image",
+                     style: "width: 300px"
+        }, this.id); 
+        this.buttons = [];
+        for(var i = 0, len = lists.length; i < len; i++){
+            var btn = new dijit.form.ValidationTextBox({
+                       required : lists[i].required,
+                       width : (lists[i].width || 240) 
+            }).placeAt(this.id + "input_" + i);
+            this.buttons.push(btn);
+        }
+        var self = this;
+        var IDOK = new dijit.form.Button({
+               label: "OK",
+               onClick: function() {
+                   var ret = {}; 
+                   var btns = self.buttons;
+                   for(var i = 0, len = btns.length; i < len; i++){
+                        if(btns[i].isValid()){
+                            ret[lists[i].value] = btns[i].get("value");
+                        }else{
+                            return;
+                        }
+                    } 
+                    if(isFunction(config.onOk)){
+                        config.onOk(ret);
+                    }
+               }
+        }).placeAt(this.id + "_bar"); 
+        var IDCancel = new dijit.form.Button({
+               label: "Cancel",
+               onClick: function() {
+                    self.dlg.hide();
+               }
+        }).placeAt(this.id + "_bar");
+    }
+})();
+
+var rtImgDlg, rtLinkDlg;
+
+function buildDialogs(){
+     var cDlg = new confirmDialog("Insert Image",
+                     [{ name : "Image URL", value : "url", required : true}], 
+                     {
+                           onOk: function(ret){
+                                richTextexecCommand("insertImage", ret); 
+                           }
+                     }
+     );
+     rtImgDlg = cDlg.dlg;
+     
+     cDlg = new confirmDialog("Insert Link",
+                     [
+                        { name : "URL ", value : "url", required : true},
+                        { name : "Display text", value : "text"}
+                     ], 
+                     {
+                           onOk: function(ret){
+                                richTextexecCommand("insertLink", ret); 
+                           }
+                     }
+     );
+     rtLinkDlg = cDlg.dlg; 
+}	
+
 dojo.addOnLoad(function() {
 	buildColorPalette();
 	buildFontStyle();
+    buildDialogs();
 });

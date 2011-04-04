@@ -1,7 +1,7 @@
-.dijitToggleButton,
-.dijitButton,
-.dijitDropDownButton,
-.dijitComboButton {
+#editbarinner .dijitToggleButton,
+#editbarinner .dijitButton,
+#editbarinner .dijitDropDownButton,
+#editbarinner .dijitComboButton {
 	margin: 0;
 }
 
