@@ -34,9 +34,7 @@ function aceCreateStructDomLine(args){
 }
 
 function collectContentPre(args) {
-    if (args.tname == "span") {
-       args.cc.doAttrib(args.state, "bold");
-    }
+    return richTextClient.collectContent(args);
 }
 
 function collectContentPost(args) {

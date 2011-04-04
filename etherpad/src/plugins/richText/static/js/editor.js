@@ -23,6 +23,39 @@ var richTextClient = {
         }
         return str;
     }, 
+    evalStyleString : function(str){
+        var style = null;
+        if(str && str.length){
+            style = {};
+            var pairs = str.split(/;|,/);
+            for(var i = 0, len = pairs.length; i < len; i++){
+                var pair = pairs[i].split(":");
+                if(pair && pair.length == 2){
+                    style[ pair[0] ] = pair[1];
+                }
+            }
+        }
+        return style;
+    },
+    /**
+    * convert font-size -> fontSize
+    **/
+    formatStyleName : function(name){
+       return (name || "").replace(/\-(.)?/,function(_, s){return s.toUpperCase()})
+    },
+    collectContent : function(args){
+        if(args.tname && args.tname.toLowerCase() == "span"){
+            var style = richTextClient.evalStyleString(args.styl);
+            if(!style) return ;
+            var lists = ["color", "font-family", "font-size", "background-color"], name;
+            for(var i = 0, len = lists.length; i < len; i++){
+                name = lists[i];
+                if(style[name]){
+                    args.cc.doAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
+                }
+            }
+        }
+    },
     parseCommand : function(args){
         if(!args) return ;
         var attributes = args.attributes;

@@ -207,7 +207,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     var lst = [];
     for(var a in state.attribs) {
       if (state.attribs[a]) {
-        lst.push([a,'true']);
+        lst.push([a, state.localValues[a]]);
       }
     }
     if (state.authorLevel > 0) {
@@ -242,15 +242,18 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       endPoint = selection.endPoint;
     }
   };
-  cc.doAttrib = function(state, na) {
+  cc.doAttrib = function(state, na, value) {
+    value = (value === undefined) ? true : value;
     state.localAttribs = (state.localAttribs || []);
     state.localAttribs.push(na);
+    state.localValues[na] = value;
     cc.incrementAttrib(state, na);
   };
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
 	       localAttribs: null,
+           localValues :{/* attribute : value */},
                attribs: {/*name -> nesting counter*/},
                attribString: ''};
     }
