@@ -66,7 +66,10 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   deserializeShape: function(parent, shape) {
     if (shape.extType == "zimage") {
-      return this.createImage(parent, shape.imageName).setTransform(shape.transform);
+      var imgShape = this.createImage(parent, shape.imageName)
+      if (shape.transform !== undefined)
+        imgShape.setTransform(shape.transform);
+      return imgShape;
     } else {
       return dojox.gfx.utils.deserialize(parent, shape);
     }
@@ -292,21 +295,40 @@ dojo.addOnLoad(function (){
   sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({fill:dojo.colorFromHex(colorHex)}); });
 
-  $(function(){  
-    var info = {  
-      action: '/ep/fileUpload/',
-      name: 'uploadfile',  
-      onSubmit: function(file, ext){
-      //console.log('Starting...');
-      },  
-      onComplete: function(file, response){
-        var path = eval(response)[0].split("/");
-	sketchSpace.editorArea.addImg(path[path.length-1]);
-      }
+  var info = {  
+    action: '/ep/fileUpload/',
+    name: 'uploadfile',  
+    onSubmit: function(file, ext){
+    //console.log('Starting...');
+    },  
+    onComplete: function(file, response){
+      var path = eval(response)[0].split("/");
+      sketchSpace.editorArea.addImg(path[path.length-1]);
     }
+  }
+  new AjaxUpload($('#sketchSpaceAddImage'), info);  
+  new AjaxUpload($('#sketchSpaceAddImage img'), info);
 
-    new AjaxUpload($('#sketchSpaceAddImage'), info);  
-    new AjaxUpload($('#sketchSpaceAddImage img'), info);
-  });
+  var info = {  
+    action: '/ep/fileUpload/',
+    name: 'uploadfile',  
+    onSubmit: function(file, ext){
+    //console.log('Starting...');
+    },  
+    onComplete: function(file, response){
+      var path = eval(response)[0].split("/");
+      var filename = path[path.length-1];
+     
+      padeditor.ace.callWithAce(function (ace) {
+	var imageId = sketchSpace.ace_insertImage(ace);
+	var rep = ace.ace_getRep();
+	ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(), escape(dojo.toJson({parent:null, shape: {extType: "zimage", imageName: filename}}))]]);
+      }, "sketchSpace", true);
+
+    }
+  }
+
+  new AjaxUpload($('#sketchSpaceAddPdfImage'), info);  
+  new AjaxUpload($('#sketchSpaceAddPdfImage img'), info);
 
 });

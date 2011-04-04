@@ -114,8 +114,8 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 
 sketchSpaceInit.prototype.updatePadFromImage = function() {
   if (this.editorArea.currentImage !== undefined) {
-    var currentImage = this.editorArea.images[this.editorArea.currentImage];
-    var imageLink = $(this.padDocument).find(".sketchSpaceImageId_" + this.editorArea.currentImage)[0];
+    var currentImageId = this.editorArea.currentImage;
+    var currentImage = this.editorArea.images[currentImageId];
 
     var visited = {};
     var update = [];
@@ -131,13 +131,19 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
       if (visited[objId] === undefined)
         update.push(["sketchSpaceImageObject:" + objId, ""]);
 
-    padeditor.ace.callWithAce(function (ace) {
-      ace.ace_performDocumentApplyAttributesToRange(ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
-						    ace.ace_getLineAndCharForPoint({node: imageLink, index:1, maxIndex:1}),
-						    update);
-    }, "updatePadFromImage", true);
-
+    this.updatePad(currentImageId, update);
   }
+}
+
+sketchSpaceInit.prototype.updatePad = function (imageId, update) {
+  var sketchSpace = this;
+  padeditor.ace.callWithAce(function (ace) {
+    sketchSpace.ace_updatePad(ace, imageId, update);
+  }, "updatePadFromImage", true);
+}
+
+sketchSpaceInit.prototype.getImageLinkFromId = function (imageId) {
+  return $(this.padDocument).find(".sketchSpaceImageId_" + imageId)[0];
 }
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
@@ -153,18 +159,34 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
   this.updateImageFromPad();
 }
 
-sketchSpaceInit.prototype.insertImage = function(event) {
-  padeditor.ace.callWithAce(function (ace) {
-    rep = ace.ace_getRep();
-
-    ace.ace_replaceRange(rep.selStart, rep.selEnd, "I");
-    ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
-    ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
-						  [["sketchSpaceIsImage", dojox.uuid.generateRandomUuid()],
-						   ["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(),
-						    escape('{parent:null,shape:{"shape":{"type":"circle","cx":100,"cy":100,"r":50},"stroke":{"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},"fill":{"r":255,"g":0,"b":0,"a":1}}}')]
-						   ]);
+sketchSpaceInit.prototype.insertImage = function() {
+  var sketchSpace = this;
+  
+  return padeditor.ace.callWithAce(function (ace) {
+    return sketchSpace.ace_insertImage(ace);
   }, "sketchSpace", true);
+}
+
+sketchSpaceInit.prototype.ace_getImageRange = function (ace, imageId) {
+  var imageLink = this.getImageLinkFromId(imageId);
+  return [ace.ace_getLineAndCharForPoint({node: imageLink, index:0, maxIndex:1}),
+	  ace.ace_getLineAndCharForPoint({node: imageLink, index:1, maxIndex:1})];
+}
+
+sketchSpaceInit.prototype.ace_updatePad = function (ace, imageId, update) {
+  var imageRange = this.ace_getImageRange(ace, imageId);
+  ace.ace_performDocumentApplyAttributesToRange(imageRange[0], imageRange[1], update);
+}
+
+sketchSpaceInit.prototype.ace_insertImage = function(ace) {
+  var imageId = dojox.uuid.generateRandomUuid();
+  rep = ace.ace_getRep();
+
+  ace.ace_replaceRange(rep.selStart, rep.selEnd, "I");
+  ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
+  ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceIsImage", imageId]]);
+
+  return imageId;
 }
 
 /* used on the client side only */
