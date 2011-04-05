@@ -38,7 +38,8 @@ function OUTER(gscope) {
   var editorInfo = parent.editorInfo;
 
   var iframe = window.frameElement;
-  var lineMarker = '*';
+  var lineMarker = '*'; 
+  var objMarker  = "*";
   var outerWin = iframe.ace_outerWin;
   iframe.ace_outerWin = null; // prevent IE 6 memory leak
   var sideDiv = iframe.nextSibling;
@@ -219,6 +220,9 @@ function OUTER(gscope) {
   editorInfo.ace_getRep = function () {
     return rep;
   }
+  
+  editorInfo.lineMarker = lineMarker;
+  editorInfo.objMarker  = objMarker;
 
   var currentCallStack = null;
   function inCallStack(type, action) {
@@ -775,7 +779,7 @@ function OUTER(gscope) {
     cmd = cmd.toLowerCase();
     var cmdArgs = Array.prototype.slice.call(arguments, 1);
     if (CMDS[cmd]) {
-      inCallStack(cmd, function() {
+      inCallStackIfNecessary(cmd, function() {
 	fastIncorp(9);
 	CMDS[cmd].apply(CMDS, cmdArgs);
       });
@@ -783,7 +787,7 @@ function OUTER(gscope) {
   }
 
   function replaceRange(start, end, text) {
-    inCallStack('replaceRange', function() {
+    inCallStackIfNecessary('replaceRange', function() {
       fastIncorp(9);
       performDocumentReplaceRange(start, end, text);
     });
@@ -1025,7 +1029,7 @@ function OUTER(gscope) {
       return;
     }
 
-    inCallStack("idleWorkTimer", function() {
+    inCallStackIfNecessary("idleWorkTimer", function() {
 
       var isTimeUp = newTimeLimit(250);
 
@@ -2028,6 +2032,7 @@ function OUTER(gscope) {
     var cs = builder.toString();
     performDocumentApplyChangeset(cs);
   }
+  editorInfo.ace_performDocumentApplyAttributesToRange = performDocumentApplyAttributesToRange;
 
   function buildKeepToStartOfRange(builder, start) {
     var startLineOffset = rep.lines.offsetOfIndex(start[0]);
@@ -2458,6 +2463,7 @@ function OUTER(gscope) {
       currentCallStack.selectionAffected = true;
     }
   }
+  editorInfo.ace_performSelectionChange = performSelectionChange;
 
   // Change the abstract representation of the document to have a different selection.
   // Should not rely on the line representation.  Should not affect the DOM.
@@ -2806,7 +2812,7 @@ function OUTER(gscope) {
   }
 
   function handleClick(evt) {
-    inCallStack("handleClick", function() {
+    inCallStackIfNecessary("handleClick", function() {
       idleWorkTimer.atMost(200);
     });
 
@@ -3041,7 +3047,7 @@ function OUTER(gscope) {
 
     var stopped = false;
 
-    inCallStack("handleKeyEvent", function() {
+    inCallStackIfNecessary("handleKeyEvent", function() {
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
@@ -3882,7 +3888,7 @@ function OUTER(gscope) {
     }
 
     // click below the body
-    inCallStack("handleOuterClick", function() {
+    inCallStackIfNecessary("handleOuterClick", function() {
       // put caret at bottom of doc
       fastIncorp(11);
       if (isCaret()) { // don't interfere with drag
@@ -3928,7 +3934,7 @@ function OUTER(gscope) {
 
   function setup() {
     doc = document; // defined as a var in scope outside
-    inCallStack("setup", function() {
+    inCallStackIfNecessary("setup", function() {
       var body = doc.getElementById("innerdocbody");
       root = body; // defined as a var in scope outside
 
