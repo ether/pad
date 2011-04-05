@@ -16,7 +16,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
   getContainerShape: function () { return this.designer.surface_transform; },
   onSetOptions: function () {
     if (this.shape !== undefined) {
-      this.shape.setStroke(this.designer.options.doStroke ? this.designer.options.stroke : undefined).setFill(this.designer.options.doFill ? this.designer.options.fill : undefined);
+      this.designer.setShapeFillAndStroke(this.shape, this.designer.options);
     }
   },
   onMouseDown: function (event) {

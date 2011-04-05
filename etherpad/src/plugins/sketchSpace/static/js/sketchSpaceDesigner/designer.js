@@ -39,7 +39,8 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       doStroke: true,
       doFill: true,
       stroke: {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},
-      fill: {"r":255,"g":0,"b":0,"a":1}
+      fill: {"r":255,"g":0,"b":0,"a":1},
+      showAuthorshipColors: false,
     });
   },
 
@@ -66,24 +67,62 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     return this.modeStack[this.modeStack.length - 1];
   },
 
-  deserializeShape: function(parent, shape) {
-    if (shape.extType == "zimage") {
-     var imgShape = this.createImage(parent, shape.imageName, shape.page);
-      if (shape.transform !== undefined)
-        imgShape.setTransform(shape.transform);
-      return imgShape;
-    } else {
-      return dojox.gfx.utils.deserialize(parent, shape);
+  /* This function should really be somewhere else... */
+  getUserColor: function (userId) {
+    var palette = pad.getColorPalette();
+    var userData;
+
+    $.each(pad.collabClient.getConnectedUsers(), function () {
+      if (this.userId == userId)
+	userData = this;
+    });
+
+    if (userData === undefined) {
+      userData = clientVars.collab_client_vars.historicalAuthorData[userId];
     }
+
+    if (userData === undefined) {
+      return;
+    }
+
+    return palette[userData.colorId]
+  },
+
+  deserializeShape: function(parent, description) {
+    var shape;
+    if (description.extType == "zimage") {
+      shape = this.createImage(parent, description.imageName, description.page);
+      if (description.transform !== undefined)
+        shape.setTransform(description.transform);
+    } else {
+      shape = dojox.gfx.utils.deserialize(parent, description);
+    }
+
+    shape.userId = description.userId;
+    shape.realColor = {fill: shape.getFill(),
+		       stroke: shape.getStroke()};
+
+    this.updateShapeAuthorshipColor(shape);
+
+    return shape;
   },
 
   serializeShape: function(shape) {
     /* FIXME: Remove "children" from serialized groups */
+
+    var description;
+
     if (shape.extType == "zimage") {
-      return {extType: "zimage", imageName: shape.imageName, page:shape.page, transform:shape.getTransform()};
+      description = {extType: "zimage", imageName: shape.imageName, page:shape.page, transform:shape.getTransform()};
     } else {
-      return dojox.gfx.utils.serialize(shape);
+      description = dojox.gfx.utils.serialize(shape);
     }
+
+    description.fill = shape.realColor.fill;
+    description.stroke = shape.realColor.stroke;
+
+    description.userId = shape.userId;
+    return description;
   },
 
   saveShapeToStr: function(shape) {
@@ -93,6 +132,35 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape), userId:shape.userId});
     this.imageUpdatedByUs();
+  },
+
+  updateShapeAuthorshipColor: function (shape) {
+    if (this.options.showAuthorshipColors) {
+      var userColor = dojox.color.fromHex(this.getUserColor(shape.userId || this.userId));
+
+      shape.setFill(shape.realColor.fill === undefined ? undefined : userColor);
+
+      var stroke;
+      if (shape.realColor.stroke !== undefined) {
+	stroke = {};
+	sketchSpaceDesigner.utils.setObject(stroke, shape.realColor.stroke);
+	var strokeColor = dojox.color.fromArray(userColor.toRgba());
+	strokeColor.r = Math.round(strokeColor.r / 2);
+	strokeColor.g = Math.round(strokeColor.g / 2);
+	strokeColor.b = Math.round(strokeColor.b / 2);
+	stroke.color = strokeColor;
+      }
+      shape.setStroke(stroke);
+    } else {
+      shape.setFill(shape.realColor.fill);
+      shape.setStroke(shape.realColor.stroke);
+    }
+  },
+
+  setShapeFillAndStroke: function (shape, options) {
+    shape.realColor = {fill: options.fill, stroke: options.stroke};
+
+    this.updateShapeAuthorshipColor(shape);
   },
 
   /* Use this to listen for changes */

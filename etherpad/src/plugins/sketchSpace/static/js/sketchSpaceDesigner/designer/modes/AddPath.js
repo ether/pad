@@ -39,7 +39,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
     this.renderToShape();
   },
   renderToShape: function () {
-   this.shape.setShape({path: ""}).setStroke(this.options.doStroke ? this.options.stroke : undefined).setFill(this.options.doFill ? this.options.fill : undefined);
+    this.shape.setShape({path: ""});
+    this.mode.designer.setShapeFillAndStroke(this.shape, this.options);
 
     this.shape.setAbsoluteMode(true);
 
