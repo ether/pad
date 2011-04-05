@@ -206,6 +206,7 @@ var confirmDialog = (function(){
                             return;
                         }
                     } 
+                    self.dlg.hide();
                     if(isFunction(config.onOk)){
                         config.onOk(ret);
                     }

@@ -177,12 +177,6 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
       var listType = /(?:^| )list:(\S+)/.exec(cls);
       if (listType) {
         listType = listType[1];
-        if(top.XM){
-            listType += " second";
-        }else{
-            listType += " first";
-            top.XM=true;
-        }
         if (listType) {
           preHtml = '<ul class="list-'+listType+'"><li>'; //FIXME new document style used
           postHtml = '</li></ul>';
@@ -240,6 +234,12 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
         }
         if(modifier.blockref){
            blockref = blockref.concat(modifier.blockref);
+        }
+        if(modifier.extraOpenTags){
+            extraOpenTags = extraOpenTags+modifier.extraOpenTags;
+        }
+        if(modifier.extraCloseTags){
+            extraCloseTags = modifier.extraCloseTags+extraCloseTags;
         }
     });
 
