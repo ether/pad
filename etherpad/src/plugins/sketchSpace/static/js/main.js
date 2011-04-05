@@ -34,7 +34,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	 imageId = val;
        } else if (key == "sketchSpaceImageObject") {
 	 var objId = val.substr(0, val.indexOf(":"));
-	 var properties = val.substr(val.indexOf(":")+1);	 
+	 var properties = val.substr(val.indexOf(":")+1);
 	 imageObjects[objId] = unescape(properties);
        } else {
          clss.push(cls);
@@ -149,7 +149,7 @@ sketchSpaceInit.prototype.getImageLinkFromId = function (imageId) {
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
   var imageId;
-  $.each(imageLink.classList, function (idx, cls) {
+  $.each($(imageLink).attr('class').split(' '), function (idx, cls) {
     var parts = cls.split("_");
     if (parts[0] == "sketchSpaceImageId")
       imageId = parts[1];
@@ -162,7 +162,7 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
 
 sketchSpaceInit.prototype.insertImage = function() {
   var sketchSpace = this;
-  
+
   return padeditor.ace.callWithAce(function (ace) {
     return sketchSpace.ace_insertImage(ace);
   }, "sketchSpace", true);

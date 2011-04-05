@@ -3,7 +3,7 @@
 
 $(document).ready(function () {
   $("body").click(function (event) {
-    if (event.target.classList.contains("sketchSpaceImageLink")) {
+    if ($(event.target).filter(".sketchSpaceImageLink").length > 0) {
       top.sketchSpace.selectImage(event.target.parentNode);
     }
   });
