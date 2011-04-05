@@ -1,10 +1,13 @@
 #! /bin/bash
 
+exec 2>>/tmp/xxx >&2
+set -x
+# pdfconvert INPUTFILE OUTPUTFILE PAGE DPI_X DPI_Y BB_X1 BB_Y1 BB_X2 BB_Y2
+
+echo convertImage.sh "$@" > /tmp/xxx
+
 tmp1=$(mktemp)
 tmp2=$(mktemp)
-
-echo pdfconvert INPUTFILE OUTPUTFILE PAGE DPI_X DPI_Y BB_X1 BB_Y1 BB_X2 BB_Y2
-echo pdfconvert "$@" > /tmp/xxx
 
 input="$1"
 output="$2"

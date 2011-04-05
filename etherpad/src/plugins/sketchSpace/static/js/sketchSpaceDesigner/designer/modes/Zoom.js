@@ -4,7 +4,7 @@ dojo.require("sketchSpaceDesigner.designer.modes.Mode");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.designer.modes.Mode], {
   zoomFactor: 0.15,
-  mouseFactor: 0.3,
+
   enable: function () {
     this.inherited(arguments);
     var mode = this;
@@ -14,11 +14,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
   },
   onMouseWheel: function (event, scroll) {
     this.inherited(arguments);
-    scroll *= this.mouseFactor;
     if (scroll < 0)
-      scroll = 1.0 / (1.0 - this.zoomFactor * scroll);
+      scroll = 1.0 / (1.0 + this.zoomFactor);
     else
-      scroll = 1.0 + this.zoomFactor * scroll;
+      scroll = 1.0 + this.zoomFactor;
     this.onZoom(scroll, event.layerX, event.layerY);
   },
   onKeyUp: function (event) {
