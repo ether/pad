@@ -32,6 +32,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.strokeColorPicker = new dijit.layout._LayoutWidget({title:"Stroke:"});
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doStroke", designer:this.designer}));
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({optionsPath:"stroke.color", designer:this.designer}));
+    this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionNumberSpinner({optionsPath:"stroke.width", designer:this.designer, style:"width:30pt"}));
     this.designer.ui.options.addChild(this.strokeColorPicker);
 
     this.fillColorPicker = new dijit.layout._LayoutWidget({title:"Fill:"});

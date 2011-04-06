@@ -37,7 +37,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.ColorPickerPopup", [dojox.wid
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorInput", [dijit.form._FormValueWidget, dijit._Templated], {
   widgetsInTemplate: true,
   value: "#ff0000",
-  templateString: '<span style="display: inline-block; width: 10pt; height: 10pt; border: 2px solid black; " dojoAttachEvent="onclick:_onClick" dojoAttachPoint="focusNode">' + 
+  templateString: '<span style="display: inline-block; width: 10pt; height: 10pt; border: 2px solid black; vertical-align: bottom;" dojoAttachEvent="onclick:_onClick" dojoAttachPoint="focusNode">' + 
                   '  <input dojoAttachPoint="valueNode" type="hidden" ${!nameAttrSetting} />' +
                   '  <span dojoType="sketchSpaceDesigner.designer.widgets.ColorPickerPopup" dojoAttachPoint="popup"></span>' +
                   '</span>',
