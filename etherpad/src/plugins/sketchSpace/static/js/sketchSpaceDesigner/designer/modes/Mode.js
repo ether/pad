@@ -26,10 +26,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.onContextMenuHandle = dojo.connect(this.designer.container, "contextmenu", this, this.onContextMenu);
     this.setOptionsHandle = dojo.connect(this.designer, "setOptions", this, this.onSetOptions);
 
-    this.foregroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer});
-    this.designer.ui.options.addChild(this.foregroundColorPicker);
-    this.backgroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Background:", optionsPath:"stroke.color", designer:this.designer});
-    this.designer.ui.options.addChild(this.backgroundColorPicker);
+    this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.designer});
+    this.designer.ui.options.addChild(this.showAuthorshipColorOption);
+    this.strokeColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Stroke:", optionsPath:"stroke.color", designer:this.designer});
+    this.designer.ui.options.addChild(this.strokeColorPicker);
+    this.fillColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer});
+    this.designer.ui.options.addChild(this.fillColorPicker);
+
     this.designer.ui.options.layout();
   },
   disable: function () {
@@ -43,8 +46,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(this.onKeyUpHandle);
     dojo.disconnect(this.onMouseWheelHandle);
     this.designer.forEachObjectShape(function (shape) { mode.disableShape(shape); });
-    this.foregroundColorPicker.destroy();
-    this.backgroundColorPicker.destroy();
+    this.showAuthorshipColorOption.destroy();
+    this.strokeColorPicker.destroy();
+    this.fillColorPicker.destroy();
     this.designer.ui.options.layout();
   },
   enableShape: function (shape) {

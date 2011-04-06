@@ -2,6 +2,9 @@ dojo.provide("sketchSpaceDesigner.designer.widgets");
 
 dojo.require("dojox.widget.ColorPicker");
 dojo.require("dojox.layout.TableContainer");
+dojo.require("dijit.form.CheckBox");
+dojo.require("dijit.form.NumberSpinner");
+dojo.require("dijit.form.NumberTextBox");
 
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorPickerPopup", [dojox.widget.ColorPicker], {
   create: function () {
@@ -73,7 +76,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionInput", [], {
     this.attr("value", this.attr("designer").getOptionByPath(this.attr("optionsPath")));
     this.inhibitSetOptions = false;
   },
-  _setValueAttr: function(value, priorityChange){
+  setOptionsFromAttr: function (value) {
     if (!this.inhibitSetOptions && this.isStarted) {
       var options = {};
       options[this.attr("optionsPath")] = value;
@@ -81,10 +84,20 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionInput", [], {
     }
     return this.inherited(arguments);
   },
+  _setValueAttr: function(value, priorityChange){
+    this.setOptionsFromAttr(value);
+    return this.inherited(arguments);
+  },
+  _setCheckedAttr: function(value, priorityChange){
+    this.setOptionsFromAttr(value);
+    return this.inherited(arguments);
+  },
 });
 
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorOptionInput", [sketchSpaceDesigner.designer.widgets.ColorInput, sketchSpaceDesigner.designer.widgets.OptionInput], {});
-
+dojo.declare("sketchSpaceDesigner.designer.widgets.OptionCheckBox", [dijit.form.CheckBox, sketchSpaceDesigner.designer.widgets.OptionInput], {});
+dojo.declare("sketchSpaceDesigner.designer.widgets.OptionNumberSpinner", [dijit.form.NumberSpinner, sketchSpaceDesigner.designer.widgets.OptionInput], {});
+dojo.declare("sketchSpaceDesigner.designer.widgets.OptionNumberTextBox", [dijit.form.NumberTextBox, sketchSpaceDesigner.designer.widgets.OptionInput], {});
 
 /* Bug workaround */
 dojo.declare("sketchSpaceDesigner.designer.widgets.TableContainer", [dojox.layout.TableContainer], {

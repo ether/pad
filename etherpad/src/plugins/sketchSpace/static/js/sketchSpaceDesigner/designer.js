@@ -49,6 +49,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   setOptions: function (options, onlyDefault) {
     sketchSpaceDesigner.utils.setObject(this.options, options, onlyDefault);
+    this.updateAuthorshipColor();
   },
 
   setOptionsByPath: function (options) {
@@ -166,6 +167,13 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       shape.setFill(shape.realColor.fill);
       shape.setStroke(shape.realColor.stroke);
     }
+  },
+
+  updateAuthorshipColor: function () {
+    var designer = this;
+    this.forEachObjectShape(function (shape) {
+      designer.updateShapeAuthorshipColor(shape);
+    });
   },
 
   setShapeFillAndStroke: function (shape, options) {
