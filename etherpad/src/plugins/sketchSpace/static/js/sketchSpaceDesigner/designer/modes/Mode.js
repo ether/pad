@@ -28,9 +28,15 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
 
     this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.designer});
     this.designer.ui.options.addChild(this.showAuthorshipColorOption);
-    this.strokeColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Stroke:", optionsPath:"stroke.color", designer:this.designer});
+
+    this.strokeColorPicker = new dijit.layout._LayoutWidget({title:"Stroke:"});
+    this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doStroke", designer:this.designer}));
+    this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({optionsPath:"stroke.color", designer:this.designer}));
     this.designer.ui.options.addChild(this.strokeColorPicker);
-    this.fillColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer});
+
+    this.fillColorPicker = new dijit.layout._LayoutWidget({title:"Fill:"});
+    this.fillColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doFill", designer:this.designer}));
+    this.fillColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer}));
     this.designer.ui.options.addChild(this.fillColorPicker);
 
     this.designer.ui.options.layout();
@@ -46,9 +52,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(this.onKeyUpHandle);
     dojo.disconnect(this.onMouseWheelHandle);
     this.designer.forEachObjectShape(function (shape) { mode.disableShape(shape); });
-    this.showAuthorshipColorOption.destroy();
-    this.strokeColorPicker.destroy();
-    this.fillColorPicker.destroy();
+    this.showAuthorshipColorOption.destroyRecursive();
+    this.strokeColorPicker.destroyRecursive();
+    this.fillColorPicker.destroyRecursive();
     this.designer.ui.options.layout();
   },
   enableShape: function (shape) {

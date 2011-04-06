@@ -177,7 +177,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   },
 
   setShapeFillAndStroke: function (shape, options) {
-    shape.realColor = {fill: options.fill, stroke: options.stroke};
+    shape.realColor = {fill: options.doFill ? options.fill : undefined, stroke: options.doStroke ? sketchSpaceDesigner.utils.setObject({}, options.stroke) : undefined};
 
     this.updateShapeAuthorshipColor(shape);
   },

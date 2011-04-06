@@ -68,8 +68,12 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionInput", [], {
   startup: function () {
     this.inherited(arguments);
     this.setAttrFromOptions(); // force an update from options
-    dojo.connect(this.attr("designer"), "setOptions", this, this.setAttrFromOptions);
+    this.setOptionsHandle = dojo.connect(this.attr("designer"), "setOptions", this, this.setAttrFromOptions);
     this.isStarted = true;
+  },
+  destroy: function () {
+    dojo.disconnect(this.setOptionsHandle); 
+    this.inherited(arguments);
   },
   setAttrFromOptions: function () {
     this.inhibitSetOptions = true;
