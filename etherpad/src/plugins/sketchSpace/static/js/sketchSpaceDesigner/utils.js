@@ -12,3 +12,34 @@ sketchSpaceDesigner.utils.setObject = function (dst, src, onlyDefault) {
   }
   return dst;
 }
+
+sketchSpaceDesigner.utils.objectFromPaths = function (pathvalues) {
+  var res = {};
+  var path;
+  for (path in pathvalues) {
+    sketchSpaceDesigner.utils.setObjectByPath(res, path, pathvalues[path]);
+  }
+  return res;
+}
+
+sketchSpaceDesigner.utils.setObjectByPath = function (obj, path, value) {
+  var pathItems = path.split(".");
+  var i;
+
+  for (i = 0; i < pathItems.length-1; i++) {
+    if (obj[pathItems[i]] === undefined)
+      obj[pathItems[i]] = {};
+    obj = obj[pathItems[i]];
+  }
+  obj[pathItems[pathItems.length-1]] = value;
+}
+
+sketchSpaceDesigner.utils.getObjectByPath = function (obj, path) {
+  var pathItems = path.split(".");
+  var i;
+
+  for (i = 0; i < pathItems.length; i++) {
+    obj = obj[pathItems[i]];
+  }
+  return obj;
+}

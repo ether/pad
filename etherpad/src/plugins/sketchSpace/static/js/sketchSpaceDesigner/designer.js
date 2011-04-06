@@ -15,11 +15,12 @@ dojo.require("dojox.layout.TableContainer");
 dojo.require("dijit.layout.ContentPane");
 
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
- constructor: function (container, userId) {
+ constructor: function (container, userId, ui) {
     this.container = container;
     
     this.surface_size = {width: $(container).width(), height: $(container).height()};
     this.userId = userId;
+    this.ui = ui;
 
     this.surface = dojox.gfx.createSurface(this.container, this.surface_size.width, this.surface_size.height);
     this.surface_transform = this.surface.createGroup();
@@ -33,9 +34,6 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     dojo.connect(this.container, "ondragstart",   dojo, "stopEvent");
     dojo.connect(this.container, "onselectstart", dojo, "stopEvent");
 
-    this.modeStack = [];
-    this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
-
     this.options = {};
     this.setOptions({
       doStroke: true,
@@ -44,10 +42,21 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       fill: {"r":255,"g":0,"b":0,"a":1},
       showAuthorshipColors: false,
     });
+
+    this.modeStack = [];
+    this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
   },
 
   setOptions: function (options, onlyDefault) {
     sketchSpaceDesigner.utils.setObject(this.options, options, onlyDefault);
+  },
+
+  setOptionsByPath: function (options) {
+    this.setOptions(sketchSpaceDesigner.utils.objectFromPaths(options));
+  },
+
+  getOptionByPath: function (path) {
+    return sketchSpaceDesigner.utils.getObjectByPath(this.options, path);
   },
 
   pushMode: function (mode) {
@@ -334,15 +343,13 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   widgetsInTemplate: true,
   templateString: '<div>' +
                   '  <div id="sketchSpaceEditor" dojoAttachPoint="editorArea"></div>' +
-                  '  <div id="sketchSpaceOptions" dojoType="dojox.layout.TableContainer" dojoAttachPoint="options" cols="1" showLabels="true">' +
+                  '  <div id="sketchSpaceOptions" dojoType="sketchSpaceDesigner.designer.widgets.TableContainer" dojoAttachPoint="options" cols="1" showLabels="true">' +
                   '    <div dojoType="dijit.layout.ContentPane" title="Option">Value</div>' +
                   '  </div>' +
                   '</div>',
   startup: function () {
     this.inherited(arguments);
-
-    this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"));
-    this.editor.ui = this;
+    this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"), this);
   }
 });
 
@@ -356,11 +363,12 @@ dojo.addOnLoad(function (){
 
   dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
 
-
+/*
   sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({stroke:{color:dojo.colorFromHex(colorHex)}}); });
   sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({fill:dojo.colorFromHex(colorHex)}); });
+*/
 
   var info = {  
     action: '/ep/fileUpload/',

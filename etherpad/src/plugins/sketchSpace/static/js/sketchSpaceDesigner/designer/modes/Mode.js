@@ -25,6 +25,12 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.onActivateHandle = dojo.connect(this.designer.container, "activate", this, this.onActivate);
     this.onContextMenuHandle = dojo.connect(this.designer.container, "contextmenu", this, this.onContextMenu);
     this.setOptionsHandle = dojo.connect(this.designer, "setOptions", this, this.onSetOptions);
+
+    this.foregroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer});
+    this.designer.ui.options.addChild(this.foregroundColorPicker);
+    this.backgroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Background:", optionsPath:"stroke.color", designer:this.designer});
+    this.designer.ui.options.addChild(this.backgroundColorPicker);
+    this.designer.ui.options.layout();
   },
   disable: function () {
     var mode = this;
@@ -37,6 +43,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(this.onKeyUpHandle);
     dojo.disconnect(this.onMouseWheelHandle);
     this.designer.forEachObjectShape(function (shape) { mode.disableShape(shape); });
+    this.foregroundColorPicker.destroy();
+    this.backgroundColorPicker.destroy();
+    this.designer.ui.options.layout();
   },
   enableShape: function (shape) {
     var mode = this;
