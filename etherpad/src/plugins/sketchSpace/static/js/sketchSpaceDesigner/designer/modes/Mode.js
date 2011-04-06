@@ -1,6 +1,8 @@
 dojo.provide("sketchSpaceDesigner.designer.modes.Mode");
 
 dojo.require("dojox.gfx.matrix");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("sketchSpaceDesigner.designer.widgets");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   constructor: function () {

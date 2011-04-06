@@ -4,22 +4,24 @@ dojo.require("sketchSpaceDesigner.utils");
 dojo.require("sketchSpaceDesigner.designer.modes");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 dojo.require("sketchSpaceDesigner.designer.selection");
+dojo.require("sketchSpaceDesigner.designer.widgets");
 dojo.require("dojox.gfx");
 dojo.require("dojox.gfx.move");
 dojo.require("dojox.gfx.utils");
 dojo.require("dojox.gfx.matrix");
 dojo.require("dojox.uuid.generateRandomUuid");
 dojo.require("dojo.parser");
-//dojo.require("dijit.popup");
-dojo.require("dojox.widget.ColorPicker");
+dojo.require("dojox.layout.TableContainer");
+dojo.require("dijit.layout.ContentPane");
 
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
- constructor: function (container, width, height, userId) {
+ constructor: function (container, userId) {
     this.container = container;
-    this.surface_size = {width: width, height: height};
+    
+    this.surface_size = {width: $(container).width(), height: $(container).height()};
     this.userId = userId;
 
-    this.surface = dojox.gfx.createSurface(this.container, width, height);
+    this.surface = dojox.gfx.createSurface(this.container, this.surface_size.width, this.surface_size.height);
     this.surface_transform = this.surface.createGroup();
     
     this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, function () { this.viewUpdated(); });
@@ -328,45 +330,36 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
 });
 
-dojo.declare("sketchSpaceDesigner.designer.ColorPickerPopup", [dojox.widget.ColorPicker], {
-  create: function () {
+dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
+  widgetsInTemplate: true,
+  templateString: '<div>' +
+                  '  <div id="sketchSpaceEditor" dojoAttachPoint="editorArea"></div>' +
+                  '  <div id="sketchSpaceOptions" dojoType="dojox.layout.TableContainer" dojoAttachPoint="options" cols="1" showLabels="true">' +
+                  '    <div dojoType="dijit.layout.ContentPane" title="Option">Value</div>' +
+                  '  </div>' +
+                  '</div>',
+  startup: function () {
     this.inherited(arguments);
-    dijit.popup.moveOffScreen(this.domNode);
-  },
-  popup: function () {
-    var widget = this;
-    dijit.popup.open({
-      parent: null,
-      popup: widget,
-      around: widget.popupFor,
-      orient: {'BR':'TR', 'BL':'TL', 'TR':'BR', 'TL':'BL'},
-      onExecute: function(){
-	dijit.popup.close(widget);
-        widget.setColor(widget.attr("value"));
-      },
-      onCancel: function(){ dijit.popup.close(widget); },
-      onClose: function(){}
-    });
-    this.focus();
-  },
-  setColor: function(colorHex) {
-    this.inherited(arguments);
-    dojo.style(this.popupFor, "background", colorHex);
-  },
-  onBlur: function () {
-    this.inherited(arguments);
-    this.onCancel();
-  },
-  onCancel: function () {},
+
+    this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"));
+    this.editor.ui = this;
+  }
 });
 
+
 dojo.addOnLoad(function (){
-  sketchSpace.editorArea = new sketchSpaceDesigner.designer.Designer(dojo.byId("sketchSpaceDebug"), 300, 300, pad.getUserId());
+  sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: pad.getUserId()}, dojo.byId("sketchSpaceEditorUI"));
+  sketchSpace.editorUi.startup();
+
+  /* For backwards compatibility for now */
+  sketchSpace.editorArea = sketchSpace.editorUi.editor;
+
   dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
 
-  sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
+
+  sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({stroke:{color:dojo.colorFromHex(colorHex)}}); });
-  sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
+  sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
   dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({fill:dojo.colorFromHex(colorHex)}); });
 
   var info = {  
