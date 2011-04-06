@@ -97,7 +97,7 @@ var richTextClient = {
                 for(var i = 0, len = lists.length; i < len; i++){
                     name = lists[i];
                     if(style[name]){
-                        args.cc.doAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
+                        args.cc.doLineAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
                     }
                 }
             }

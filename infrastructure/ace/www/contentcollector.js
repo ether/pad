@@ -79,6 +79,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     var attribsArray = [];
     var attribsBuilder = null;
     var op = Changeset.newOp('+');
+    var lineMarkerAttribString = "";
     var self = {
       length: function() { return textArray.length; },
       atColumnZero: function() {
@@ -90,7 +91,18 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         attribsBuilder = Changeset.smartOpAssembler();
       },
       textOfLine: function(i) { return textArray[i]; },
+      addLineMarkerAttrib : function(aStr){
+          lineMarkerAttribString += aStr; 
+      },
+      checkLineMarker : function(){
+         if(lineMarkerAttribString && 0 == textArray[textArray.length -1].length){
+            var aStr = lineMarkerAttribString;
+            lineMarkerAttribString = "";
+            lines.appendText('*', aStr); 
+         }
+      },
       appendText: function(txt, attrString) {
+        self.checkLineMarker(); 
         textArray[textArray.length-1] += txt;
         //dmesg(txt+" / "+attrString);
         op.attribs = attrString;
@@ -101,6 +113,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       attribLines: function() { return attribsArray; },
       // call flush only when you're done
       flush: function(withNewline) {
+        self.checkLineMarker();
         if (attribsBuilder) {
           attribsArray.push(attribsBuilder.toString());
           attribsBuilder = null;
@@ -221,7 +234,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     state.attribString = Changeset.makeAttribsString('+', lst, apool);
   }
   function _produceListMarker(state) {
-    lines.appendText('*', Changeset.makeAttribsString(
+      lines.addLineMarkerAttrib(Changeset.makeAttribsString(
       '+', [['list', state.listType],
             ['insertorder', 'first']],
       apool));
@@ -248,6 +261,12 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     state.localAttribs.push(na);
     state.localValues[na] = value;
     cc.incrementAttrib(state, na);
+  };
+  cc.doLineAttrib = function(state, na, value){
+    value = (value === undefined) ? true : value;
+    lines.addLineMarkerAttrib(Changeset.makeAttribsString(
+        '+', [[na, value]],
+        apool));
   };
   cc.collectContent = function (node, state) {
     if (! state) {
