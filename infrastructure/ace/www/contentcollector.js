@@ -25,7 +25,7 @@ function sanitizeUnicode(s) {
 }
 
 function makeContentCollector(collectStyles, browser, apool, domInterface,
-                              className2Author) {
+                              className2Author, lineMarker, objMarker) {
   browser = browser || {};
 
   var plugins_;
@@ -56,6 +56,13 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     },
     nodeAttr: function(n, a) {
       return n.getAttribute(a);
+    },
+    nodeAttributes : function(n){
+       var attribs = {}, na = n.attributes;
+       for(var i = 0, len = na.length; i < len; i++){
+            attribs[na[i].name] = na[i].value; 
+       }
+       return attribs;
     },
     optNodeInnerHTML: function(n) {
       return n.innerHTML;
@@ -98,7 +105,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
          if(lineMarkerAttribString && 0 == textArray[textArray.length -1].length){
             var aStr = lineMarkerAttribString;
             lineMarkerAttribString = "";
-            lines.appendText('*', aStr); 
+            lines.appendText(lineMarker, aStr); 
          }
       },
       appendText: function(txt, attrString) {
@@ -268,6 +275,13 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         '+', [[na, value]],
         apool));
   };
+  cc.doObjAttrib = function(state, na, value){
+    value = (value === undefined) ? true : value;
+    lines.appendText(objMarker, Changeset.makeAttribsString(
+        '+', [[na, value]],
+        apool));
+  };
+ 
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
@@ -341,13 +355,19 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       if (tname == "br") {
         cc.startNewLine(state);
       }
-      else if (tname == "script" || tname == "style") {
+      else if (tname == "script" || tname == "style") { 
         // ignore
-      }
-      else if (! isEmpty) {
+      } else if (tname == "img"){
         var styl = dom.nodeAttr(node, "style");
         var cls = dom.nodeProp(node, "className");
-
+        var attribs = dom.nodeAttributes(node);
+	    plugins_.callHook('collectContentPre', {cc: cc, state:state,
+                     tname:tname, styl:styl, cls:cls, attribs : attribs});
+      } else if (! isEmpty) {
+        var styl = dom.nodeAttr(node, "style");
+        var cls = dom.nodeProp(node, "className");
+        var attribs = dom.nodeAttributes(node);
+ 
         var isPre = (tname == "pre");
         if ((! isPre) && browser.safari) {
           isPre = (styl && /\bwhite-space:\s*pre\b/i.exec(styl));
@@ -356,7 +376,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         var oldListTypeOrNull = null;
         var oldAuthorOrNull = null;
         if (collectStyles) {
-	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls, attribs : attribs});
           if (tname == "b" || (styl && /\bfont-weight:\s*bold\b/i.exec(styl)) ||
               tname == "strong") {
 	    cc.doAttrib(state, "bold");
@@ -406,7 +426,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         }
 
         if (collectStyles) {
-	  plugins_.callHook('collectContentPost', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+	  plugins_.callHook('collectContentPost', {cc: cc, state:state, tname:tname, styl:styl, cls:cls, attribs: attribs});
         }
 
         if (isPre) cc.decrementFlag(state, 'preMode');

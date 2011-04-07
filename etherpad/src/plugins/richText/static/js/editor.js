@@ -31,11 +31,11 @@ var richTextClient = {
                     if(!value || !value.url) return;
                     rep = richTextClient.getRecordSelection();
                     ace.ace_replaceRange(rep.selStart, rep.selEnd, ace.objMarker);
-                    ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]-1], rep.selStart, false);
-                    ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
+                    ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]], rep.selStart, false);
+                    ace.ace_performDocumentApplyAttributesToRange(rep.selStart, [rep.selStart[0],rep.selStart[1] + 1],
                            [["imgSrc", value.url]]);
                 }, "insertImage", true);
-                break; 
+                return; 
               case "link":
                 rtLinkDlg.show();
                 break;
@@ -81,8 +81,9 @@ var richTextClient = {
     },
     collectContent : function(args){
         if(args.tname){
-            var style = richTextClient.evalStyleString(args.styl);
-            if( "span" == args.tname.toLowerCase()){
+            var style = richTextClient.evalStyleString(args.styl), tname = args.tname.toLowerCase(),
+                attribs = args.attribs;
+            if( "span" == tname){
                 if(!style) return ;
                 var lists = ["color", "font-family", "font-size", "background-color"], name;
                 for(var i = 0, len = lists.length; i < len; i++){
@@ -91,7 +92,7 @@ var richTextClient = {
                         args.cc.doAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
                     }
                 }
-            } else if( "div" == args.tname.toLowerCase() &&  -1 == (args.cls || "").indexOf("ace-line")){
+            } else if( "div" == tname &&  -1 == (args.cls || "").indexOf("ace-line")){
                 if(!style) return ;
                 var lists = ["text-align"], name;
                 for(var i = 0, len = lists.length; i < len; i++){
@@ -100,6 +101,8 @@ var richTextClient = {
                         args.cc.doLineAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
                     }
                 }
+            } else if("img" == tname){
+                args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
             }
         }
     },

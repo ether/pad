@@ -39,7 +39,7 @@ function OUTER(gscope) {
 
   var iframe = window.frameElement;
   var lineMarker = '*'; 
-  var objMarker  = "*";
+  var objMarker  = '+';
   var outerWin = iframe.ace_outerWin;
   iframe.ace_outerWin = null; // prevent IE 6 memory leak
   var sideDiv = iframe.nextSibling;
@@ -1393,7 +1393,7 @@ function OUTER(gscope) {
       lastDirtyNode = (lastDirtyNode && isNodeDirty(lastDirtyNode) && lastDirtyNode);
       if (firstDirtyNode && lastDirtyNode) {
     	var cc = makeContentCollector(isStyled, browser, rep.apool, null,
-                                     className2Author);
+                                     className2Author, lineMarker, objMarker);
 	    cc.notifySelection(selection);
     	var dirtyNodes = [];
     	for(var n = firstDirtyNode; n && ! (n.previousSibling &&
