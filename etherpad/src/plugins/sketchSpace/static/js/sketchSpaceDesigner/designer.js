@@ -363,7 +363,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 
 
 dojo.addOnLoad(function (){
-  sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: pad.getUserId()}, dojo.byId("sketchSpaceEditorUI"));
+  sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: typeof(pad) != "undefined" ? pad.getUserId() : undefined}, dojo.byId("sketchSpaceEditorUI"));
   sketchSpace.editorUi.startup();
 
   /* For backwards compatibility for now */
@@ -371,58 +371,52 @@ dojo.addOnLoad(function (){
 
   dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
 
-/*
-  sketchSpace.editorArea.foregroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("foregroundColorPicker")});
-  dojo.connect(sketchSpace.editorArea.foregroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({stroke:{color:dojo.colorFromHex(colorHex)}}); });
-  sketchSpace.editorArea.backgroundColorPicker = new sketchSpaceDesigner.designer.widgets.ColorPickerPopup({popupFor: dojo.byId("backgroundColorPicker")});
-  dojo.connect(sketchSpace.editorArea.backgroundColorPicker, "setColor", sketchSpace.editorArea, function (colorHex) { this.setOptions({fill:dojo.colorFromHex(colorHex)}); });
-*/
-
-  var info = {  
-    action: '/ep/fileUpload/',
-    name: 'uploadfile',  
-    onSubmit: function(file, ext){
-    //console.log('Starting...');
-    },  
-    onComplete: function(file, response){
-      var path = eval(response)[0].split("/");
-      sketchSpace.editorArea.addImg(path[path.length-1]);
+  if (typeof(pad) != "undefined") {
+    var info = {  
+      action: '/ep/fileUpload/',
+      name: 'uploadfile',  
+      onSubmit: function(file, ext){
+      //console.log('Starting...');
+      },  
+      onComplete: function(file, response){
+	var path = eval(response)[0].split("/");
+	sketchSpace.editorArea.addImg(path[path.length-1]);
+      }
     }
-  }
-  new AjaxUpload($('#sketchSpaceAddImage'), info);  
-  new AjaxUpload($('#sketchSpaceAddImage img'), info);
+    new AjaxUpload($('#sketchSpaceAddImage'), info);  
+    new AjaxUpload($('#sketchSpaceAddImage img'), info);
 
-  var info = {  
-    action: '/ep/fileUpload/',
-    name: 'uploadfile',  
-    onSubmit: function(file, ext){
-    //console.log('Starting...');
-    },  
-    onComplete: function(file, response){
-      var path = eval(response)[0].split("/");
-      var filename = path[path.length-1];
-     
-      dojo.xhrGet({
-	url: "/ep/imageConvert/" + filename + "?action=getPages",
-	handleAs: "json",
-	load: function(data){
-          padeditor.ace.callWithAce(function (ace) {
-  	    for (var page = 0; page < data.pages; page++) {
+    var info = {  
+      action: '/ep/fileUpload/',
+      name: 'uploadfile',  
+      onSubmit: function(file, ext){
+      //console.log('Starting...');
+      },  
+      onComplete: function(file, response){
+	var path = eval(response)[0].split("/");
+	var filename = path[path.length-1];
 
-	      var imageId = sketchSpace.ace_insertImage(ace);
-	      var rep = ace.ace_getRep();
-	      ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(), escape(dojo.toJson({parent:null, shape: {extType: "zimage", imageName: filename, page:page}}))]]);
-	      ace.ace_performSelectionChange(rep.selEnd, rep.selEnd, false);
+	dojo.xhrGet({
+	  url: "/ep/imageConvert/" + filename + "?action=getPages",
+	  handleAs: "json",
+	  load: function(data){
+	    padeditor.ace.callWithAce(function (ace) {
+	      for (var page = 0; page < data.pages; page++) {
 
-	    }
-	  }, "sketchSpace", true)
-	}
-      });
+		var imageId = sketchSpace.ace_insertImage(ace);
+		var rep = ace.ace_getRep();
+		ace.ace_performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd, [["sketchSpaceImageObject:" + dojox.uuid.generateRandomUuid(), escape(dojo.toJson({parent:null, shape: {extType: "zimage", imageName: filename, page:page}}))]]);
+		ace.ace_performSelectionChange(rep.selEnd, rep.selEnd, false);
 
+	      }
+	    }, "sketchSpace", true)
+	  }
+	});
+
+      }
     }
+
+    new AjaxUpload($('#sketchSpaceAddPdfImage'), info);  
+    new AjaxUpload($('#sketchSpaceAddPdfImage img'), info);
   }
-
-  new AjaxUpload($('#sketchSpaceAddPdfImage'), info);  
-  new AjaxUpload($('#sketchSpaceAddPdfImage img'), info);
-
 });
