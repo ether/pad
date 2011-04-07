@@ -348,10 +348,10 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     $(".toolSelector.toolAddRect").css({background: "#cccccc"});
   },
 
-  addCircle: function() {
-    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddCircle());
+  addEllipse: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddEllipse());
     $(".toolSelector").css({background: "#ffffff"});
-    $(".toolSelector.toolAddCircle").css({background: "#cccccc"});
+    $(".toolSelector.toolAddEllipse").css({background: "#cccccc"});
   },
 
   addPath: function() {
