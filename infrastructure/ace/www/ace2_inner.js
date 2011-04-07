@@ -3956,7 +3956,10 @@ function OUTER(gscope) {
       initDynamicCSS();
 
       enforceEditability();
-
+       
+      if(browser.mozilla){ //disable image resize 
+          doc.execCommand("enableObjectResizing", false, false);
+      }
       // set up dom and rep
       while (root.firstChild) root.removeChild(root.firstChild);
       var oneEntry = createDomLineEntry("");

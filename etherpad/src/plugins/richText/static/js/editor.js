@@ -110,13 +110,14 @@ var richTextClient = {
         if(!args) return ;
         var attributes = args.attributes;
         var attStr = "", noderef = [], blockref = [], style = {}, temp = {},
-               cmd = "", value = "", extraOpenTags = "", extraCloseTags = "";
+               cmd = "", value = "", extraOpenTags = "", extraCloseTags = "", cls = "";
         if(attributes && attributes.length){
             for(var i = 0, len = attributes.length; i < len; i++){
                 var pool = attributes[i];
                 switch(pool[0]){
                     case "imgSrc":
                         extraOpenTags += "<img src=" + pool[1] + " />"; 
+                        cls="ace-placeholder";
                         break;
                     case "color":
                         style.color = pool[1];
@@ -145,6 +146,7 @@ var richTextClient = {
             var styleStr = richTextClient.joinStyle(style);
             attStr += styleStr;
         }
-        return [ {attStr : attStr, noderef: noderef, blockref : blockref, extraOpenTags : extraOpenTags, extraCloseTags : extraCloseTags}];
+        return [ {attStr : attStr, noderef: noderef, blockref : blockref, 
+                 cls : cls, extraOpenTags : extraOpenTags, extraCloseTags : extraCloseTags}];
     }
 }

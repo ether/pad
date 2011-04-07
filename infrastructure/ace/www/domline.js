@@ -168,8 +168,8 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
    * blockref may be equal to noderef in most cases, except in the above case.
    * the elements in reference are order-independent
    * */
-  result.appendSpan = function(txt, cls, attributes, marker) {  
-    if(marker){
+  result.appendSpan = function(txt, cls, attributes, lineMarker) {  
+    if(lineMarker){
         result.lineMarker +=txt.length;
         txt = "";
     }
@@ -224,7 +224,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
         "aceCreateStructDomLine", {domline:domline, cls:cls, attributes: attributes}
     ).map(function(modifier){ 
         if(modifier.cls){
-            cls += modifier.cls;
+            cls += " " + modifier.cls;
         }
         if(modifier.attStr !== undefined){
             attStr += modifier.attStr; 
@@ -258,8 +258,12 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	    simpleTags.reverse();
     	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
       }
+      var pTxt = perTextNodeProcess(domline.escapeHTML(txt));
+      if(txt.length && /\bace\-placeholder\b/.exec(cls)){
+        pTxt = ""; //don't display text for object marker
+      }
       blockHTML.push('<span class="',cls||'','"'+ attStr +'>',extraOpenTags,
-		perTextNodeProcess(domline.escapeHTML(txt)),
+		        pTxt,
                 extraCloseTags,'</span>');
     }
   };
