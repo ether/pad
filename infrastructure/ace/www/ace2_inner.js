@@ -2845,7 +2845,7 @@ function OUTER(gscope) {
     performDocumentReplaceSelection('\n');
     if (listType) {
       if (lineNum+1 < rep.lines.length()) {
-        setLineListType(lineNum+1, listType);
+       setLineListType(lineNum+1, listType);
       }
     }
     else {
@@ -4248,7 +4248,8 @@ function OUTER(gscope) {
             op = opIter.next();
             ret = Changeset.opAttributeValue(op, attributeName, rep.apool);
             if(!ret){
-               if(op.chars == 1){
+               var lineText = rep.lines.atIndex(lineNum).text;
+               if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
                    ret = "ace-linestyle";
                 }else{
                    ret = "ace-none-linestyle";
