@@ -218,7 +218,8 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
     $.each(
       order, function(key, val){
 //	console.log(val);
-	visited[val].moveToFront();
+	if(visited[val])
+  	  visited[val].moveToFront();
       }
       );
 
@@ -259,10 +260,6 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
       console.log('New order');
       console.log(newOrder);
 */
-      function nextSeq(){
-	return zSequence++;
-      }
-
       var objIdArr = newOrder;
       var idxArr = [];
       $.each(newOrder, function(key){idxArr.push(key);});
@@ -270,8 +267,8 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
       var objIdStr = objIdArr.join(";");
       var idxStr = idxArr.join(";");
 
-      update.push(["sketchSpaceImageZ;"+nextSeq()+";" + objIdStr, idxStr]);
-//      console.log(["sketchSpaceImageZ;"+nextSeq()+";" + objIdStr, idxStr]);
+      update.push(["sketchSpaceImageZ;"+(++zSequence)+";" + objIdStr, idxStr]);
+//    console.log(["sketchSpaceImageZ;"+nextSeq()+";" + objIdStr, idxStr]);
 
       update.push(["sketchSpaceImageZSequence", "" + zSequence]);
     }
