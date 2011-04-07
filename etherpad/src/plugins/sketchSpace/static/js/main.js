@@ -38,7 +38,8 @@ sketchSpaceInit.prototype.aceAttribsToClasses = function(args) {
     return [args.key + ":" + args.value];
   else if (args.key == 'sketchSpaceImageZSequence')
     return [args.key + ":" + args.value];
-
+  else if (args.key == 'sketchSpaceImageIsCurrent')
+    return [args.key + ":" + args.value];
 };
 
 /**
@@ -56,6 +57,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
     var zSequence = 0;
     var orderTags=[];
     var order=[];
+    var isCurrentImage = false;
     // sketchSpaceImageZ_ID_OBJECTID: pos
     for (var i = 0; i < argClss.length; i++) {
       var cls = argClss[i];
@@ -89,6 +91,8 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	} else if (key == 'sketchSpaceImageZSequence'){
 	  val = parseInt(val, 10);
 	  zSequence = val;
+        } else if (key == "sketchSpaceImageIsCurrent") {
+ 	  isCurrentImage = true;
 	} else {
 	  clss.push(cls);
 	}
@@ -137,12 +141,25 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 //    console.log(order);
 
     this.editorArea.images[imageId] = {objects:imageObjects, order:order, zSequence: zSequence};
+
+//    console.log("IMG:" + imageId + (isCurrentImage ? ":current" : ":NOXXX"));
+
+    this.imgeNeedsUpdate = true;
+    if (isCurrentImage)
+      this.editorArea.selectSharedImage(imageId);
     if (this.editorArea.currentImage == imageId) {
-      this.updateImageFromPad();
+      this.updateImageFromPadIfNeeded();
     }
+    this.imgeNeedsUpdate = false;
 
     return [{cls: clss.join(" "), extraOpenTags: '<a class="sketchSpaceImageLink">', extraCloseTags: '</a>'}];
   }
+};
+
+sketchSpaceInit.prototype.updateImageFromPadIfNeeded = function() {
+  if (this.imgeNeedsUpdate)
+    this.updateImageFromPad();
+  this.imgeNeedsUpdate = false;
 };
 
 /**
@@ -293,17 +310,49 @@ sketchSpaceInit.prototype.getImageLinkFromId = function (imageId) {
   return $(this.padDocument).find(".sketchSpaceImageId_" + imageId)[0];
 };
 
-sketchSpaceInit.prototype.selectImage = function(imageLink) {
+sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
   var imageId;
   $.each($(imageLink).attr('class').split(' '), function (idx, cls) {
     var parts = cls.split("_");
     if (parts[0] == "sketchSpaceImageId")
       imageId = parts[1];
   });
+  return imageId;
+};
 
+sketchSpaceInit.prototype.selectImage = function(imageLink) {
+  // FIXME: Ugly hack to have this here, should be somewhere onLoad()
   this.padDocument = imageLink.ownerDocument;
-  this.editorArea.selectImage(imageId);
-  this.updateImageFromPad();
+
+  var imageId = this.getImageIdFromLink(imageLink);
+
+  if (this.editorArea.options.shareCurrentImage) {
+    var sketchSpace = this;
+    padeditor.ace.callWithAce(function (ace) {
+      var rep = ace.ace_getRep();
+      var numLines = rep.lines.length();
+      var lastLineLength = rep.lines.atIndex(numLines-1).text.length;
+
+      var start = ace.ace_lineAndColumnFromChar(0);
+      var end = ace.ace_lineAndColumnFromChar(rep.alltext.length-1);
+      var imageRange = sketchSpace.ace_getImageRange(ace, imageId);
+
+      // console.log(rep.alltext.length);
+
+      // console.log(start);
+      // console.log(imageRange[0]);
+      // console.log(imageRange[1]);
+      // console.log(end);
+
+      ace.ace_performDocumentApplyAttributesToRange(start, imageRange[0], [["sketchSpaceImageIsCurrent", ""]]);
+      ace.ace_performDocumentApplyAttributesToRange(imageRange[0], imageRange[1], [["sketchSpaceImageIsCurrent", "true"]]);
+      ace.ace_performDocumentApplyAttributesToRange(imageRange[1], end, [["sketchSpaceImageIsCurrent", ""]]);
+
+    }, "updatePadFromImage", true);
+  } else {
+    this.editorArea.selectImage(imageId);
+    this.updateImageFromPad();
+  }
 };
 
 sketchSpaceInit.prototype.insertImage = function() {

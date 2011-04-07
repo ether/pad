@@ -29,6 +29,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     this.images = {};
     this.currentImage = undefined;
+    this.currentSharedImage = undefined;
     this.selection = new sketchSpaceDesigner.designer.selection.Selection(this);
 
     dojo.connect(this.container, "ondragstart",   dojo, "stopEvent");
@@ -41,6 +42,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       stroke: {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},
       fill: {"r":255,"g":0,"b":0,"a":1},
       showAuthorshipColors: false,
+      shareCurrentImage: false,
     });
 
     this.modeStack = [];
@@ -50,6 +52,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
   setOptions: function (options, onlyDefault) {
     sketchSpaceDesigner.utils.setObject(this.options, options, onlyDefault);
     this.updateAuthorshipColor();
+    this.selectSharedImage();
   },
 
   setOptionsByPath: function (options) {
@@ -201,6 +204,14 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   selectImage: function (imageId) {
     this.currentImage = imageId;
+  },
+
+  selectSharedImage: function (imageId) {
+    if (imageId !== undefined)
+      this.currentSharedImage = imageId;
+    if (this.options.shareCurrentImage) {
+      this.selectImage(this.currentSharedImage);
+    }
   },
 
   editorGetShapeByObjId: function(objId) {
@@ -382,6 +393,7 @@ dojo.addOnLoad(function (){
   sketchSpace.editorArea = sketchSpace.editorUi.editor;
 
   dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
+  dojo.connect(sketchSpace.editorArea, "selectImage", sketchSpace, sketchSpace.updateImageFromPadIfNeeded);
 
   if (typeof(pad) != "undefined") {
     var info = {  
@@ -392,7 +404,7 @@ dojo.addOnLoad(function (){
       },  
       onComplete: function(file, response){
 	var path = eval(response)[0].split("/");
-	sketchSpace.editorArea.addImg(path[path.length-1]);
+	sketchSpace.editorUi.addImg(path[path.length-1]);
       }
     }
     new AjaxUpload($('#sketchSpaceAddImage'), info);  

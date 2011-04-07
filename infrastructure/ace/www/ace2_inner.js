@@ -1945,6 +1945,7 @@ function OUTER(gscope) {
     var lineNum = rep.lines.indexOfEntry(lineEntry);
     return [lineNum, x - lineStart];
   }
+  editorInfo.ace_lineAndColumnFromChar = lineAndColumnFromChar;
 
   function performDocumentReplaceCharRange(startChar, endChar, newText) {
     if (startChar == endChar && newText.length == 0) {
