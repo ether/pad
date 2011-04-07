@@ -69,8 +69,14 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
   },
 
   applyToShapes: function () {
-   /* applyToShapes(op, arg1, arg2...argn) results in
-      shape[OP](arg1, arg2...argn) */
+   /* applyToShapes(op, arg1, arg2...argn) generally results in
+    * shape[OP](arg1, arg2...argn).
+    *
+    * Op can also be a function, in which case op.call(shape, arg1, arg2...argn) is called.
+    *
+    * In addition, op can be the string "save", in which case the shapes are saved
+    * to their string representation and imageUpdated is signalled.
+    */
 
     var op = arguments[0];
     var arg = Array.prototype.slice.call(arguments, 1, arguments.length);

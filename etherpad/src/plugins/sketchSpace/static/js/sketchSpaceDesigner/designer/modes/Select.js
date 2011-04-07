@@ -64,14 +64,31 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 46)
+    if (event.keyCode == 46) {
       this.designer.selection.applyToShapes("removeShape");
+    } else if (event.keyCode == 36) {
+      this.designer.selection.applyToShapes(
+	function(){
+	  this.zOrderMoved = true; this.moveToFront();
+//	  console.log('Move ' + this.objId + ' to front');
+	}
+      );
+      this.designer.selection.applyToShapes("save");
+    } else if (event.keyCode == 35) {
+      this.designer.selection.applyToShapes(
+	function(){
+	  this.zOrderMoved = true; this.moveToBack();
+//	  console.log('Move ' + this.objId + ' to back');
+	}
+      );
+      this.designer.selection.applyToShapes("save");
+    }
   },
 
   onMouseUp: function(event) {
     this.inherited(arguments);
     if (this.isOutlineMoving) {
-      this.designer.selection.applyToShapes("save", this.getCurrentMove(event));
+      this.designer.selection.applyToShapes("save");
       this.isOutlineMoving = false;
     }
     this.isOutlineMouseDown = false;
