@@ -75,6 +75,15 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
       this.getCurrentMode().enable();
   },
 
+  setMode: function (mode) {
+    if (this.modeStack.length > 0)
+      this.getCurrentMode().disable();
+    this.modeStack = [];
+    mode.designer = this;
+    this.modeStack.push(mode);
+    this.getCurrentMode().enable();
+  },
+
   getCurrentMode: function () {
     return this.modeStack[this.modeStack.length - 1];
   },
@@ -238,18 +247,6 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     this.saveShapeToStr(shape);
   },
 
-  addRect: function() {
-    this.pushMode(new sketchSpaceDesigner.designer.modes.AddRect());
-  },
-
-  addCircle: function() {
-    this.pushMode(new sketchSpaceDesigner.designer.modes.AddCircle());
-  },
-
-  addPath: function() {
-    this.pushMode(new sketchSpaceDesigner.designer.modes.AddPath());
-  },
-
   createImage: function(parent, imageName, page) {
     var designer = this;
 
@@ -328,23 +325,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     image.updateHandle = dojo.connect(designer, "viewUpdated", image, image.updateDisplayLazy);
 
     return image;
-  },
-
-  addImg: function(imageName) {
-    var shape = this.createImage(this.surface_transform, imageName);
-    this.registerObjectShape(shape);
-    this.saveShapeToStr(shape);
-  },
-
-  /* refactor out this code and put it somewhere else... */
-  foregroundColorPickerPopup: function() {
-    this.foregroundColorPicker.popup();
-  },
-
-  backgroundColorPickerPopup: function() {
-    this.backgroundColorPicker.popup();
-  },
-
+  }
 });
 
 dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
@@ -358,7 +339,29 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   startup: function () {
     this.inherited(arguments);
     this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"), this);
-  }
+  },
+
+  addRect: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddRect());
+  },
+
+  addCircle: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddCircle());
+  },
+
+  addPath: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddPath());
+  },
+
+  select: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.Select());
+  },
+
+  addImg: function(imageName) {
+    var shape = this.editor.createImage(this.surface_transform, imageName);
+    this.editor.registerObjectShape(shape);
+    this.editor.saveShapeToStr(shape);
+  },
 });
 
 

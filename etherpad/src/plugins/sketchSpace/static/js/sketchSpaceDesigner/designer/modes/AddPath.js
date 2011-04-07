@@ -173,8 +173,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
       this.designer.setOptions({isClosed: false});
     } else if (event.keyCode == 13 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=ENTER */
       this.done();
-    } else if (event.keyCode == 27) {
-      this.designer.popMode();
     }
   },
   onSetOptions: function () {

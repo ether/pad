@@ -46,9 +46,4 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddCircle", [sketchSpaceDesigne
       this.shape.setShape(shapeData);
     }
   },
-  onKeyUp: function (event) {
-    this.inherited(arguments);
-    if (event.keyCode == 27)
-      this.designer.popMode();
-  }
 });
