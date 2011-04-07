@@ -141,7 +141,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
     var parent = null;
     if (shape.parent.objId != undefined)
       parent = shape.parent.objId;
-
+    shape.userId = this.userId;
     shape.strRepr = dojo.toJson({parent:parent, shape:this.serializeShape(shape), userId:shape.userId});
     this.imageUpdatedByUs();
   },

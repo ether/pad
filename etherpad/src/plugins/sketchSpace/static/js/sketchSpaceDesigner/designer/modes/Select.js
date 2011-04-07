@@ -1,15 +1,25 @@
 dojo.provide("sketchSpaceDesigner.designer.modes.Select");
 
 dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
+dojo.require("dijit.form.Button");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Zoom], {
   isOutlineMouseDown: false,
   isMoving: false,
   enable: function () {
+    var designer = this;
     this.inherited(arguments);
     this.enableOutline();
     this.selectionUpdatedHandle = dojo.connect(this.designer.selection, "selectionUpdated", this, this.updateOutline);
     this.viewUpdatedHandle = dojo.connect(this.designer, "viewUpdated", this, this.updateOutline);
+
+    this.applyOption = new dijit.layout._LayoutWidget({title:"Apply options [ENTER]:"});
+    this.applyOption.addChild(new dijit.form.Button({label:"Apply", onClick: function () { designer.applyOptionsToSelection(); }}));
+    this.designer.ui.options.addChild(this.applyOption);
+    this.deleteOption = new dijit.layout._LayoutWidget({title:"Delete [DELETE]:"});
+    this.deleteOption.addChild(new dijit.form.Button({label:"Delete", onClick: function () { designer.deleteSelection(); }}));
+    this.designer.ui.options.addChild(this.deleteOption);
+    this.designer.ui.options.layout();
   },
 
   disable: function () {
@@ -17,6 +27,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     dojo.disconnect(this.selectionUpdatedHandle);
     this.disableOutline();
     this.inherited(arguments);
+    this.applyOption.destroyRecursive();
+    this.deleteOption.destroyRecursive();
+    this.designer.ui.options.layout();
   },
 
   enableOutline: function() {
@@ -51,6 +64,17 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.enableOutline();
   },
 
+  applyOptionsToSelection: function () {
+    this.designer.selection.applyToShapes(function (designer) {
+      designer.setShapeFillAndStroke(this, designer.options);
+    }, this.designer);
+    this.designer.selection.applyToShapes("save");
+  },
+
+  deleteSelection: function () {
+    this.designer.selection.applyToShapes("removeShape");
+  },
+
   onShapeMouseDown: function (shape, event) {
     this.inherited(arguments);
     this.onOutlineMouseDown(event);
@@ -64,8 +88,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 46)
-      this.designer.selection.applyToShapes("removeShape");
+    if (event.keyCode == 13)
+      this.applyOptionsToSelection();
+    else if (event.keyCode == 46)
+      this.deleteSelection();
   },
 
   onMouseUp: function(event) {
