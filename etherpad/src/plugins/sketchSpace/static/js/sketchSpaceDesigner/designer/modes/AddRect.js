@@ -7,16 +7,12 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
     this.inherited(arguments);
     this.shape = undefined;
 
-    this.x = new dijit.layout.ContentPane({title:"Add:", content:"Rect"});
-    this.designer.ui.options.addChild(this.x);
-    this.designer.ui.options.layout();
   },
   disable: function () {
     this.inherited(arguments);
     if (this.shape !== undefined) {
       this.shape.removeShape();
     }
-    this.x.destroy();
   },
 
   getContainerShape: function () { return this.designer.surface_transform; },

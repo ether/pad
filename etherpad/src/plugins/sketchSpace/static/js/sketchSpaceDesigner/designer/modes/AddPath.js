@@ -120,13 +120,29 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.designer.modes.Zoom], {
   enable: function () {
     this.inherited(arguments);
+    // Set some defaults
     this.designer.setOptions({smothenessFactor: 6, isClosed: false, isLine: false, isStraight:false}, true);
+    this.smothenessFactorOption = new sketchSpaceDesigner.designer.widgets.OptionNumberSpinner({title:"Smoothness", optionsPath:"smothenessFactor", designer:this.designer, style:"width:30pt"});
+    this.designer.ui.options.addChild(this.smothenessFactorOption);
+    this.isClosedOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Close loop [c] [ALT]:", optionsPath:"isClosed", designer:this.designer});
+    this.designer.ui.options.addChild(this.isClosedOption);
+    this.isLineOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Lines [l] [CTRL]:", optionsPath:"isLine", designer:this.designer});
+    this.designer.ui.options.addChild(this.isLineOption);
+    this.isStraightOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Straighten [SHIFT]:", optionsPath:"isStraight", designer:this.designer});
+    this.designer.ui.options.addChild(this.isStraightOption);
+    this.designer.ui.options.layout();
+
   },
   disable: function () {
     this.inherited(arguments);
     if (this.path !== undefined) {
       this.path.shape.removeShape();
     }
+    this.smothenessFactorOption.destroyRecursive();
+    this.isClosedOption.destroyRecursive();
+    this.isLineOption.destroyRecursive();
+    this.isStraightOption.destroyRecursive();
+    this.designer.ui.options.layout();
   },
   getContainerShape: function () { return this.designer.surface_transform; },
   onKeyDown: function (event) {

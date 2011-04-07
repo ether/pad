@@ -29,13 +29,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.designer});
     this.designer.ui.options.addChild(this.showAuthorshipColorOption);
 
-    this.strokeColorPicker = new dijit.layout._LayoutWidget({title:"Stroke:"});
+    this.strokeColorPicker = new dijit.layout._LayoutWidget({title:"Stroke [s]:"});
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doStroke", designer:this.designer}));
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({optionsPath:"stroke.color", designer:this.designer}));
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionNumberSpinner({optionsPath:"stroke.width", designer:this.designer, style:"width:30pt"}));
     this.designer.ui.options.addChild(this.strokeColorPicker);
 
-    this.fillColorPicker = new dijit.layout._LayoutWidget({title:"Fill:"});
+    this.fillColorPicker = new dijit.layout._LayoutWidget({title:"Fill [f]:"});
     this.fillColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doFill", designer:this.designer}));
     this.fillColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({title:"Fill:", optionsPath:"fill", designer:this.designer}));
     this.designer.ui.options.addChild(this.fillColorPicker);
