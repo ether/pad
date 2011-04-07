@@ -339,22 +339,31 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   startup: function () {
     this.inherited(arguments);
     this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"), this);
+    $(".toolSelector.toolSelect").css({background: "#cccccc"});
   },
 
   addRect: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddRect());
+    $(".toolSelector").css({background: "#ffffff"});
+    $(".toolSelector.toolAddRect").css({background: "#cccccc"});
   },
 
   addCircle: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddCircle());
+    $(".toolSelector").css({background: "#ffffff"});
+    $(".toolSelector.toolAddCircle").css({background: "#cccccc"});
   },
 
   addPath: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddPath());
+    $(".toolSelector").css({background: "#ffffff"});
+    $(".toolSelector.toolAddPath").css({background: "#cccccc"});
   },
 
   select: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.Select());
+    $(".toolSelector").css({background: "#ffffff"});
+    $(".toolSelector.toolSelect").css({background: "#cccccc"});
   },
 
   addImg: function(imageName) {
