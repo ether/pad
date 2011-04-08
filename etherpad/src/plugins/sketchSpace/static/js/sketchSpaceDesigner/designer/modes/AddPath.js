@@ -13,7 +13,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
     this.mode = mode;
     this.sections = [];
     this.options = {};
-    this.shape = dojox.gfx.utils.deserialize(mode.getContainerShape(), {shape:{type:"path", path:""}});
+    this.shape = undefined;
     this.setOptions(mode.designer.options);
   },
   setOptions: function (options) {
@@ -39,13 +39,16 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
     this.renderToShape();
   },
   renderToShape: function () {
-    this.shape.setShape({path: ""});
-    this.mode.designer.setShapeFillAndStroke(this.shape, this.options);
-
-    this.shape.setAbsoluteMode(true);
-
     if (this.sections.length > 0 && this.sections[0].points.length > 0) {
-      this.shape.moveTo(this.sections[0].points[0].x, this.sections[0].points[0].y);
+      // Note: We can't set path empty here and use shape.moveTo() because then Chrome woulod freak out...
+      var path = "M " + this.sections[0].points[0].x + "," + this.sections[0].points[0].y;
+      if (this.shape === undefined)
+        this.shape = dojox.gfx.utils.deserialize(this.mode.getContainerShape(), {shape:{type:"path", path:path}});
+      else
+        this.shape.setShape({path:path});
+
+      this.mode.designer.setShapeFillAndStroke(this.shape, this.options);
+      this.shape.setAbsoluteMode(true);
 
       this.shape.lastPoint = this.sections[0].points[0];
       dojo.forEach(this.sections, function(section, i) {
