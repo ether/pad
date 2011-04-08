@@ -93,16 +93,23 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
   /* This function should really be somewhere else... */
   getUserColor: function (userId) {
-    var palette = pad.getColorPalette();
+    var palette;
     var userData;
 
-    $.each(pad.collabClient.getConnectedUsers(), function () {
-      if (this.userId == userId)
-	userData = this;
-    });
+    if (typeof(pad) == "undefined") {
+      palette = clientVars.colorPalette;
+      userData = clientVars.historicalAuthorData[userId];
+    } else {
+      palette = pad.getColorPalette();
 
-    if (userData === undefined) {
-      userData = clientVars.collab_client_vars.historicalAuthorData[userId];
+      $.each(pad.collabClient.getConnectedUsers(), function () {
+	if (this.userId == userId)
+	  userData = this;
+      });
+
+      if (userData === undefined) {
+	userData = clientVars.collab_client_vars.historicalAuthorData[userId];
+      }
     }
 
     if (userData === undefined) {
