@@ -14,7 +14,8 @@ function sketchSpaceInit() {
  this.install = install;
  this.uninstall = uninstall;
 
- this.editorUi = {editor:{images:[], currentImage: undefined}};
+ // This is a stub for the editor API so that aceCreateDomLine etc will work...
+ this.editorUi = {editor:{images:[], currentImage: undefined, selectSharedImage: function () {}}};
 }
 
 function install() {
