@@ -17,7 +17,7 @@ dojo.require("dijit.layout.ContentPane");
 dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
  constructor: function (container, userId, ui) {
     this.container = container;
-    
+
     this.surface_size = {width: $(container).width(), height: $(container).height()};
     this.userId = userId;
     this.ui = ui;
@@ -387,6 +387,9 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 
 dojo.addOnLoad(function (){
   sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: typeof(pad) != "undefined" ? pad.getUserId() : undefined}, dojo.byId("sketchSpaceEditorUI"));
+  // Bug workaround
+  $(sketchSpace.editorUi.editorArea).width(300);
+  $(sketchSpace.editorUi.editorArea).height(300);
   sketchSpace.editorUi.startup();
 
   /* For backwards compatibility for now */
