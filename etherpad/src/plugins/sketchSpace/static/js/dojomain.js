@@ -5,15 +5,11 @@ dojo.require("dojox.uuid.generateRandomUuid");
 
 dojo.addOnLoad(function (){
   sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: typeof(pad) != "undefined" ? pad.getUserId() : undefined}, dojo.byId("sketchSpaceEditorUI"));
-/*
-  $(sketchSpace.editorUi.editorArea).width(300);
-  $(sketchSpace.editorUi.editorArea).height(300);
-*/
-  window.setTimeout(function () {
-    sketchSpace.editorUi.startup();
-    dojo.connect(sketchSpace.editorUi.editor, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
-    dojo.connect(sketchSpace.editorUi.editor, "selectImage", sketchSpace, sketchSpace.updateImageFromPadIfNeeded);
-  }, 10);
+
+  sketchSpace.editorUi.startup();
+
+  dojo.connect(sketchSpace.editorUi.editor, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
+  dojo.connect(sketchSpace.editorUi.editor, "selectImage", sketchSpace, sketchSpace.updateImageFromPadIfNeeded);
 
 
   if (typeof(pad) != "undefined") {

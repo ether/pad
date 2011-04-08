@@ -16,7 +16,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 		  '       <div class="editbarright" id="editbarright"><!-- --></div>      ' +
 		  '       <div class="editbarinner" id="editbarinner">' +
 		  '	 <table border="0" cellspacing="0" cellpadding="0" class="editbartable" id="editbartable">' +
-		  '	   <tbody><tr>' +
+		  '	   <tbody><tr class="tools">' +
 		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>' +
 		  '	     <td class="editbarbutton editbargroupsfirst tool addEllipse" unselectable="on" dojoAttachEvent="onclick:_onAddEllipse"><img title="Add ellipse" src="/static/html/plugins/sketchSpace/imgeditbar_add_circle_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool addPath" unselectable="on" dojoAttachEvent="onclick:_onAddPath"><img title="Add path" src="/static/html/plugins/sketchSpace/imgeditbar_add_line_icon.png"></td>' +
@@ -59,8 +59,14 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
       new AjaxUpload($(this.addImgButton), info);  
     }
 
-    this.editor = new sketchSpaceDesigner.designer.editor.Editor(this.editorArea, this.attr("userId"), this);
+    this.editor = new sketchSpaceDesigner.designer.editor.Editor(this.editorArea, this.attr("userId"), this, typeof(pad) == "undefined");
+    var editor = this.editor;
+    window.setTimeout(function () { editor.resize(); }, 10); 
+
     this.selectToolIcon("select");
+
+    if (typeof(pad) == "undefined")
+      $(this.toolbar).find(".tools").css({display:"none"});
   },
 
   selectToolIcon: function(name) {

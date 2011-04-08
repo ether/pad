@@ -15,7 +15,7 @@ dojo.require("dojox.layout.TableContainer");
 dojo.require("dijit.layout.ContentPane");
 
 dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
- constructor: function (container, userId, ui) {
+ constructor: function (container, userId, ui, viewOnly) {
     this.container = container;
 
     this.userId = userId;
@@ -46,7 +46,10 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
     });
 
     this.modeStack = [];
-    this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
+    if (viewOnly)
+      this.pushMode(new sketchSpaceDesigner.designer.modes.Zoom());
+    else
+      this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
 
     dojo.connect(container.window, "onresize", this, "resize");
   },
