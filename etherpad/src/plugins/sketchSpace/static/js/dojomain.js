@@ -1,6 +1,6 @@
 dojo.provide("dojomain");
 
-dojo.require("sketchSpaceDesigner.designer");
+dojo.require("sketchSpaceDesigner.designer.ui");
 dojo.require("dojox.uuid.generateRandomUuid");
 
 dojo.addOnLoad(function (){
