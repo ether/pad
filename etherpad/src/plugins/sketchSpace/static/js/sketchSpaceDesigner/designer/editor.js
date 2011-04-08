@@ -18,11 +18,11 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
  constructor: function (container, userId, ui) {
     this.container = container;
 
-    this.surface_size = {width: $(container).width(), height: $(container).height()};
     this.userId = userId;
     this.ui = ui;
 
-    this.surface = dojox.gfx.createSurface(this.container, this.surface_size.width, this.surface_size.height);
+    this.surface = dojox.gfx.createSurface(this.container, 1, 1);
+    this.resize();
     this.surface_transform = this.surface.createGroup();
     
     this.viewUpdatedHandle = dojo.connect(this.surface_transform, "setTransform", this, function () { this.viewUpdated(); });
@@ -47,6 +47,13 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 
     this.modeStack = [];
     this.pushMode(new sketchSpaceDesigner.designer.modes.Select());
+
+    dojo.connect(container.window, "onresize", this, "resize");
+  },
+
+  resize: function () {
+    this.surface_size = {width: $(this.container).width(), height: $(this.container).height()};
+    this.surface.setDimensions(this.surface_size.width, this.surface_size.height);
   },
 
   setOptions: function (options, onlyDefault) {
