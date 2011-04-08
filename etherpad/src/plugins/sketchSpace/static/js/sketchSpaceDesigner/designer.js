@@ -348,6 +348,34 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
   widgetsInTemplate: true,
   templateString: '<div>' +
+		  ' <div id="sketchSpaceEditBar">' +
+		  '   <div class="editbar enabledtoolbar" id="editbar">' +
+		  '     <div class="editbarinner" id="editbarinner">' +
+		  '       <div class="editbarleft" id="editbarleft"><!-- --></div>' +
+		  '       <div class="editbarright" id="editbarright"><!-- --></div>      ' +
+		  '       <div class="editbarinner" id="editbarinner">' +
+		  '	 <table border="0" cellspacing="0" cellpadding="0" class="editbartable" id="editbartable">' +
+		  '	   <tbody><tr>' +
+		  '' +
+		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>' +
+		  '	     <td class="editbarbutton editbargroupsfirst toolSelector toolAddEllipse" unselectable="on"><a title="Add ellipse" href="javascript:void (sketchSpace.editorUi.addEllipse());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_circle_icon.png"></a></td>' +
+		  '	     <td class="editbarbutton toolSelector toolAddPath" unselectable="on"><a title="Add line" href="javascript:void (sketchSpace.editorUi.addPath());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_line_icon.png"></a></td>' +
+		  '	     <td class="editbarbutton toolSelector toolAddRect" unselectable="on"><a title="Add rectangle" href="javascript:void (sketchSpace.editorUi.addRect());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></a></td>' +
+		  '	     <td class="editbarbutton toolSelector toolAddImage" unselectable="on"><a id="sketchSpaceAddImage" title="Add image" href="javascript:void (0);"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></a></td>' +
+		  '	     <td class="editbarbutton toolSelector toolSelect" unselectable="on"><a title="Select objects" href="javascript:void (sketchSpace.editorUi.select());"><img src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></a></td>' +
+		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>' +
+		  '' +
+		  '	     <td width="100%">&nbsp;</td>' +
+		  '	   </tr></tbody>' +
+		  '	 </table>' +
+		  '	 <table border="0" cellspacing="0" cellpadding="0" class="editbarsavetable" id="editbarsavetable">' +
+		  '	   <tbody><tr>' +
+		  '	   </tr></tbody>' +
+		  '	 </table>' +
+		  '       </div>' +
+		  '     </div>' +
+		  '   </div>' +
+		  ' </div>' +
                   '  <div id="sketchSpaceEditor" dojoAttachPoint="editorArea"></div>' +
                   '  <div id="sketchSpaceOptions" dojoType="sketchSpaceDesigner.designer.widgets.TableContainer" dojoAttachPoint="options" cols="1" showLabels="true">' +
                   '    <div dojoType="dijit.layout.ContentPane" title="Option">Value</div>' +
