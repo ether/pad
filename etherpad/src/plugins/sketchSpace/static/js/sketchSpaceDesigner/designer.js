@@ -263,7 +263,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 
     var image = parent.createGroup();
     image.extType = "zimage";
-    image.currentDisplay = image.createImage();
+    image.currentDisplay = undefined;
     image.imageName = imageName;
     image.page = page ? page : 0;
     image.updateDisplay = function () {
@@ -297,9 +297,9 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	  src: "/ep/imageConvert/" + this.imageName + "?p=" + image.page + "&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
         };
 
-	var oldShape = this.currentDisplay.getShape()
+	var oldShape = this.currentDisplay ? this.currentDisplay.getShape() : undefined;
 
-	if (oldShape.src != newShape.src) {
+	if (!oldShape || oldShape.src != newShape.src) {
 
 	  image.newShape = newShape;
 
@@ -311,8 +311,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 	      /* We've already zoomed more, forget about it... */
  	      if (image.newShape != newShape) return;
 	      var lastDisplay = this.currentDisplay;
-	      image.currentDisplay = image.createImage();
-	      image.currentDisplay.setShape(newShape);
+	      image.currentDisplay = image.createImage(newShape);
 	      if (lastDisplay) lastDisplay.removeShape();
 	    }
 	  });
