@@ -22,20 +22,6 @@ dojo.addOnLoad(function (){
       },  
       onComplete: function(file, response){
 	var path = eval(response)[0].split("/");
-	sketchSpace.editorUi.addImg(path[path.length-1]);
-      }
-    }
-    new AjaxUpload($('#sketchSpaceAddImage'), info);  
-    new AjaxUpload($('#sketchSpaceAddImage img'), info);
-
-    var info = {  
-      action: '/ep/fileUpload/',
-      name: 'uploadfile',  
-      onSubmit: function(file, ext){
-      //console.log('Starting...');
-      },  
-      onComplete: function(file, response){
-	var path = eval(response)[0].split("/");
 	var filename = path[path.length-1];
 
 	dojo.xhrGet({

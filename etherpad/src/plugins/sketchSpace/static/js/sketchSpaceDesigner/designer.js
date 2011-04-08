@@ -348,7 +348,7 @@ dojo.declare("sketchSpaceDesigner.designer.Designer", [], {
 dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
   widgetsInTemplate: true,
   templateString: '<div>' +
-		  ' <div id="sketchSpaceEditBar">' +
+		  ' <div id="sketchSpaceEditBar" dojoAttachPoint="toolbar">' +
 		  '   <div class="editbar enabledtoolbar" id="editbar">' +
 		  '     <div class="editbarinner" id="editbarinner">' +
 		  '       <div class="editbarleft" id="editbarleft"><!-- --></div>' +
@@ -356,13 +356,12 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 		  '       <div class="editbarinner" id="editbarinner">' +
 		  '	 <table border="0" cellspacing="0" cellpadding="0" class="editbartable" id="editbartable">' +
 		  '	   <tbody><tr>' +
-		  '' +
 		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupleft.gif"></td>' +
-		  '	     <td class="editbarbutton editbargroupsfirst toolSelector toolAddEllipse" unselectable="on"><a title="Add ellipse" href="javascript:void (sketchSpace.editorUi.addEllipse());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_circle_icon.png"></a></td>' +
-		  '	     <td class="editbarbutton toolSelector toolAddPath" unselectable="on"><a title="Add line" href="javascript:void (sketchSpace.editorUi.addPath());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_line_icon.png"></a></td>' +
-		  '	     <td class="editbarbutton toolSelector toolAddRect" unselectable="on"><a title="Add rectangle" href="javascript:void (sketchSpace.editorUi.addRect());"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></a></td>' +
-		  '	     <td class="editbarbutton toolSelector toolAddImage" unselectable="on"><a id="sketchSpaceAddImage" title="Add image" href="javascript:void (0);"><img src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></a></td>' +
-		  '	     <td class="editbarbutton toolSelector toolSelect" unselectable="on"><a title="Select objects" href="javascript:void (sketchSpace.editorUi.select());"><img src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></a></td>' +
+		  '	     <td class="editbarbutton editbargroupsfirst tool addEllipse" unselectable="on" dojoAttachEvent="onclick:_onAddEllipse"><img title="Add ellipse" src="/static/html/plugins/sketchSpace/imgeditbar_add_circle_icon.png"></td>' +
+		  '	     <td class="editbarbutton tool addPath" unselectable="on" dojoAttachEvent="onclick:_onAddPath"><img title="Add path" src="/static/html/plugins/sketchSpace/imgeditbar_add_line_icon.png"></td>' +
+		  '	     <td class="editbarbutton tool addRect" unselectable="on" dojoAttachEvent="onclick:_onAddRect"><img title="Add rectangle" src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></td>' +
+		  '	     <td class="editbarbutton" unselectable="on"><img dojoAttachPoint="addImgButton" title="Add image" src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></td>' +
+		  '	     <td class="editbarbutton tool select" unselectable="on" dojoAttachEvent="onclick:_onSelect"><img title="Select objects" src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></td>' +
 		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>' +
 		  '' +
 		  '	     <td width="100%">&nbsp;</td>' +
@@ -383,32 +382,44 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
                   '</div>',
   startup: function () {
     this.inherited(arguments);
+
+    if (typeof("AjaxUpload") != "undefined") {
+      var info = {  
+	action: '/ep/fileUpload/',
+	name: 'uploadfile',  
+	onSubmit: function(file, ext){
+	//console.log('Starting...');
+	},  
+	onComplete: function(file, response){
+	  var path = eval(response)[0].split("/");
+	  sketchSpace.editorUi.addImg(path[path.length-1]);
+	}
+      }
+      new AjaxUpload($(this.addImgButton), info);  
+    }
+
     this.editor = new sketchSpaceDesigner.designer.Designer(this.editorArea, this.attr("userId"), this);
-    $(".toolSelector.toolSelect").css({background: "#cccccc"});
+    this.selectToolIcon("select");
   },
 
-  addRect: function() {
-    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddRect());
-    $(".toolSelector").css({background: "#ffffff"});
-    $(".toolSelector.toolAddRect").css({background: "#cccccc"});
+  selectToolIcon: function(name) {
+    $(this.toolbar).find(".tool").css({background: "#ffffff"});
+    $(this.toolbar).find(".tool." + name).css({background: "#cccccc"});
   },
 
-  addEllipse: function() {
+  _onAddEllipse: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddEllipse());
-    $(".toolSelector").css({background: "#ffffff"});
-    $(".toolSelector.toolAddEllipse").css({background: "#cccccc"});
+    this.selectToolIcon("addEllipse");
   },
 
-  addPath: function() {
+  _onAddPath: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddPath());
-    $(".toolSelector").css({background: "#ffffff"});
-    $(".toolSelector.toolAddPath").css({background: "#cccccc"});
+    this.selectToolIcon("addPath");
   },
 
-  select: function() {
-    this.editor.setMode(new sketchSpaceDesigner.designer.modes.Select());
-    $(".toolSelector").css({background: "#ffffff"});
-    $(".toolSelector.toolSelect").css({background: "#cccccc"});
+  _onAddRect: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddRect());
+    this.selectToolIcon("addRect");
   },
 
   addImg: function(imageName) {
@@ -416,5 +427,11 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     this.editor.registerObjectShape(shape);
     this.editor.saveShapeToStr(shape);
   },
+
+  _onSelect: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.Select());
+    this.selectToolIcon("select");
+  },
+
 
 });
