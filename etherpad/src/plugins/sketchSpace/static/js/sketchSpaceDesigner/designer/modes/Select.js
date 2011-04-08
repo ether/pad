@@ -1,9 +1,9 @@
 dojo.provide("sketchSpaceDesigner.designer.modes.Select");
 
-dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
+dojo.require("sketchSpaceDesigner.designer.modes.Edit");
 dojo.require("dijit.form.Button");
 
-dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Zoom], {
+dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Edit], {
   isOutlineMouseDown: false,
   isMoving: false,
   enable: function () {

@@ -1,8 +1,8 @@
 dojo.provide("sketchSpaceDesigner.designer.modes.AddEllipse");
 
-dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
+dojo.require("sketchSpaceDesigner.designer.modes.Edit");
 
-dojo.declare("sketchSpaceDesigner.designer.modes.AddEllipse", [sketchSpaceDesigner.designer.modes.Zoom], {
+dojo.declare("sketchSpaceDesigner.designer.modes.AddEllipse", [sketchSpaceDesigner.designer.modes.Edit], {
   enable: function () {
     this.inherited(arguments);
     this.shape = undefined;

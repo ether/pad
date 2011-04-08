@@ -329,7 +329,7 @@ sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
   var imageId = this.getImageIdFromLink(imageLink);
 
-  if (this.editorUi.editor.options.shareCurrentImage) {
+  if (typeof(pad) != "undefined" && this.editorUi.editor.options.shareCurrentImage) {
     if (this.editorUi.editor.currentSharedImage != imageId) {
       var sketchSpace = this;
 

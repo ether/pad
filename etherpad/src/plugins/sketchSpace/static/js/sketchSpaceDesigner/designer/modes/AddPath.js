@@ -5,7 +5,7 @@ ALT=18
  */
 dojo.provide("sketchSpaceDesigner.designer.modes.AddPath");
 
-dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
+dojo.require("sketchSpaceDesigner.designer.modes.Edit");
 dojo.require("sketchSpaceDesigner.utils");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
@@ -120,7 +120,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.PathSection", [], {
   }
 });
 
-dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.designer.modes.Zoom], {
+dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.designer.modes.Edit], {
   enable: function () {
     this.inherited(arguments);
     // Set some defaults
