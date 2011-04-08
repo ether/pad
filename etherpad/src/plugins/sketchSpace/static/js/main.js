@@ -121,21 +121,19 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	   }
 	  );
 */
-    $.each(
-      orderTags, function(){
-	var id = this[0];
-	var oId = this[1];
-	var idx = this[2];
-	for(var i=0; i<oId.length; i++)
-	{
-	  var oldIdx = order.indexOf(oId[i]);
-	  if(oldIdx != -1){
-	    order.splice(oldIdx, 1);
-	  }
-	  order.splice(idx[i], 0, oId[i]);
+    for(var j=0; j<orderTags.length; j++) {
+      var val = orderTags[j];
+      var id = val[0];
+      var oId = val[1];
+      var idx = val[2];
+      for(var i=0; i<oId.length; i++) {
+	var oldIdx = order.indexOf(oId[i]);
+	if(oldIdx != -1){
+	  order.splice(oldIdx, 1);
 	}
+	order.splice(idx[i], 0, oId[i]);
       }
-    );
+    }
 
 //    console.log("New world order:");
 //    console.log(order);
@@ -300,8 +298,8 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 
     for (var objId in currentImage)
       if (visited[objId] === undefined)
-        update.push(["sketchSpaceImageObject:" + objId, ""]);
-
+        update.push(["sketchSpaceImageObject:" + objId, ""])
+;
 //    console.log(update);
     this.updatePad(currentImageId, update);
   }
