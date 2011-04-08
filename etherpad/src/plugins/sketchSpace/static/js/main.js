@@ -259,10 +259,19 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 
     var changedOrder = [];
 
+    var oldIds = {
+    };
+    $.each(oldOrder, function(key,val){
+	     oldIds[val]=true;
+	   }
+	  );
+
     this.editorArea.forEachObjectShape(function (shape) {
       newOrder.push(shape.objId);
       if(shape.zOrderMoved){
 	shape.zOrderMoved = undefined;
+	changedOrder.push(shape.objId);
+      } else if(!(shape.objId in oldIds)){
 	changedOrder.push(shape.objId);
       }
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
