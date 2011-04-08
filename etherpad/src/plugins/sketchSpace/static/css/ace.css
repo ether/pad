@@ -5,3 +5,7 @@
   height: 32px;
   width: 32px;
 }
+
+.sketchSpaceImageIsCurrent a {
+  border: 5px solid red;
+}

@@ -15,7 +15,6 @@
 
 function sketchSpaceInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
-  this.padDocument = undefined;
 }
 
 /**
@@ -93,6 +92,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	  zSequence = val;
         } else if (key == "sketchSpaceImageIsCurrent") {
  	  isCurrentImage = true;
+	  clss.push("sketchSpaceImageIsCurrent");
 	} else {
 	  clss.push(cls);
 	}
@@ -144,22 +144,21 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 
 //    console.log("IMG:" + imageId + (isCurrentImage ? ":current" : ":NOXXX"));
 
-    this.imgeNeedsUpdate = true;
+    this.currentImage = undefined;
     if (isCurrentImage)
       this.editorArea.selectSharedImage(imageId);
     if (this.editorArea.currentImage == imageId) {
       this.updateImageFromPadIfNeeded();
     }
-    this.imgeNeedsUpdate = false;
 
     return [{cls: clss.join(" "), extraOpenTags: '<a class="sketchSpaceImageLink">', extraCloseTags: '</a>'}];
   }
 };
 
 sketchSpaceInit.prototype.updateImageFromPadIfNeeded = function() {
-  if (this.imgeNeedsUpdate)
+  if (this.currentImage != this.editorArea.currentImage)
     this.updateImageFromPad();
-  this.imgeNeedsUpdate = false;
+  this.currentImage = this.editorArea.currentImage;
 };
 
 /**
@@ -307,7 +306,7 @@ sketchSpaceInit.prototype.updatePad = function (imageId, update) {
 };
 
 sketchSpaceInit.prototype.getImageLinkFromId = function (imageId) {
-  return $(this.padDocument).find(".sketchSpaceImageId_" + imageId)[0];
+  return $($($("#editorcontainer iframe")[0].contentDocument).find("body iframe")[0].contentDocument).find(".sketchSpaceImageId_" + imageId)[0];
 };
 
 sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
@@ -321,34 +320,25 @@ sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
 };
 
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
-  // FIXME: Ugly hack to have this here, should be somewhere onLoad()
-  this.padDocument = imageLink.ownerDocument;
-
   var imageId = this.getImageIdFromLink(imageLink);
 
   if (this.editorArea.options.shareCurrentImage) {
-    var sketchSpace = this;
-    padeditor.ace.callWithAce(function (ace) {
-      var rep = ace.ace_getRep();
-      var numLines = rep.lines.length();
-      var lastLineLength = rep.lines.atIndex(numLines-1).text.length;
+    if (this.editorArea.currentSharedImage != imageId) {
+      var sketchSpace = this;
 
-      var start = ace.ace_lineAndColumnFromChar(0);
-      var end = ace.ace_lineAndColumnFromChar(rep.alltext.length-1);
-      var imageRange = sketchSpace.ace_getImageRange(ace, imageId);
+      if (this.editorArea.currentSharedImage !== undefined)
+	this.updatePad(sketchSpace.editorArea.currentSharedImage, [["sketchSpaceImageIsCurrent", ""]]);
 
-      // console.log(rep.alltext.length);
+      this.updatePad(imageId, [["sketchSpaceImageIsCurrent", "true"]]);
+      /* FIXME: This is an ugly bug workaround: Sometimes, clients don't seem to update properly... Note the "truer" != "true"... */
+      setTimeout(
+        function () {
+          sketchSpace.updatePad(imageId, [["sketchSpaceImageIsCurrent", "truer"]]);
+        }, 500);
 
-      // console.log(start);
-      // console.log(imageRange[0]);
-      // console.log(imageRange[1]);
-      // console.log(end);
-
-      ace.ace_performDocumentApplyAttributesToRange(start, imageRange[0], [["sketchSpaceImageIsCurrent", ""]]);
-      ace.ace_performDocumentApplyAttributesToRange(imageRange[0], imageRange[1], [["sketchSpaceImageIsCurrent", "true"]]);
-      ace.ace_performDocumentApplyAttributesToRange(imageRange[1], end, [["sketchSpaceImageIsCurrent", ""]]);
-
-    }, "updatePadFromImage", true);
+    } else {
+      // console.log("You selected the same image again!");
+    }
   } else {
     this.editorArea.selectImage(imageId);
     this.updateImageFromPad();
