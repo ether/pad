@@ -108,6 +108,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 	}
       );
       this.designer.selection.applyToShapes("save");
+    } else if (event.keyCode == 33) {
+      this.designer.selection.applyToShapes(
+	function(){
+	  this.zOrderMoved = true; this.moveToBack();
+	}
+      );
+      this.designer.selection.applyToShapes("save");
     }
   },
 
