@@ -14,7 +14,7 @@ function sketchSpaceInit() {
  this.install = install;
  this.uninstall = uninstall;
 
- this.editorArea = {images:[], currentImage: undefined};
+ this.editorUi = {editor:{images:[], currentImage: undefined}};
 }
 
 function install() {

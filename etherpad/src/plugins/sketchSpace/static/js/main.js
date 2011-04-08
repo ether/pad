@@ -140,14 +140,14 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 //    console.log("New world order:");
 //    console.log(order);
 
-    this.editorArea.images[imageId] = {objects:imageObjects, order:order, zSequence: zSequence};
+    this.editorUi.editor.images[imageId] = {objects:imageObjects, order:order, zSequence: zSequence};
 
 //    console.log("IMG:" + imageId + (isCurrentImage ? ":current" : ":NOXXX"));
 
     this.currentImage = undefined;
     if (isCurrentImage)
-      this.editorArea.selectSharedImage(imageId);
-    if (this.editorArea.currentImage == imageId) {
+      this.editorUi.editor.selectSharedImage(imageId);
+    if (this.editorUi.editor.currentImage == imageId) {
       this.updateImageFromPadIfNeeded();
     }
 
@@ -156,22 +156,22 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 };
 
 sketchSpaceInit.prototype.updateImageFromPadIfNeeded = function() {
-  if (this.currentImage != this.editorArea.currentImage)
+  if (this.currentImage != this.editorUi.editor.currentImage)
     this.updateImageFromPad();
-  this.currentImage = this.editorArea.currentImage;
+  this.currentImage = this.editorUi.editor.currentImage;
 };
 
 /**
  *
  */
 sketchSpaceInit.prototype.updateImageFromPad = function() {
-  if (this.editorArea.currentImage !== undefined) {
-    var currentImage = this.editorArea.images[this.editorArea.currentImage].objects;
-    var order = this.editorArea.images[this.editorArea.currentImage].order;
+  if (this.editorUi.editor.currentImage !== undefined) {
+    var currentImage = this.editorUi.editor.images[this.editorUi.editor.currentImage].objects;
+    var order = this.editorUi.editor.images[this.editorUi.editor.currentImage].order;
 
     /* Some debug info printing:
     console.log("Image:");
-    sketchSpace.editorArea.forEachObjectShape(function (shape) { console.log(shape.objId); })
+    sketchSpace.editorUi.editor.forEachObjectShape(function (shape) { console.log(shape.objId); })
     console.log("Pad:");
     for (name in currentImage)
       console.log(name);
@@ -181,7 +181,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
     var toDelete = {};
 
     // Mark all changed/deleted shapes for delation
-    this.editorArea.forEachObjectShape(function (shape) {
+    this.editorUi.editor.forEachObjectShape(function (shape) {
       if (currentImage[shape.objId] === undefined) {
         toDelete[shape.objId] = shape;
       } else {
@@ -215,11 +215,11 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	// if stuff changed between the loop above and this function.
         var obj = dojo.fromJson(objStr);
 
-	var parent = sketchSpace.editorArea.surface_transform;
+	var parent = sketchSpace.editorUi.editor.surface_transform;
 	if (obj.parent) parent = materialize(obj.parent);
 
-        var shape = sketchSpace.editorArea.deserializeShape(parent, obj.shape);
-	sketchSpace.editorArea.registerObjectShape(shape);
+        var shape = sketchSpace.editorUi.editor.deserializeShape(parent, obj.shape);
+	sketchSpace.editorUi.editor.registerObjectShape(shape);
 
         shape.objId = objId;
         shape.strRepr = objStr;
@@ -239,16 +239,16 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
       }
       );
 
-    this.editorArea.imageUpdatedByOthers();
+    this.editorUi.editor.imageUpdatedByOthers();
   }
 };
 
 sketchSpaceInit.prototype.updatePadFromImage = function() {
-  if (this.editorArea.currentImage !== undefined) {
-    var currentImageId = this.editorArea.currentImage;
-    var currentImage = this.editorArea.images[currentImageId].objects;
-    var oldOrder=this.editorArea.images[currentImageId].order;
-    var zSequence=this.editorArea.images[currentImageId].zSequence;
+  if (this.editorUi.editor.currentImage !== undefined) {
+    var currentImageId = this.editorUi.editor.currentImage;
+    var currentImage = this.editorUi.editor.images[currentImageId].objects;
+    var oldOrder=this.editorUi.editor.images[currentImageId].order;
+    var zSequence=this.editorUi.editor.images[currentImageId].zSequence;
 
     var visited = {};
     var update = [];
@@ -266,7 +266,7 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 	   }
 	  );
 
-    this.editorArea.forEachObjectShape(function (shape) {
+    this.editorUi.editor.forEachObjectShape(function (shape) {
       newOrder.push(shape.objId);
       if(shape.zOrderMoved){
 	shape.zOrderMoved = undefined;
@@ -331,12 +331,12 @@ sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
 sketchSpaceInit.prototype.selectImage = function(imageLink) {
   var imageId = this.getImageIdFromLink(imageLink);
 
-  if (this.editorArea.options.shareCurrentImage) {
-    if (this.editorArea.currentSharedImage != imageId) {
+  if (this.editorUi.editor.options.shareCurrentImage) {
+    if (this.editorUi.editor.currentSharedImage != imageId) {
       var sketchSpace = this;
 
-      if (this.editorArea.currentSharedImage !== undefined)
-	this.updatePad(sketchSpace.editorArea.currentSharedImage, [["sketchSpaceImageIsCurrent", ""]]);
+      if (this.editorUi.editor.currentSharedImage !== undefined)
+	this.updatePad(sketchSpace.editorUi.editor.currentSharedImage, [["sketchSpaceImageIsCurrent", ""]]);
 
       this.updatePad(imageId, [["sketchSpaceImageIsCurrent", "true"]]);
       /* FIXME: This is an ugly bug workaround: Sometimes, clients don't seem to update properly... Note the "truer" != "true"... */
@@ -349,7 +349,7 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
       // console.log("You selected the same image again!");
     }
   } else {
-    this.editorArea.selectImage(imageId);
+    this.editorUi.editor.selectImage(imageId);
     this.updateImageFromPad();
   }
 };

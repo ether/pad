@@ -391,11 +391,8 @@ dojo.addOnLoad(function (){
   $(sketchSpace.editorUi.editorArea).height(300);
   sketchSpace.editorUi.startup();
 
-  /* For backwards compatibility for now */
-  sketchSpace.editorArea = sketchSpace.editorUi.editor;
-
-  dojo.connect(sketchSpace.editorArea, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
-  dojo.connect(sketchSpace.editorArea, "selectImage", sketchSpace, sketchSpace.updateImageFromPadIfNeeded);
+  dojo.connect(sketchSpace.editorUi.editor, "imageUpdatedByUs", sketchSpace, sketchSpace.updatePadFromImage);
+  dojo.connect(sketchSpace.editorUi.editor, "selectImage", sketchSpace, sketchSpace.updateImageFromPadIfNeeded);
 
   if (typeof(pad) != "undefined") {
     var info = {  
