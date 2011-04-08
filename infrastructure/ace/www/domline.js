@@ -173,18 +173,24 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
         result.lineMarker +=txt.length;
         txt = "";
     }
-    if (cls.indexOf('list') >= 0) { 
+    var orderedlist = !!(/\bace\-orderedlist\b/.exec(cls));
+    if (cls.indexOf('list') >= 0 || orderedlist) { 
       var listType = /(?:^| )list:(\S+)/.exec(cls);
       if (listType) {
         listType = listType[1];
+        if(orderedlist){
+            listType += " ace-orderedlist";
+        }
         if (listType) {
-          preHtml = '<ul class="list-'+listType+'"><li>'; //FIXME new document style used
+          preHtml = '<ul class="list-'+listType+'"><li>'; 
           postHtml = '</li></ul>';
         }
-        result.lineMarker += txt.length;
-//      return; // don't append any text
+      } else if(orderedlist){
+          preHtml = '<ul class="ace-orderedlist"><li>'; 
+          postHtml = '</li></ul>';
       }
     }
+
     var href = null;
     var simpleTags = null;
     if (cls.indexOf('url') >= 0) {

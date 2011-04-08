@@ -25,7 +25,7 @@ ul, ol, li {
 }
 ul { margin-left: 1.5em; }
 ul ul { margin-left: 0 !important; }
-ul.list-bullet1 { margin-left: 1.5em; }
+ul.list-bullet1 { margin-left: 2em; }
 ul.list-bullet2 { margin-left: 3em; }
 ul.list-bullet3 { margin-left: 4.5em; }
 ul.list-bullet4 { margin-left: 6em; }

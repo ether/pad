@@ -24,6 +24,9 @@ function richTextexecCommand(cmd, value){
 }
 
 function aceAttribsToClasses(args) {
+    if("orderedlist" == args.key && args.value){
+        return ["ace-orderedlist"];
+    }
 }
 
 function aceCreateDomLine(args) {

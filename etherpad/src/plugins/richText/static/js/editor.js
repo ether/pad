@@ -36,6 +36,11 @@ var richTextClient = {
                            [["imgSrc", value.url]]);
                 }, "insertImage", true);
                 return; 
+              case "orderedlist":
+                padeditor.ace.callWithAce(function(ace){
+                    ace.ace_toggleAttributeOnLine(cmd, true);
+                }, "orderedlist", true); 
+                break;
               case "link":
                 rtLinkDlg.show();
                 break;

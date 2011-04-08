@@ -1623,11 +1623,42 @@ function OUTER(gscope) {
 	root.insertBefore(node, nodeToAddAfter.nextSibling);
       }
       nodeToAddAfter = node;
+      computeOrderedList(node);
       info.notifyAdded();
       p2.mark("markClean");
       markNodeClean(node);
       p2.end();
     });
+  }
+ 
+  function getDOMListInfo(aceLine){
+     var info = {type : "", start : "", index: -1};
+     if(aceLine && aceLine.childNodes){
+         forEach(aceLine.childNodes, function(child, index){
+            var cname = child.className;
+            if((child.tagName || "").toLowerCase() == "ul" && /\bace\-orderedlist\b/.exec(cname)){
+               var listType = /(?:^| )list-(\S+)/.exec(cname);
+               if(listType){
+                    info.type = listType[1] || "bullet1";
+               } 
+               info.start = child.getAttribute("start") || 0; 
+               info.start = parseInt(isNaN(info.start)? 0 : info.start);
+               info.index = index;
+               return info; //only one ul node
+            }
+         });
+     }
+     return info;
+  }
+
+  function computeOrderedList(node){
+     var info = getDOMListInfo(node);
+     if(info.type){
+        var pInfo = getDOMListInfo(node.previousSibling);
+        var listNode = node.childNodes[info.index]; 
+        listNode.setAttribute("start", pInfo.start + 1);
+        listNode.style.listStyleType = "decimal";
+     }
   }
 
   function isCaret() {
@@ -2844,11 +2875,11 @@ function OUTER(gscope) {
     }
     var lineNum = rep.selStart[0];
     var listType = getLineListType(lineNum);
-
+    var orderedList = (getLineAttribute(lineNum, "orderedlist") == "true");
     performDocumentReplaceSelection('\n');
     if (listType) {
       if (lineNum+1 < rep.lines.length()) {
-       setLineListType(lineNum+1, listType);
+       setLineListType(lineNum+1, listType, orderedList);
       }
     }
     else {
@@ -4159,12 +4190,13 @@ function OUTER(gscope) {
     return '';
   }
 
-  function setLineListType(lineNum, listType) {
-    setLineListTypes([[lineNum, listType]]);
+  function setLineListType(lineNum, listType, orderedlist) {
+        setLineListTypes([[lineNum, listType]], orderedlist);
   }
 
-  function setLineListTypes(lineNumTypePairsInOrder) {
+  function setLineListTypes(lineNumTypePairsInOrder, orderedlist) {
     var loc = [0,0];
+    orderedlist = (orderedlist === true) ? true : "";
     var builder = Changeset.builder(rep.lines.totalWidth());
     for(var i=0;i<lineNumTypePairsInOrder.length;i++) {
       var pair = lineNumTypePairsInOrder[i];
@@ -4176,7 +4208,7 @@ function OUTER(gscope) {
         //if (listType) {
           // make different list type
           buildKeepRange(builder, loc, (loc = [lineNum,1]),
-                         [['list',listType]], rep.apool);
+                         [['list',listType], ["orderedlist", orderedlist]], rep.apool);
        // }
        // else {
           // remove list marker
@@ -4191,10 +4223,10 @@ function OUTER(gscope) {
               // add a line marker
              builder.insert(lineMarker, [['author', thisAuthor],
                                ['insertorder', 'first'],
-                               ['list', listType]], rep.apool);
+                               ['list', listType], ["orderedlist", orderedlist]], rep.apool);
           } else if ("ace-linestyle" == style){
              buildKeepRange(builder, loc, (loc = [lineNum,1]),
-                         [['list',listType]], rep.apool);
+                         [['list',listType], ["orderedlist", orderedlist]], rep.apool);
           }
         }
       }
