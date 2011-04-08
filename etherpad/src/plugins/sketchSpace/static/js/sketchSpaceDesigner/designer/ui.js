@@ -44,7 +44,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   startup: function () {
     this.inherited(arguments);
 
-    if (typeof("AjaxUpload") != "undefined") {
+    if (typeof(AjaxUpload) != "undefined") {
       var info = {  
 	action: '/ep/fileUpload/',
 	name: 'uploadfile',  
@@ -55,7 +55,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 	  var path = eval(response)[0].split("/");
 	  sketchSpace.editorUi.addImg(path[path.length-1]);
 	}
-      }
+      };
       new AjaxUpload($(this.addImgButton), info);  
     }
 
