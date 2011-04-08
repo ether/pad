@@ -116,7 +116,7 @@ var richTextClient = {
                 var pool = attributes[i];
                 switch(pool[0]){
                     case "imgSrc":
-                        extraOpenTags += "<img src=" + pool[1] + " />"; 
+                        extraOpenTags += "<img ondragend='customDragEnd()' src=" + pool[1] + " />"; /*manual fire dragend event on chrome*/ 
                         cls="ace-placeholder";
                         break;
                     case "color":

@@ -1310,7 +1310,10 @@ function OUTER(gscope) {
     }
   }
 
+  var imageDragDropLock = false; //lock for image drag drop //set drag affected to "move"
   function incorporateUserChanges(isTimeUp) {
+    
+    if(imageDragDropLock) return false; 
 
     if (currentCallStack.domClean) return false;
 
@@ -3861,6 +3864,16 @@ function OUTER(gscope) {
       inInternationalComposition = false;
     }
   }
+  
+  function customDragDrop(evt){
+      if(evt.target && (evt.target.tagName || "").toLowerCase() == "img"){
+        imageDragDropLock = true;
+      }
+  }
+
+  customDragEnd = function(evt){
+      imageDragDropLock = false;
+  }
 
   function bindTheEventHandlers() {
     bindEventHandler(window, "unload", teardown);
@@ -3868,6 +3881,10 @@ function OUTER(gscope) {
     bindEventHandler(document, "keypress", handleKeyEvent);
     bindEventHandler(document, "keyup", handleKeyEvent);
     bindEventHandler(document, "click", handleClick);
+
+    bindEventHandler(document, "dragstart", customDragDrop);
+    bindEventHandler(document, "dragend", customDragEnd); /*can't fire on chrome, only fire in image node*/
+
     bindEventHandler(root, "blur", handleBlur);
     if (browser.msie) {
       bindEventHandler(document, "click", handleIEOuterClick);
