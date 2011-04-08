@@ -108,12 +108,74 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 	}
       );
       this.designer.selection.applyToShapes("save");
-    } else if (event.keyCode == 33) {
+    } else if (event.keyCode == 34) {
+      var move = {};
       this.designer.selection.applyToShapes(
 	function(){
-	  this.zOrderMoved = true; this.moveToBack();
+	  this.zOrderMoved = true;
+	  move[this.objId]=true;
 	}
       );
+
+      var shapes={};
+      this.designer.forEachObjectShape(function(shape){shapes[shape.objId]=shape;});
+      var img = this.designer.images[this.designer.currentImage];
+      var myOrder = img.order.slice(0);
+      for(var i=0; i<myOrder.length; i++){
+	if(myOrder[i] in move){
+	  if(i == 0) {
+	    continue;
+
+	  }
+	  var tmp=myOrder[i-1];
+	  if(myOrder[i-1] in move) {
+	    continue;
+	  }
+
+	  myOrder[i-1] = myOrder[i];
+	  myOrder[i]=tmp;
+	}
+      }
+      for(var i=0; i<myOrder.length; i++){
+	if(shapes[myOrder[i]]){
+	  shapes[myOrder[i]].moveToFront();
+	}
+      }
+
+      this.designer.selection.applyToShapes("save");
+    } else if (event.keyCode == 33) {
+      var move = {};
+      this.designer.selection.applyToShapes(
+	function(){
+	  this.zOrderMoved = true;
+	  move[this.objId]=true;
+	}
+      );
+
+      var shapes={};
+      this.designer.forEachObjectShape(function(shape){shapes[shape.objId]=shape;});
+      var img = this.designer.images[this.designer.currentImage];
+      var myOrder = img.order.slice(0);
+      for(var i=myOrder.length-1; i>=0; i--){
+	if(myOrder[i] in move){
+	  if(i == (myOrder-length-1)) {
+	    continue;
+	  }
+	  var tmp=myOrder[i+1];
+	  if(myOrder[i+1] in move) {
+	    continue;
+	  }
+
+	  myOrder[i+1] = myOrder[i];
+	  myOrder[i]=tmp;
+	}
+      }
+      for(var i=0; i<myOrder.length; i++){
+	if(shapes[myOrder[i]]){
+	  shapes[myOrder[i]].moveToFront();
+	}
+      }
+
       this.designer.selection.applyToShapes("save");
     }
   },
