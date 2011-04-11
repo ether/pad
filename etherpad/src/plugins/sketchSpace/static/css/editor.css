@@ -1,4 +1,5 @@
-#sketchSpaceEditorUI {
+#sketchSpaceEditorUI,
+.sketchSpace.maximized #sketchSpaceEditorUI {
   display: none;
 }
 
@@ -8,8 +9,9 @@
 }
 
 .sketchSpace.maximized #padpage {
-  z-index: 100;
-  background: #EBEBEB url(/static/img/jun09/pad/backgrad.gif) repeat-x left top;
+  left: 8px;
+  right: 8px;
+  width: auto;
 }
 
 .sketchSpace #padpage {
