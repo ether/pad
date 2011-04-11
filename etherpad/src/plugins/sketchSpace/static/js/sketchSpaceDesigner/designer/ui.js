@@ -14,8 +14,8 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 		  '   <div class="topbarright"><!-- --></div>' +
 		  '   <div class="topbarcenter">' +
 		  '     <a href="http://github.com/redhog/pad" class="topbarBrand">SketchSpace</a>' +
-		  '     <div class="fullscreen" onclick="$(\'body\').toggleClass(\'sketchSpaceMaximized\');">Full screen</div>' +
-		  '     <a href="javascript:void(0);" onclick="$(\'body\').toggleClass(\'sketchSpaceMaximized\');" class="topbarmaximize" title="Toggle maximization"></a>' +
+		  '     <div class="fullscreen" dojoAttachEvent="onclick:_onMaximize">Full screen</div>' +
+		  '     <a href="javascript:void(0);" dojoAttachEvent="onclick:_onMaximize" class="topbarmaximize" title="Toggle maximization"></a>' +
 		  '   </div>' +
 		  '   <div class="specialkeyarea"><!-- --></div>' +
 		  ' </div>' +
@@ -81,7 +81,10 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     if (typeof(pad) == "undefined")
       $(this.toolbar).find(".tools").css({display:"none"});
   },
-
+  _onMaximize: function () {
+    $('body').toggleClass('sketchSpaceMaximized');
+    this.editor.resize();
+  },
   onSelectImage: function (imageId) {
     $("body").addClass("sketchSpace");
   },
