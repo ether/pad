@@ -1479,6 +1479,10 @@ function OUTER(gscope) {
     //rep.lexer.lexCharRange(getVisibleCharRange(), function() { return false; });
     //var isTimeUp = newTimeLimit(100);
 
+    //mark delete node
+    forEach(toDeleteAtEnd, function (n) {
+        setAssoc(n, "aceDeleted", true); 
+    }); 
     // do DOM inserts
     p.mark("insert");
     forEach(domInsertsNeeded, function (ins) {
@@ -1624,63 +1628,93 @@ function OUTER(gscope) {
       }
       nodeToAddAfter = node;
       var index = rep.lines.indexOfKey(key);
-      computeOrderedList(index);
       info.notifyAdded();
       p2.mark("markClean");
       markNodeClean(node);
       p2.end();
+      computeOrderedList(index);
     });
   }
 
-  function getDOMListInfo(aceLine){
-     var info = {type : "", start : "", index: -1};
+  function getOrderedListInfo(aceLine){
+     //only return useful when it's class name contain ace-orderedlist
+     var info = null;
      if(aceLine && aceLine.childNodes){
          forEach(aceLine.childNodes, function(child, index){
             var cname = child.className;
             if((child.tagName || "").toLowerCase() == "ol" && /\bace\-orderedlist\b/.exec(cname)){
                var listType = /(?:^| )list\-(\S+)/.exec(cname);
+               info = {type : "", start : "", index: -1, cname : ""};
                if(listType){
                     info.type = listType[1] || "bullet1";
                } 
                info.start = child.getAttribute("start") || 0; 
                info.start = parseInt(isNaN(info.start)? 0 : info.start);
                info.index = index;
-               return info; //only one ol node
+               info.cname = cname;
+               return true; //only one ol node
             }
          });
      }
      return info;
   }
 
-  function getOrderedListType(lineNum){
-       if(lineNum < 0 || lineNum > rep.alines.length){
-           return ""; 
+  function setOrderListStartIndex(node, index, start){
+       if(node && index >=0 && index < node.childNodes.length){
+          var listNode = node.childNodes[index];
+          listNode.setAttribute("start", start);
+          listNode.style.listStyleType = "decimal";
+          markNodeClean(node);
        }
-       var ordered =  (getLineAttribute(lineNum, "orderedlist") == "true");
-       if(!ordered){
-           return "";
-       }
-       var listType = getLineListType(lineNum) || "bullet1"; //ordered list must be set with list type
-       return listType;
+  }  
+
+  var domLines = [];
+
+  function domLinesSnapshot(){
+      releaseDomLines();
+      forEach(document.body.childNodes, function(node){
+            var cname = node.className || "", id = node.id || "";
+            if(-1 != id.indexOf("magicdomid") && !getAssoc(node, "aceDeleted")){
+                domLines.push(node);
+            }
+      });
+  }
+  
+  function releaseDomLines(){
+      domLines = [];
   }
 
   function computeOrderedList(lineNum){
-      if(lineNum < 0 || lineNum > rep.alines.length){
+      domLinesSnapshot();
+      if(lineNum < 0 || lineNum > domLines.length){
            return ; 
       }
-      var orderType = getOrderedListType(lineNum); 
-      if(!orderType) return ;
+      var node = domLines[lineNum];
+      var info = getOrderedListInfo(node); 
+      if(!info) return ;
       var start = 0;
-      var preOrderType = getOrderedListType(lineNum - 1);
-      if(preOrderType == orderType){
-          var pInfo = getDOMListInfo(rep.lines.atIndex(lineNum -1).lineNode);
-          start = pInfo.start; 
+      var preInfo = getOrderedListInfo(domLines[lineNum - 1]) || {};
+      if(preInfo.type == info.type){
+          start = preInfo.start; 
       }
-      var node = rep.lines.atIndex(lineNum).lineNode;
-      var info = getDOMListInfo(node);
-      var listNode = node.childNodes[info.index]; 
-      listNode.setAttribute("start", start + 1);
-      listNode.style.listStyleType = "decimal";
+      setOrderListStartIndex(node, info.index, start + 1);
+      updateFollowedOrderedList(lineNum + 1, start + 2, info.type);
+      releaseDomLines();
+  }
+
+  function updateFollowedOrderedList(lineNum, start, type){
+      var info, node;
+      type = type || "bullet1";
+      for(var i = lineNum + 1, linesLength = domLines.length; i < linesLength; i++){
+            node = domLines[i]; 
+            info = getOrderedListInfo(node);      
+            if(info && info.type == type){
+               setOrderListStartIndex(node, info.index, start);         
+               start ++;
+               markNodeClean(node);
+            }
+      }
+      
   }
 
   function isCaret() {
