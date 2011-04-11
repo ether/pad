@@ -88,6 +88,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onKeyUp: function (event) {
     this.inherited(arguments);
+
     if (event.keyCode == 13) {
       this.applyOptionsToSelection();
     } else if (event.keyCode == 46) {
