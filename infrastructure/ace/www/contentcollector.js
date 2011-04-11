@@ -393,7 +393,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
               tname == "del") {
 	   cc.doAttrib(state, "strikethrough");
           }
-          if (tname == "ul") {
+          if (tname == "ol") {
             var type;
             var rr = cls &&  /(?:^| )list-(bullet[12345678])\b/.exec(cls);
             type = rr && rr[1] || "bullet"+

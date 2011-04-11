@@ -1623,42 +1623,64 @@ function OUTER(gscope) {
 	root.insertBefore(node, nodeToAddAfter.nextSibling);
       }
       nodeToAddAfter = node;
-      computeOrderedList(node);
+      var index = rep.lines.indexOfKey(key);
+      computeOrderedList(index);
       info.notifyAdded();
       p2.mark("markClean");
       markNodeClean(node);
       p2.end();
     });
   }
- 
+
   function getDOMListInfo(aceLine){
      var info = {type : "", start : "", index: -1};
      if(aceLine && aceLine.childNodes){
          forEach(aceLine.childNodes, function(child, index){
             var cname = child.className;
-            if((child.tagName || "").toLowerCase() == "ul" && /\bace\-orderedlist\b/.exec(cname)){
-               var listType = /(?:^| )list-(\S+)/.exec(cname);
+            if((child.tagName || "").toLowerCase() == "ol" && /\bace\-orderedlist\b/.exec(cname)){
+               var listType = /(?:^| )list\-(\S+)/.exec(cname);
                if(listType){
                     info.type = listType[1] || "bullet1";
                } 
                info.start = child.getAttribute("start") || 0; 
                info.start = parseInt(isNaN(info.start)? 0 : info.start);
                info.index = index;
-               return info; //only one ul node
+               return info; //only one ol node
             }
          });
      }
      return info;
   }
 
-  function computeOrderedList(node){
-     var info = getDOMListInfo(node);
-     if(info.type){
-        var pInfo = getDOMListInfo(node.previousSibling);
-        var listNode = node.childNodes[info.index]; 
-        listNode.setAttribute("start", pInfo.start + 1);
-        listNode.style.listStyleType = "decimal";
-     }
+  function getOrderedListType(lineNum){
+       if(lineNum < 0 || lineNum > rep.alines.length){
+           return ""; 
+       }
+       var ordered =  (getLineAttribute(lineNum, "orderedlist") == "true");
+       if(!ordered){
+           return "";
+       }
+       var listType = getLineListType(lineNum) || "bullet1"; //ordered list must be set with list type
+       return listType;
+  }
+
+  function computeOrderedList(lineNum){
+      if(lineNum < 0 || lineNum > rep.alines.length){
+           return ; 
+      }
+      var orderType = getOrderedListType(lineNum); 
+      if(!orderType) return ;
+      var start = 0;
+      var preOrderType = getOrderedListType(lineNum - 1);
+      if(preOrderType == orderType){
+          var pInfo = getDOMListInfo(rep.lines.atIndex(lineNum -1).lineNode);
+          start = pInfo.start; 
+      }
+      var node = rep.lines.atIndex(lineNum).lineNode;
+      var info = getDOMListInfo(node);
+      var listNode = node.childNodes[info.index]; 
+      listNode.setAttribute("start", start + 1);
+      listNode.style.listStyleType = "decimal";
   }
 
   function isCaret() {

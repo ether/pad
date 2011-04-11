@@ -182,12 +182,12 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
             listType += " ace-orderedlist";
         }
         if (listType) {
-          preHtml = '<ul class="list-'+listType+'"><li>'; 
-          postHtml = '</li></ul>';
+          preHtml = '<ol class="list-'+listType+'"><li>'; //chrome can't support ul with start attribute 
+          postHtml = '</li></ol>';
         }
       } else if(orderedlist){
-          preHtml = '<ul class="ace-orderedlist"><li>'; 
-          postHtml = '</li></ul>';
+          preHtml = '<ol class="ace-orderedlist"><li>'; 
+          postHtml = '</li></ol>';
       }
     }
 
