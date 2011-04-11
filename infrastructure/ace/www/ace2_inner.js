@@ -1533,6 +1533,8 @@ function OUTER(gscope) {
 
     p.end("END");
 
+    parent.parent.plugins.callHook("incorporateUserChanges", {domChanges: domChanges});
+
     return domChanges;
   }
 
@@ -1862,6 +1864,9 @@ function OUTER(gscope) {
 	currentCallStack.selectionAffected = true;
       }
     }
+
+    parent.parent.plugins.callHook("performDocumentApplyChangeset", {});
+
   }
 
   function checkChangesetLineInformationAgainstRep(changes) {

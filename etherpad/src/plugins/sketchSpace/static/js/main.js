@@ -14,7 +14,7 @@
  */
 
 function sketchSpaceInit() {
-  this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine'];
+  this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine', 'incorporateUserChanges', 'performDocumentApplyChangeset'];
 }
 
 /**
@@ -151,6 +151,15 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 
     return [{cls: clss.join(" "), extraOpenTags: '<a class="sketchSpaceImageLink">', extraCloseTags: '</a>'}];
   }
+};
+
+sketchSpaceInit.prototype.incorporateUserChanges = sketchSpaceInit.prototype.performDocumentApplyChangeset = function () {
+  var sharedImageLink = this.getImageLinkFromId(this.editorUi.editor.currentSharedImage);
+
+  if (sharedImageLink === undefined || !$(sharedImageLink).hasClass("sketchSpaceImageIsCurrent"))
+    this.deselectSharedImage();
+  if (this.getImageLinkFromId(this.editorUi.editor.currentImage) === undefined)
+    this.deselectImage();
 };
 
 sketchSpaceInit.prototype.updateImageFromPadIfNeeded = function() {
@@ -326,9 +335,16 @@ sketchSpaceInit.prototype.getImageIdFromLink = function (imageLink) {
   return imageId;
 };
 
-sketchSpaceInit.prototype.selectImage = function(imageLink) {
+sketchSpaceInit.prototype.imageLinkClicked = function(imageLink) {
   var imageId = this.getImageIdFromLink(imageLink);
 
+  if (this.editorUi.editor.currentImage == imageId)
+    this.userDeselectImage();
+  else
+    this.userSelectImage(imageId);
+};
+
+sketchSpaceInit.prototype.userSelectImage = function(imageId) {
   if (typeof(pad) != "undefined" && this.editorUi.editor.options.shareCurrentImage) {
     if (this.editorUi.editor.currentSharedImage != imageId) {
       var sketchSpace = this;
@@ -337,19 +353,46 @@ sketchSpaceInit.prototype.selectImage = function(imageLink) {
 	this.updatePad(sketchSpace.editorUi.editor.currentSharedImage, [["sketchSpaceImageIsCurrent", ""]]);
 
       this.updatePad(imageId, [["sketchSpaceImageIsCurrent", "true"]]);
-      /* FIXME: This is an ugly bug workaround: Sometimes, clients don't seem to update properly... Note the "truer" != "true"... */
+
+      /* FIXME: This is an ugly bug workaround: Sometimes, clients don't seem to update properly... Note the "truer" != "true"... 
       setTimeout(
         function () {
           sketchSpace.updatePad(imageId, [["sketchSpaceImageIsCurrent", "truer"]]);
         }, 500);
+      */
 
     } else {
       // console.log("You selected the same image again!");
     }
   } else {
-    this.editorUi.editor.selectImage(imageId);
-    this.updateImageFromPad();
+    this.selectImage(imageId);
   }
+};
+
+sketchSpaceInit.prototype.userDeselectImage = function() {
+};
+
+sketchSpaceInit.prototype.selectImage = function(imageId) {
+  this.editorUi.editor.selectImage(imageId);
+  this.updateImageFromPad();
+};
+
+sketchSpaceInit.prototype.userDeselectImage = function () {
+  if (typeof(pad) != "undefined" && this.editorUi.editor.options.shareCurrentImage) {
+    if (this.editorUi.editor.currentSharedImage !== undefined)
+      this.updatePad(sketchSpace.editorUi.editor.currentSharedImage, [["sketchSpaceImageIsCurrent", ""]]);
+  } else {
+    this.deselectImage();
+  }
+};
+
+sketchSpaceInit.prototype.deselectImage = function () {
+  this.currentImage = undefined;
+  this.editorUi.editor.deselectImage();
+};
+
+sketchSpaceInit.prototype.deselectSharedImage = function () {
+  this.editorUi.editor.deselectSharedImage();
 };
 
 sketchSpaceInit.prototype.insertImage = function() {

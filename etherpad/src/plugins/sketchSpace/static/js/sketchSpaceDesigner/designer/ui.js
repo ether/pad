@@ -63,10 +63,21 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     var editor = this.editor;
     window.setTimeout(function () { editor.resize(); }, 10); 
 
+    dojo.connect(this.editor, "selectImage", this, this.onSelectImage);
+    dojo.connect(this.editor, "deselectImage", this, this.onDeselectImage);
+
     this.selectToolIcon("select");
 
     if (typeof(pad) == "undefined")
       $(this.toolbar).find(".tools").css({display:"none"});
+  },
+
+  onSelectImage: function (imageId) {
+    $("body").addClass("sketchSpace");
+  },
+
+  onDeselectImage: function (imageId) {
+    $("body").removeClass("sketchSpace");
   },
 
   selectToolIcon: function(name) {

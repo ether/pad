@@ -223,11 +223,22 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
     this.currentImage = imageId;
   },
 
+  deselectImage: function () {
+    this.currentImage = undefined;
+  },
+
   selectSharedImage: function (imageId) {
     if (imageId !== undefined)
       this.currentSharedImage = imageId;
     if (this.options.shareCurrentImage) {
       this.selectImage(this.currentSharedImage);
+    }
+  },
+
+  deselectSharedImage: function () {
+    this.currentSharedImage = undefined;
+    if (this.options.shareCurrentImage) {
+      this.deselectImage();
     }
   },
 

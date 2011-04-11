@@ -4,7 +4,7 @@
 $(document).ready(function () {
   $("body").click(function (event) {
     if ($(event.target).filter(".sketchSpaceImageLink").length > 0) {
-      top.sketchSpace.selectImage(event.target.parentNode);
+      top.sketchSpace.imageLinkClicked(event.target.parentNode);
     }
   });
 });

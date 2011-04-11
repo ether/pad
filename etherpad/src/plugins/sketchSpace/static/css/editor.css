@@ -1,16 +1,25 @@
-.maximized #padpage {
+#sketchSpaceEditorUI {
+  display: none;
+}
+
+
+.sketchSpace #sketchSpaceEditorUI {
+  display: block;
+}
+
+.sketchSpace.maximized #padpage {
   z-index: 100;
   background: #EBEBEB url(/static/img/jun09/pad/backgrad.gif) repeat-x left top;
 }
 
-#padpage {
+.sketchSpace #padpage {
   right: 0px;
   width: 50%;
   margin-left: 0;
   left: auto;
 }
 
-#sketchSpaceEditorUI {
+.sketchSpace #sketchSpaceEditorUI {
   position: absolute;
   left: 0;
   width: 50%;
@@ -18,7 +27,7 @@
   bottom: 0;
 }
 
-#sketchSpaceEditBar {
+.sketchSpace #sketchSpaceEditBar {
   position: absolute;
   left: 0;
   top: 0;
@@ -27,7 +36,7 @@
   background: white;
 }
 
-#sketchSpaceEditor {
+.sketchSpace #sketchSpaceEditor {
   position: absolute;
   left: 0;
   top: 36px;
@@ -37,7 +46,7 @@
   background: white;
 }
 
-#sketchSpaceOptions {
+.sketchSpace #sketchSpaceOptions {
   position: absolute;
   left: 0;
   bottom: 0;
