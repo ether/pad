@@ -114,7 +114,8 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   },
 
   addImg: function(imageName) {
-    var shape = this.editor.createImage(this.surface_transform, imageName);
+    var shape = this.editor.createImage(this.editor.surface_transform, imageName);
+    this.editor.setShapeFillAndStroke(shape, this.editor.options);
     this.editor.registerObjectShape(shape);
     this.editor.saveShapeToStr(shape);
   },

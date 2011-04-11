@@ -65,8 +65,8 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
     var pageSize = getSize(inFileName, page);
     offset.y = pageSize.h - offset.y;
 
-    var dpix = pixelSize.w * 72.0 / size.w;
-    var dpiy = pixelSize.h * 72.0 / size.h;
+    var dpix = Math.max(10, pixelSize.w * 72.0 / size.w);
+    var dpiy = Math.max(10, pixelSize.h * 72.0 / size.h);
     proc = ProcessBuilder("src/plugins/imageConvert/convertImage.sh",
 			  inFileName,
 			  outFileName,

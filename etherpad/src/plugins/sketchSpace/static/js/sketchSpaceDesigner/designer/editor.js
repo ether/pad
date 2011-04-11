@@ -291,11 +291,14 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 
     var image = parent.createGroup();
     image.extType = "zimage";
+    image.background = undefined;
     image.currentDisplay = undefined;
     image.imageName = imageName;
     image.page = page ? page : 0;
     image.updateDisplay = function () {
       var image = this;
+      if (image.background === undefined)
+        image.background = dojox.gfx.utils.deserialize(image, {shape:{type:"rect", x:0, y:0, width:100, height:100}, fill:{r:196,g:196,b:196,a:1}});
       if (this.pointSize === undefined) {
 	dojo.xhrGet({
 	  url: "/ep/imageConvert/" + this.imageName + "?action=getSize&p=" + image.page,
@@ -306,6 +309,11 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 	  }
 	});
       } else {
+        var shape = image.background.getShape();
+	shape.width = this.pointSize.w;
+	shape.height = this.pointSize.h;
+	image.background.setShape(shape);
+
 	var objToScreenMatrix = this._getRealMatrix();
 	var screenToObjMatrix = dojox.gfx.matrix.invert(objToScreenMatrix);
 
@@ -316,6 +324,16 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix).powroundSize({x:2, y:2}, {x:8, y:8});
 
 	//console.log("zoom: " + displayBboxOnObj.toString() + " @ " + displayBboxOnScreen.width + ":" + displayBboxOnScreen.height);
+
+	if (isNaN(displayBboxOnObj.x) || isNaN(displayBboxOnObj.y) || isNaN(displayBboxOnObj.width) || isNaN(displayBboxOnObj.height) || isNaN(displayBboxOnScreen.width) || isNaN(displayBboxOnScreen.height) ||
+	    displayBboxOnObj.width < 1 || displayBboxOnObj.height < 1 || displayBboxOnScreen.width < 1 || displayBboxOnScreen.height < 1) {
+ 	  console.log(["NaN", displayBboxOnObj, displayBboxOnScreen]);
+  	  image.newShape = undefined;
+	  if (image.currentDisplay !== undefined)
+	    image.currentDisplay.removeShape();
+	  image.currentDisplay = undefined;
+	  return;
+        }
 
 	var newShape = {
 	  x:displayBboxOnObj.x,
