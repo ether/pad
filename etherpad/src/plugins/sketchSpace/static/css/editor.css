@@ -4,14 +4,14 @@
 }
 
 
-.sketchSpace #sketchSpaceEditorUI {
-  display: block;
-}
-
 .sketchSpace.maximized #padpage {
   left: 8px;
   right: 8px;
   width: auto;
+}
+
+.sketchSpace.sketchSpaceMaximized #padpage {
+  display: none;
 }
 
 .sketchSpace #padpage {
@@ -21,7 +21,14 @@
   left: auto;
 }
 
+.sketchSpace.sketchSpaceMaximized #sketchSpaceEditorUI {
+  left: 0;
+  right: 0;
+  width: auto;
+}
+
 .sketchSpace #sketchSpaceEditorUI {
+  display: block;
   position: absolute;
   left: 0;
   width: 50%;
@@ -32,7 +39,7 @@
 .sketchSpace #sketchSpaceEditBar {
   position: absolute;
   left: 0;
-  top: 0;
+  top: 25px;
   width: 100%;
   height: 36px;
   background: white;
@@ -41,9 +48,8 @@
 .sketchSpace #sketchSpaceEditor {
   position: absolute;
   left: 0;
-  top: 36px;
-  bottom: 201px;
-  border-bottom: 1px solid #C4C4C4;
+  top: 61px;
+  bottom: 0;
   width: 100%;
   background: white;
 }
@@ -53,7 +59,13 @@
   left: 0;
   bottom: 0;
   height: 200px;
-  width: 100%;
   background: white;
   overflow: auto;
+  border-top: 1px solid #C4C4C4;
+  border-right: 1px solid #C4C4C4;
+  padding: 8px;
+}
+
+.sketchSpace.sketchSpaceMaximized a.topbarmaximize {
+  background: url(/static/img/jun09/pad/maximize_maximized.png);
 }

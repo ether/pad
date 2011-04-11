@@ -9,6 +9,16 @@ dojo.require("dijit.layout.ContentPane");
 dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
   widgetsInTemplate: true,
   templateString: '<div>' +
+		  ' <div class="topbar">' +
+		  '   <div class="topbarleft"><!-- --></div>' +
+		  '   <div class="topbarright"><!-- --></div>' +
+		  '   <div class="topbarcenter">' +
+		  '     <a href="http://github.com/redhog/pad" class="topbarBrand">SketchSpace</a>' +
+		  '     <div class="fullscreen" onclick="$(\'body\').toggleClass(\'sketchSpaceMaximized\');">Full screen</div>' +
+		  '     <a href="javascript:void(0);" onclick="$(\'body\').toggleClass(\'sketchSpaceMaximized\');" class="topbarmaximize" title="Toggle maximization"></a>' +
+		  '   </div>' +
+		  '   <div class="specialkeyarea"><!-- --></div>' +
+		  ' </div>' +
 		  ' <div id="sketchSpaceEditBar" dojoAttachPoint="toolbar">' +
 		  '   <div class="editbar enabledtoolbar" id="editbar">' +
 		  '     <div class="editbarinner" id="editbarinner">' +
@@ -61,7 +71,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 
     this.editor = new sketchSpaceDesigner.designer.editor.Editor(this.editorArea, this.attr("userId"), this, typeof(pad) == "undefined");
     var editor = this.editor;
-    window.setTimeout(function () { editor.resize(); }, 10); 
+    window.setTimeout(function () { editor.resize(); }, 1000); 
 
     dojo.connect(this.editor, "selectImage", this, this.onSelectImage);
     dojo.connect(this.editor, "deselectImage", this, this.onDeselectImage);
