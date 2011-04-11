@@ -1572,6 +1572,7 @@ function OUTER(gscope) {
         return (pos == 1 && txt && (txt == lineMarker));
   }
 
+  //must mark deleted line with aceDeleted in order to build ordered list
   function insertDomLines(nodeToAddAfter, infoStructs, isTimeUp) {
     isTimeUp = (isTimeUp || function() { return false; });
 
@@ -1705,7 +1706,7 @@ function OUTER(gscope) {
   function updateFollowedOrderedList(lineNum, start, type){
       var info, node;
       type = type || "bullet1";
-      for(var i = lineNum + 1, linesLength = domLines.length; i < linesLength; i++){
+      for(var i = lineNum, linesLength = domLines.length; i < linesLength; i++){
             node = domLines[i]; 
             info = getOrderedListInfo(node);      
             if(info && info.type == type){
@@ -1957,6 +1958,12 @@ function OUTER(gscope) {
 	nodeToAddAfter = getCleanNodeByKey(rep.lines.atIndex(startLine-1).key);
       }
       else nodeToAddAfter = null;
+
+
+      forEach(keysToDelete, function (k) { //mark delete
+    	var n = doc.getElementById(k);
+    	setAssoc(n, "aceDeleted", true);
+      });
 
       insertDomLines(nodeToAddAfter, map(lineEntries, function (entry) { return entry.domInfo; }),
 		     isTimeUp);
