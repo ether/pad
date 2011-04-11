@@ -30,19 +30,19 @@ body.fullwidth #padpage { width: auto; margin-left: 6px; margin-right: 6px; }
 body.squish1width #padpage { width: 800px; }
 body.squish2width #padpage { width: 700px; }
 
-#topbar { height: 25px; background: #326cbd url(/static/img/jun09/pad/padtopback2.gif) repeat-x left top;
+.topbar { height: 25px; background: #326cbd url(/static/img/jun09/pad/padtopback2.gif) repeat-x left top;
   position: relative; }
 
-#topbarleft { float: left; height: 100%;  overflow: hidden;
+.topbarleft { float: left; height: 100%;  overflow: hidden;
  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left top; width: 5px; 
 
  } 
-#topbarright { float: right; height: 100%; overflow: hidden;
+.topbarright { float: right; height: 100%; overflow: hidden;
  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat right top; width: 5px; }
 
-.propad #topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
-.propad #topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
-.propad #topbarright { background: url(/static/img/jun09/pad/protop.gif) no-repeat right top; }
+.propad .topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
+.propad .topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
+.propad .topbarright { background: url(/static/img/jun09/pad/protop.gif) no-repeat right top; }
 
 a#backtoprosite, #accountnav {
   display: block; position: absolute; height: 15px; line-height: 15px;
@@ -54,22 +54,22 @@ a#backtoprosite { padding-left: 20px; left: 6px;
   background: url(/static/img/jun09/pad/protop.gif) no-repeat -5px -6px; }
 #accountnav { right: 30px; color: #fff; }
   
-#topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
-a#topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
+.topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
+a.topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
   position: relative; top: 3px; height: 0; padding-top: 20px;
 /*  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -397px -3px; overflow: hidden; */
 }
 
 
-#topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
+.topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
 
 
 
-#EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
-#Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
-#fullscreen {font-size: 1.2em; color: white;float:right;margin-top:4px;margin-right:-120px; text-decoration: none;  }
+.EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
+.Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
+.fullscreen {font-size: 1.2em; color: white;float:right;margin-top:4px;margin-right:-120px; text-decoration: none;  }
 
-.propad a#topbaretherpad { background: url(/static/img/jun09/pad/protop.gif) no-repeat -397px -3px; }
+.propad a.topbaretherpad { background: url(/static/img/jun09/pad/protop.gif) no-repeat -397px -3px; }
 
 #specialkeyarea { top: 5px; left: 250px; color: yellow; font-weight: bold;
   font-size: 1.5em; position: absolute; }
@@ -1077,7 +1077,7 @@ form#reconnectform { display: none; }
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/static/img/jun09/pad/overlay2.png", sizingMethod="scale");
 }
 
-a#topbarmaximize {
+a.topbarmaximize {
  float: right;
  width: 16px;
  height: 16px;
@@ -1086,7 +1086,7 @@ a#topbarmaximize {
  background: url(/static/img/jun09/pad/maximize_normal.png);
 }
 
-.maximized a#topbarmaximize {
+.maximized a.topbarmaximize {
  background: url(/static/img/jun09/pad/maximize_maximized.png);
 }
 

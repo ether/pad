@@ -37,33 +37,33 @@ limitations under the License. */ %>
 <% template.define('body', function() { var ejs_data=''; %>
   <div id="padpage">
     <div id="padtop">
-      <div id="topbar">
+      <div class="topbar">
 	<% /* floated left */ %>
-	<div id="topbarleft"><!-- --></div>
-	<% /* <a href="#" id="topbarnewpad">New Pad</a> */ %>
+	<div class="topbarleft"><!-- --></div>
+	<% /* <a href="#" class="topbarnewpad">New Pad</a> */ %>
 	<% /* floated right */ %>
-	<div id="topbarright"><!-- --></div>
-	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
+	<div class="topbarright"><!-- --></div>
+	<% /* <a href="#" class="topbarfullwidth">Toggle Width</a> */ %>
 	<% /* non-floated */ %>
-	<div id="topbarcenter">
+	<div class="topbarcenter">
 
-	  <a href="/" id="topbarBrand"><%= appjet.config.customBrandingName %></a>
+	  <a href="/" class="topbarBrand"><%= appjet.config.customBrandingName %></a>
         <% /* Replace above with an image if you want */ %>
 
             <% if (appjet.config.showLinkandLicense == "true") { 
 		//if (isloggedin == "true") {
 		// This bit needs doing
 		%>
-	  <a href="http://etherpad.org" id="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" id="Licensing">free software</a>
+	  <a href="http://etherpad.org" class="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" class="Licensing">free software</a>
 	    <% 
 	// } 
 	} %>
-	<div id="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
+	<div class="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
 
-	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize" title="Toggle maximization"></a>
+	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" class="topbarmaximize" title="Toggle maximization"></a>
 	</div>
         <%: template.use('topBar'); %>
-	<div id="specialkeyarea"><!-- --></div>
+	<div class="specialkeyarea"><!-- --></div>
       </div>
       <div id="alertbar">
 	<div id="servermsg">
