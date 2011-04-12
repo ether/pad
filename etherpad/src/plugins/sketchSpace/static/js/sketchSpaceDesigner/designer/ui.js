@@ -70,8 +70,13 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     }
 
     this.editor = new sketchSpaceDesigner.designer.editor.Editor(this.editorArea, this.attr("userId"), this, typeof(pad) == "undefined");
+
     var editor = this.editor;
-    window.setTimeout(function () { editor.resize(); }, 1000); 
+    function resizeUntilDone () {
+      if (!editor.resize())
+        window.setTimeout(resizeUntilDone, 1000);
+    }
+    resizeUntilDone();
 
     dojo.connect(this.editor, "selectImage", this, this.onSelectImage);
     dojo.connect(this.editor, "deselectImage", this, this.onDeselectImage);
