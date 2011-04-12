@@ -104,16 +104,17 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 
     orderTags.sort(
       function(a,b){
-	for(var i=0; i<Math.min(a[0].length, b[0].length); i++) {
-	  if(a[0][i] != b[0][i]){
 
-	    if(i==1)
-	      return parseInt(a[0][i],10)>parseInt(b[0][i],10);
-	    else
-	      return a[0][i]>b[0][i];
-	  }
+	var av = parseInt(a[0][1],10);
+	var bv = parseInt(b[0][1],10);
+	if( av != bv)
+	  return av - bv;
+
+	for(var i=2; i<Math.min(a[0].length, b[0].length); i++) {
+	  if(a[0][i]!=b[0][i])
+	    return a[0][i] > b[0][i]?1:-1;
 	}
-	return a[0][i].length > b[0][i].length;
+	return a[0].length - b[0].length;
       }
     );
 /*    $.each(orderTags, function(key,val){
@@ -121,6 +122,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	   }
 	  );
 */
+//    console.log(orderTags);
     for(var j=0; j<orderTags.length; j++) {
       var val = orderTags[j];
       var id = val[0];
@@ -129,15 +131,17 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
       for(var i=0; i<oId.length; i++) {
 	var oldIdx = order.indexOf(oId[i]);
 	if(oldIdx != -1){
+//	  console.log("Remove " + oId[i] + " from " + oldIdx);
 	  order.splice(oldIdx, 1);
 	}
 	order.splice(idx[i], 0, oId[i]);
+//	console.log("Insert " + oId[i] + " @ " + idx[i]);
       }
     }
-
-//    console.log("New world order:");
-//    console.log(order);
-
+/*
+    console.log("New world order:");
+    console.log(order);
+*/
     this.editorUi.editor.images[imageId] = {objects:imageObjects, order:order, zSequence: zSequence};
 
 //    console.log("IMG:" + imageId + (isCurrentImage ? ":current" : ":NOXXX"));
@@ -273,18 +277,21 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 	   }
 	  );
 
+
+    var idx=0;
     this.editorUi.editor.forEachObjectShape(function (shape) {
       newOrder.push(shape.objId);
       if(shape.zOrderMoved){
 	shape.zOrderMoved = undefined;
-	changedOrder.push(shape.objId);
+	changedOrder.push([shape.objId, idx]);
       } else if(!(shape.objId in oldIds)){
-	changedOrder.push(shape.objId);
+	changedOrder.push([shape.objId, idx]);
       }
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
         update.push(["sketchSpaceImageObject:" + shape.objId, escape(shape.strRepr)]);
       }
       visited[shape.objId] = shape;
+      idx++;
     });
     if(changedOrder.length){
 /*      console.log('Old order');
@@ -296,11 +303,25 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
       var idxArr = [];
       $.each(newOrder, function(key){idxArr.push(key);});
 
-      var objIdStr = objIdArr.join(";");
-      var idxStr = idxArr.join(";");
 
-      update.push(["sketchSpaceImageZ;"+(++zSequence)+";" + objIdStr, idxStr]);
-//    console.log(["sketchSpaceImageZ;"+nextSeq()+";" + objIdStr, idxStr]);
+      var objIdStr = "";
+      var idxStr = "";
+
+      $.each(
+	changedOrder,
+	function(key, value){
+	  if(key != 0){
+	    objIdStr += ";";
+	    idxStr += ";";
+	  }
+	  objIdStr += value[0];
+	  idxStr += value[1];
+	}
+      );
+
+      var diff = ["sketchSpaceImageZ;"+(++zSequence)+";" + objIdStr, idxStr];
+//      console.log(diff);
+      update.push(diff);
 
       update.push(["sketchSpaceImageZSequence", "" + zSequence]);
     }
