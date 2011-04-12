@@ -54,10 +54,17 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
     var imageId = undefined;
     var argClss = args.cls.split(" ");
     var zSequence = 0;
-    var orderTags=[];
+
+    /*
+     * zOrderUpdates is an array of all z order update attributes. Every
+     * array cell is another array, where the first element is a sort
+     * key, the second element is an array of object IDs and the third
+     * element is an array of Z indices (as strings).
+     */
+
+    var zOrderUpdates=[];
     var order=[];
     var isCurrentImage = false;
-    // sketchSpaceImageZ_ID_OBJECTID: pos
     for (var i = 0; i < argClss.length; i++) {
       var cls = argClss[i];
       if (cls.indexOf(":") != -1) {
@@ -72,21 +79,11 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
 	  var properties = val.substr(val.indexOf(":")+1);
 	  imageObjects[objId] = unescape(properties);
 	} else if (key.indexOf('sketchSpaceImageZ;')==0){
-
 	  var idx = val.split(';');
 	  var oId = key.split(';');
 	  oId.shift();
-	  oId.shift();
-/*
-	  if(oId.length != idx.length){
-	    console.log("DAMMIT");
-	    console.log(key);
-	    console.log(val);
-	  }
-*/
-	  orderTags.push([ key.split(';'), oId, idx ]);
-//	  console.log("Wee, found a Z attribute");
-
+	  var seq = parseInt(oId.shift(),10);
+	  zOrderUpdates.push([ seq, oId, idx ]);
 	} else if (key == 'sketchSpaceImageZSequence'){
 	  val = parseInt(val, 10);
 	  zSequence = val;
@@ -102,49 +99,37 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
       }
     }
 
-    orderTags.sort(
+    // Sort all z changes into time order
+    zOrderUpdates.sort(
       function(a,b){
-
-	var av = parseInt(a[0][1],10);
-	var bv = parseInt(b[0][1],10);
-	if( av != bv)
-	  return av - bv;
-
-	for(var i=2; i<Math.min(a[0].length, b[0].length); i++) {
-	  if(a[0][i]!=b[0][i])
-	    return a[0][i] > b[0][i]?1:-1;
+	if( a[0] != b[0])
+	  return a[0] - b[0];
+	/* Completely arbitrary tie breaker - but needs to be deterministic */
+	for(var i=0; i<Math.min(a[1].length, b[1].length); i++) {
+	  if(a[1][i]!=b[1][i])
+	    return a[1][i] > b[1][i]?1:-1;
 	}
-	return a[0].length - b[0].length;
+	return a[1].length - b[1].length;
       }
     );
-/*    $.each(orderTags, function(key,val){
-	     console.log(val[0][1]);
-	   }
-	  );
-*/
-//    console.log(orderTags);
-    for(var j=0; j<orderTags.length; j++) {
-      var val = orderTags[j];
-      var id = val[0];
-      var oId = val[1];
-      var idx = val[2];
-      for(var i=0; i<oId.length; i++) {
-	var oldIdx = order.indexOf(oId[i]);
-	if(oldIdx != -1){
-//	  console.log("Remove " + oId[i] + " from " + oldIdx);
-	  order.splice(oldIdx, 1);
+
+    // Recreate the current order of objects by replaying all changes in order
+    for(var j=0; j<zOrderUpdates.length; j++) {
+      var val = zOrderUpdates[j];
+      var objId = val[1];
+      var zIdxStr = val[2];
+      for(var i=0; i<objId.length; i++) {
+	var currZIdx = order.indexOf(objId[i]);
+	if(currZIdx != -1){
+	  order.splice(currZIdx, 1);
 	}
-	order.splice(idx[i], 0, oId[i]);
-//	console.log("Insert " + oId[i] + " @ " + idx[i]);
+	var zIdx = parseInt(zIdxStr[i], 10);
+	if(zIdx >= 0) {
+    	  order.splice(zIdx, 0, objId[i]);
+	}
       }
     }
-/*
-    console.log("New world order:");
-    console.log(order);
-*/
     this.editorUi.editor.images[imageId] = {objects:imageObjects, order:order, zSequence: zSequence};
-
-//    console.log("IMG:" + imageId + (isCurrentImage ? ":current" : ":NOXXX"));
 
     this.currentImage = undefined;
     if (isCurrentImage)
@@ -264,11 +249,11 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
     var visited = {};
     var update = [];
 
-    var idx = 0;
+    var shapeIdx = 0;
 
     var newOrder=[];
 
-    var changedOrder = [];
+    var zOrderUpdate = [];
 
     var oldIds = {
     };
@@ -277,38 +262,40 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
 	   }
 	  );
 
-
-    var idx=0;
+    var shapeIdx=0;
     this.editorUi.editor.forEachObjectShape(function (shape) {
       newOrder.push(shape.objId);
       if(shape.zOrderMoved){
 	shape.zOrderMoved = undefined;
-	changedOrder.push([shape.objId, idx]);
+	zOrderUpdate.push([shape.objId, shapeIdx]);
       } else if(!(shape.objId in oldIds)){
-	changedOrder.push([shape.objId, idx]);
+	zOrderUpdate.push([shape.objId, shapeIdx]);
       }
       if (currentImage[shape.objId] === undefined || currentImage[shape.objId] != shape.strRepr) {
         update.push(["sketchSpaceImageObject:" + shape.objId, escape(shape.strRepr)]);
       }
       visited[shape.objId] = shape;
-      idx++;
+      shapeIdx++;
     });
-    if(changedOrder.length){
-/*      console.log('Old order');
-      console.log(oldOrder);
-      console.log('New order');
-      console.log(newOrder);
-*/
+
+    for (var objId in currentImage) {
+      if (visited[objId] === undefined) {
+	update.push(["sketchSpaceImageObject:" + objId, ""]);
+	update.push(["sketchSpaceImageZ;" + (++zSequence) + ";" + objId, "-1"]);
+      }
+    }
+
+    if (zOrderUpdate.length){
+
       var objIdArr = newOrder;
       var idxArr = [];
       $.each(newOrder, function(key){idxArr.push(key);});
 
-
       var objIdStr = "";
       var idxStr = "";
-
+      // Create a diff between previous and current Z order
       $.each(
-	changedOrder,
+	zOrderUpdate,
 	function(key, value){
 	  if(key != 0){
 	    objIdStr += ";";
@@ -320,17 +307,14 @@ sketchSpaceInit.prototype.updatePadFromImage = function() {
       );
 
       var diff = ["sketchSpaceImageZ;"+(++zSequence)+";" + objIdStr, idxStr];
-//      console.log(diff);
       update.push(diff);
+    }
 
+    if (zSequence != this.editorUi.editor.images[currentImageId].zSequence) {
       update.push(["sketchSpaceImageZSequence", "" + zSequence]);
     }
 
-    for (var objId in currentImage)
-      if (visited[objId] === undefined)
-        update.push(["sketchSpaceImageObject:" + objId, ""])
-;
-//    console.log(update);
+    //    console.log(update);
     this.updatePad(currentImageId, update);
   }
 };
