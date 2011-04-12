@@ -77,12 +77,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onShapeMouseDown: function (shape, event) {
     this.inherited(arguments);
-    this.onOutlineMouseDown(event);
+    if (event.button == 0)
+      this.onOutlineMouseDown(event);
   },
 
   onShapeMouseUp: function (shape, event) {
     this.inherited(arguments);
-    if (!this.isOutlineMoving)
+    if (event.button == 0 && !this.isOutlineMoving)
       this.designer.selection.toggleShape(shape, !event.ctrlKey);
   },
 
