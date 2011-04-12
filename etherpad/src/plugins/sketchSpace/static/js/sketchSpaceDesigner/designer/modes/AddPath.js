@@ -54,10 +54,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Path", [], {
       dojo.forEach(this.sections, function(section, i) {
 	section.renderToShape();
       });
-    }
 
-    if (this.options.isClosed) {
-      this.shape.closePath();
+      if (this.options.isClosed) {
+	this.shape.closePath();
+      }
     }
   }
 });
