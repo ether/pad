@@ -38,7 +38,7 @@ var richTextClient = {
                 return; 
               case "orderedlist":
                 padeditor.ace.callWithAce(function(ace){
-                    ace.ace_toggleAttributeOnLine(cmd, true);
+                    ace.ace_toggleAttributeOnLine(cmd, "true");
                 }, "orderedlist", true); 
                 break;
               case "link":
@@ -72,7 +72,7 @@ var richTextClient = {
             for(var i = 0, len = pairs.length; i < len; i++){
                 var pair = pairs[i].split(":");
                 if(pair && pair.length == 2){
-                    style[ pair[0] ] = pair[1];
+                    style[ pair[0].trim() ] = pair[1].trim();
                 }
             }
         }
@@ -107,7 +107,20 @@ var richTextClient = {
                     }
                 }
             } else if("img" == tname){
+                if(style){
+                    var lists = ["height", "width"], name;
+                    for(var i = 0, len = lists.length; i < len; i++){
+                        name = lists[i];
+                        if(style[name]){
+                            args.cc.doAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
+                        }
+                    }
+                }
                 args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
+            } else if("ol" == tname && /\bace\-orderedlist\b/.exec(args.cls)){
+                args.cc.doLineAttrib(args.state, "orderedlist", "true");
+            } else if("ol" == tname){
+                debugger;
             }
         }
     },
@@ -115,14 +128,15 @@ var richTextClient = {
         if(!args) return ;
         var attributes = args.attributes;
         var attStr = "", noderef = [], blockref = [], style = {}, temp = {},
-               cmd = "", value = "", extraOpenTags = "", extraCloseTags = "", cls = "";
+               cmd = "", value = "", extraOpenTags = "", extraCloseTags = "", cls = "", redirect = false;
         if(attributes && attributes.length){
             for(var i = 0, len = attributes.length; i < len; i++){
                 var pool = attributes[i];
                 switch(pool[0]){
                     case "imgSrc":
-                        extraOpenTags += "<img ondragend='customDragEnd()' src=" + pool[1] + " />"; /*manual fire dragend event on chrome*/ 
+                        extraOpenTags += "<img ondragend='customDragEnd()' src=" + pool[1] + " "; /*manually fire dragend event on chrome*/ 
                         cls="ace-placeholder";
+                        redirect = true;
                         break;
                     case "color":
                         style.color = pool[1];
@@ -135,6 +149,12 @@ var richTextClient = {
                         break;
                     case "fontFamily":
                         style["font-family"] = pool[1];
+                        break;
+                    case "width":
+                        style["width"] = pool[1];
+                        break;
+                    case "height":
+                        style["height"] = pool[1]; 
                         break;
                     case "textAlign":
                         temp = {
@@ -150,6 +170,9 @@ var richTextClient = {
             }
             var styleStr = richTextClient.joinStyle(style);
             attStr += styleStr;
+            if(redirect){
+                extraOpenTags += styleStr + " />";
+            }
         }
         return [ {attStr : attStr, noderef: noderef, blockref : blockref, 
                  cls : cls, extraOpenTags : extraOpenTags, extraCloseTags : extraCloseTags}];

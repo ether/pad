@@ -1637,9 +1637,10 @@ function OUTER(gscope) {
     });
   }
 
-  function getOrderedListInfo(aceLine){
+  function getOrderedListInfo(aceLine, lineNum){
      //only return useful when it's class name contain ace-orderedlist
      var info = null;
+     if(orderedListCache[lineNum]) return orderedListCache[lineNum].info;
      if(aceLine && aceLine.childNodes){
          forEach(aceLine.childNodes, function(child, index){
             var cname = child.className;
@@ -1657,65 +1658,104 @@ function OUTER(gscope) {
             }
          });
      }
+     if(lineNum !== undefined && !isNaN(lineNum)){
+       orderedListCache[lineNum] = {info:info, find : true}; 
+     }
      return info;
   }
 
-  function setOrderListStartIndex(node, index, start){
+  function setOrderListStartIndex(node, index, start, lineNum){
        if(node && index >=0 && index < node.childNodes.length){
           var listNode = node.childNodes[index];
           listNode.setAttribute("start", start);
           listNode.style.listStyleType = "decimal";
           markNodeClean(node);
+          var info = getOrderedListInfo(node, lineNum);
+          info.start = start;
+          orderedListCache[lineNum] = {info:info, find:true};
        }
   }  
 
   var domLines = [];
+  var orderedListCache  = [];
 
   function domLinesSnapshot(){
+      var forceUpdate = false;
       releaseDomLines();
       forEach(document.body.childNodes, function(node){
             var cname = node.className || "", id = node.id || "";
             if(-1 != id.indexOf("magicdomid") && !getAssoc(node, "aceDeleted")){
                 domLines.push(node);
+            } else if(getAssoc(node, "aceDeleted")){
+                var info = getOrderedListInfo(node); 
+                if(info){
+                    forceUpdate = true; //ordered list was deleted
+                }
             }
       });
+      return forceUpdate;
   }
   
   function releaseDomLines(){
       domLines = [];
+      orderedListCache = [];
+  }
+
+  function getPreOrderedListInfo(lineNum, type){
+       var preInfo = {type : "bullet1", start : 0, index: -1, cname : ""}, pInfor,
+             type = type || "bullet1", level = getOrderedListLevel(type);
+       if(lineNum > domLines.length) return;
+       for(var i = lineNum - 1; i >=0; i--){
+            pInfo = getOrderedListInfo(domLines[i], i);
+            if(pInfo && pInfo.type == type){
+                return pInfo;
+            }else if(level > getOrderedListLevel(pInfo.type)){
+                break;
+            }
+       }
+       return preInfo;
   }
 
   function computeOrderedList(lineNum){
-      domLinesSnapshot();
+      var forceUpdate = domLinesSnapshot(lineNum);
       if(lineNum < 0 || lineNum > domLines.length){
            return ; 
       }
       var node = domLines[lineNum];
-      var info = getOrderedListInfo(node); 
-      if(!info) return ;
-      var start = 0;
-      var preInfo = getOrderedListInfo(domLines[lineNum - 1]) || {};
-      if(preInfo.type == info.type){
-          start = preInfo.start; 
+      var info = getOrderedListInfo(node,lineNum); 
+      if(!info && !forceUpdate) return ;
+      var start = 0, type = info ? info.type : "bullet1";
+      var preInfo = getPreOrderedListInfo(lineNum, type);
+      start = preInfo.start;
+      if(info){
+        start++;
+        setOrderListStartIndex(node, info.index, start, lineNum);
       }
-      setOrderListStartIndex(node, info.index, start + 1);
-      updateFollowedOrderedList(lineNum + 1, start + 2, info.type);
+      start++;
+      updateFollowedOrderedList(lineNum + 1, start, type);
       releaseDomLines();
   }
 
+  function getOrderedListLevel(type){
+        return parseInt(type.replace("bullet", ""));
+  }
+
   function updateFollowedOrderedList(lineNum, start, type){
-      var info, node;
       type = type || "bullet1";
+      var info, node, level = getOrderedListLevel(type);
       for(var i = lineNum, linesLength = domLines.length; i < linesLength; i++){
             node = domLines[i]; 
-            info = getOrderedListInfo(node);      
-            if(info && info.type == type){
-               setOrderListStartIndex(node, info.index, start);         
+            info = getOrderedListInfo(node, i);      
+            if(!info) continue;
+            if(info.type == type){
+               setOrderListStartIndex(node, info.index, start, i);         
                start ++;
                markNodeClean(node);
+            } else {
+                var preInfo = getPreOrderedListInfo(i, info.type);
+                setOrderListStartIndex(node, info.index, preInfo.start + 1, i);
             }
       }
-      
   }
 
   function isCaret() {
@@ -2962,8 +3002,12 @@ function OUTER(gscope) {
 
     var mods = [];
     var foundLists = false;
+    var ordered = false; 
     for(var n=firstLine;n<=lastLine;n++) {
       var listType = getLineListType(n);
+      if(!ordered){
+          ordered = (getLineAttribute(n, "orderedlist") == "true")
+      }
       if (listType) {
         listType = /([a-z]+)([12345678])/.exec(listType);
         if (listType) {
@@ -2981,7 +3025,7 @@ function OUTER(gscope) {
     }
 
     if (mods.length > 0) {
-      setLineListTypes(mods);
+      setLineListTypes(mods, ordered);
     }
 
     return foundLists;
@@ -4068,9 +4112,6 @@ function OUTER(gscope) {
 
       enforceEditability();
        
-      if(browser.mozilla){ //disable image resize 
-          doc.execCommand("enableObjectResizing", false, false);
-      }
       // set up dom and rep
       while (root.firstChild) root.removeChild(root.firstChild);
       var oneEntry = createDomLineEntry("");
@@ -4268,15 +4309,15 @@ function OUTER(gscope) {
       buildKeepRange(builder, loc, (loc = [lineNum,0]));
       if (getLineListType(lineNum)) {
         // already a line marker
-        //if (listType) {
+        if (listType || orderedlist || hasUsefulLineAttributes(lineNum, ['list', 'orderedlist', 'insertorder'])) {
           // make different list type
           buildKeepRange(builder, loc, (loc = [lineNum,1]),
                          [['list',listType], ["orderedlist", orderedlist]], rep.apool);
-       // }
-       // else {
+        }
+        else {
           // remove list marker
-          //buildRemoveRange(builder, loc, (loc = [lineNum,1]));
-       // }
+          buildRemoveRange(builder, loc, (loc = [lineNum,1]));
+        }
       }
       else {
         // currently no line marker
@@ -4313,7 +4354,7 @@ function OUTER(gscope) {
 
     var allLinesAreList = true;
     for(var n=firstLine;n<=lastLine;n++) {
-      if (! getLineListType(n)) {
+      if (! getLineListType(n) || getLineAttribute(n, "orderedlist") == "true") {
         allLinesAreList = false;
         break;
       }
@@ -4338,13 +4379,18 @@ function OUTER(gscope) {
            style = getLineAttribute(lineNum, attributeName); 
            switch(style){
                 case "ace-none-linestyle":
+                    if(!value) continue;
                     builder.insert(lineMarker, [['author', thisAuthor],
                                [attributeName, value]], rep.apool);
                     break;
                 case "ace-linestyle":
                 default:
-                    buildKeepRange(builder, loc, (loc = [lineNum,1]),
-                             [[attributeName, value]], rep.apool);
+                    if(value || hasUsefulLineAttributes(lineNum, [attributeName])){
+                        buildKeepRange(builder, loc, (loc = [lineNum,1]),
+                                 [[attributeName, value]], rep.apool);
+                    } else { 
+                        buildRemoveRange(builder, loc, (loc = [lineNum,1]));
+                    }
                     break;
            }
         }   
@@ -4352,6 +4398,32 @@ function OUTER(gscope) {
         if (! Changeset.isIdentity(cs)) {
           performDocumentApplyChangeset(cs);
         }
+  }
+
+  function hasUsefulLineAttributes(lineNum, exclude){
+        var aline = rep.alines[lineNum], ret = false;
+        if (aline) {
+          var opIter = Changeset.opIterator(aline);
+          if (opIter.hasNext()) { //all line attribute were put in the first attribute 
+            op = opIter.next();
+            var lineText = rep.lines.atIndex(lineNum).text;
+            if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
+                 var excludeObj = {}, exclude = exclude || [];
+                 exclude.push("author");
+                 forEach(exclude, function(name){
+                    excludeObj[name] = true;
+                 }); 
+                 Changeset.eachAttribNumber(op.attribs, function(n) {
+                    var key = rep.apool.getAttribKey(n);
+                    if(!excludeObj[key]){
+                        ret = true;
+                        return true;
+                    }
+                 }); 
+            }
+          }
+        }
+        return ret
   }
 
   function  getLineAttribute(lineNum, attributeName){

@@ -93,6 +93,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         return textArray[textArray.length-1] === "";
       },
       startNew: function() {
+        self.checkLineMarker();
         textArray.push("");
         self.flush(true);
         attribsBuilder = Changeset.smartOpAssembler();
@@ -279,7 +280,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     value = (value === undefined) ? true : value;
     lines.appendText(objMarker, Changeset.makeAttribsString(
         '+', [[na, value]],
-        apool));
+        apool) + state.attribString);
   };
  
   cc.collectContent = function (node, state) {

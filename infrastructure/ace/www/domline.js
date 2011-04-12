@@ -186,7 +186,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
           postHtml = '</li></ol>';
         }
       } else if(orderedlist){
-          preHtml = '<ol class="ace-orderedlist"><li>'; 
+          preHtml = '<ol class="list-bullet1 ace-orderedlist"><li>'; 
           postHtml = '</li></ol>';
       }
     }
