@@ -3,12 +3,14 @@ dojo.provide("sketchSpaceDesigner.designer.modes.Mode");
 dojo.require("dojox.gfx.matrix");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("sketchSpaceDesigner.designer.widgets");
+dojo.require("sketchSpaceDesigner.designer.outline");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   constructor: function () {
     this.inputState = {};
     this.inputState.keyboard = {};
     this.inputState.mouse = {};
+    this.outlines = {};
   },
   enable: function () {
     var mode = this;
@@ -49,6 +51,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.shareCurrentImageOption.destroyRecursive();
     this.showAuthorshipColorOption.destroyRecursive();
     this.designer.ui.options.layout();
+    for (var name in this.outlines)
+      this.disableOutline(name);
   },
   enableShape: function (shape) {
     var mode = this;
@@ -111,4 +115,17 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     return dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);
   },
 
+  addOutline: function(name, bbox, lineDefinitions) {
+    if (this.outlines[name] !== undefined)
+      throw "Outline set twice; please use update";
+    this.outlines[name] = sketchSpaceDesigner.designer.outline.createOutline(this.designer, bbox, lineDefinitions);
+    return this.outlines[name];
+  },
+
+  removeOutline: function (name) {
+    if (this.outlines[name] !== undefined) {
+      this.outlines[name].removeShape();
+      delete this.outlines[name];
+    }
+  },
 });

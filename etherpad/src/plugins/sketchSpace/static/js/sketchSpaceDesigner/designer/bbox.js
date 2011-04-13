@@ -17,6 +17,9 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     this.height = copyFrom.height;
   },
 
+  // Listen to this for changes
+  onChange: function () {},
+
   copy: function() {
     return new sketchSpaceDesigner.designer.bbox.Bbox(this);
   },
@@ -26,7 +29,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     return bbox.x === undefined;
   },
 
-  makeEmpty: function() { this.x = undefined; this.y = undefined; this.width = undefined; this.height = undefined; },
+  makeEmpty: function() { this.x = undefined; this.y = undefined; this.width = undefined; this.height = undefined; this.onChange(); },
 
   add: function(bbox) { /* rename to union? */
     if (this.isEmpty(bbox)) {
@@ -45,7 +48,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
       this.width = Math.max(old.x + this.width, bbox.x + bbox.width) - this.x;
       this.height = Math.max(old.y + this.height, bbox.y + bbox.height) - this.y;
     }
-
+    this.onChange();
     return this;
   },
 
@@ -63,7 +66,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
       this.width = Math.max(Math.min(old.x + this.width, bbox.x + bbox.width) - this.x, 0);
       this.height = Math.max(Math.min(old.y + this.height, bbox.y + bbox.height) - this.y, 0);
     }
-
+    this.onChange();
     return this;
   },
 
@@ -87,6 +90,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
 	this.height = point.y - this.y;
       }
     }
+    this.onChange();
     return this;
   },
 
@@ -118,6 +122,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
 	}
       ));
     }
+    this.onChange();
     return this;
   },
 
@@ -133,6 +138,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     
     this.width = Math.ceil((old.x + this.width) / precission.x) * precission.x - this.x;
     this.height = Math.ceil((old.y + this.height) / precission.y) * precission.y - this.y;
+    this.onChange();
     return this;
   },
 
@@ -152,6 +158,7 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
 
     this.width = Math.ceil(this.width / precission.x) * precission.x;
     this.height = Math.ceil(this.height / precission.y) * precission.y;
+    this.onChange();
     return this;
   },
 

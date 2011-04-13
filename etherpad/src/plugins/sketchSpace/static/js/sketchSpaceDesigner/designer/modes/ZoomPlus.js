@@ -33,31 +33,22 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     $(this.designer.container).css({'cursor': 'url(/static/html/plugins/sketchSpace/' + cur + '),default'});
   },
 
+  getCursorBbox: function() {
+    return sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
+  },
+
   enableOutline: function() {
-    if (this.outline !== undefined) return;
-    if (this.orig !== undefined && this.mouse !== undefined) {
-      var bbox = sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
-
-      this.outline = this.designer.surface.createGroup();
-
-      this.outline.setTransform(dojox.gfx.matrix.translate(bbox.x, bbox.y));
-      this.outline.originalMatrix = this.outline.matrix;
-
-      this.outline.outlineOuter = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:-2, y:-2, width:bbox.width+4, height:bbox.height+4}, stroke:{color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}});
-      this.outline.outlineInner = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:0, y:0, width:bbox.width, height:bbox.height}, stroke:{color:{r:128,g:128,b:128,a:1},width:1, style:"solid"}});
-    }
+    this.addOutline("cursorZoomSelection", this.getCursorBbox(), [{color:{r:128,g:128,b:128,a:1},width:1, style:"solid"}, {color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}]);
   },
 
   disableOutline: function () {
-    if (this.outline !== undefined) {
-      this.outline.removeShape();
-      this.outline = undefined;
-    }
+    this.removeOutline("cursorZoomSelection");
   },
 
   updateOutline: function () {
-    this.disableOutline();
-    this.enableOutline();
+    if (this.outlines.cursorZoomSelection == undefined) return;
+    this.outlines.cursorZoomSelection.bbox = this.getCursorBbox();
+    this.outlines.cursorZoomSelection.update();
   },
 
   onKeyDown: function (event) {
@@ -105,9 +96,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
 
   onMouseMove: function (event) {
     this.inherited(arguments);
-    if (this.outline !== undefined) {
-      this.mouse = {x:event.layerX, y:event.layerY};
-      this.updateOutline();
-    }
+    this.mouse = {x:event.layerX, y:event.layerY};
+    this.updateOutline();
   },
 });
