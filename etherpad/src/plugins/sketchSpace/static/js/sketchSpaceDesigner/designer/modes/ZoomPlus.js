@@ -4,10 +4,18 @@ dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner.designer.modes.Zoom], {
+  constructor: function (zoomIn) {
+    this.inherited(arguments, []);
+    this.initialZoomIn = zoomIn;
+  },
+
   enable: function () {
     this.inherited(arguments);
     // Set some defaults
     this.designer.setOptions({zoomIn: true}, true);
+    if (this.initialZoomIn !== undefined)
+      this.designer.setOptions({zoomIn: this.initialZoomIn});
+    this.initialZoomIn = undefined;
     this.zoomInOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Zoom in [SHIFT]:", optionsPath:"zoomIn", designer:this.designer});
     this.designer.ui.options.addChild(this.zoomInOption);
     this.designer.ui.options.layout();
