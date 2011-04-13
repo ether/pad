@@ -11,7 +11,6 @@ sketchSpaceDesigner.designer.outline.createOutline = function (designer, bbox, l
 
   outline.update = function () {
     var outline = this;
-    console.log("UPDATE");
     $.each(outline.lines, function() { this.removeShape(); });
 
     outline.setTransform(dojox.gfx.matrix.translate(outline.bbox.x, outline.bbox.y));

@@ -9,6 +9,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     this.initialZoomIn = zoomIn;
   },
 
+  cursorBboxOutlineDefinitions: {zoom: [{color:{r:128,g:128,b:128,a:1},width:1, style:"solid"}, {color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}]},
+
   enable: function () {
     this.inherited(arguments);
     // Set some defaults
@@ -37,20 +39,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     return sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
   },
 
-  enableOutline: function() {
-    this.addOutline("cursorZoomSelection", this.getCursorBbox(), [{color:{r:128,g:128,b:128,a:1},width:1, style:"solid"}, {color:{r:196,g:196,b:196,a:1},width:1, style:"solid"}]);
-  },
-
-  disableOutline: function () {
-    this.removeOutline("cursorZoomSelection");
-  },
-
-  updateOutline: function () {
-    if (this.outlines.cursorZoomSelection == undefined) return;
-    this.outlines.cursorZoomSelection.bbox = this.getCursorBbox();
-    this.outlines.cursorZoomSelection.update();
-  },
-
   onKeyDown: function (event) {
     this.inherited(arguments);
     if (event.keyCode == dojo.keys.SHIFT) {
@@ -69,14 +57,14 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     this.inherited(arguments);
     if (event.button == dojo.mouseButtons.LEFT) {
       this.orig = this.mouse = {x:event.layerX, y:event.layerY}
-      this.enableOutline();
+      this.addCursorBboxOutline("zoom");
     }
   },
 
   onMouseUp: function (event) {
     this.inherited(arguments);
     if (event.button == dojo.mouseButtons.LEFT) {
-      this.disableOutline();
+      this.removeCursorBboxOutline("zoom");
       if (this.orig == this.mouse) {
         if (this.designer.options.zoomIn)
  	  this.onZoom(1.0 + this.zoomFactor, this.orig.x, this.orig.y);
@@ -95,8 +83,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
   },
 
   onMouseMove: function (event) {
-    this.inherited(arguments);
     this.mouse = {x:event.layerX, y:event.layerY};
-    this.updateOutline();
+    this.inherited(arguments);
   },
 });

@@ -87,6 +87,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     delete this.inputState.mouse[event.button];
   },
   onMouseMove: function(event) {
+    this.updateCursorBboxOutline();
   },
   onShapeMouseDown: function (shape, event) {
   },
@@ -115,6 +116,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     return dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);
   },
 
+  getCurrentCursorBbox: function() {
+    return sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
+  },
+
   addOutline: function(name, bbox, lineDefinitions) {
     if (this.outlines[name] !== undefined)
       throw "Outline set twice; please use update";
@@ -128,4 +133,19 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
       delete this.outlines[name];
     }
   },
+
+  addCursorBboxOutline: function(name) {
+    this.addOutline("cursorBboxOutline", this.getCursorBbox(), this.cursorBboxOutlineDefinitions[name]);
+  },
+
+  updateCursorBboxOutline: function () {
+    if (this.outlines.cursorBboxOutline == undefined) return;
+    this.outlines.cursorBboxOutline.bbox = this.getCurrentCursorBbox();
+    this.outlines.cursorBboxOutline.update();
+  },
+
+  removeCursorBboxOutline: function () {
+    this.removeOutline("cursorBboxOutline");
+  },
+
 });
