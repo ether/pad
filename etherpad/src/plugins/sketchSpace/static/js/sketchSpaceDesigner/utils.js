@@ -43,3 +43,7 @@ sketchSpaceDesigner.utils.getObjectByPath = function (obj, path) {
   }
   return obj;
 }
+
+for (var i = 1; i < 128; i++)
+  dojo.keys["CHAR_" + String.fromCharCode(i)] = i;
+

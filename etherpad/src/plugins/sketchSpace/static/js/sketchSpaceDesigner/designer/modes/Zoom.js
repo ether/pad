@@ -22,9 +22,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
   },
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 38 && event.ctrlKey && !event.altKey && !event.shiftKey) {
+    if (event.keyCode == dojo.keys.UP_ARROW && event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.onZoom(1.0 + this.zoomFactor);
-    } else if (event.keyCode == 40 && event.ctrlKey && !event.altKey && !event.shiftKey) {
+    } else if (event.keyCode == dojo.keys.DOWN_ARROW && event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.onZoom(1.0 / (1.0 + this.zoomFactor));
     }
   },
@@ -36,19 +36,19 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
     this.inherited(arguments);
     var mouse = this.inputState.mouse;
     var key = this.inputState.keyboard;
-    if (   (    mouse[1] != undefined
-            && !mouse[1].ctrlKey
-	    && !mouse[1].altKey
-            && !mouse[1].shiftKey)
-	|| (    key[32] != undefined
-	    &&  mouse[0] != undefined
-            && !mouse[0].ctrlKey
-	    && !mouse[0].altKey
-            && !mouse[0].shiftKey
-            && !key[32].ctrlKey
-	    && !key[32].altKey
-	    && !key[32].shiftKey)) {
-       var mouseDown = mouse[1] || mouse[0];
+    if (   (    mouse[dojo.mouseButtons.MIDDLE] != undefined
+            && !mouse[dojo.mouseButtons.MIDDLE].ctrlKey
+	    && !mouse[dojo.mouseButtons.MIDDLE].altKey
+            && !mouse[dojo.mouseButtons.MIDDLE].shiftKey)
+	|| (    key[dojo.keys.SPACE] != undefined
+	    &&  mouse[dojo.mouseButtons.LEFT] != undefined
+            && !mouse[dojo.mouseButtons.LEFT].ctrlKey
+	    && !mouse[dojo.mouseButtons.LEFT].altKey
+            && !mouse[dojo.mouseButtons.LEFT].shiftKey
+            && !key[dojo.keys.SPACE].ctrlKey
+	    && !key[dojo.keys.SPACE].altKey
+	    && !key[dojo.keys.SPACE].shiftKey)) {
+       var mouseDown = mouse[dojo.mouseButtons.MIDDLE] || mouse[dojo.mouseButtons.LEFT];
        var orig = this.getCurrentMouse(mouseDown, this.designer.surface);
        var mouse = this.getCurrentMouse(event, this.designer.surface);
        var move = dojox.gfx.matrix.translate(mouse.x - orig.x, mouse.y - orig.y);

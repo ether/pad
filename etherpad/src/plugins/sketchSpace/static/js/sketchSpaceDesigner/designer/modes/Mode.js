@@ -43,6 +43,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(this.onMouseUpHandle);
     dojo.disconnect(this.onMouseMoveHandle);
     dojo.disconnect(this.onKeyUpHandle);
+    dojo.disconnect(this.onKeyDownHandle);
     dojo.disconnect(this.onMouseWheelHandle);
     this.designer.forEachObjectShape(function (shape) { mode.disableShape(shape); });
     this.shareCurrentImageOption.destroyRecursive();
@@ -68,9 +69,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
   onKeyUp: function (event) {
     console.log([event.keyCode, event]);
-    if (event.keyCode == 83) { /* key=s */
+    if (event.keyCode == dojo.keys.CHAR_S) {
       this.designer.setOptions({doStroke: !this.designer.options.doStroke});
-    } else if (event.keyCode == 70) { /* key=f */
+    } else if (event.keyCode == dojo.keys.CHAR_F) {
       this.designer.setOptions({doFill: !this.designer.options.doFill});
     }
     delete this.inputState.keyboard[event.keyCode];

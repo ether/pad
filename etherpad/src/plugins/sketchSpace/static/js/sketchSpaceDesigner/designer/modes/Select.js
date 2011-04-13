@@ -90,11 +90,11 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   onKeyUp: function (event) {
     this.inherited(arguments);
 
-    if (event.keyCode == 13) {
+    if (event.keyCode == dojo.keys.ENTER) {
       this.applyOptionsToSelection();
-    } else if (event.keyCode == 46) {
+    } else if (event.keyCode == dojo.keys.DELETE) {
       this.deleteSelection();
-    } else if (event.keyCode == 36) {
+    } else if (event.keyCode == dojo.keys.HOME) {
       this.designer.selection.applyToShapes(
 	function(){
 	  this.zOrderMoved = true; this.moveToFront();
@@ -102,7 +102,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 	}
       );
       this.designer.selection.applyToShapes("save");
-    } else if (event.keyCode == 35) {
+   } else if (event.keyCode == dojo.keys.END) {
       this.designer.selection.applyToShapes(
 	function(){
 	  this.zOrderMoved = true; this.moveToBack();
@@ -110,7 +110,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 	}
       );
       this.designer.selection.applyToShapes("save");
-    } else if (event.keyCode == 34) {
+    } else if (event.keyCode == dojo.keys.PAGE_DOWN) {
       var move = {};
       this.designer.selection.applyToShapes(
 	function(){
@@ -145,7 +145,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
       }
 
       this.designer.selection.applyToShapes("save");
-    } else if (event.keyCode == 33) {
+    } else if (event.keyCode == dojo.keys.PAGE_UP) {
       var move = {};
       this.designer.selection.applyToShapes(
 	function(){

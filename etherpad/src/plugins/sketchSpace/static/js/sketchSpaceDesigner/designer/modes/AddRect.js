@@ -24,7 +24,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
   },
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == 0 && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+    if (event.button == dojo.mouseButtons.LEFT && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.orig = this.getCurrentMouse(event);
       this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"rect", x:this.orig.x, y:this.orig.y, width:1, height:1}});
       this.onSetOptions();

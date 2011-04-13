@@ -56,21 +56,21 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
 
   onKeyDown: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 16) { /* key=SHIFT */
+    if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({zoomIn: !this.designer.options.zoomIn});
     }
   },
 
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 16) { /* key=SHIFT */
+    if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({zoomIn: !this.designer.options.zoomIn});
     }
   },
 
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == 0) {
+    if (event.button == dojo.mouseButtons.LEFT) {
       this.orig = this.mouse = {x:event.layerX, y:event.layerY}
       this.enableOutline();
     }
@@ -78,7 +78,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
 
   onMouseUp: function (event) {
     this.inherited(arguments);
-    if (event.button == 0) {
+    if (event.button == dojo.mouseButtons.LEFT) {
       this.disableOutline();
       if (this.orig == this.mouse) {
         if (this.designer.options.zoomIn)

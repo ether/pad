@@ -150,31 +150,31 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
   getContainerShape: function () { return this.designer.surface_transform; },
   onKeyDown: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 16) { /* key=SHIFT */
+    if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({isStraight: true});
-    } else if (event.keyCode == 17) { /* key=CTRL */
+    } else if (event.keyCode == dojo.keys.CTRL) {
       this.designer.setOptions({isLine: true});
-    } else if (event.keyCode == 18) { /* key=ALT */
+    } else if (event.keyCode == dojo.keys.ALT) {
       this.designer.setOptions({isClosed: true});
     }
   },
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 38 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=UP */
+    if (event.keyCode == dojo.keys.UP_ARROW && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.designer.setOptions({smothenessFactor: Math.max(4, this.designer.options.smothenessFactor + 3)});
-    } else if (event.keyCode == 40 && !event.ctrlKey && !event.altKey && !event.shiftKey) {/* key=DOWN */
+    } else if (event.keyCode == dojo.keys.DOWN_ARROW && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.designer.setOptions({smothenessFactor: Math.max(4, this.designer.options.smothenessFactor - 3)});
-    } else if (event.keyCode == 67 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=c */
+    } else if (event.keyCode == dojo.keys.CHAR_C && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.designer.setOptions({isClosed: !this.designer.options.isClosed});
-    } else if (event.keyCode == 76 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=l */
+    } else if (event.keyCode == dojo.keys.CHAR_L && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.designer.setOptions({isLine: !this.designer.options.isLine});
-    } else if (event.keyCode == 16) { /* key=SHIFT */
+    } else if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({isStraight: false});
-    } else if (event.keyCode == 17) { /* key=CTRL */
+    } else if (event.keyCode == dojo.keys.CTRL) {
       this.designer.setOptions({isLine: false});
-    } else if (event.keyCode == 18) { /* key=ALT */
+    } else if (event.keyCode == dojo.keys.ALT) {
       this.designer.setOptions({isClosed: false});
-    } else if (event.keyCode == 13 && !event.ctrlKey && !event.altKey && !event.shiftKey) { /* key=ENTER */
+    } else if (event.keyCode == dojo.keys.ENTER && !event.ctrlKey && !event.altKey && !event.shiftKey) {
       this.done();
     }
   },
@@ -184,7 +184,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
   },
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == 0) {
+    if (event.button == dojo.mouseButtons.LEFT) {
       if (this.path === undefined) {
         this.path = new sketchSpaceDesigner.designer.modes.Path(this);
         this.path.addSection();
@@ -195,7 +195,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
   onMouseUp: function (event) {
     this.inherited(arguments);
     if (this.path !== undefined) {
-      if (event.button == 2) {
+      if (event.button == dojo.mouseButtons.RIGHT) {
         this.path.removeSection();
         this.done()
       } else {

@@ -27,19 +27,19 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddEllipse", [sketchSpaceDesign
   },
   onKeyDown: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 16) { /* key=SHIFT */
+    if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({isStraight: true});
     }
   },
   onKeyUp: function (event) {
     this.inherited(arguments);
-    if (event.keyCode == 16) { /* key=SHIFT */
+    if (event.keyCode == dojo.keys.SHIFT) {
       this.designer.setOptions({isStraight: false});
     }
   },
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == 0) {
+    if (event.button == dojo.mouseButtons.LEFT) {
       this.mouse = this.orig = this.getCurrentMouse(event);
       this.shape = dojox.gfx.utils.deserialize(this.getContainerShape(), {shape:{type:"ellipse", cx:this.orig.x, cy:this.orig.y, rx:1, ry:1}});
       this.onSetOptions();
