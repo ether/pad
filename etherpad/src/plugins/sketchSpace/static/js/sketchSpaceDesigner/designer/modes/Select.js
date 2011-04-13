@@ -20,6 +20,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.deleteOption.addChild(new dijit.form.Button({label:"Delete", onClick: function () { designer.deleteSelection(); }}));
     this.designer.ui.options.addChild(this.deleteOption);
     this.designer.ui.options.layout();
+    $(this.designer.container).css({'cursor': 'move'});
   },
 
   disable: function () {
@@ -30,6 +31,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.applyOption.destroyRecursive();
     this.deleteOption.destroyRecursive();
     this.designer.ui.options.layout();
+    $(this.designer.container).css({'cursor': 'default'});
   },
 
   enableOutline: function() {

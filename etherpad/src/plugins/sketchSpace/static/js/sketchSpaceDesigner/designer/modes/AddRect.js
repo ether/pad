@@ -6,13 +6,14 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
   enable: function () {
     this.inherited(arguments);
     this.shape = undefined;
-
+    $(this.designer.container).css({'cursor': 'crosshair'});
   },
   disable: function () {
     this.inherited(arguments);
     if (this.shape !== undefined) {
       this.shape.removeShape();
     }
+    $(this.designer.container).css({'cursor': 'default'});
   },
 
   getContainerShape: function () { return this.designer.surface_transform; },

@@ -19,12 +19,18 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     this.zoomInOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Zoom in [SHIFT]:", optionsPath:"zoomIn", designer:this.designer});
     this.designer.ui.options.addChild(this.zoomInOption);
     this.designer.ui.options.layout();
-
   },
+
   disable: function () {
     this.inherited(arguments);
     this.zoomInOption.destroyRecursive();
     this.designer.ui.options.layout();
+    $(this.designer.container).css({'cursor': 'default'});
+  },
+
+  onSetOptions: function (options) {
+    var cur = this.designer.options.zoomIn ? 'imgeditbar_zoom_in_icon.png' : 'imgeditbar_zoom_out_icon.png';
+    $(this.designer.container).css({'cursor': 'url(/static/html/plugins/sketchSpace/' + cur + '),default'});
   },
 
   enableOutline: function() {
