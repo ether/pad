@@ -33,6 +33,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 		  '	     <td class="editbarbutton tool addRect" unselectable="on" dojoAttachEvent="onclick:_onAddRect"><img title="Add rectangle" src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></td>' +
 		  '	     <td class="editbarbutton" unselectable="on"><img dojoAttachPoint="addImgButton" title="Add image" src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool select" unselectable="on" dojoAttachEvent="onclick:_onSelect"><img title="Select objects" src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></td>' +
+		  '	     <td class="editbarbutton tool zoomPlus" unselectable="on" dojoAttachEvent="onclick:_onZoomPlus"><img title="Zoom" src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></td>' +
 		  '	     <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>' +
 		  '' +
 		  '	     <td width="100%">&nbsp;</td>' +
@@ -128,5 +129,10 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   _onSelect: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.Select());
     this.selectToolIcon("select");
+  },
+
+  _onZoomPlus: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.ZoomPlus());
+    this.selectToolIcon("zoomPlus");
   },
 });

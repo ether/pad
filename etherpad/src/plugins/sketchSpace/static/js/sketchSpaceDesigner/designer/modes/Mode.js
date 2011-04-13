@@ -94,6 +94,12 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     return dojox.gfx.matrix.multiplyPoint(screenToObjMatrix, p.x, p.y);
   },
 
+  localCoordToScreen: function (p, container) {
+    if (container === undefined) container = this.getContainerShape();
+    var objToScreenMatrix = container._getRealMatrix();
+    return dojox.gfx.matrix.multiplyPoint(objToScreenMatrix, p.x, p.y);
+  },
+
   getCurrentMouse: function (event, container) {
    return this.screenToLocalCoord({x:event.layerX, y:event.layerY}, container);
   },
