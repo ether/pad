@@ -87,6 +87,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     delete this.inputState.mouse[event.button];
   },
   onMouseMove: function(event) {
+    this.mouse = {x:event.layerX, y:event.layerY};
     this.updateCursorBboxOutline();
   },
   onShapeMouseDown: function (shape, event) {
@@ -107,7 +108,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
 
   getCurrentMouse: function (event, container) {
-   return this.screenToLocalCoord({x:event.layerX, y:event.layerY}, container);
+   return this.screenToLocalCoord({x:event.layerX, y:event.layerY}, container);b
   },
 
   getCurrentMove: function (event, container, orig) {
@@ -121,8 +122,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
 
   addOutline: function(name, bbox, lineDefinitions) {
-    if (this.outlines[name] !== undefined)
-      throw "Outline set twice; please use update";
+    if (this.outlines[name] !== undefined) return;
     this.outlines[name] = sketchSpaceDesigner.designer.outline.createOutline(this.designer, bbox, lineDefinitions);
     return this.outlines[name];
   },
@@ -135,7 +135,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
 
   addCursorBboxOutline: function(name) {
-    this.addOutline("cursorBboxOutline", this.getCursorBbox(), this.cursorBboxOutlineDefinitions[name]);
+    this.addOutline("cursorBboxOutline", this.getCurrentCursorBbox(), this.cursorBboxOutlineDefinitions[name]);
   },
 
   updateCursorBboxOutline: function () {

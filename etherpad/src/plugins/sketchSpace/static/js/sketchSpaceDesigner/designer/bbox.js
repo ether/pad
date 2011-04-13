@@ -24,11 +24,6 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     return new sketchSpaceDesigner.designer.bbox.Bbox(this);
   },
 
-  isEmpty: function(bbox) {
-    if (bbox === undefined) bbox = this;
-    return bbox.x === undefined;
-  },
-
   makeEmpty: function() { this.x = undefined; this.y = undefined; this.width = undefined; this.height = undefined; this.onChange(); },
 
   add: function(bbox) { /* rename to union? */
@@ -169,6 +164,23 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
      if (factor === undefined) factor = {x:1, y:1};
      return this.roundSize({x:Math.pow(base.x, Math.floor(Math.log(this.width/factor.x)/Math.log(base.x))),
                             y:Math.pow(base.y, Math.floor(Math.log(this.height/factor.y)/Math.log(base.y)))});
+  },
+
+  isEmpty: function(bbox) {
+    if (bbox === undefined) bbox = this;
+    return bbox.x === undefined;
+  },
+
+  isEqual: function (other) {
+    return this.x == other.x && this.y == other.y && this.width == other.width && this.height == other.height;
+  },
+
+  isSupersetOf: function (other) {
+    return this.isEqual(this.copy().add(other));
+  },
+
+  isSubsetOf: function (other) {
+    return other.isEqual(other.copy().add(this));
   },
 
   toString: function () {

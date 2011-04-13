@@ -43,6 +43,21 @@ dojo.declare("sketchSpaceDesigner.designer.selection.Selection", [], {
     this.selectionUpdated();
   },
 
+  addShapesByBbox: function(bbox) {
+    var selection = this;
+    this.designer.forEachObjectShapeInBbox(bbox, function (shape) { selection.addShape(shape); });
+  },
+
+  removeShapesByBbox: function(bbox) {
+    var selection = this;
+    this.designer.forEachObjectShapeInBbox(bbox, function (shape) { selection.removeShape(shape); });
+  },
+
+  toggleShapesByBbox: function(bbox) {
+    var selection = this;
+    this.designer.forEachObjectShapeInBbox(bbox, function (shape) { selection.toggleShape(shape); });
+  },
+
   shapeIsSelected: function(shape) {
     return shape.objId !== undefined && this.objects[shape.objId] !== undefined;
   },

@@ -35,10 +35,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     $(this.designer.container).css({'cursor': 'url(/static/html/plugins/sketchSpace/' + cur + '),default'});
   },
 
-  getCursorBbox: function() {
-    return sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
-  },
-
   onKeyDown: function (event) {
     this.inherited(arguments);
     if (event.keyCode == dojo.keys.SHIFT) {
@@ -80,10 +76,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
         this.designer.surface_transform.setTransform(dojox.gfx.matrix.multiply(dojox.gfx.matrix.scale(Math.min(hScale, vScale)), dojox.gfx.matrix.translate(-bbox.x, -bbox.y), originalMatrix));
       }
     }
-  },
-
-  onMouseMove: function (event) {
-    this.mouse = {x:event.layerX, y:event.layerY};
-    this.inherited(arguments);
   },
 });

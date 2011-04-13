@@ -6,6 +6,9 @@ dojo.require("dijit.form.Button");
 dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Edit], {
   isOutlineMouseDown: false,
   isMoving: false,
+
+  cursorBboxOutlineDefinitions: {select: [{color:{r:128,g:0,b:128,a:1}, width:1, style:"solid"}, {color:{r:196,g:0,b:196,a:1}, width:1, style:"solid"}]},
+
   enable: function () {
     var designer = this;
     this.inherited(arguments);
@@ -184,12 +187,32 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     }
   },
 
+  onMouseDown: function (event) {
+    this.inherited(arguments);
+    if (!this.isOutlineMoving) {
+      if (event.button == dojo.mouseButtons.LEFT) {
+        this.orig = this.mouse = {x:event.layerX, y:event.layerY}
+        this.addCursorBboxOutline("select");
+      }
+    }
+  },
+
   onMouseUp: function(event) {
     this.inherited(arguments);
     if (this.isOutlineMoving) {
       this.designer.selection.applyToShapes("save");
       this.isOutlineMoving = false;
+    } else {
+      if (event.button == dojo.mouseButtons.LEFT) {
+        if (event.ctrlKey) {
+ 	  this.designer.selection.toggleShapesByBbox(this.getCurrentCursorBbox());
+        } else {
+ 	  this.designer.selection.clear();
+ 	  this.designer.selection.addShapesByBbox(this.getCurrentCursorBbox());
+        }
+      }
     }
+    this.removeCursorBboxOutline("zoom");
     this.isOutlineMouseDown = false;
   },
 

@@ -261,6 +261,14 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
     });
   },
 
+  forEachObjectShapeInBbox: function(bbox, fn) {
+    this.forEachObjectShape(function (shape) {
+      if (bbox.isSupersetOf(new sketchSpaceDesigner.designer.bbox.Bbox().addPoints(shape.getTransformedBoundingBox()))) {
+        fn(shape);
+      }
+    });
+  },
+
   registerObjectShape: function(shape) {
     if (shape.objId === undefined) {
       shape.objId = dojox.uuid.generateRandomUuid();
