@@ -119,8 +119,6 @@ var richTextClient = {
                 args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
             } else if("ol" == tname && /\bace\-orderedlist\b/.exec(args.cls)){
                 args.cc.doLineAttrib(args.state, "orderedlist", "true");
-            } else if("ol" == tname){
-                debugger;
             }
         }
     },

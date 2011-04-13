@@ -187,14 +187,14 @@ linestylefilter.getRegexpFilter = function (regExp, tag) {
 
     var handleRegExpMatchsAfterSplit = (function() {
       var curIndex = 0;
-      return function(txt, cls) {
+      return function(txt, cls, attribs, pos) {
 	var txtlen = txt.length;
 	var newCls = cls;
 	var regExpMatch = regExpMatchForIndex(curIndex);
 	if (regExpMatch) {
 	  newCls += " "+tag+":"+regExpMatch;
 	}
-	textAndClassFunc(txt, newCls);
+	textAndClassFunc(txt, newCls, attribs, pos);
 	curIndex += txtlen;
       };
     })();
@@ -222,9 +222,9 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
     nextPointIndex++;
   }
 
-  function spanHandler(txt, cls) {
+  function spanHandler(txt, cls, attribs, pos) {
     if ((! splitPointsOpt) || nextPointIndex >= splitPointsOpt.length) {
-      func(txt, cls);
+      func(txt, cls, attribs, pos);
       idx += txt.length;
     }
     else {
@@ -232,7 +232,7 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
       var pointLocInSpan = splitPoints[nextPointIndex] - idx;
       var txtlen = txt.length;
       if (pointLocInSpan >= txtlen) {
-	func(txt, cls);
+	func(txt, cls, attribs, pos);
 	idx += txt.length;
 	if (pointLocInSpan == txtlen) {
 	  nextPointIndex++;
@@ -240,12 +240,12 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
       }
       else {
 	if (pointLocInSpan > 0) {
-	  func(txt.substring(0, pointLocInSpan), cls);
+	  func(txt.substring(0, pointLocInSpan), cls, attribs, pos);
 	  idx += pointLocInSpan;
 	}
 	nextPointIndex++;
 	// recurse
-	spanHandler(txt.substring(pointLocInSpan), cls);
+	spanHandler(txt.substring(pointLocInSpan), cls, attribs, pos);
       }
     }
   }

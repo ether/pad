@@ -1707,7 +1707,8 @@ function OUTER(gscope) {
        if(lineNum > domLines.length) return;
        for(var i = lineNum - 1; i >=0; i--){
             pInfo = getOrderedListInfo(domLines[i], i);
-            if(pInfo && pInfo.type == type){
+            if(!pInfo) continue;
+            if(pInfo.type == type){
                 return pInfo;
             }else if(level > getOrderedListLevel(pInfo.type)){
                 break;
@@ -1851,25 +1852,28 @@ function OUTER(gscope) {
     }
     while (!(n == lineNode && after)) {
       if (after) {
-	if (n.nextSibling) {
-	  n = n.nextSibling;
-	  after = false;
-	}
-	else n = n.parentNode;
-      }
-      else {
-	if (isNodeText(n)) {
-	  var len = n.nodeValue.length;
-	  if (charsLeft <= len) {
-	    return {node: n, index:charsLeft, maxIndex:len};
-	  }
-	  charsLeft -= len;
-	  after = true;
-	}
-	else {
-	  if (n.firstChild) n = n.firstChild;
-	  else after = true;
-	}
+	    if (n.nextSibling) {
+    	  n = n.nextSibling;
+	      after = false;
+    	}
+	    else n = n.parentNode;
+      } else {
+    	if (isNodeText(n)) {
+	      var len = n.nodeValue.length;
+    	  if (charsLeft <= len) {
+	        return {node: n, index:charsLeft, maxIndex:len};
+    	  }
+	      charsLeft -= len;
+    	  after = true;
+	    } else {
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+            charsLeft--;
+            after = true;
+          } else {
+    	    if (n.firstChild) n = n.firstChild;
+    	    else after = true;
+          }
+    	}
       }
     }
     return {node: lineNode, index:1, maxIndex:1};
@@ -1899,20 +1903,23 @@ function OUTER(gscope) {
       // if this part fails, it probably means the selection node
       // was dirty, and we didn't see it when collecting dirty nodes.
       if (isNodeText(n)) {
-	col = point.index;
+    	col = point.index;
       }
       else if (point.index > 0) {
-	col = nodeText(n).length;
+	    col = nodeText(n).length;
       }
       var parNode, prevSib;
       while ((parNode = n.parentNode) != root) {
-	if ((prevSib = n.previousSibling)) {
-	  n = prevSib;
-	  col += nodeText(n).length;
-	}
-	else {
-	  n = parNode;
-	}
+    	if ((prevSib = n.previousSibling)) {
+	      n = prevSib;
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+              col ++;
+          } else {
+        	  col += nodeText(n).length;
+          }
+	    } else {
+    	  n = parNode;
+    	}
       }
       if (n.id == "") console.debug("BAD");
       if (n.firstChild && isBlockElement(n.firstChild)) {
@@ -2980,9 +2987,9 @@ function OUTER(gscope) {
     var listType = getLineListType(lineNum);
     var orderedList = (getLineAttribute(lineNum, "orderedlist") == "true");
     performDocumentReplaceSelection('\n');
-    if (listType) {
+    if (listType || orderedList) {
       if (lineNum+1 < rep.lines.length()) {
-       setLineListType(lineNum+1, listType, orderedList);
+       setLineListType(lineNum+1, listType || "bullet1", orderedList);
       }
     }
     else {
@@ -4111,7 +4118,10 @@ function OUTER(gscope) {
       initDynamicCSS();
 
       enforceEditability();
-       
+
+      if(browser.mozilla){ //disable image resize 
+          doc.execCommand("enableObjectResizing", false, false);
+      } 
       // set up dom and rep
       while (root.firstChild) root.removeChild(root.firstChild);
       var oneEntry = createDomLineEntry("");

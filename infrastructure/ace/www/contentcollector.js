@@ -280,7 +280,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     value = (value === undefined) ? true : value;
     lines.appendText(objMarker, Changeset.makeAttribsString(
         '+', [[na, value]],
-        apool) + state.attribString);
+        apool) + (state.attribString || ""));
   };
  
   cc.collectContent = function (node, state) {
