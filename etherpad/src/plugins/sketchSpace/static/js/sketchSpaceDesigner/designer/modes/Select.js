@@ -189,7 +189,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (!this.isOutlineMoving) {
+    if (!this.isOutlineMouseDown && !this.isOutlineMoving) {
       if (event.button == dojo.mouseButtons.LEFT) {
         this.orig = this.mouse = {x:event.layerX, y:event.layerY}
         this.addCursorBboxOutline("select");
@@ -201,8 +201,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.inherited(arguments);
     if (this.isOutlineMoving) {
       this.designer.selection.applyToShapes("save");
-      this.isOutlineMoving = false;
-    } else {
+   } else if (this.isOutlineMouseDown) {
+   } else {
       if (event.button == dojo.mouseButtons.LEFT) {
         if (event.ctrlKey) {
  	  this.designer.selection.toggleShapesByBbox(this.getCurrentCursorBbox());
@@ -214,22 +214,23 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     }
     this.removeCursorBboxOutline("zoom");
     this.isOutlineMouseDown = false;
+    this.isOutlineMoving = false;
   },
 
   onMouseMove: function(event) {
     this.inherited(arguments);
 
-    if (!this.isOutlineMouseDown || !this.outline) return;
+    if (this.isOutlineMouseDown && this.outline) {
+      this.isOutlineMoving = true;
 
-    this.isOutlineMoving = true;
+      var move = this.getCurrentMove(event);
+      this.outline.setTransform(dojox.gfx.matrix.multiply(this.outline.originalMatrix, move));
 
-    var move = this.getCurrentMove(event);
-    this.outline.setTransform(dojox.gfx.matrix.multiply(this.outline.originalMatrix, move));
-
-    move = this.getCurrentMove(event, this.designer.selection.parent, this.designer.selection.orig);
-    this.designer.selection.applyToShapes(function () {
-      this.setTransform(dojox.gfx.matrix.multiply(this.originalMatrix, move));
-    });
+      move = this.getCurrentMove(event, this.designer.selection.parent, this.designer.selection.orig);
+      this.designer.selection.applyToShapes(function () {
+	this.setTransform(dojox.gfx.matrix.multiply(this.originalMatrix, move));
+      });
+    }
   },
 
   getContainerShape: function () { return this.designer.surface; },
