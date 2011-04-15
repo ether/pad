@@ -158,7 +158,8 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   function _pointHere(charsAfter, state) {
     var ln = lines.length()-1;
     var chr = lines.textOfLine(ln).length;
-    if (chr == 0 && state.listType && state.listType != 'none') {
+    if (chr == 0 && ((state.listType && state.listType != 'none')
+                     || state.lineMarker)) {
       chr += 1; // listMarker
     }
     chr += charsAfter;
@@ -253,6 +254,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       if (atBeginningOfLine && state.listType && state.listType != 'none') {
         _produceListMarker(state);
       }
+      state.lineMarker = false;
     }
     lines.startNew();
   }
@@ -275,6 +277,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     lines.addLineMarkerAttrib(Changeset.makeAttribsString(
         '+', [[na, value]],
         apool));
+    state.lineMarker = true;
   };
   cc.doObjAttrib = function(state, na, value){
     value = (value === undefined) ? true : value;
@@ -286,8 +289,9 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
-	       localAttribs: null,
-           localValues :{/* attribute : value */},
+    	       localAttribs: null,
+               localValues :{/* attribute : value */},
+               lineMarker : false,
                attribs: {/*name -> nesting counter*/},
                attribString: ''};
     }
