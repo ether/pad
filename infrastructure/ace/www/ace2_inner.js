@@ -2268,6 +2268,52 @@ function OUTER(gscope) {
   }
   editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
 
+
+  function eraseTextAttributeOnSelection() {
+    if (!(rep.selStart && rep.selEnd)) return;
+
+
+    var objAttribStr = Changeset.makeAttribsString('+', [["aceObject", "true"]], rep.apool);
+    var objAttribRegex = new RegExp(objAttribStr.replace(/\*/g,'\\*')+"(\\*|$)");
+    function isAceObject(attribs) { return objAttribRegex.test(attribs); }
+
+    var clearLists = [];
+    var selStartLine = rep.selStart[0];
+    var selEndLine = rep.selEnd[0];
+    for(var n=selStartLine; n<=selEndLine; n++) {
+      var opIter = Changeset.opIterator(rep.alines[n]);
+      var indexIntoLine = 0;
+      var selectionStartInLine = 0;
+      var selectionEndInLine = rep.lines.atIndex(n).text.length; // exclude newline
+      if (n == selStartLine) {
+    	selectionStartInLine = rep.selStart[1];
+      }
+      if (n == selEndLine) {
+    	selectionEndInLine = rep.selEnd[1];
+      }
+      while (opIter.hasNext()) {
+    	var op = opIter.next();
+    	var opStartInLine = indexIntoLine;
+    	var opEndInLine = opStartInLine + op.chars;
+    	if (! (opEndInLine <= selectionStartInLine || opStartInLine >= selectionEndInLine 
+                || isAceObject(op.attribs))) { 
+            //in order work efficiently, attributes for object and text may be different
+            Changeset.eachAttribNumber(op.attribs, function(n) {
+                 var key = rep.apool.getAttribKey(n);
+                 if(key !== undefined){
+                    clearLists.push([key, ""]);
+                 }
+            });
+    	}
+	    indexIntoLine = opEndInLine;
+      }
+    }
+
+    performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
+					    clearLists);
+  }
+  editorInfo.ace_eraseTextAttributeOnSelection = eraseTextAttributeOnSelection;
+
   function performDocumentReplaceSelection(newText) {
     if (!(rep.selStart && rep.selEnd)) return;
     performDocumentReplaceRange(rep.selStart, rep.selEnd, newText);
@@ -2691,7 +2737,9 @@ function OUTER(gscope) {
     return str.replace(/[\n\r ]/g, ' ').replace(/\xa0/g, ' ').replace(/\t/g, '        ');
   }
 
-  var _blockElems = { "div":1, "p":1, "pre":1, "li":1, "ol":1, "ul":1 };
+  var _blockElems = { "div":1, "p":1, "pre":1, "li":1, "ol":1, "ul":1 , 
+                      "h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1,
+                      "blockquote":1};
   function isBlockElement(n) {
     return !!_blockElems[(n.tagName || "").toLowerCase()];
   }

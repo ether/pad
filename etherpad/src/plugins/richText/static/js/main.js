@@ -1,11 +1,13 @@
 function richTextInit() {
   this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine',
-	 'collectContentPre', 'collectContentPost', 'aceCreateStructDomLine'];
+	 'collectContentPre', 'collectContentPost', 'aceCreateStructDomLine',
+     'aceInitInnerdocbodyHead'];
   this.aceAttribsToClasses = aceAttribsToClasses;
   this.aceCreateDomLine = aceCreateDomLine;
   this.collectContentPre = collectContentPre;
   this.collectContentPost = collectContentPost;
   this.aceCreateStructDomLine = aceCreateStructDomLine;
+  this.aceInitInnerdocbodyHead = aceInitInnerdocbodyHead;
 }
 
 
@@ -38,6 +40,10 @@ function aceCreateStructDomLine(args){
 
 function collectContentPre(args) {
     return richTextClient.collectContent(args);
+}
+
+function aceInitInnerdocbodyHead(args){
+    args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/richText/richtext.css"/>\'');
 }
 
 function collectContentPost(args) {

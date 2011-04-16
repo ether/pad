@@ -282,7 +282,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   cc.doObjAttrib = function(state, na, value){
     value = (value === undefined) ? true : value;
     lines.appendText(objMarker, Changeset.makeAttribsString(
-        '+', [[na, value]],
+        '+', [["aceObject", "true"],[na, value]],
         apool) + (state.attribString || ""));
   };
  

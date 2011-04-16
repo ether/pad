@@ -37,6 +37,7 @@ function colorPalette(name, img, callback){
         });
         dojo.byId(name + "ColorPalette").appendChild(Button.domNode);
 }
+
 function buildColorPalette(){ //build text-color and background-color palette
 	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){
           richTextexecCommand("color", val);
@@ -85,7 +86,7 @@ function styleMenuList(name, style, values, callback, selectedIndex){
           dropDown: menu,
           id: name + "menu"
     });
-    dojo.byId(name + "placeholder").appendChild(button.domNode)
+    dojo.byId(name + "placeholder").appendChild(button.domNode);
 } 
 	
 function familyLists(values, callback, selectedIndex){
@@ -123,11 +124,73 @@ function familyLists(values, callback, selectedIndex){
     }).placeAt("fontfamilyplaceholder");
 }
 
+
+function preDefinedList(lists, name, selectedIndex, callback){
+    var menu = new dijit.Menu({
+         //  style: "display: none; width:100px",
+         style: { width: '100px', overflow:"hidden" },
+         forceWidth : true
+    });
+	selectedIndex = selectedIndex || 0;
+
+	var strList = [
+	   "<",
+       "", //tagname
+	   " class='",
+	   "", //classname
+	   "'>",
+	   "", //title
+	   "</",
+       "", //tagname
+       ">" 		  
+	];
+	selectedIndex = selectedIndex || 0;
+	for(var i = 0, len = lists.length; i < len; i++){
+        item = lists[i]; 
+        strList[1] = strList[7] = item.tagName;
+        strList[3] = item.className;
+        strList[5] = item.title;
+        var menuItem = new dijit.MenuItem({
+	          label : strList.join(""), 
+              title : item.title,
+	 	      value : item.value,
+              onClick: function() {
+    		      var val = this.get("value"), title = this.get("title");		
+	    	      button.set({"label": title, "value": val});
+		    	  if(callback){
+			         callback(val);
+    			  }
+    	      }
+        });
+        menu.addChild(menuItem);
+	}	
+
+    var button = new dijit.form.DropDownButton({
+          label: lists[selectedIndex].title,
+	      value: lists[selectedIndex].value, 
+          name: name + "menulist",
+          dropDown: menu,
+          id: name + "menu"
+    });
+    dojo.byId(name + "placeholder").appendChild(button.domNode);
+}
+
 function buildFontStyle(){
 	var sizes = ["10px", "12px", "16px", 
 			"18px", "24px", "32px", "48px"];
 	var families = ["Arial", "Arial Black", "Comic Sans MS", 
 			"Georgia", "Times New Roman", "\u5b8b\u4f53", "\u6977\u4f53"]; 
+    var preDefined = [
+            {title:"Heading 1", value : "h1", tagName : "h1", className :""},
+            {title:"Heading 2", value : "h2", tagName : "h2", className :""},
+            {title:"Heading 3", value : "h3", tagName : "h3", className :""},
+            {title:"Heading 4", value : "h4", tagName : "h4", className :""},
+            {title:"Heading 5", value : "h5", tagName : "h5", className :""},
+            {title:"Heading 6", value : "h6", tagName : "h6", className :""},
+            {title:"Block Quote", value : "blockquote", tagName : "blockquote", className :"richquotestyle"},
+            {title:"Content", value : "content", tagName : "span", className :""}
+    ];
+
     styleMenuList("fontsize", "font-size", sizes, function(val){
           richTextexecCommand("fontSize", val);
     });	
@@ -135,6 +198,10 @@ function buildFontStyle(){
 	//families, function(val){alert(val)}); //how to set fix width in dojo?
 	familyLists(families, function(val){
           richTextexecCommand("fontFamily", val);
+    });
+
+    preDefinedList(preDefined, "preDefinedStyle", 0, function(val){
+          richTextexecCommand("preDefinedStyle", val);
     });
 }
 
@@ -169,7 +236,9 @@ var confirmDialog = (function(){
         elem.style.display = "none";
         var str = "";
         for(var i = 0, len = lists.length; i < len; i++){
-            str += "<div style='margin-bottom:0.2em; font-size:1.2em'><label>" + lists[i].name + " : </label><span id=" + id + "input_" + i + "></span></div>" 
+            str += "<div style='margin-bottom:0.2em; font-size:1.2em'><label>" 
+                    + lists[i].name + " : </label><span id=" + id + "input_" 
+                    + i + "></span></div>" 
         }
         var foot = "<div id="+ id+"_bar" +" class=dijitDialogPaneActionBar></div>";
         str += foot;

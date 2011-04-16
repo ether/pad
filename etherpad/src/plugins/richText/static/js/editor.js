@@ -16,7 +16,7 @@ var richTextClient = {
              case "textAlign":
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnLine(cmd, value);
-                 }, cmd, true);
+                }, cmd, true);
                 break;
               case "image":
                 padeditor.ace.callWithAce(function (ace) {
@@ -33,7 +33,7 @@ var richTextClient = {
                     ace.ace_replaceRange(rep.selStart, rep.selEnd, ace.objMarker);
                     ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]], rep.selStart, false);
                     ace.ace_performDocumentApplyAttributesToRange(rep.selStart, [rep.selStart[0],rep.selStart[1] + 1],
-                           [["imgSrc", value.url]]);
+                           [["aceObject", "true"],["imgSrc", value.url]]);
                 }, "insertImage", true);
                 return; 
               case "orderedlist":
@@ -41,12 +41,25 @@ var richTextClient = {
                     ace.ace_toggleAttributeOnLine(cmd, "true");
                 }, "orderedlist", true); 
                 break;
+              case "Eraser":
+                padeditor.ace.callWithAce(function(ace){
+                    ace.ace_eraseTextAttributeOnSelection();
+                }, "Eraser", true); 
+                break;
               case "link":
                 rtLinkDlg.show();
                 break;
               case "insertLink":
                 alert(value.url+ " : " + value.text);
                 break;
+              case "preDefinedStyle":
+                 padeditor.ace.callWithAce(function (ace) {
+                    if(value == "content"){
+                        value = "";
+                    }
+                    ace.ace_toggleAttributeOnLine(cmd, value);  
+                }, cmd, true);
+                break; 
               default:
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnSelection(cmd, value);
@@ -82,7 +95,12 @@ var richTextClient = {
     * convert font-size -> fontSize
     **/
     formatStyleName : function(name){
-       return (name || "").replace(/\-(.)?/,function(_, s){return s.toUpperCase()})
+       return (name || "").replace(/\-(.)?/g,function(_, s){return s.toUpperCase()})
+    },
+    isStyledBlockElement : function(tagName){
+        var tagLists = ["h1", "h2", "h3", "h4", "h5", "h6", "blockquote"];
+        var tagReg = new RegExp(tagLists.join("|"));
+        return !! tagReg.test(tagName || "");
     },
     collectContent : function(args){
         if(args.tname){
@@ -119,7 +137,9 @@ var richTextClient = {
                 args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
             } else if("ol" == tname && /\bace\-orderedlist\b/.exec(args.cls)){
                 args.cc.doLineAttrib(args.state, "orderedlist", "true");
-            }
+            } else if(richTextClient.isStyledBlockElement(tname)){ //predefined style
+                args.cc.doLineAttrib(args.state, "preDefinedStyle", tname);
+            } 
         }
     },
     parseCommand : function(args){
@@ -153,6 +173,31 @@ var richTextClient = {
                         break;
                     case "height":
                         style["height"] = pool[1]; 
+                        break;
+                    case "preDefinedStyle":
+                        temp = {
+                            tag : "div", 
+                            attrs : {
+                            }
+                        };
+                        switch(pool[1]){
+                            case "h1":
+                            case "h2":
+                            case "h3":
+                            case "h4":
+                            case "h5":
+                            case "h6":
+                                temp.tag = pool[1]; 
+                                break;
+                            case "blockquote":
+                                temp.tag = "blockquote";
+                                temp.attrs.class="richquotestyle";
+                                break;
+                            default:
+                                tep = {};
+                                
+                        }
+                        blockref.push(temp);
                         break;
                     case "textAlign":
                         temp = {
