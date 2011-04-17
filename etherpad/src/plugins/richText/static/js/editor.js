@@ -47,10 +47,27 @@ var richTextClient = {
                 }, "Eraser", true); 
                 break;
               case "link":
+                padeditor.ace.callWithAce(function (ace) {
+                     var rep = ace.ace_getRep();
+                     richTextClient.recordSelection(rep.selStart, rep.selEnd);
+                }, "link", true);
                 rtLinkDlg.show();
                 break;
               case "insertLink":
-                alert(value.url+ " : " + value.text);
+                 padeditor.ace.callWithAce(function (ace) {
+                    var rep;
+                    if(!value || !value.url || !value.text) return;
+                    rep = richTextClient.getRecordSelection();
+                    ace.ace_replaceRange(rep.selStart, rep.selEnd, value.text);
+                    ace.ace_performSelectionChange([rep.selStart[0],rep.selStart[1]], rep.selStart, false);
+                    ace.ace_performDocumentApplyAttributesToRange(rep.selStart, [rep.selStart[0],rep.selStart[1] + value.text.length],
+                           [["link", value.url]]);
+                }, "insertLink", true);
+                break;
+              case "unlink":
+                padeditor.ace.callWithAce(function(ace){
+                    ace.ace_toggleAttributeOnSelection("link", "");
+                }, "unlink", true); 
                 break;
               case "preDefinedStyle":
                  padeditor.ace.callWithAce(function (ace) {
@@ -139,6 +156,8 @@ var richTextClient = {
                 args.cc.doLineAttrib(args.state, "orderedlist", "true");
             } else if(richTextClient.isStyledBlockElement(tname)){ //predefined style
                 args.cc.doLineAttrib(args.state, "preDefinedStyle", tname);
+            } else if("a" == tname && attribs.href){
+                args.cc.doAttrib(args.state, "link", attribs.href);
             } 
         }
     },
@@ -173,6 +192,10 @@ var richTextClient = {
                         break;
                     case "height":
                         style["height"] = pool[1]; 
+                        break;
+                    case "link":
+                        extraOpenTags += "<a href='" + pool[1] +"' >"; /*manually fire dragend event on chrome*/ 
+                        extraCloseTags = "</a>" + extraCloseTags;
                         break;
                     case "preDefinedStyle":
                         temp = {
@@ -213,7 +236,7 @@ var richTextClient = {
             }
             var styleStr = richTextClient.joinStyle(style);
             attStr += styleStr;
-            if(redirect){
+            if(redirect){ //need to update
                 extraOpenTags += styleStr + " />";
             }
         }
