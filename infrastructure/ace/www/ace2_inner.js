@@ -2799,6 +2799,7 @@ function OUTER(gscope) {
 
     var cleanNodeForIndexCache = {};
     var N = rep.lines.length(); // old number of lines
+
     function cleanNodeForIndex(i) {
       // if line (i) in the un-updated line representation maps to a clean node
       // in the document, return that node.
@@ -2941,6 +2942,10 @@ function OUTER(gscope) {
       }
     }
 
+    if(forceDirtyLineNumber != -1){ //hack for image drag drop
+	   splitRange(0, forceDirtyLineNumber);
+       forceDirtyLineNumber = -1;
+    }
     if (N == 0) {
       p.cancel();
       if (! isConsecutive(0)) {
@@ -4098,9 +4103,18 @@ function OUTER(gscope) {
     }
   }
   
+  //hack for image drag drop
+  var forceDirtyLineNumber = -1; //force line be dirty to collect content
   function customDragDrop(evt){
       if(evt.target && (evt.target.tagName || "").toLowerCase() == "img"){
         imageDragDropLock = true;
+        var node = evt.target.parentNode;
+        while(node && node.parentNode != root){
+            node = node.parentNode;
+        }
+        if(node && (node.id || "").indexOf("magicdomid") != -1){
+           forceDirtyLineNumber = rep.lines.indexOfKey(node.id); 
+        } 
       }
   }
 
