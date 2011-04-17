@@ -9,8 +9,13 @@ function richTextInit() {
   this.aceCreateStructDomLine = aceCreateStructDomLine;
   this.aceInitInnerdocbodyHead = aceInitInnerdocbodyHead;
 }
-
-
+if(typeof richTextClient == "undefined"){
+    var richTextClient ={
+        execCommand    : function(){},
+        parseCommand   : function(){},
+        collectContent : function(){}
+    }
+}
 //rich text command entry
 function richTextexecCommand(cmd, value){
     switch(cmd){

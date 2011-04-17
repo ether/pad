@@ -21,3 +21,9 @@ function editBarItemsLeftPad(arg) {
   initRunTime();
   return arg.template.include('richTextEditbarButtons.ejs', undefined, ['richText']);
 }
+
+function editBarItemsLeftPadView(){
+	helpers.addToHead('<script src="/static/js/plugins/richText/editor.js"></script>');
+	helpers.addToHead('<link rel="stylesheet" type="text/css" href="/static/css/plugins/richText/claropatch.css" />');
+	helpers.addBodyClass("maximized");  //remove full window toggle button 
+}

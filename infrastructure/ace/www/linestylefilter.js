@@ -287,8 +287,17 @@ linestylefilter.populateDomLine = function(textLine, aline, apool,
     text = text.substring(0, text.length-1);
   }
 
-  function textAndClassFunc(tokenText, tokenClass) {
-    domLineObj.appendSpan(tokenText, tokenClass);
+  function isMarkerToken(txt, pos){
+        var lineMarker = "*";
+        return (pos == 1 && txt && (txt == lineMarker));
+  }
+
+  function textAndClassFunc(tokenText, tokenClass, apool, pos) {
+    var marker = false;
+    if(isMarkerToken(tokenText, pos)){
+                marker = true;
+    }
+    domLineObj.appendSpan(tokenText, tokenClass, apool, marker);
   }
 
   var func = linestylefilter.getFilterStack(text, textAndClassFunc);

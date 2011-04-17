@@ -169,7 +169,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
    * the elements in reference are order-independent
    * */
   result.appendSpan = function(txt, cls, attributes, lineMarker) {  
-    if(lineMarker){
+    if(lineMarker){ //TODO mark a lineMarker using attrbute "ace-lineMarker"
         result.lineMarker +=txt.length;
         txt = "";
     }
