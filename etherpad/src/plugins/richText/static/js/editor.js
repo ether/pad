@@ -200,6 +200,7 @@ var richTextClient = {
                     case "preDefinedStyle":
                         temp = {
                             tag : "div", 
+                            className : "", //class can't be used as attribute in safari
                             attrs : {
                             }
                         };
@@ -214,7 +215,7 @@ var richTextClient = {
                                 break;
                             case "blockquote":
                                 temp.tag = "blockquote";
-                                temp.attrs.class="richquotestyle";
+                                temp.className = "richquotestyle";
                                 break;
                             default:
                                 tep = {};

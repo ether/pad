@@ -125,7 +125,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
       var ret = {preHtml:"", postHtml:""};
       ref = mergeRef(ref);
       for(var i = 0, len = ref.length; i < len; i++){
-            ret.preHtml += "<" + ref[i].tag + attr2String(ref[i].attrs) + ">";
+            ret.preHtml += "<" + ref[i].tag +" class='" + (ref[i].className || "") + "' " + attr2String(ref[i].attrs) + ">";
             ret.postHtml = "</" + ref[i].tag + ">" + ret.postHtml;
       }
       return ret;

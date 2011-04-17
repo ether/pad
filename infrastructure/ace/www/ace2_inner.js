@@ -1959,6 +1959,9 @@ function OUTER(gscope) {
           }
 	    } else {
     	  n = parNode;
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+              col ++;
+          }
     	}
       }
       if (n.id == "") console.debug("BAD");
@@ -2309,6 +2312,16 @@ function OUTER(gscope) {
   editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
 
 
+  function isLineMarker(op, startIndex, lineNumber){//need to attributs to supprt
+    if(0 == startIndex && 1 == op.chars && op.attribs){
+        var txt = rep.lines.atIndex(lineNumber).text;
+        if(txt && txt[0] == lineMarker){
+            return true;
+        }
+    }
+    return false;
+  }
+
   function eraseTextAttributeOnSelection() {
     if (!(rep.selStart && rep.selEnd)) return;
 
@@ -2336,7 +2349,7 @@ function OUTER(gscope) {
     	var opStartInLine = indexIntoLine;
     	var opEndInLine = opStartInLine + op.chars;
     	if (! (opEndInLine <= selectionStartInLine || opStartInLine >= selectionEndInLine 
-                || isAceObject(op.attribs))) { 
+                || isAceObject(op.attribs) || isLineMarker(op, opStartInLine, n))) { 
             //in order work efficiently, attributes for object and text may be different
             Changeset.eachAttribNumber(op.attribs, function(n) {
                  var key = rep.apool.getAttribKey(n);
@@ -3173,7 +3186,8 @@ function OUTER(gscope) {
             var prevLineBlank = (prevLineEntry &&
                                  prevLineEntry.text.length ==
                                  prevLineEntry.lineMarker);
-            if (thisLineListType) {
+            var lineMarker = hasLineMarker(theLine);
+            if (thisLineListType || lineMarker) {
               // this line is a list
               if (prevLineBlank && ! prevLineListType) {
                  // previous line is blank, remove it
@@ -4521,7 +4535,7 @@ function OUTER(gscope) {
             var lineText = rep.lines.atIndex(lineNum).text;
             if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
                  var excludeObj = {}, exclude = exclude || [];
-                 exclude.push("author");
+//               exclude.push("author");
                  forEach(exclude, function(name){
                     excludeObj[name] = true;
                  }); 
@@ -4536,6 +4550,10 @@ function OUTER(gscope) {
           }
         }
         return ret
+  }
+
+  function hasLineMarker(lineNum){
+       return hasUsefulLineAttributes(lineNum);
   }
 
   function  getLineAttribute(lineNum, attributeName){
