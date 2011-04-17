@@ -1269,6 +1269,44 @@ function OUTER(gscope) {
     }
   }
 
+  var preSelection = null; //for drag drop
+  function recordSelection(selection){ //
+     preSelection = null;
+     if(!selection) return;
+     preSelection = {};
+     for(var i in selection){
+        if(typeof selection[i] == "object"){
+            preSelection[i] = {};
+            var local = selection[i];
+            for(var j in local){
+                preSelection[i][j] = local[j];
+            } 
+        } else {
+            preSelection[i] = selection[i];
+        }
+     }
+  }
+
+
+  function observePreviousSelection(){
+    if(preSelection){
+     var selection = preSelection;
+     function topLevel(n) {
+    	if ((!n) || n == root) return null;
+    	while (n && n.parentNode != root) {
+    	  n = n.parentNode;
+	    }
+    	return n;
+      }
+      var node1 = topLevel(selection.startPoint.node);
+      var node2 = topLevel(selection.endPoint.node);
+      if (node1) observeChangesAroundNode(node1);
+      if (node2 && node1 != node2) {
+	    observeChangesAroundNode(node2);
+      }
+    } 
+  }
+
   function observeChangesAroundSelection() {
     if (currentCallStack.observedSelection) return;
     currentCallStack.observedSelection = true;
@@ -1278,18 +1316,20 @@ function OUTER(gscope) {
     p.end();
     if (selection) {
       function topLevel(n) {
-	if ((!n) || n == root) return null;
-	while (n.parentNode != root) {
-	  n = n.parentNode;
-	}
-	return n;
+	    if ((!n) || n == root) return null;
+    	while (n.parentNode != root) {
+	      n = n.parentNode;
+    	}
+    	return n;
       }
       var node1 = topLevel(selection.startPoint.node);
       var node2 = topLevel(selection.endPoint.node);
       if (node1) observeChangesAroundNode(node1);
       if (node2 && node1 != node2) {
-	observeChangesAroundNode(node2);
+	    observeChangesAroundNode(node2);
       }
+      observePreviousSelection();
+      recordSelection(selection);
     }
   }
 
