@@ -1,7 +1,7 @@
 var richTextClient = {
     localSelection :{
         selStart : [],
-        selEnd   : [],
+        selEnd   : []
     },
     recordSelection : function(start, end){
         if(!start || !end) return;

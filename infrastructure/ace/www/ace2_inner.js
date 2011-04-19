@@ -772,7 +772,7 @@ function OUTER(gscope) {
       else {
         setAttributeOnSelection('author', '');
       }
-    },
+    }
   };
 
   function execCommand(cmd) {

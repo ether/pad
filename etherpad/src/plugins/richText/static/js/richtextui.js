@@ -145,6 +145,7 @@ function preDefinedList(lists, name, selectedIndex, callback){
        ">" 		  
 	];
 	selectedIndex = selectedIndex || 0;
+    var item = null;
 	for(var i = 0, len = lists.length; i < len; i++){
         item = lists[i]; 
         strList[1] = strList[7] = item.tagName;
