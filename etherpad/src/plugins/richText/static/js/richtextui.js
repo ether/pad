@@ -1,9 +1,11 @@
-dojo.require("dijit.form.Button");
-dojo.require("dijit.Menu");
-dojo.require("dijit.ColorPalette");
-dojo.require('dijit.form.Select');
-dojo.require("dijit.Dialog");
-dojo.require("dijit.form.ValidationTextBox");
+if(typeof dojo != "undefined"){
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.Menu");
+    dojo.require("dijit.ColorPalette");
+    dojo.require('dijit.form.Select');
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.ValidationTextBox");
+}
 
 
 
@@ -318,8 +320,9 @@ function buildDialogs(){
      rtLinkDlg = cDlg.dlg; 
 }	
 
-dojo.addOnLoad(function() {
-	buildColorPalette();
-	buildFontStyle();
-    buildDialogs();
-});
+if(typeof dojo != "undefined"){
+    dojo.addOnLoad(function() {
+        buildColorPalette();
+        buildFontStyle();
+    });
+}

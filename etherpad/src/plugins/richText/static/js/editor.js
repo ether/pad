@@ -1,3 +1,4 @@
+if(typeof window == "object"){
 var richTextClient = {
     localSelection :{
         selStart : [],
@@ -244,4 +245,5 @@ var richTextClient = {
         return [ {attStr : attStr, noderef: noderef, blockref : blockref, 
                  cls : cls, extraOpenTags : extraOpenTags, extraCloseTags : extraCloseTags}];
     }
+}
 }
