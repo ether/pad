@@ -38,10 +38,10 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
     this.options = {};
     this.setOptions({
       doStroke: true,
-      doFill: true,
+      doFill: false,
       stroke: {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},
       fill: {"r":255,"g":0,"b":0,"a":1},
-      showAuthorshipColors: false,
+      showAuthorshipColors: true,
       shareCurrentImage: true,
     });
 
