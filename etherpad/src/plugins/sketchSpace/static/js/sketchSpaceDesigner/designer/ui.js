@@ -31,6 +31,7 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 		  '	     <td class="editbarbutton editbargroupsfirst tool addEllipse" unselectable="on" dojoAttachEvent="onclick:_onAddEllipse"><img title="Add ellipse" src="/static/html/plugins/sketchSpace/imgeditbar_add_circle_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool addPath" unselectable="on" dojoAttachEvent="onclick:_onAddPath"><img title="Add path" src="/static/html/plugins/sketchSpace/imgeditbar_add_line_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool addPathFreehand" unselectable="on" dojoAttachEvent="onclick:_onAddPathFreehand"><img title="Add freehand path" src="/static/html/plugins/sketchSpace/imgeditbar_add_path_freehand_icon.png"></td>' +
+		  '	     <td class="editbarbutton tool addPathPolyline" unselectable="on" dojoAttachEvent="onclick:_onAddPathPolyline"><img title="Add polyline path" src="/static/html/plugins/sketchSpace/imgeditbar_add_path_polyline_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool addRect" unselectable="on" dojoAttachEvent="onclick:_onAddRect"><img title="Add rectangle" src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></td>' +
 		  '	     <td class="editbarbutton" unselectable="on"><img dojoAttachPoint="addImgButton" title="Add image" src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></td>' +
 		  '	     <td class="editbarbutton tool select" unselectable="on" dojoAttachEvent="onclick:_onSelect"><img title="Select objects" src="/static/html/plugins/sketchSpace/imgeditbar_select_icon.png"></td>' +
@@ -126,6 +127,11 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   _onAddPathFreehand: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddPathFreehand());
     this.selectToolIcon("addPathFreehand");
+  },
+
+  _onAddPathPolyline: function() {
+    this.editor.setMode(new sketchSpaceDesigner.designer.modes.AddPathPolyline());
+    this.selectToolIcon("addPathPolyline");
   },
 
   _onAddRect: function() {

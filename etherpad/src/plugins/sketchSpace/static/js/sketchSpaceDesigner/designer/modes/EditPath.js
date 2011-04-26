@@ -3,49 +3,6 @@ dojo.provide("sketchSpaceDesigner.designer.modes.EditPath");
 dojo.require("sketchSpaceDesigner.designer.modes.Edit");
 dojo.require("sketchSpaceDesigner.utils");
 
-dojo.declare("sketchSpaceDesigner.designer.modes.EditPath", [sketchSpaceDesigner.designer.modes.Edit], {
-  disable: function () {
-    this.inherited(arguments);
-    if (this.path !== undefined) {
-      this.path.shape.removeShape();
-    }
-  },
-  onKeyUp: function (event) {
-    this.inherited(arguments);
-    if (event.keyCode == dojo.keys.ENTER && !event.ctrlKey && !event.altKey && !event.shiftKey) {
-      this.done();
-    }
-  },
-  onSetOptions: function () {
-    if (this.path !== undefined)
-      this.path.setOptions(this.designer.options);
-  },
-  addPoint: function (position) {
-    if (this.path === undefined) return;
-    this.path.addPoint(position);
-  },
-  begin: function (position) {
-    if (this.path !== undefined) return;
-    this.path = new sketchSpaceDesigner.designer.modes.EditPath.Path(this);
-    this.beginSection(position);
-  },
-  beginSection: function (position) {
-    if (this.path === undefined) return;
-    this.path.addSection();
-    this.path.addPoint(position);
-  },
-  done: function () {
-    if (this.path === undefined) return;
-    if (this.path.sections.length > 0) {
-      this.designer.registerObjectShape(this.path.shape);
-      this.designer.saveShapeToStr(this.path.shape);
-      this.designer.imageUpdated();
-    } else {
-      this.path.shape.removeShape();
-    }
-    this.path = undefined;
-  },
-});
 
 dojo.declare("sketchSpaceDesigner.designer.modes.EditPath.Path", [], {
   constructor: function (mode) {
@@ -63,7 +20,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.EditPath.Path", [], {
     this.renderToShape();
   },
   addSection: function () {
-    this.sections.push(new sketchSpaceDesigner.designer.modes.EditPath.PathSection(this));
+    this.sections.push(new this.mode.PathSection(this));
     this.getLastSection().setOptions(this.options);
   },
   removeSection: function () {
@@ -127,9 +84,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.EditPath.PathSection", [], {
       if (this.options.isStraight) {
         prevPoint = this.path.shape.lastPoint;
         if (Math.abs(point.x - prevPoint.x) > Math.abs(point.y - prevPoint.y)) {
- 	  point.y = prevPoint.y;
+	  point = {x:point.x, y:prevPoint.y};
         } else {
- 	  point.x = prevPoint.x;
+ 	  point = {x:prevPoint.x, y:point.y};
         }
         this.path.shape.lineTo(point.x, point.y);
         this.path.shape.lastPoint = point;
@@ -159,3 +116,48 @@ dojo.declare("sketchSpaceDesigner.designer.modes.EditPath.PathSection", [], {
   }
 });
 
+dojo.declare("sketchSpaceDesigner.designer.modes.EditPath", [sketchSpaceDesigner.designer.modes.Edit], {
+  Path: sketchSpaceDesigner.designer.modes.EditPath.Path,
+  PathSection: sketchSpaceDesigner.designer.modes.EditPath.PathSection,
+  disable: function () {
+    this.inherited(arguments);
+    if (this.path !== undefined) {
+      this.path.shape.removeShape();
+    }
+  },
+  onKeyUp: function (event) {
+    this.inherited(arguments);
+    if (event.keyCode == dojo.keys.ENTER && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+      this.done();
+    }
+  },
+  onSetOptions: function () {
+    if (this.path === undefined) return;
+    this.path.setOptions(this.designer.options);
+  },
+  addPoint: function (position) {
+    if (this.path === undefined) return;
+    this.path.addPoint(position);
+  },
+  begin: function (position) {
+    if (this.path !== undefined) return;
+    this.path = new this.Path(this);
+    this.beginSection(position);
+  },
+  beginSection: function (position) {
+    if (this.path === undefined) return;
+    this.path.addSection();
+    this.path.addPoint(position);
+  },
+  done: function () {
+    if (this.path === undefined) return;
+    if (this.path.sections.length > 0) {
+      this.designer.registerObjectShape(this.path.shape);
+      this.designer.saveShapeToStr(this.path.shape);
+      this.designer.imageUpdated();
+    } else {
+      this.path.shape.removeShape();
+    }
+    this.path = undefined;
+  },
+});

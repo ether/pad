@@ -10,3 +10,4 @@ dojo.require("sketchSpaceDesigner.designer.modes.AddRect");
 dojo.require("sketchSpaceDesigner.designer.modes.AddEllipse");
 dojo.require("sketchSpaceDesigner.designer.modes.AddPath");
 dojo.require("sketchSpaceDesigner.designer.modes.AddPathFreehand");
+dojo.require("sketchSpaceDesigner.designer.modes.AddPathPolyline");

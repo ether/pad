@@ -3,7 +3,21 @@ dojo.provide("sketchSpaceDesigner.designer.modes.AddPathFreehand");
 dojo.require("sketchSpaceDesigner.designer.modes.EditPath");
 dojo.require("sketchSpaceDesigner.utils");
 
+
+
+dojo.declare("sketchSpaceDesigner.designer.modes.AddPathFreehand.Path", [sketchSpaceDesigner.designer.modes.EditPath.prototype.Path], {
+  setOptions: function (options) {
+   this.inherited(arguments,
+		  [sketchSpaceDesigner.utils.setObject({
+		     isClosed: false,
+		     isLine: false,
+		     isStraight: false
+		   }, options, true)]);
+  },
+});
+
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathFreehand", [sketchSpaceDesigner.designer.modes.EditPath], {
+  Path: sketchSpaceDesigner.designer.modes.AddPathFreehand.Path,
   enable: function () {
     this.inherited(arguments);
     // Set some defaults
