@@ -16,9 +16,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.selectionUpdatedHandle = dojo.connect(this.designer.selection, "selectionUpdated", this, this.updateOutline);
     this.viewUpdatedHandle = dojo.connect(this.designer, "viewUpdated", this, this.updateOutline);
 
-    this.applyOption = new dijit.layout._LayoutWidget({title:"Apply options [ENTER]:"});
-    this.applyOption.addChild(new dijit.form.Button({label:"Apply", onClick: function () { designer.applyOptionsToSelection(); }}));
-    this.designer.ui.options.addChild(this.applyOption);
+    // this.applyOption = new dijit.layout._LayoutWidget({title:"Apply options [ENTER]:"});
+    // this.applyOption.addChild(new dijit.form.Button({label:"Apply", onClick: function () { designer.applyOptionsToSelection(); }}));
+    // this.designer.ui.options.addChild(this.applyOption);
     this.deleteOption = new dijit.layout._LayoutWidget({title:"Delete [DELETE]:"});
     this.deleteOption.addChild(new dijit.form.Button({label:"Delete", onClick: function () { designer.deleteSelection(); }}));
     this.designer.ui.options.addChild(this.deleteOption);
@@ -31,7 +31,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     dojo.disconnect(this.selectionUpdatedHandle);
     this.disableOutline();
     this.inherited(arguments);
-    this.applyOption.destroyRecursive();
+    // this.applyOption.destroyRecursive();
     this.deleteOption.destroyRecursive();
     this.designer.ui.options.layout();
     $(this.designer.container).css({'cursor': 'default'});
@@ -67,6 +67,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   updateOutline: function () {
     this.disableOutline();
     this.enableOutline();
+  },
+
+  onSetOptions: function () {
+    this.applyOptionsToSelection();
   },
 
   applyOptionsToSelection: function () {
