@@ -180,10 +180,10 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
     if (this.options.showAuthorshipColors) {
       var userColor = dojox.color.fromHex(this.getUserColor(shape.userId || this.userId) || "#ff0000");
 
-      shape.setFill(shape.realColor.fill === undefined ? undefined : userColor);
+      shape.setFill(!shape.realColor.fill ? undefined : userColor);
 
       var stroke;
-      if (shape.realColor.stroke !== undefined) {
+      if (shape.realColor.stroke) {
 	stroke = {};
 	sketchSpaceDesigner.utils.setObject(stroke, shape.realColor.stroke);
 	var strokeColor = dojox.color.fromArray(userColor.toRgba());
