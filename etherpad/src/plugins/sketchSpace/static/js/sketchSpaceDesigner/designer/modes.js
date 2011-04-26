@@ -3,6 +3,7 @@ dojo.provide("sketchSpaceDesigner.designer.modes");
 dojo.require("sketchSpaceDesigner.designer.modes.Mode");
 dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 dojo.require("sketchSpaceDesigner.designer.modes.ZoomPlus");
+dojo.require("sketchSpaceDesigner.designer.modes.PanPlus");
 dojo.require("sketchSpaceDesigner.designer.modes.Edit");
 dojo.require("sketchSpaceDesigner.designer.modes.Select");
 dojo.require("sketchSpaceDesigner.designer.modes.AddRect");
