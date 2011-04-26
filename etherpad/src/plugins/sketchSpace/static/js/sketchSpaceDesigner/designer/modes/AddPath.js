@@ -1,8 +1,3 @@
-/* KEYCODES:
-SHIFT=16
-CTRL=17
-ALT=18
- */
 dojo.provide("sketchSpaceDesigner.designer.modes.AddPath");
 
 dojo.require("sketchSpaceDesigner.designer.modes.Edit");

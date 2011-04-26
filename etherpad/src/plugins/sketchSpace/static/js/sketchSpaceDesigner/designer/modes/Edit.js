@@ -25,4 +25,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Edit", [sketchSpaceDesigner.des
     this.fillColorPicker.destroyRecursive();
     this.designer.ui.options.layout();
   },
+  getContainerShape: function () { return this.designer.surface_transform; },
 });
