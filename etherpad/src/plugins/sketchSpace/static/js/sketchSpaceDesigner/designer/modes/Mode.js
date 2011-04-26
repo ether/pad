@@ -77,6 +77,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
       this.designer.setOptions({doStroke: !this.designer.options.doStroke});
     } else if (event.keyCode == dojo.keys.CHAR_F) {
       this.designer.setOptions({doFill: !this.designer.options.doFill});
+    } else if (event.keyCode == dojo.keys.ESCAPE) {
+     // FIXME: Kind of ugly, but needed to set the corect mode icon in
+     // the UI. Maybe change UI code to use dojo.connect for that?
+     this.designer.ui._onSelect();
     }
     delete this.inputState.keyboard[event.keyCode];
   },
