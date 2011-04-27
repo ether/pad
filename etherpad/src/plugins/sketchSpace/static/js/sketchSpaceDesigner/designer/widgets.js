@@ -5,6 +5,8 @@ dojo.require("dojox.layout.TableContainer");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.NumberSpinner");
 dojo.require("dijit.form.NumberTextBox");
+dojo.require("dojox.layout.TableContainer");
+dojo.require("dijit.layout._LayoutWidget");
 
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorPickerPopup", [dojox.widget.ColorPicker], {
   create: function () {
@@ -110,3 +112,81 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.TableContainer", [dojox.layou
     return this.inherited(arguments);
   }
 });
+
+
+
+
+dojo.declare("sketchSpaceDesigner.designer.widgets.OptionsContainer",
+	dijit.layout._LayoutWidget,
+	{
+
+	postCreate: function(){
+		this.inherited(arguments);
+		this._children = [];
+	},
+
+	startup: function() {
+		if(this._started) {
+			return;
+		}
+		this.inherited(arguments);
+
+		// Call startup on all child widgets
+		dojo.forEach(this.getChildren(), function(child){
+			if(!child.started && !child._started) {
+				child.startup();
+			}
+		});
+		this.resize();
+		this.layout();
+	},
+
+	resize: function(){
+		dojo.forEach(this.getChildren(), function(child){
+			if(typeof child.resize == "function") {
+				child.resize();
+			}
+		});
+	},
+
+	layout: function(){
+   	        var children = this.getChildren();
+
+		// Create the options container.
+		var optionsContainer = dojo.create("div", {"class": "optionsContainer"}, this.domNode);
+
+		// Iterate over the children, adding them to the container.
+		var first = true;
+		dojo.forEach(children, dojo.hitch(this, function(child, index){
+		   if (!first) {
+		     dojo.create("span", {"class": "optionsContainer-separator"}, optionsContainer);
+		   }
+		   first = false;
+		   var labeled = dojo.create("span", {"class": "optionsContainer-option"}, optionsContainer);
+		   var label = dojo.create("label", {"for": child.get("id"), class:"optionsContainer-label"}, labeled);
+		   label.innerHTML = child.get("label") || child.get("title");
+		   labeled.appendChild(child.domNode);
+		   dojo.addClass(child.domNode, "optionsContainer-child");
+		}));
+
+		if(this.optionsContainer)	 {
+			this.optionsContainer.parentNode.removeChild(this.optionsContainer);
+		}
+
+		// Refresh the layout of any child widgets, allowing them to resize
+		// to their new parent.
+		dojo.forEach(children, function(child){
+			if(typeof child.layout == "function") {
+				child.layout();
+			}
+		});
+		this.optionsContainer = optionsContainer;
+		this.resize();
+	},
+	
+	destroyDescendants: function(/*Boolean*/ preserveDom){
+		dojo.forEach(this._children, function(child){ child.destroyRecursive(preserveDom); });
+	},
+});
+
+

@@ -8,7 +8,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Edit", [sketchSpaceDesigner.des
 
     this.strokeColorPicker = new dijit.layout._LayoutWidget({title:"Stroke [s]:"});
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionCheckBox({optionsPath:"doStroke", designer:this.designer}));
-    this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({optionsPath:"stroke.color", designer:this.designer}));
+    this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.ColorOptionInput({optionsPath:"stroke.color", designer:this.designer, style:"vertical-align:middle;"}));
     this.strokeColorPicker.addChild(new sketchSpaceDesigner.designer.widgets.OptionNumberSpinner({optionsPath:"stroke.width", designer:this.designer, style:"width:30pt"}));
     this.designer.ui.options.addChild(this.strokeColorPicker);
 

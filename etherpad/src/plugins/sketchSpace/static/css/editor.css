@@ -3,6 +3,18 @@
   display: none;
 }
 
+.sketchSpace #sketchSpaceEditorUI {
+  display: block;
+}
+
+.sketchSpace #sketchSpaceEditorUI .editorui {
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 50%;
+  top: 0;
+  bottom: 20pt;
+}
 
 .sketchSpace.maximized #padpage {
   left: 8px;
@@ -19,21 +31,13 @@
   width: 50%;
   margin-left: 0;
   left: auto;
+  bottom: 20pt;
 }
 
-.sketchSpace.sketchSpaceMaximized #sketchSpaceEditorUI {
+.sketchSpace.sketchSpaceMaximized .editorui {
   left: 0;
   right: 0;
   width: auto;
-}
-
-.sketchSpace #sketchSpaceEditorUI {
-  display: block;
-  position: absolute;
-  left: 0;
-  width: 50%;
-  top: 0;
-  bottom: 0;
 }
 
 .sketchSpace #sketchSpaceEditBar {
@@ -54,18 +58,57 @@
   background: white;
 }
 
-.sketchSpace #sketchSpaceOptions {
+.sketchSpace.sketchSpaceMaximized a.topbarmaximize {
+  background: url(/static/img/jun09/pad/maximize_maximized.png);
+}
+
+#sketchSpaceOptions {
   position: absolute;
   left: 0;
+  right: 0;
   bottom: 0;
-  height: 200px;
+  height: 20pt;
   background: white;
   overflow: auto;
   border-top: 1px solid #C4C4C4;
   border-right: 1px solid #C4C4C4;
-  padding: 8px;
+  padding: 0;
 }
 
-.sketchSpace.sketchSpaceMaximized a.topbarmaximize {
-  background: url(/static/img/jun09/pad/maximize_maximized.png);
+.optionsContainer {
+  vertical-align: middle;
+  height: 100%;
+  line-height: 20pt;
+  display: block;
+}
+
+.optionsContainer-separator {
+  padding-left: 20pt;
+}
+
+.optionsContainer-option {
+}
+
+.optionsContainer-label,
+.optionsContainer-child {
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1em;
+}
+
+.optionsContainer-label {
+ padding-right: 4pt;
+}
+
+
+
+/* Openingdesign specific */
+
+#padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer {
+  display: none;
+}
+
+#padusers {
+  height: auto;
+  bottom: 0;
 }
