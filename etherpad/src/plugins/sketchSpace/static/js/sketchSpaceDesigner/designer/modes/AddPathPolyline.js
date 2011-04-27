@@ -5,15 +5,15 @@ dojo.require("sketchSpaceDesigner.utils");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline.Path", [sketchSpaceDesigner.designer.modes.EditPath.prototype.Path], {
   setOptions: function (options) {
-   this.inherited(arguments,
-		  [sketchSpaceDesigner.utils.setObject({
-		     isClosed: false,
+    this.inherited(arguments,
+		   [sketchSpaceDesigner.utils.setObject({
 		     isLine: true,
 		   }, options, true)]);
   },
 });
 
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceDesigner.designer.modes.EditPath], {
+  CLOSE_CLICK_DISTANCE: 5,
   Path: sketchSpaceDesigner.designer.modes.AddPathPolyline.Path,
   enable: function () {
     this.inherited(arguments);
@@ -46,29 +46,46 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceD
   },
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (event.button == dojo.mouseButtons.LEFT) {
-      if (this.path !== undefined)
-        this.beginSection(this.getCurrentMouse(event));
-      else
-        this.begin(this.getCurrentMouse(event));
-    }
-  },
-  onMouseUp: function (event) {
-    this.inherited(arguments);
     if (   event.button == dojo.mouseButtons.RIGHT
-	|| (   this.lastMouseUpEvent
-	    && this.lastMouseUpEvent.layerX == event.layerX
-	    && this.lastMouseUpEvent.layerY == event.layerY
-	    && this.lastMouseUpEvent.button == dojo.mouseButtons.LEFT
-            && event.button == dojo.mouseButtons.LEFT))  {
+	|| (   this.lastMouseDownEvent
+	    && this.lastMouseDownEvent.layerX == event.layerX
+	    && this.lastMouseDownEvent.layerY == event.layerY
+	    && this.lastMouseDownEvent.button == dojo.mouseButtons.LEFT
+            && event.button == dojo.mouseButtons.LEFT)) {
+
+      if (   this.path.sections.length > 0
+          && this.lastMouseDownEvent.layerX == event.layerX
+	     && this.lastMouseDownEvent.layerY == event.layerY) {
+       this.path.removeSection();
+      }
+
+      if (this.path.sections.length > 0) {
+        var mouse = {x:event.layerX, y:event.layerY};
+	var first = this.localCoordToScreen(this.path.sections[0].points[0]);
+ 
+        if (Math.abs(first.x - mouse.x) <= this.CLOSE_CLICK_DISTANCE && Math.abs(first.y - mouse.y) <= this.CLOSE_CLICK_DISTANCE) {
+	  this.path.removeSection();
+	  this.designer.setOptions({isClosed: true});
+        }
+ 
+	this.done();
+      }
+    } else if (event.button == dojo.mouseButtons.LEFT) {
       if (this.path !== undefined) {
-        this.done()
+        this.beginSection(this.getCurrentMouse(event));
+      } else {
+        this.designer.setOptions({isClosed: false});
+        this.begin(this.getCurrentMouse(event));
       }
     }
-    this.lastMouseUpEvent = event;
+    this.lastMouseDownEvent = event;
   },
   onMouseMove: function (event) {
     this.inherited(arguments);
     this.addPoint(this.getCurrentMouse(event));
+  },
+  begin: function (position) {
+    this.inherited(arguments)
+    this.designer.setOptions({isClosed: false}, true);
   },
 });
