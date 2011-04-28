@@ -100,15 +100,3 @@
 .optionsContainer-label {
  padding-right: 4pt;
 }
-
-
-
-/* Openingdesign specific */
-#padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer {
-  display: none;
-}
-
-#padusers {
-  height: auto;
-  bottom: 0;
-}

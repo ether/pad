@@ -43,7 +43,7 @@ dojo.addOnLoad(function (){
       }
     }
 
-    new AjaxUpload($('#sketchSpaceAddPdfImage'), info);  
-    new AjaxUpload($('#sketchSpaceAddPdfImage img'), info);
+    new AjaxUpload($('.sketchSpaceAddPdfImage'), info);  
+    new AjaxUpload($('.sketchSpaceAddPdfImage img'), info);
   }
 });

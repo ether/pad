@@ -1,0 +1,8 @@
+#padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer, .sketchSpaceEditbarButtons {
+  display: none;
+}
+
+#padusers {
+  height: auto;
+  bottom: 0;
+}
