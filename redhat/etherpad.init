@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# etherpad        Startup script for Etherpad
+#
+# chkconfig: - 345 99
+# description: Collaborative real-time editor
+# processname: etherpad
+# config: /etc/sysconfig/etherpad
+# config: ${ETHERPAD_HOME}/etherpad/etc/etherpad.local.propeties
+# pidfile: /var/run/etherpad/etherpad.pid
+# pidfile: /var/run/etherpad/soffice.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+# Load Environment Variables.
+if [ -f /etc/sysconfig/etherpad ]; then
+        . /etc/sysconfig/etherpad
+fi
+
+CP="appjet-eth-dev.jar:data"
+for f in $ETHERPAD_HOME/etherpad/lib/*.jar; do
+        CP="$CP:$f"
+done
+
+sname="soffice"
+slockfile="/var/lock/subsys/${sname}"
+spidfile="${PID_HOME}/${sname}.pid"
+slogfile="/var/log/${sname}.log"
+sargs="-nologo -nofirststartwizard -headless -norestore -invisible \"-accept=socket,host=localhost,port=8100;urp;StarOffice.Service\""
+
+ename="etherpad"
+elockfile="/var/lock/subsys/${ename}"
+epidfile="${PID_HOME}/${ename}.pid"
+elogfile="/var/log/${ename}.log"
+eargs="-classpath ${CP} -server -Xmx${MAXRAM} -Xms${MAXRAM} -Djava.awt.headless=true -XX:MaxGCPauseMillis=500 -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:CMSIncrementalSafetyFactor=50 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:./data/logs/backend/jvm-gc.log -Dappjet.jmxremote=true net.appjet.oui.main --configFile=${ETHERPAD_CONFIG} --maxThreads=${MAXTHREADS}"
+
+start() {
+        echo "Starting ${sname}: "
+        ( daemon --user=etherpad ${OOFFICE} ${sargs} >> ${slogfile} ) &
+	[ "$VERBOSE" != no ] && echo -n "Waiting for service to come up ..."
+        for counter in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+                fuser -n tcp 8100 > /dev/null 2>&1 && break
+                [ "$VERBOSE" != no ] && echo -n "."
+                sleep 1
+        done
+        [ "$VERBOSE" != no ] && echo ""
+	pgrep -U etherpad soffice >> ${spidfile}
+
+	echo "Starting ${ename}: "
+	( daemon --user=etherpad ${JAVA} "${eargs}" >> ${elogfile} ) &
+	[ "$VERBOSE" != no ] && echo -n "Waiting for service to come up ..."
+        for counter in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+                echo "GET /" | netcat -w 1 localhost 9000 > /dev/null 2>&1 && break
+                [ "$VERBOSE" != no ] && echo -n "."
+                sleep 1
+        done
+        [ "$VERBOSE" != no ] && echo ""
+	pgrep -U etherpad java >> ${epidfile}
+	RETVAL=$?
+	touch ${slockfile}
+	touch ${elockfile}
+	echo "done"
+}
+
+stop() {
+	echo "Stopping ${sname}: "
+	killproc -p ${spidfile}
+	echo "Stopping ${ename}: "
+	killproc -d 30 -p ${epidfile}
+	RETVAL=$?
+	rm -f ${slockfile} ${spidfile} ${elockfile} ${epidfile}
+}
+restart() {
+	stop
+	start
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+        echo -n ${sname} ;status -p ${spidfile}
+	echo -n ${ename} ;status -p ${epidfile}	
+	RETVAL=$?
+	;;
+  restart)
+	stop
+	start
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|restart|status}"
+	exit 1
+esac
+
+exit $RETVAL
