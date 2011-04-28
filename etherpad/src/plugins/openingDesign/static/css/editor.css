@@ -1,23 +1,23 @@
 #padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer, .clearAuthorshipColors, .sketchSpaceEditbarButtons, .topbar {
-  display: none;
+  display: none !important;
 }
 
 #padusers {
-  height: auto;
-  bottom: 0;
+  height: auto !important;
+  bottom: 0 !important;
 }
 
 .sketchSpace #sketchSpaceEditBar {
-  top: 37px;
+  top: 37px !important;
 }
 .sketchSpace #sketchSpaceEditor {
-  top: 73px;
+  top: 73px !important;
 }
 
 #padmain {
-  top: 31px;
+  top: 31px !important;
 }
 
 .sketchSpace #sketchSpaceEditorVdraggie {
-  top: 37px;
+  top: 37px !important;
 }
