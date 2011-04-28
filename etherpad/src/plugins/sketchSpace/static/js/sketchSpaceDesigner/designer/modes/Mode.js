@@ -28,11 +28,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     this.onContextMenuHandle = dojo.connect(this.designer.container, "contextmenu", this, this.onContextMenu);
     this.setOptionsHandle = dojo.connect(this.designer, "setOptions", this, this.onSetOptions);
 
+/*
     this.shareCurrentImageOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Shared image selection:", optionsPath:"shareCurrentImage", designer:this.designer});
     this.designer.ui.options.addChild(this.shareCurrentImageOption);
 
     this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.designer});
     this.designer.ui.options.addChild(this.showAuthorshipColorOption);
+*/
 
     this.designer.ui.options.layout();
   },
@@ -48,8 +50,10 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     dojo.disconnect(this.onKeyDownHandle);
     dojo.disconnect(this.onMouseWheelHandle);
     this.designer.forEachObjectShape(function (shape) { mode.disableShape(shape); });
+/*
     this.shareCurrentImageOption.destroyRecursive();
     this.showAuthorshipColorOption.destroyRecursive();
+*/
     this.designer.ui.options.layout();
     for (var name in this.outlines)
       this.disableOutline(name);

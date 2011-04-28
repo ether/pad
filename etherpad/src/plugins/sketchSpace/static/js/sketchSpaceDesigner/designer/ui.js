@@ -20,6 +20,19 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
                   '      </div>' +
                   '      <div class="specialkeyarea"><!-- --></div>' +
                   '    </div>' +
+                  '    <div id="sketchSpaceDocbar" class="menu docbar docbar-public">' +
+                  '      <table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable" class="docbartable">' +
+                  '        <tbody><tr>' +
+                  '          <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>' +
+                  '          <td id="docbarpadtitle" class="docbarpadtitle" title=""><span></span></td>' +
+                  '          <td width="100%">&nbsp;</td>' +
+                  '          <td class="docbarbutton"><a dojoAttachPoint="addImgButton">Add PDF background</a></td>' +
+                  '          <td class="docbarbutton">Sync view: <div dojoAttachPoint="shareCurrentImageOptionDiv"></div></td>' +
+                  '          <td class="docbarbutton">Authorship colors: <div dojoAttachPoint="showAuthorshipColorOptionDiv"></div></td>' +
+                  '          <td><img src="/static/img/jun09/pad/roundcorner_right_orange.gif"></td>' +
+                  '        </tbody>' +
+                  '      </table>' +
+                  '    </div>' +
                   '    <div id="sketchSpaceEditBar" dojoAttachPoint="toolbar">' +
                   '      <div class="editbar enabledtoolbar" id="editbar">' +
                   '        <div class="editbarinner" id="editbarinner">' +
@@ -35,7 +48,6 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
                   '                <td class="editbarbutton tool addPathFreehand" unselectable="on" dojoAttachEvent="onclick:_onAddPathFreehand"><img title="Add freehand path" src="/static/html/plugins/sketchSpace/imgeditbar_add_path_freehand_icon.png"></td>' +
                   '                <td class="editbarbutton tool addPathPolyline" unselectable="on" dojoAttachEvent="onclick:_onAddPathPolyline"><img title="Add polyline path" src="/static/html/plugins/sketchSpace/imgeditbar_add_path_polyline_icon.png"></td>' +
                   '                <td class="editbarbutton tool addRect" unselectable="on" dojoAttachEvent="onclick:_onAddRect"><img title="Add rectangle" src="/static/html/plugins/sketchSpace/imgeditbar_add_rect_icon.png"></td>' +
-                  '                <td class="editbarbutton" unselectable="on"><img dojoAttachPoint="addImgButton" title="Add image" src="/static/html/plugins/sketchSpace/imgeditbar_add_img_icon.png"></td>' +
                   '                <td><img height="24" width="2" src="/static/img/jun09/pad/editbar_groupright.gif"></td>' +
                   '' +
                   '                <td width="100%">&nbsp;</td>' +
@@ -99,6 +111,11 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
 
     if (typeof(pad) == "undefined")
       $(this.toolbar).find(".tools").css({display:"none"});
+
+    this.shareCurrentImageOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Shared image selection:", optionsPath:"shareCurrentImage", designer:this.editor}, this.shareCurrentImageOptionDiv);
+    this.shareCurrentImageOption.startup();
+    this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.editor}, this.showAuthorshipColorOptionDiv);   
+    this.showAuthorshipColorOption.startup();
   },
   _onMaximize: function () {
     $('body').toggleClass('sketchSpaceMaximized');
