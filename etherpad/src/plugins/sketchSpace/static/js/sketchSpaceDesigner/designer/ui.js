@@ -115,6 +115,8 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
     this.shareCurrentImageOption.startup();
     this.showAuthorshipColorOption = new sketchSpaceDesigner.designer.widgets.OptionCheckBox({title:"Show authorship:", optionsPath:"showAuthorshipColors", designer:this.editor}, this.showAuthorshipColorOptionDiv);   
     this.showAuthorshipColorOption.startup();
+
+    $("body").addClass("noSketchSpace");
   },
   _onMaximize: function () {
     $('body').toggleClass('sketchSpaceMaximized');
@@ -122,10 +124,12 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   },
   onSelectImage: function (imageId) {
     $("body").addClass("sketchSpace");
+    $("body").removeClass("noSketchSpace");
   },
 
   onDeselectImage: function (imageId) {
     $("body").removeClass("sketchSpace");
+    $("body").addClass("noSketchSpace");
   },
 
   selectToolIcon: function(name) {

@@ -4,7 +4,9 @@ dojo.require("sketchSpaceDesigner.designer.ui");
 dojo.require("dojox.uuid.generateRandomUuid");
 
 dojo.addOnLoad(function (){
-  sketchSpace.editorUi = sketchSpaceDesigner.designer.DesignerUI({userId: typeof(pad) != "undefined" ? pad.getUserId() : undefined}, dojo.byId("sketchSpaceEditorUI"));
+  sketchSpace.editorUi = new sketchSpaceDesigner.designer.DesignerUI({userId: typeof(pad) != "undefined" ? pad.getUserId() : undefined}, dojo.byId("sketchSpaceEditorUI"));
+
+  makeResizableHPane($(".editorui"), $("#sketchSpaceEditorVdraggie"), $("#padpage"), 0, 0, 10, -22, function () { sketchSpace.editorUi.editor.resize(); });
 
   sketchSpace.editorUi.startup();
 
