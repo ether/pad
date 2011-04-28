@@ -24,7 +24,6 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
                   '      <table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable" class="docbartable">' +
                   '        <tbody><tr>' +
                   '          <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>' +
-                  '          <td id="docbarpadtitle" class="docbarpadtitle" title=""><span></span></td>' +
                   '          <td width="100%">&nbsp;</td>' +
                   '          <td class="docbarbutton"><a dojoAttachPoint="addImgButton">Add PDF background</a></td>' +
                   '          <td class="docbarbutton">Sync view: <div dojoAttachPoint="shareCurrentImageOptionDiv"></div></td>' +
