@@ -95,7 +95,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #shuttingdown { position: relative; zoom: 1; border: 1px solid #992;
   background: #ffc; padding: 0.6em; font-size: 1.2em; margin-top: 6px; }
 
-#docbar { margin-top: 6px; height: 25px; position: relative; zoom: 1;
+.docbar { margin-top: 6px; height: 25px; position: relative; zoom: 1;
   background: #fbfbfb url(/static/img/jun09/pad/padtopback2.gif) repeat-x 0 -31px; }
 
 .docbarbutton
@@ -143,26 +143,26 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border-right: 0px;
 }
 
-#docbarleft { position: absolute; left: 0; top: 0; height: 100%;
+.docbarleft { position: absolute; left: 0; top: 0; height: 100%;
   overflow: hidden;
   background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left -31px; width: 7px; }
 
 <% /* changing the size of the title / rename area means adjusting
-   the #docbarpadtitle.width, #padtitlebuttons.left,
+   the .docbarpadtitle.width, #padtitlebuttons.left,
    and #padtitleedit.width */ %>
   
-#docbarpadtitle { position: absolute; height: auto; left: 9px;
+.docbarpadtitle { position: absolute; height: auto; left: 9px;
   width: 280px; font-size: 1.6em; color: #444; font-weight: normal;
   line-height: 22px; margin-left: 2px; height: 22px; top: 2px;
   overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
   white-space:nowrap; }
-.docbar-public #docbarpadtitle { padding-left: 22px;
+.docbar-public .docbarpadtitle { padding-left: 22px;
   background: url(/static/img/jun09/pad/public.gif) no-repeat left center; }
   
-#docbarrenamelink { position: absolute; top: 6px;
+.docbarrenamelink { position: absolute; top: 6px;
   font-size: 1.1em; display: none; }
-#docbarrenamelink a { color: #999; }
-#docbarrenamelink a:hover { color: #48d; }
+.docbarrenamelink a { color: #999; }
+.docbarrenamelink a:hover { color: #48d; }
 #padtitlebuttons { position: absolute; width: 74px; zoom: 1;
   height: 17px; top: 4px; left: 170px; display: none;
   background: url(/static/img/jun09/pad/ok_or_cancel.gif) 0px 0px; }
@@ -646,7 +646,7 @@ table#otheruserstable { display: none; }
 /* We give docbar a higher z-index than its descendant impexp-wrapper in
    order to allow the Import/Export panel to be on top of stuff lower
    down on the page in IE.  Strange but it works! */
-#docbar { z-index: 52; }
+.docbar { z-index: 52; }
 
 #impexp-wrapper { width: 650px; right: 10px; }
 #impexp-panel { height: 160px; }
