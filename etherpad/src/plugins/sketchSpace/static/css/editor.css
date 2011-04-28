@@ -80,6 +80,7 @@
   height: 100%;
   line-height: 20pt;
   display: block;
+  padding-left: 4pt;
 }
 
 .optionsContainer-separator {
