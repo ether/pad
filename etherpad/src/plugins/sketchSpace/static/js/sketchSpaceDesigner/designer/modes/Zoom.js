@@ -64,5 +64,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
 
     var mouse = dojox.gfx.matrix.multiplyPoint(screenToCurrentZoomMatrix, x, y);
     this.designer.surface_transform.applyTransform(dojox.gfx.matrix.scaleAt(zoom, zoom, mouse.x, mouse.y));
-  },
+  }
 });

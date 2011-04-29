@@ -216,5 +216,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPath", [sketchSpaceDesigner.
       }
       this.path = undefined;
     }
-  },
+  }
 });

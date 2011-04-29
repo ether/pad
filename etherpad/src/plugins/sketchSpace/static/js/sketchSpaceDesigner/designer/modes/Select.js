@@ -248,6 +248,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.designer.selection.applyToShapes(function () {
       this.originalMatrix = this.matrix;
     });
-  },
+  }
 
 });

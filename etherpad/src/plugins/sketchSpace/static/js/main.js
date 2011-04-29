@@ -13,6 +13,18 @@
  * be a ready, rendered image of a single image that is displayed on screen.
  */
 
+// IE workaround
+if(!Array.indexOf) {
+  Array.prototype.indexOf = function(obj) {
+    for(var i = 0; i < this.length; i++){
+      if(this[i] == obj){
+        return i;
+      }
+    }
+    return -1;
+  }
+}
+
 function sketchSpaceInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine', 'incorporateUserChanges', 'performDocumentApplyChangeset'];
 }

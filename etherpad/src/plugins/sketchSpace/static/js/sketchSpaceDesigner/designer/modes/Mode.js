@@ -171,6 +171,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
 
   removeCursorBboxOutline: function () {
     this.removeOutline("cursorBboxOutline");
-  },
+  }
 
 });

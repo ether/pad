@@ -7,9 +7,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline.Path", [sketchS
   setOptions: function (options) {
     this.inherited(arguments,
 		   [sketchSpaceDesigner.utils.setObject({
-		     isLine: true,
+		     isLine: true
 		   }, options, true)]);
-  },
+  }
 });
 
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceDesigner.designer.modes.EditPath], {
@@ -95,5 +95,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceD
   begin: function (position) {
     this.inherited(arguments)
     this.designer.setOptions({isClosed: false}, true);
-  },
+  }
 });

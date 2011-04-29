@@ -13,7 +13,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathFreehand.Path", [sketchS
 		     isLine: false,
 		     isStraight: false
 		   }, options, true)]);
-  },
+  }
 });
 
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathFreehand", [sketchSpaceDesigner.designer.modes.EditPath], {
@@ -58,5 +58,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathFreehand", [sketchSpaceD
   onMouseMove: function (event) {
     this.inherited(arguments);
     this.addPoint(this.getCurrentMouse(event));
-  },
+  }
 });

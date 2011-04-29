@@ -76,5 +76,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
         this.designer.surface_transform.setTransform(dojox.gfx.matrix.multiply(dojox.gfx.matrix.scale(Math.min(hScale, vScale)), dojox.gfx.matrix.translate(-bbox.x, -bbox.y), originalMatrix));
       }
     }
-  },
+  }
 });

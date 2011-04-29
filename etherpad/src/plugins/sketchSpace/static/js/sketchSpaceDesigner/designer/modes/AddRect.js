@@ -62,5 +62,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddRect", [sketchSpaceDesigner.
       }
       this.shape.setShape(shapeData);
     }
-  },
+  }
 });
