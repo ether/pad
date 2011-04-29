@@ -9,7 +9,7 @@ URL: http://etherpad.org/
 Packager: Norman Maul <nmaul@mozilla.com>
 BuildArch: noarch
 Buildroot: %{_tmppath}/%{name}-%{version}-root
-Requires: scala, mysql-connector-java, java, screen
+Requires: scala, mysql-connector-java, java, screen, openoffice.org-core, openoffice.org-ure
 Requires(pre): shadow-utils
 
 %description
