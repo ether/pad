@@ -4,10 +4,7 @@ Version: 20110428
 Release: 1
 Group: Development/Tools
 License: Apache License 2.0
-Source0: etherpad-20110428.tar.gz
-Source1: etherpad.init
-Source2: sysconfig.etherpad
-Source3: etherpad.local.properties
+Source: etherpad-20110428.tar.gz
 URL: http://etherpad.org/
 Packager: Norman Maul <nmaul@mozilla.com>
 BuildArch: noarch
