@@ -5,7 +5,7 @@ Release: 1
 Group: Development/Tools
 License: Apache License 2.0
 Source0: etherpad-20110428.tar.gz
-Source1: init.etherpad
+Source1: etherpad.init
 Source2: sysconfig.etherpad
 Source3: etherpad.local.properties
 URL: http://etherpad.org/
@@ -28,7 +28,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/etherpad
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/etherpad
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
-cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/init.etherpad $RPM_BUILD_ROOT/etc/init.d/etherpad
+cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.init $RPM_BUILD_ROOT/etc/init.d/etherpad
 cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.sysconfig $RPM_BUILD_ROOT/etc/sysconfig/etherpad
 cp $RPM_BUILD_DIR/%{name}-%{version}/etherpad/etc/etherpad.localdev-default.properties $RPM_BUILD_ROOT/etc/etherpad/etherpad.local.properties
 mv $RPM_BUILD_DIR/%{name}-%{version}/* $RPM_BUILD_ROOT/usr/share/etherpad
