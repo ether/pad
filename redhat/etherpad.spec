@@ -26,6 +26,15 @@ exit 0
 %setup
 
 %build
+cd $RPM_BUILD_DIR/%{name}-%{version}
+source redhat/etherpad.sysconfig
+cd infrastructure/ace
+bin/make normal etherpad
+cd ..
+rm bin/exports.sh
+cp redhat/etherpad.sysconfig bin/exports.sh
+bin/build.sh
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
