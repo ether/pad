@@ -33,7 +33,6 @@ mv $RPM_BUILD_DIR/%{name}-%{version}/* $RPM_BUILD_ROOT/usr/share/etherpad
 %files
 %defattr(-,root,root)
 /usr/share/etherpad
-/usr/share/etherpad/*
 /etc/init.d/etherpad
 %config /etc/sysconfig/etherpad
 %config /etc/etherpad/etherpad.local.properties
