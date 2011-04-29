@@ -34,19 +34,18 @@ mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/etherpad
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 mkdir -p $RPM_BUILD_ROOT/var/run/etherpad
-cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.init $RPM_BUILD_ROOT/etc/init.d/etherpad
+cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.init-alt $RPM_BUILD_ROOT/etc/init.d/etherpad
 cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.sysconfig $RPM_BUILD_ROOT/etc/sysconfig/etherpad
 cp $RPM_BUILD_DIR/%{name}-%{version}/etherpad/etc/etherpad.localdev-default.properties $RPM_BUILD_ROOT/etc/etherpad/etherpad.local.properties
 mv $RPM_BUILD_DIR/%{name}-%{version}/* $RPM_BUILD_ROOT/usr/share/etherpad
 
 %files
 %defattr(-,root,root)
-/usr/share/etherpad
 /var/run/etherpad
+%attr(755, etherpad, root) /usr/share/etherpad
 /etc/init.d/etherpad
 %config /etc/sysconfig/etherpad
 %config /etc/etherpad/etherpad.local.properties
-%attr(755, etherpad, root) /usr/share/etherpad
 
 
 %clean
