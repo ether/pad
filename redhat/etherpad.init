@@ -2,7 +2,7 @@
 #
 # etherpad        Startup script for Etherpad
 #
-# chkconfig: - 345 99
+# chkconfig: 345 99 01
 # description: Collaborative real-time editor
 # processname: etherpad
 # config: /etc/sysconfig/etherpad
