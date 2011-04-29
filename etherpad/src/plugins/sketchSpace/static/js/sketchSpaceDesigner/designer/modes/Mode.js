@@ -95,7 +95,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     delete this.inputState.mouse[event.button];
   },
   onMouseMove: function(event) {
-    this.mouse = {x:event.layerX, y:event.layerY};
+    this.mouse = this.getCurrentGlobalMouse(event);
     this.updateCursorBboxOutline();
   },
   onShapeMouseDown: function (shape, event) {
@@ -115,8 +115,24 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
     return dojox.gfx.matrix.multiplyPoint(objToScreenMatrix, p.x, p.y);
   },
 
+  getCurrentGlobalMouse: function (event) {
+    if (event.layerX !== undefined) {
+      return {x:event.layerX, y:event.layerY};
+    } else {
+      /* All of this is for Opera, that Dojo does not seem to handle
+       * correctly... Hopefully it doesn't break other browsers... */
+      var cpos = $(this.designer.container).offset();
+      var tpos = $(event.target).offset();
+      console.log( event.offsetX );
+      console.log( tpos.left );
+      console.log( cpos.left );
+
+      return {x: event.offsetX + tpos.left - cpos.left, y: event.offsetY + tpos.top - cpos.top};
+    }
+  },
+
   getCurrentMouse: function (event, container) {
-   return this.screenToLocalCoord({x:event.layerX, y:event.layerY}, container);b
+   return this.screenToLocalCoord(this.getCurrentGlobalMouse(event), container);
   },
 
   getCurrentMove: function (event, container, orig) {
@@ -149,6 +165,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   updateCursorBboxOutline: function () {
     if (this.outlines.cursorBboxOutline == undefined) return;
     this.outlines.cursorBboxOutline.bbox = this.getCurrentCursorBbox();
+    var n = this.outlines.cursorBboxOutline.bbox;
     this.outlines.cursorBboxOutline.update();
   },
 

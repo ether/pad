@@ -52,7 +52,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
   onMouseDown: function (event) {
     this.inherited(arguments);
     if (event.button == dojo.mouseButtons.LEFT) {
-      this.orig = this.mouse = {x:event.layerX, y:event.layerY}
+      this.orig = this.mouse = this.getCurrentGlobalMouse(event);
       this.addCursorBboxOutline("zoom");
     }
   },
