@@ -38,6 +38,7 @@ cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.init $RPM_BUILD_ROOT/etc/in
 cp $RPM_BUILD_DIR/%{name}-%{version}/redhat/etherpad.sysconfig $RPM_BUILD_ROOT/etc/sysconfig/etherpad
 cp $RPM_BUILD_DIR/%{name}-%{version}/etherpad/etc/etherpad.localdev-default.properties $RPM_BUILD_ROOT/etc/etherpad/etherpad.local.properties
 mv $RPM_BUILD_DIR/%{name}-%{version}/* $RPM_BUILD_ROOT/usr/share/etherpad
+chmod -R etherpad:etherpad $RPM_BUILD_ROOT/usr/share/etherpad
 
 %files
 %defattr(-,root,root)
