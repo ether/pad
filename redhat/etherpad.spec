@@ -28,9 +28,9 @@ exit 0
 %build
 cd $RPM_BUILD_DIR/%{name}-%{version}
 source redhat/etherpad.sysconfig
-cd infrastructure/ace
+pushd infrastructure/ace
 bin/make normal etherpad
-cd ..
+popd
 rm bin/exports.sh
 cp redhat/etherpad.sysconfig bin/exports.sh
 bin/build.sh
