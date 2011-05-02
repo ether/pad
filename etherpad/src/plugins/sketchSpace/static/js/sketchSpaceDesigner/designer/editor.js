@@ -55,6 +55,9 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
   },
 
   resize: function () {
+    /* IE + dojo workaround */
+    $(this.container).removeAttr("style");
+
     this.surface_size = {width: $(this.container).width(), height: $(this.container).height()};
     this.surface.setDimensions(this.surface_size.width, this.surface_size.height);
     return $(this.container).width() > 1 && $(this.container).height() > 1;
