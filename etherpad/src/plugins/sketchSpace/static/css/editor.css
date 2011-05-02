@@ -121,7 +121,7 @@ body {
   display: block;
   background: url(/static/img/jun09/pad/vdraggie.gif) no-repeat top center;
   cursor: W-resize;
-  bottom:0;
+  bottom: 20pt;
   position:absolute;
   right:50%;
   top:62px;
