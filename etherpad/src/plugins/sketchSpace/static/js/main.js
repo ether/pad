@@ -23,11 +23,11 @@ if(!Array.indexOf) {
     }
     return -1;
   }
-}
+};
 
 function sketchSpaceInit() {
   this.hooks = ['aceInitInnerdocbodyHead', 'aceAttribsToClasses', 'aceCreateDomLine', 'incorporateUserChanges', 'performDocumentApplyChangeset'];
-}
+};
 
 /**
  *
@@ -234,7 +234,7 @@ sketchSpaceInit.prototype.updateImageFromPad = function() {
 	visited[objId] = shape;
       }
       return visited[objId];
-    }
+    };
 
     for (var objId in currentImage)
       materialize(objId);
