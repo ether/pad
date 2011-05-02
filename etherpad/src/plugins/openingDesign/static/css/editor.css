@@ -1,4 +1,4 @@
-#padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer, .clearAuthorshipColors, .sketchSpaceEditbarButtons, .topbar {
+#padchat, #hdraggie, #docbarsavedrevs-outer, #docbarimpexp-outer, #docbaroptions-outer, .clearAuthorshipColors, .save, .sketchSpaceEditbarButtons, .topbar, #docbarpadtitle {
   display: none !important;
 }
 
