@@ -379,7 +379,7 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
       this.updateDisplayTimout = window.setTimeout(function () {
 	image.updateDisplay();
 	image.updateDisplayTimout = undefined;
-      }, 500);
+      }, 1000);
     }
     image.getTransformedBoundingBox = function () {
       var objToScreenMatrix = this._getRealMatrix();
