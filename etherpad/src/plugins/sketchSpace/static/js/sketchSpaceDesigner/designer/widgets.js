@@ -33,7 +33,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.ColorPickerPopup", [dojox.wid
     this.inherited(arguments);
     this.onCancel();
   },
-  onCancel: function () {},
+  onCancel: function () {}
 });
 
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorInput", [dijit.form._FormValueWidget, dijit._Templated], {
@@ -62,7 +62,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.ColorInput", [dijit.form._For
     var widget = this;
     this.popup.setColor(this.attr("value").toHex());
     this.popup.popup(this.domNode, function (color) { widget.attr("value", color); });
-  },
+  }
 });
 
 
@@ -97,7 +97,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionInput", [], {
   _setCheckedAttr: function(value, priorityChange){
     this.setOptionsFromAttr(value);
     return this.inherited(arguments);
-  },
+  }
 });
 
 dojo.declare("sketchSpaceDesigner.designer.widgets.ColorOptionInput", [sketchSpaceDesigner.designer.widgets.ColorInput, sketchSpaceDesigner.designer.widgets.OptionInput], {});
@@ -116,10 +116,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.TableContainer", [dojox.layou
 
 
 
-dojo.declare("sketchSpaceDesigner.designer.widgets.OptionsContainer",
-	dijit.layout._LayoutWidget,
-	{
-
+dojo.declare("sketchSpaceDesigner.designer.widgets.OptionsContainer", [dijit.layout._LayoutWidget], {
 	postCreate: function(){
 		this.inherited(arguments);
 		this._children = [];
@@ -163,13 +160,13 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionsContainer",
 		   }
 		   first = false;
 		   var labeled = dojo.create("span", {"class": "optionsContainer-option"}, optionsContainer);
-		   var label = dojo.create("label", {"for": child.get("id"), class:"optionsContainer-label"}, labeled);
+		   var label = dojo.create("label", {"for": child.get("id"), "class":"optionsContainer-label"}, labeled);
 		   label.innerHTML = child.get("label") || child.get("title");
 		   labeled.appendChild(child.domNode);
 		   dojo.addClass(child.domNode, "optionsContainer-child");
 		}));
 
-		if(this.optionsContainer)	 {
+		if(this.optionsContainer) {
 			this.optionsContainer.parentNode.removeChild(this.optionsContainer);
 		}
 
@@ -186,7 +183,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.OptionsContainer",
 	
 	destroyDescendants: function(/*Boolean*/ preserveDom){
 		dojo.forEach(this._children, function(child){ child.destroyRecursive(preserveDom); });
-	},
+	}
 });
 
 

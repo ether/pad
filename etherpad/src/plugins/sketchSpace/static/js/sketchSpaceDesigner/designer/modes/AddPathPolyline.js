@@ -7,9 +7,9 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline.Path", [sketchS
   setOptions: function (options) {
     this.inherited(arguments,
 		   [sketchSpaceDesigner.utils.setObject({
-		     isLine: true,
+		     isLine: true
 		   }, options, true)]);
-  },
+  }
 });
 
 dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceDesigner.designer.modes.EditPath], {
@@ -45,22 +45,30 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceD
     }
   },
   onMouseDown: function (event) {
+    var lastMouseDownPoint;
+    var point;
     this.inherited(arguments);
+
+    if (this.lastMouseDownEvent) {
+      lastMouseDownPoint = this.getCurrentGlobalMouse(this.lastMouseDownEvent);
+      point = this.getCurrentGlobalMouse(event);
+    }
+
     if (   event.button == dojo.mouseButtons.RIGHT
 	|| (   this.lastMouseDownEvent
-	    && this.lastMouseDownEvent.layerX == event.layerX
-	    && this.lastMouseDownEvent.layerY == event.layerY
+	    && lastMouseDownPoint.x == point.x
+	    && lastMouseDownPoint.y == point.y
 	    && this.lastMouseDownEvent.button == dojo.mouseButtons.LEFT
             && event.button == dojo.mouseButtons.LEFT)) {
 
       if (   this.path.sections.length > 0
-          && this.lastMouseDownEvent.layerX == event.layerX
-	     && this.lastMouseDownEvent.layerY == event.layerY) {
-       this.path.removeSection();
+          && lastMouseDownPoint.x == point.x
+	  && lastMouseDownPoint.y == point.y) {
+        this.path.removeSection();
       }
 
       if (this.path.sections.length > 0) {
-        var mouse = {x:event.layerX, y:event.layerY};
+        var mouse = this.getCurrentGlobalMouse(event);
 	var first = this.localCoordToScreen(this.path.sections[0].points[0]);
  
         if (Math.abs(first.x - mouse.x) <= this.CLOSE_CLICK_DISTANCE && Math.abs(first.y - mouse.y) <= this.CLOSE_CLICK_DISTANCE) {
@@ -87,5 +95,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddPathPolyline", [sketchSpaceD
   begin: function (position) {
     this.inherited(arguments)
     this.designer.setOptions({isClosed: false}, true);
-  },
+  }
 });

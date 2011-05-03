@@ -42,7 +42,7 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
       stroke: {"type":"stroke","color":{"r":0,"g":255,"b":0,"a":1},"style":"solid","width":2,"cap":"butt","join":4},
       fill: {"r":255,"g":0,"b":0,"a":1},
       showAuthorshipColors: true,
-      shareCurrentImage: true,
+      shareCurrentImage: true
     });
 
     this.modeStack = [];
@@ -55,6 +55,9 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
   },
 
   resize: function () {
+    /* IE + dojo workaround */
+    $(this.container).removeAttr("style");
+
     this.surface_size = {width: $(this.container).width(), height: $(this.container).height()};
     this.surface.setDimensions(this.surface_size.width, this.surface_size.height);
     return $(this.container).width() > 1 && $(this.container).height() > 1;

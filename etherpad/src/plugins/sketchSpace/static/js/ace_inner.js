@@ -3,9 +3,14 @@
 
 $(document).ready(function () {
   $("body").click(function (event) {
+    var target = undefined;
     if ($(event.target).filter(".sketchSpaceImageLink").length > 0) {
-      top.sketchSpace.imageLinkClicked(event.target.parentNode);
+      target = $(event.target).filter(".sketchSpaceImageLink")[0];
+    } else if ($(event.target).find(".sketchSpaceImageLink").length > 0) {
+      target = $(event.target).find(".sketchSpaceImageLink")[0];
     }
+    if (target)
+      top.sketchSpace.imageLinkClicked(target.parentNode);
   });
 });
 

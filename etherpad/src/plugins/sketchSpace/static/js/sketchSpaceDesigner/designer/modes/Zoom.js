@@ -18,7 +18,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
       scroll = 1.0 / (1.0 + this.zoomFactor);
     else
       scroll = 1.0 + this.zoomFactor;
-    this.onZoom(scroll, event.layerX, event.layerY);
+    var p = this.getCurrentGlobalMouse(event);
+    this.onZoom(scroll, p.x, p.y);
   },
   onKeyUp: function (event) {
     this.inherited(arguments);
@@ -63,5 +64,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Zoom", [sketchSpaceDesigner.des
 
     var mouse = dojox.gfx.matrix.multiplyPoint(screenToCurrentZoomMatrix, x, y);
     this.designer.surface_transform.applyTransform(dojox.gfx.matrix.scaleAt(zoom, zoom, mouse.x, mouse.y));
-  },
+  }
 });

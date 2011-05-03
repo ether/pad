@@ -72,5 +72,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.AddEllipse", [sketchSpaceDesign
     }
 
     this.shape.setShape(shapeData);
-  },
+  }
 });

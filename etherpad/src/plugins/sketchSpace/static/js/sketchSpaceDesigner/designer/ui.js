@@ -5,6 +5,8 @@ dojo.require("sketchSpaceDesigner.designer.widgets");
 dojo.require("dojo.parser");
 dojo.require("dojox.layout.TableContainer");
 dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 
 dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._Templated], {
   widgetsInTemplate: true,
@@ -191,6 +193,6 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   _onPan: function() {
     this.editor.setMode(new sketchSpaceDesigner.designer.modes.PanPlus(false));
     this.selectToolIcon("pan");
-  },
+  }
 
 });

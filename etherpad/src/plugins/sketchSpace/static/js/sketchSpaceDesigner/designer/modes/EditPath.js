@@ -159,5 +159,5 @@ dojo.declare("sketchSpaceDesigner.designer.modes.EditPath", [sketchSpaceDesigner
       this.path.shape.removeShape();
     }
     this.path = undefined;
-  },
+  }
 });
