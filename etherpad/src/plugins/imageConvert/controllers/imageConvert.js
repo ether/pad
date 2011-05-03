@@ -61,19 +61,18 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
   if (File(outFileName).exists()) return;
   var proc;
   if (inFileName.split(".").pop().toLowerCase() == 'pdf') {
-    // PDF is upside down
     var pageSize = getSize(inFileName, page);
-    offset.y = pageSize.h - offset.y;
 
     var dpix = Math.max(10, pixelSize.w * 72.0 / size.w);
     var dpiy = Math.max(10, pixelSize.h * 72.0 / size.h);
+
     proc = ProcessBuilder("src/plugins/imageConvert/convertImage.sh",
 			  inFileName,
 			  outFileName,
 			  page + 1,
 			  dpix, dpiy,
-			  offset.x, offset.y - size.h,
-			  offset.x + size.w, offset.y);
+			  Math.floor(offset.x * dpix / 72), Math.floor(offset.y * dpiy / 72),
+			  pixelSize.w, pixelSize.h);
   } else {
     proc = ProcessBuilder("convert",
 			  "-crop",
