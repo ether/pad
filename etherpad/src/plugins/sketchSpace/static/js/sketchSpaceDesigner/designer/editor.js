@@ -332,14 +332,24 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 	var screenBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:designer.surface_size.width, height:designer.surface_size.height}).transform(screenToObjMatrix);
 	var objBboxOnObj = new sketchSpaceDesigner.designer.bbox.Bbox({x: 0, y: 0, width:this.pointSize.w, height:this.pointSize.h});
 
-	var displayBboxOnObj = objBboxOnObj.copy().intersection(screenBboxOnObj).powround({x:2, y:2}, {x:8, y:8});
-	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix).powroundSize({x:2, y:2}, {x:8, y:8});
+	// Rounding here does not seem to work with all renderers :(
+	var displayBboxOnObj = objBboxOnObj.copy().intersection(screenBboxOnObj); //.powround({x:2, y:2}, {x:8, y:8});
+	var displayBboxOnScreen = displayBboxOnObj.copy().transform(objToScreenMatrix); //.powroundSize({x:2, y:2}, {x:8, y:8});
 
 	//console.log("zoom: " + displayBboxOnObj.toString() + " @ " + displayBboxOnScreen.width + ":" + displayBboxOnScreen.height);
 
+	// Make sure our offset and size is in the source image is in whole pixels (after scaling) as some renderers require this! 
+	var objToPixelMatrix = dojox.gfx.matrix.scale(displayBboxOnScreen.width / displayBboxOnObj.width,
+						      displayBboxOnScreen.height / displayBboxOnObj.height);
+	var pixelToObjMatrix = dojox.gfx.matrix.invert(objToPixelMatrix);
+	var displayBboxOnObjInScreenPixels = displayBboxOnObj.copy().transform(objToPixelMatrix).round({x:1, y:1});
+	displayBboxOnObj = displayBboxOnObjInScreenPixels.copy().transform(pixelToObjMatrix);
+
+//	console.log("Bbox: inPixels=" + displayBboxOnObjInScreenPixels + "; inPoints=" + displayBboxOnObj);
+
 	if (isNaN(displayBboxOnObj.x) || isNaN(displayBboxOnObj.y) || isNaN(displayBboxOnObj.width) || isNaN(displayBboxOnObj.height) || isNaN(displayBboxOnScreen.width) || isNaN(displayBboxOnScreen.height) ||
 	    displayBboxOnObj.width < 1 || displayBboxOnObj.height < 1 || displayBboxOnScreen.width < 1 || displayBboxOnScreen.height < 1) {
- 	  console.log(["NaN", displayBboxOnObj, displayBboxOnScreen]);
+ 	  console.log("NaN: onObj=" + displayBboxOnObj + "; onScreen=" + displayBboxOnScreen);
   	  image.newShape = undefined;
 	  if (image.currentDisplay !== undefined)
 	    image.currentDisplay.removeShape();
@@ -352,7 +362,16 @@ dojo.declare("sketchSpaceDesigner.designer.editor.Editor", [], {
 	  y:displayBboxOnObj.y,
 	  width:displayBboxOnObj.width,
 	  height:displayBboxOnObj.height,
-	  src: "/ep/imageConvert/" + this.imageName + "?p=" + image.page + "&x=" + displayBboxOnObj.x + "&y=" + displayBboxOnObj.y + "&w=" + displayBboxOnObj.width + "&h=" + displayBboxOnObj.height + "&pw=" + displayBboxOnScreen.width + "&ph=" + displayBboxOnScreen.height
+	  src: "/ep/imageConvert/" + this.imageName +
+	    "?p=" + image.page +
+	    "&x=" + displayBboxOnObj.x +
+	    "&y=" + displayBboxOnObj.y +
+	    "&w=" + displayBboxOnObj.width +
+	    "&h=" + displayBboxOnObj.height +
+	    "&px=" + displayBboxOnObjInScreenPixels.x + 
+	    "&py=" + displayBboxOnObjInScreenPixels.y + 
+	    "&pw=" + displayBboxOnObjInScreenPixels.width +
+	    "&ph=" + displayBboxOnObjInScreenPixels.height
         };
 
 	var oldShape = this.currentDisplay ? this.currentDisplay.getShape() : undefined;

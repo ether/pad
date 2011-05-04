@@ -57,21 +57,21 @@ function getSize(filename, page) {
   return {w:w, h:h}
 }
 
-function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
+function convertImage(inFileName, page, outFileName, offset, size, pixelOffset, pixelSize) {
   if (File(outFileName).exists()) return;
   var proc;
   if (inFileName.split(".").pop().toLowerCase() == 'pdf') {
     var pageSize = getSize(inFileName, page);
 
-    var dpix = Math.max(10, pixelSize.w * 72.0 / size.w);
-    var dpiy = Math.max(10, pixelSize.h * 72.0 / size.h);
+    var dpi = {x: pixelSize.w * 72.0 / size.w,
+	       y: pixelSize.h * 72.0 / size.h};
 
     proc = ProcessBuilder("src/plugins/imageConvert/convertImage.sh",
 			  inFileName,
 			  outFileName,
 			  page + 1,
-			  dpix, dpiy,
-			  Math.floor(offset.x * dpix / 72), Math.floor(offset.y * dpiy / 72),
+			  dpi.x, dpi.y,
+			  pixelOffset.x, pixelOffset.y,
 			  pixelSize.w, pixelSize.h);
   } else {
     proc = ProcessBuilder("convert",
@@ -88,12 +88,14 @@ function convertImage(inFileName, page, outFileName, offset, size, pixelSize) {
 function onRequest() {
   var path = "src/plugins/fileUpload/upload/" + request.path.toString().slice("/ep/imageConvert/".length);  
   var page = request.params.p === undefined ? 0 : parseInt(request.params.p);
-  var offset = {x:(request.params.x === undefined) ? 0 : parseInt(request.params.x),
-		y:(request.params.y === undefined) ? 0 : parseInt(request.params.y)};
-  var size = {w:(request.params.w === undefined) ? 0 : parseInt(request.params.w),
-	      h:(request.params.h === undefined) ? 0 : parseInt(request.params.h)};
-  var pixelSize = {w:(request.params.pw === undefined) ? 0 : parseInt(request.params.pw),
-		   h:(request.params.ph === undefined) ? 0 : parseInt(request.params.ph)};
+  var offset = {x:(request.params.x === undefined) ? 0 : parseFloat(request.params.x),
+		y:(request.params.y === undefined) ? 0 : parseFloat(request.params.y)};
+  var size = {w:(request.params.w === undefined) ? 0 : parseFloat(request.params.w),
+	      h:(request.params.h === undefined) ? 0 : parseFloat(request.params.h)};
+  var pixelOffset = {x:(request.params.px === undefined) ? 0 : parseFloat(request.params.px),
+		     y:(request.params.py === undefined) ? 0 : parseFloat(request.params.py)};
+  var pixelSize = {w:(request.params.pw === undefined) ? 0 : parseFloat(request.params.pw),
+		   h:(request.params.ph === undefined) ? 0 : parseFloat(request.params.ph)};
 
   if (request.params.action == "getPages") {
     var pages = getPages(path);
@@ -110,7 +112,7 @@ function onRequest() {
     outFileName.push("png");
     outFileName = outFileName.join(".");
 
-    convertImage(path, page, outFileName, offset, size, pixelSize);
+    convertImage(path, page, outFileName, offset, size, pixelOffset, pixelSize);
 
     response.setContentType("image/png");
     response.alwaysCache();
