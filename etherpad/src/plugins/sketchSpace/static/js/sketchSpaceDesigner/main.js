@@ -1,4 +1,4 @@
-dojo.provide("dojomain");
+dojo.provide("sketchSpaceDesigner.main");
 
 dojo.require("sketchSpaceDesigner.designer.ui");
 dojo.require("dojox.uuid.generateRandomUuid");
