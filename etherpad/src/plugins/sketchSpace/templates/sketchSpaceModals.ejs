@@ -4,7 +4,7 @@
  which will make dojo unable to know where it's loaded from, and hence
  how to load more modules
 */ %>
-<% if (0 && appjet.config.devMode) { %>
+<% if (appjet.config.devMode) { %>
   <script src="/static/js/plugins/sketchSpace/dojo/dojo.js" djConfig="gfxRenderer:'svg,vml,canvas,silverligth'"></script>
   <script src="/static/js/plugins/sketchSpace/sketchSpaceDesigner/main.js"></script>
 <% } else { %>
