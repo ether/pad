@@ -10,7 +10,7 @@ $(document).ready(function () {
       target = $(event.target).find(".sketchSpaceImageLink")[0];
     }
     if (target)
-      top.sketchSpace.imageLinkClicked(target.parentNode);
+      parent.parent.sketchSpace.imageLinkClicked(target.parentNode);
   });
 });
 
