@@ -2,6 +2,7 @@ ETHERPAD_ROOT="$(cd $(dirname "$0"); pwd)/../../../../"
 . "$ETHERPAD_ROOT/bin/exports.sh"
 
 (
+  mkdir -p ../.extdeps
   cd ../.extdeps
 
   #### Dojo ####
