@@ -169,7 +169,7 @@ function onRequest() {
     var isPro = isProDomainRequest();
     var isProUser = (isPro && ! padusers.isGuest(userId));
 
-    var bodyClass = ["limwidth",
+    var bodyClass = ["timeslider", "limwidth",
                      (isPro ? "propad" : "nonpropad"),
                      (isProUser ? "prouser" : "nonprouser")].join(" ");
 
