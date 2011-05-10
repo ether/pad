@@ -122,17 +122,18 @@ dojo.declare("sketchSpaceDesigner.designer.DesignerUI", [dijit._Widget, dijit._T
   },
   _onMaximize: function () {
     $('body').toggleClass('sketchSpaceMaximized');
-    this.editor.resize();
+    $(window).trigger("resize");
   },
   onSelectImage: function (imageId) {
     $("body").addClass("sketchSpace");
     $("body").removeClass("noSketchSpace");
-  },
+    $(window).trigger("resize");  },
 
   onDeselectImage: function (imageId) {
     $("body").removeClass("sketchSpace");
     $("body").addClass("noSketchSpace");
-  },
+    $(window).trigger("resize");
+   },
 
   selectToolIcon: function(name) {
     $(this.toolbar).find(".tool").css({background: "#ffffff"});
