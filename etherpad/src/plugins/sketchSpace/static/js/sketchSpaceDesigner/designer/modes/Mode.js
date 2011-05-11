@@ -116,17 +116,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Mode", [], {
   },
 
   getCurrentGlobalMouse: function (event) {
-    if (event.layerX !== undefined) {
+    if (event.layerX !== undefined && !$.browser.msie) {
       return {x:event.layerX, y:event.layerY};
     } else {
       /* All of this is for Opera, that Dojo does not seem to handle
        * correctly... Hopefully it doesn't break other browsers... */
       var cpos = $(this.designer.container).offset();
       var tpos = $(event.target).offset();
-      console.log( event.offsetX );
-      console.log( tpos.left );
-      console.log( cpos.left );
-
       return {x: event.offsetX + tpos.left - cpos.left, y: event.offsetY + tpos.top - cpos.top};
     }
   },

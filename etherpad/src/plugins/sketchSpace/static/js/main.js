@@ -150,7 +150,7 @@ sketchSpaceInit.prototype.aceCreateDomLine = function(args) {
       this.updateImageFromPadIfNeeded();
     }
 
-    return [{cls: clss.join(" "), extraOpenTags: '<a class="sketchSpaceImageLink">', extraCloseTags: '</a>'}];
+    return [{cls: clss.join(" "), extraOpenTags: '', extraCloseTags: ''}];
   }
 };
 

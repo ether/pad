@@ -2,15 +2,10 @@
 // links inside the ACE domlines...
 
 $(document).ready(function () {
-  $("body").click(function (event) {
+  $("body").mousedown(function (event) {
     var target = undefined;
-    if ($(event.target).filter(".sketchSpaceImageLink").length > 0) {
-      target = $(event.target).filter(".sketchSpaceImageLink")[0];
-    } else if ($(event.target).find(".sketchSpaceImageLink").length > 0) {
-      target = $(event.target).find(".sketchSpaceImageLink")[0];
+    if ($(event.target).filter(".sketchSpaceIsImage").length > 0) {
+      parent.parent.sketchSpace.imageLinkClicked(event.target);
     }
-    if (target)
-      parent.parent.sketchSpace.imageLinkClicked(target.parentNode);
   });
 });
-
