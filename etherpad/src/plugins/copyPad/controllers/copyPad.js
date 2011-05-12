@@ -33,6 +33,7 @@ import("etherpad.pad.padutils");
 import("etherpad.pad.model");
 import("etherpad.collab.server_utils");
 import("etherpad.collab.collab_server.buildHistoricalAuthorDataMapForPadHistory");
+import("etherpad.collab.ace.easysync2.{Changeset,AttribPool}");
 
 function formatAuthorData(historicalAuthorData) {
   var authors_all = [];
@@ -73,14 +74,25 @@ function createCopy(localPadId, pad, clonePadId, cloneRevNum) {
 
     return {
       'padText':pad.getRevisionText(cloneRevNum),
+      'padAText': pad.getInternalRevisionAText(cloneRevNum),
+      'pool': pad.pool(),
       'historicalAuthorData': buildHistoricalAuthorDataMapForPadHistory(pad)
     };
   }, 'r');
 
   var author_list = formatAuthorData(cloneData.historicalAuthorData);
-  var header   = "This pad builds on [["+clonePadId+"/rev."+cloneRevNum + "]], created by " + author_list.join(" & ") + "\n\n";
+  var header = "This pad builds on [["+clonePadId+"/rev."+cloneRevNum + "]], created by " + author_list.join(" & ") + "\n\n";
 
-  pad.create(header + cloneData.padText);	    
+  pad.create('');
+
+  var pool = pad.pool();
+  pool.fromJsonable(cloneData.pool.toJsonable());
+  var assem = Changeset.smartOpAssembler();
+  assem.appendOpWithText('+', header, [], pool);
+  Changeset.appendATextToAssembler(cloneData.padAText, assem);
+  assem.endDocument();
+  pad.appendRevision(Changeset.pack(1, header.length + cloneData.padText.length + 1, assem.toString(), header + cloneData.padText));
+
   return;
 }
 
