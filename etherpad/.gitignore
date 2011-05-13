@@ -7,3 +7,8 @@ appjet-eth*.jar
 etherpad-pne-*.jar
 
 
+src/plugins/.extdeps/
+src/plugins/sketchSpace/static/js/dojo
+src/plugins/sketchSpace/static/js/dojox
+src/plugins/sketchSpace/static/js/dijit
+src/plugins/sketchSpace/static/js/build

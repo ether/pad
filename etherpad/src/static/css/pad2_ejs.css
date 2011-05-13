@@ -30,19 +30,19 @@ body.fullwidth #padpage { width: auto; margin-left: 6px; margin-right: 6px; }
 body.squish1width #padpage { width: 800px; }
 body.squish2width #padpage { width: 700px; }
 
-#topbar { height: 25px; background: #326cbd url(/static/img/jun09/pad/padtopback2.gif) repeat-x left top;
+.topbar { height: 25px; background: #326cbd url(/static/img/jun09/pad/padtopback2.gif) repeat-x left top;
   position: relative; }
 
-#topbarleft { float: left; height: 100%;  overflow: hidden;
+.topbarleft { float: left; height: 100%;  overflow: hidden;
  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left top; width: 5px; 
 
  } 
-#topbarright { float: right; height: 100%; overflow: hidden;
+.topbarright { float: right; height: 100%; overflow: hidden;
  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat right top; width: 5px; }
 
-.propad #topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
-.propad #topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
-.propad #topbarright { background: url(/static/img/jun09/pad/protop.gif) no-repeat right top; }
+.propad .topbar { background: #2c2c2c url(/static/img/jun09/pad/protop.gif) repeat-x 0 -25px; }
+.propad .topbarleft { background: url(/static/img/jun09/pad/protop.gif) no-repeat left top; }
+.propad .topbarright { background: url(/static/img/jun09/pad/protop.gif) no-repeat right top; }
 
 a#backtoprosite, #accountnav {
   display: block; position: absolute; height: 15px; line-height: 15px;
@@ -54,22 +54,22 @@ a#backtoprosite { padding-left: 20px; left: 6px;
   background: url(/static/img/jun09/pad/protop.gif) no-repeat -5px -6px; }
 #accountnav { right: 30px; color: #fff; }
   
-#topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
-a#topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
+.topbarcenter { margin-left: 150px; margin-right: 150px; text-align:center;}
+a.topbaretherpad { margin-left: auto; margin-right: auto; display: block; width: 103px;
   position: relative; top: 3px; height: 0; padding-top: 20px;
 /*  background: url(/static/img/jun09/pad/padtop5.gif) no-repeat -397px -3px; overflow: hidden; */
 }
 
 
-#topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
+.topbarBrand {font-size:2.1em; color: white; font-weight: bold; text-decoration: none; text-align: center;}
 
 
 
-#EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
-#Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
-#fullscreen {font-size: 1.2em; color: white;float:right;margin-top:4px;margin-right:-120px; text-decoration: none;  }
+.EtherpadLink {font-size: 1.2em; color: white;float:left;margin-left:-140px;margin-top:4px; text-decoration: none;  }
+.Licensing {font-size: 1.2em; color: white;float:left;margin-top:4px;margin-left:-75px; text-decoration: none;  }
+.fullscreen {font-size: 1.2em; color: white;float:right;margin-top:4px;margin-right:-120px; text-decoration: none;  }
 
-.propad a#topbaretherpad { background: url(/static/img/jun09/pad/protop.gif) no-repeat -397px -3px; }
+.propad a.topbaretherpad { background: url(/static/img/jun09/pad/protop.gif) no-repeat -397px -3px; }
 
 #specialkeyarea { top: 5px; left: 250px; color: yellow; font-weight: bold;
   font-size: 1.5em; position: absolute; }
@@ -95,7 +95,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
 #shuttingdown { position: relative; zoom: 1; border: 1px solid #992;
   background: #ffc; padding: 0.6em; font-size: 1.2em; margin-top: 6px; }
 
-#docbar { margin-top: 6px; height: 25px; position: relative; zoom: 1;
+.docbar { margin-top: 6px; height: 25px; position: relative; zoom: 1;
   background: #fbfbfb url(/static/img/jun09/pad/padtopback2.gif) repeat-x 0 -31px; }
 
 .docbarbutton
@@ -143,26 +143,26 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border-right: 0px;
 }
 
-#docbarleft { position: absolute; left: 0; top: 0; height: 100%;
+.docbarleft { position: absolute; left: 0; top: 0; height: 100%;
   overflow: hidden;
   background: url(/static/img/jun09/pad/padtop5.gif) no-repeat left -31px; width: 7px; }
 
 <% /* changing the size of the title / rename area means adjusting
-   the #docbarpadtitle.width, #padtitlebuttons.left,
+   the .docbarpadtitle.width, #padtitlebuttons.left,
    and #padtitleedit.width */ %>
   
-#docbarpadtitle { position: absolute; height: auto; left: 9px;
+.docbarpadtitle { position: absolute; height: auto; left: 9px;
   width: 280px; font-size: 1.6em; color: #444; font-weight: normal;
   line-height: 22px; margin-left: 2px; height: 22px; top: 2px;
   overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
   white-space:nowrap; }
-.docbar-public #docbarpadtitle { padding-left: 22px;
+.docbar-public .docbarpadtitle { padding-left: 22px;
   background: url(/static/img/jun09/pad/public.gif) no-repeat left center; }
   
-#docbarrenamelink { position: absolute; top: 6px;
+.docbarrenamelink { position: absolute; top: 6px;
   font-size: 1.1em; display: none; }
-#docbarrenamelink a { color: #999; }
-#docbarrenamelink a:hover { color: #48d; }
+.docbarrenamelink a { color: #999; }
+.docbarrenamelink a:hover { color: #48d; }
 #padtitlebuttons { position: absolute; width: 74px; zoom: 1;
   height: 17px; top: 4px; left: 170px; display: none;
   background: url(/static/img/jun09/pad/ok_or_cancel.gif) 0px 0px; }
@@ -211,7 +211,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   z-index: 10;
 }
 
-#editbar { height: 36px;
+.editbar { height: 36px;
   background: #a5bfe2 url(/static/img/jun09/pad/editbar_background.gif) repeat-x; 
   height:36px;
   left:0;
@@ -221,16 +221,16 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   color: #444444;
 }
 
-#editbarinner {
+.editbarinner {
   overflow: hidden;
 }
 
-#editbarleft { float: left; height: 100%; overflow: hidden;
+.editbarleft { float: left; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_left.gif) no-repeat left top; width: 2px; }
-#editbarright { float: right; height: 100%; overflow: hidden;
+.editbarright { float: right; height: 100%; overflow: hidden;
   background: url(/static/img/jun09/pad/editbar_background_right.gif) no-repeat right top; width: 2px; }
 
-#editbartable
+.editbartable
 {
   position:absolute;
   top: 6px;
@@ -239,7 +239,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   height: 24px;
 }
 
-#editbarsavetable
+.editbarsavetable
 {
   position:absolute;
   top: 6px;
@@ -247,7 +247,7 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   height: 24px;
 }
 
-#editbarsavetable td, #editbartable td
+.editbarsavetable td, .editbartable td
 {
   white-space: nowrap;
 }
@@ -283,10 +283,10 @@ a#hidetopmsg { position: absolute; right: 5px; bottom: 5px; }
   border-left-width: 0px !important;
 }
 
-#editbar #syncstatussyncing { position: absolute; height: 26px; width: 26px;
+.editbar #syncstatussyncing { position: absolute; height: 26px; width: 26px;
   background: url(/static/img/jun09/pad/syncing2.gif) no-repeat center center;
   right: 38px; top: 5px; display: none; }
-#editbar #syncstatusdone { position: absolute; height: 26px; width: 26px;
+.editbar #syncstatusdone { position: absolute; height: 26px; width: 26px;
   background: url(/static/img/jun09/pad/syncdone.gif) no-repeat center center;
   right: 38px; top: 5px; display: none; }
   
@@ -646,7 +646,7 @@ table#otheruserstable { display: none; }
 /* We give docbar a higher z-index than its descendant impexp-wrapper in
    order to allow the Import/Export panel to be on top of stuff lower
    down on the page in IE.  Strange but it works! */
-#docbar { z-index: 52; }
+.docbar { z-index: 52; }
 
 #impexp-wrapper { width: 650px; right: 10px; }
 #impexp-panel { height: 160px; }
@@ -1077,7 +1077,7 @@ form#reconnectform { display: none; }
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/static/img/jun09/pad/overlay2.png", sizingMethod="scale");
 }
 
-a#topbarmaximize {
+a.topbarmaximize {
  float: right;
  width: 16px;
  height: 16px;
@@ -1086,7 +1086,7 @@ a#topbarmaximize {
  background: url(/static/img/jun09/pad/maximize_normal.png);
 }
 
-.maximized a#topbarmaximize {
+.maximized a.topbarmaximize {
  background: url(/static/img/jun09/pad/maximize_maximized.png);
 }
 

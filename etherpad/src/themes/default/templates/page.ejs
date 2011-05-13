@@ -37,33 +37,33 @@ limitations under the License. */ %>
 <% template.define('body', function() { var ejs_data=''; %>
   <div id="padpage">
     <div id="padtop">
-      <div id="topbar">
+      <div class="topbar">
 	<% /* floated left */ %>
-	<div id="topbarleft"><!-- --></div>
-	<% /* <a href="#" id="topbarnewpad">New Pad</a> */ %>
+	<div class="topbarleft"><!-- --></div>
+	<% /* <a href="#" class="topbarnewpad">New Pad</a> */ %>
 	<% /* floated right */ %>
-	<div id="topbarright"><!-- --></div>
-	<% /* <a href="#" id="topbarfullwidth">Toggle Width</a> */ %>
+	<div class="topbarright"><!-- --></div>
+	<% /* <a href="#" class="topbarfullwidth">Toggle Width</a> */ %>
 	<% /* non-floated */ %>
-	<div id="topbarcenter">
+	<div class="topbarcenter">
 
-	  <a href="/" id="topbarBrand"><%= appjet.config.customBrandingName %></a>
+	  <a href="/" class="topbarBrand"><%= appjet.config.customBrandingName %></a>
         <% /* Replace above with an image if you want */ %>
 
             <% if (appjet.config.showLinkandLicense == "true") { 
 		//if (isloggedin == "true") {
 		// This bit needs doing
 		%>
-	  <a href="http://etherpad.org" id="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" id="Licensing">free software</a>
+	  <a href="http://etherpad.org" class="EtherpadLink">Etherpad is</a> <a href="/static/LICENSE" class="Licensing">free software</a>
 	    <% 
 	// } 
 	} %>
-	<div id="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
+	<div class="fullscreen" onclick="$('body').toggleClass('maximized');">Full screen</div>
 
-	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" id="topbarmaximize" title="Toggle maximization"></a>
+	  <a href="javascript:void(0);" onclick="$('body').toggleClass('maximized');" class="topbarmaximize" title="Toggle maximization"></a>
 	</div>
         <%: template.use('topBar'); %>
-	<div id="specialkeyarea"><!-- --></div>
+	<div class="specialkeyarea"><!-- --></div>
       </div>
       <div id="alertbar">
 	<div id="servermsg">
@@ -76,8 +76,8 @@ limitations under the License. */ %>
         <%: template.callHookStr('renderNavigation', {request: request}, '', '', ''); %>
       </div>
 
-      <div id="docbar" class="menu">
-	<table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable">
+      <div id="docbar" class="menu docbar">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" id="docbartable" class="docbartable">
 	  <tr>
 	    <td><img src="/static/img/jun09/pad/roundcorner_left.gif"></td>
             <%: template.use('docBarTitle'); %>
@@ -102,22 +102,22 @@ limitations under the License. */ %>
 	});
       </script>
       <div id="padeditor">
-	<div id="editbar" class="disabledtoolbar">
-          <div id="editbarinner">
+	<div id="editbar" class="editbar disabledtoolbar">
+          <div id="editbarinner" class="editbarinner">
 	    <% /* floated left */ %>
-	    <div id="editbarleft"><!-- --></div>
+	    <div id="editbarleft" class="editbarleft"><!-- --></div>
 	    <% /* floated right */ %>
-	    <div id="editbarright"><!-- --></div>      
+	    <div id="editbarright" class="editbarright"><!-- --></div>      
 	    <% /* non-floated */ %>
-	    <div id="editbarinner">
-	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable">
+	    <div id="editbarinner" class="editbarinner">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbartable" class="editbartable">
 		<tr>
 		  <%: template.use('editBarItemsLeft'); %>
 		  <%: template.callHookStr('editBarItemsLeftAll', {}, '', '', ''); %>
 		  <td width="100%">&nbsp;</td>
 		</tr>
 	      </table>
-	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable">
+	      <table cellpadding="0" cellspacing="0" border = "0" id="editbarsavetable" class="editbarsavetable">
 		<tr>
 		  <%: template.callHookStr('editBarItemsRightAll', {}, '', '', ''); %>
 		  <%: template.use('editBarItemsRight'); %>

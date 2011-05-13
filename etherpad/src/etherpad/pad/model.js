@@ -227,8 +227,26 @@ function accessPadGlobal(padId, padFunc, rwMode) {
           meta.status.dirty = true;
           meta.supportsTimeSlider = true;
 
-	  var firstChangeset = Changeset.makeSplice("\n", 0, 0,
-	    cleanText(optText || ''));
+	  var firstChangeset;
+	  if (typeof(optText) == "string") {
+	    firstChangeset = Changeset.makeSplice("\n", 0, 0, optText, [], pad.pool());
+	  } else if (optText.padId !== undefined) {
+	    var cloneData = accessPadGlobal(optText.padId, function(pad) {
+	      var cloneRevNum = pad.getHeadRevisionNumber();
+	      return {
+		'padText':pad.getRevisionText(cloneRevNum),
+		'padAText': pad.getInternalRevisionAText(cloneRevNum),
+		'pool': pad.pool()
+	      };
+	    }, 'r');
+	    var pool = pad.pool();
+	    pool.fromJsonable(cloneData.pool.toJsonable());
+	    var assem = Changeset.smartOpAssembler();
+	    Changeset.appendATextToAssembler(cloneData.padAText, assem);
+	    assem.endDocument();
+	    firstChangeset = Changeset.pack(1, cloneData.padText.length + 1, assem.toString(), cloneData.padText);
+	  }
+
 	  addRevision(firstChangeset, '');
 
 	  _insertPadMetaData(padId, meta);

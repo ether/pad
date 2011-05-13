@@ -96,6 +96,8 @@ function onRequest() {
 //----------------------------------------------------------------
 
 function getDefaultPadText() {
+  if (appjet.config.defaultPadContent !== undefined)
+    return {padId: appjet.config.defaultPadContent};
   if (pro_utils.isProDomainRequest()) {
     return pro_config.getConfig().defaultPadText;
   }

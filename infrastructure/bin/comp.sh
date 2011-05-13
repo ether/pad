@@ -27,7 +27,7 @@ if [ "$1" == "clearcache" ]; then
 fi
 
 if [ -z "$CC" ]; then
-    CC=fsc
+    CC=scalac
 fi
 echo compiling with \'$CC\'...
 

@@ -29,3 +29,16 @@ source "$ETHERPADDIR/bin/exports.sh"
 ( cd "$ETHERPADDIR"/infrastructure/ace; bin/make normal etherpad; )
 cp "$ETHERPADDIR"/infrastructure/build/appjet.jar $ETHERPADDIR/etherpad/appjet-eth-dev.jar
 rm -rf "$ETHERPADDIR"/infrastructure/{appjet,build,buildjs,buildcache}
+
+# Rebuild modules
+(
+  cd "$ETHERPADDIR"
+  ls etherpad/src/plugins/ | while read name; do
+    (
+      cd "$ETHERPADDIR/etherpad/src/plugins/$name"
+      if [ -e "build.sh" ]; then
+        ./build.sh
+      fi
+    )
+  done
+)

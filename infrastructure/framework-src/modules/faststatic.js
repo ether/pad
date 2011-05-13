@@ -40,7 +40,7 @@ jimport("java.lang.System.out.println");
 // Content Type Guessing
 //----------------------------------------------------------------
 
-var _contentTypes = {
+var contentTypes = {
   'gif': 'image/gif',
   'png': 'image/png',
   'jpg': 'image/jpeg',
@@ -55,20 +55,20 @@ var _contentTypes = {
   'xml': 'application/xml'
 };
 
-var _gzipableTypes = {
+var gzipableTypes = {
   'text/css': true,
   'application/x-javascript': true,
   'text/html; charset=utf-8': true
 };
 
-function _guessContentType(path) {
+function guessContentType(path) {
   var ext = path.split('.').pop().toLowerCase();
-  return _contentTypes[ext] || _contentTypes['txt'];
+  return contentTypes[ext] || contentTypes['txt'];
 }
 
 //----------------------------------------------------------------
 
-function _getCache(name) {
+function getCache(name) {
   var m = 'faststatic';
   if (!appjet.cache[m]) {
     appjet.cache[m] = {};
@@ -82,8 +82,8 @@ function _getCache(name) {
 
 var _mtimeCheckInterval = 5000; // 5 seconds
 
-function _getMTime(f) {
-  var mcache = _getCache('mtimes');
+function getMTime(f) {
+  var mcache = getCache('mtimes');
   var now = +(new Date);
   if (appjet.config.devMode ||
       !(mcache[f] && (now - mcache[f].lastCheck < _mtimeCheckInterval))) {
@@ -121,15 +121,15 @@ function manglePluginPaths(localFile) {
   return localFile;
 }
 
-function _wrapFile(localFile) {
+function wrapFile(localFile) {
   return {
     getPath: function() { return localFile; },
-    getMTime: function() { return _getMTime(localFile); },
-    getContents: function() { return _readFileAndProcess(manglePluginPaths(localFile), 'string'); }
+    getMTime: function() { return getMTime(localFile); },
+    getContents: function() { return readFileAndProcess(manglePluginPaths(localFile), 'string'); }
   };
 }
 
-function _readFileAndProcess(fileName, type) {
+function readFileAndProcess(fileName, type) {
   if (fileName.slice(-8) == "_ejs.css") {
     // run CSS through EJS
     var template = readFile(fileName);
@@ -150,13 +150,13 @@ function _readFileAndProcess(fileName, type) {
   }
 }
 
-function _cachedFileBytes(f) {
-  var mtime = _getMTime(f);
+function cachedFileBytes(f) {
+  var mtime = getMTime(f);
   if (!mtime) { return null; }
-  var fcache = _getCache('file-bytes-cache');
+  var fcache = getCache('file-bytes-cache');
   if (!(fcache[f] && (fcache[f].mtime == mtime))) {
     varz.incrementInt("faststatic-file-bytes-cache-miss");
-    var bytes = _readFileAndProcess(f, 'bytes');
+    var bytes = readFileAndProcess(f, 'bytes');
     if (bytes) {
       fcache[f] = {mtime: mtime, bytes: bytes};
     };
@@ -168,17 +168,17 @@ function _cachedFileBytes(f) {
   }
 }
 
-function _shouldGzip(contentType) {
+function shouldGzip(contentType) {
   var userAgent = request.headers["User-Agent"];
   if (! userAgent) return false;
   if (! (/Firefox/.test(userAgent) || /webkit/i.test(userAgent))) return false;
-  if (! _gzipableTypes[contentType]) return false;
+  if (! gzipableTypes[contentType]) return false;
 
 	return request.acceptsGzip;
 }
 
-function _getCachedGzip(original, key) {
-  var c = _getCache("gzipped");
+function getCachedGzip(original, key) {
+  var c = getCache("gzipped");
   if (! c[key] || ! java.util.Arrays.equals(c[key].original, original)) {
     c[key] = {original: original,
               gzip: stringutils.gzip(original)};
@@ -186,7 +186,7 @@ function _getCachedGzip(original, key) {
   return c[key].gzip;
 }
 
-function _setGzipHeader() {
+function setGzipHeader() {
   response.setHeader("Content-Encoding", "gzip");
 }
 
@@ -196,16 +196,16 @@ function _setGzipHeader() {
  * Function for serving a single static file.
  */
 function singleFileServer(localPath, opts) {
-  var contentType = _guessContentType(localPath);
+  var contentType = guessContentType(localPath);
 
   return function() {
     (opts.cache ? response.alwaysCache() : response.neverCache());
     response.setContentType(contentType);
-    var bytes = _cachedFileBytes(localPath);
+    var bytes = cachedFileBytes(localPath);
     if (bytes) {
-      if (_shouldGzip(contentType)) {
-        bytes = _getCachedGzip(bytes, "file:"+localPath);
-        _setGzipHeader();
+      if (shouldGzip(contentType)) {
+        bytes = getCachedGzip(bytes, "file:"+localPath);
+        setGzipHeader();
       }
       response.writeBytes(bytes);
       return true;
@@ -231,15 +231,15 @@ function directoryServer(localDir, opts) {
       response.forbid();
     }
     (opts.cache ? response.alwaysCache() : response.neverCache());
-    var contentType = _guessContentType(relpath);
+    var contentType = guessContentType(relpath);
     response.setContentType(contentType);
     var fullPath = localDir + "/" + relpath;
-    var bytes = _cachedFileBytes(fullPath);
+    var bytes = cachedFileBytes(fullPath);
 
     if (bytes) {
-      if (_shouldGzip(contentType)) {
-        bytes = _getCachedGzip(bytes, "file:"+fullPath);
-        _setGzipHeader();
+      if (shouldGzip(contentType)) {
+        bytes = getCachedGzip(bytes, "file:"+fullPath);
+        setGzipHeader();
       }
       response.writeBytes(bytes);
       return true;
@@ -253,17 +253,17 @@ function directoryServer(localDir, opts) {
  * Serves cat files, which are concatenated versions of many files.
  */
 function compressedFileServer(opts) {
-  var cfcache = _getCache('compressed-files');
+  var cfcache = getCache('compressed-files');
   return function() {
     var key = request.path.split('/').slice(-1)[0];
-    var contentType = _guessContentType(request.path);
+    var contentType = guessContentType(request.path);
     response.setContentType(contentType);
     response.alwaysCache();
     var data = cfcache[key];
     if (data) {
-      if (_shouldGzip(contentType)) {
-        data = _getCachedGzip((new java.lang.String(data)).getBytes(response.getCharacterEncoding()), "comp:"+key);
-        _setGzipHeader();
+      if (shouldGzip(contentType)) {
+        data = getCachedGzip((new java.lang.String(data)).getBytes(response.getCharacterEncoding()), "comp:"+key);
+        setGzipHeader();
         response.writeBytes(data);
       } else {
         response.write(data);
@@ -284,7 +284,7 @@ function getCompressedFilesKey(type, baseLocalDir, localFileList) {
   // convert passed-in file list into list of our file objects
   localFileList.forEach(function(f) {
     if (typeof(f) == 'string') {
-      fileList.push(_wrapFile(baseLocalDir+'/'+f));
+      fileList.push(wrapFile(baseLocalDir+'/'+f));
     } else {
       fileList.push(f);
     }
@@ -295,7 +295,7 @@ function getCompressedFilesKey(type, baseLocalDir, localFileList) {
   var fsMTime = Math.max.apply(this,
 			       fileList.map(function(f) { return f.getMTime(); }));
 
-  var kdcache = _getCache('fileset-keydata-cache');
+  var kdcache = getCache('fileset-keydata-cache');
   if (!(kdcache[fsId] && (kdcache[fsId].mtime == fsMTime))) {
     //println("cache miss for fileset: "+fsId);
     //println("compressing fileset...");
@@ -328,7 +328,7 @@ function _compressFilesAndMakeKey(type, fileList) {
   fullstr = _compress(fullstr);
 
   var key = stringutils.md5(fullstr) + '.' + type;
-  var cfcache = _getCache('compressed-files');
+  var cfcache = getCache('compressed-files');
   cfcache[key] = fullstr;
   return key;
 }

@@ -18,7 +18,7 @@ limitations under the License. */ %>
 %>
 
 <% template.define('docBarTitle', function() { var ejs_data=''; %>
-  <td id="docbarpadtitle"><span>Plugin manager</span></td>
+  <td id="docbarpadtitle" class="docbarpadtitle"><span>Plugin manager</span></td>
 <% return ejs_data; }); %>
 
 <% template.define('docBarItems', function() { var ejs_data=''; %>
@@ -76,8 +76,8 @@ limitations under the License. */ %>
        <% if (plugin_registry.plugins[plugin] !== undefined) { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=uninstall">Uninstall</a>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=reinstall">Reinstall</a>
-	<% if (plugin_registry.plugins[plugin].configLink !== undefined) { %>
-	 <a href="<%= plugin_registry.plugins[plugin].configLink %>">Configure</a>
+	<% if (plugin_registry.pluginModules[plugin].configLink !== undefined) { %>
+	 <a href="<%= plugin_registry.pluginModules[plugin].configLink %>">Configure</a>
 	<% } %>
        <% } else { %>
 	<a href="/ep/admin/pluginmanager/?plugin=<%= plugin %>&action=install">Install</a>

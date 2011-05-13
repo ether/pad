@@ -59,7 +59,7 @@ function makeDraggable(jqueryNodes, eventHandler) {
   });
 }
 
-function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
+function makeResizableVPane(top, sep, bottom, minTop, minBottom, callback) {
   if (minTop === undefined) minTop = 0;
   if (minBottom === undefined) minBottom = 0;
 
@@ -92,11 +92,12 @@ function makeResizableVPane(top, sep, bottom, minTop, minBottom) {
       $(sep).css('top', topHeight + "%");
       $(bottom).css('top', (topHeight +  sepHeight) + '%');
       $(bottom).css('height', 'auto');
+      if (callback) callback();
     }
   });
 }
 
-function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOffset) {
+function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOffset, callback) {
   if (minLeft === undefined) minLeft = 0;
   if (minRight === undefined) minRight = 0;
 
@@ -146,6 +147,7 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
       $(sep).css('left', (leftWidth + newSepOffset) + "%");
       $(right).css('left', (leftWidth + newSepWidth) + '%');
       $(right).css('width', 'auto');
+      if (callback) callback();
     }
   });
 }

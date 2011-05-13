@@ -1,0 +1,37 @@
+Extensions
+-----------
+Use Etherpad to write and collaborate on HTML, CSS, and JavaScript
+https://github.com/toolness/htmlpad
+
+A script (ideal for cron job'n) to login to your Etherpad account, download all pads, archive them and save locally or push to S3
+https://github.com/jrk/EtherPad-Backup
+
+Integrations
+-------------
+Use Etherpad as editor in the Drupal CMS
+http://drupal.org/project/etherpad
+
+Use Etherpad as editor in the Wordpress blog engine/CMS
+https://github.com/bsoule/expost
+
+Chrome App for managing your etherpads
+https://github.com/boazsender/etherpads
+
+shinx + s6 + etherpad + keynote-like thema
+https://github.com/nati/sphinx-s6-misc
+
+Software using Etherpad
+------------------------
+A tool designed to help organise the rapid development of apps
+https://github.com/JordanHatch/RapidHackr
+
+A content management system using etherpad as a backend
+https://github.com/themasch/PadCMS
+
+APIs
+-----
+Ruby Etherpad API
+https://github.com/adammck/reefer
+
+Create a new etherpad page and upload a file from the command line
+https://github.com/tomjnixon/etherpad_upload
