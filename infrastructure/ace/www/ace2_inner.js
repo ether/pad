@@ -3085,7 +3085,7 @@ function OUTER(gscope) {
 	}
 	if ((!specialHandled) && isTypeForCmdKey &&
 	    String.fromCharCode(which).toLowerCase() == "z" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
+	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Z (undo)
 	  fastIncorp(6);
 	  evt.preventDefault();
@@ -3099,7 +3099,7 @@ function OUTER(gscope) {
 	}
 	if ((!specialHandled) && isTypeForCmdKey &&
 	    String.fromCharCode(which).toLowerCase() == "y" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
+	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Y (redo)
 	  fastIncorp(10);
 	  evt.preventDefault();
@@ -3108,7 +3108,7 @@ function OUTER(gscope) {
 	}
 	if ((!specialHandled) && isTypeForCmdKey &&
 	    String.fromCharCode(which).toLowerCase() == "b" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
+	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-B (bold)
 	  fastIncorp(13);
 	  evt.preventDefault();
@@ -3117,7 +3117,7 @@ function OUTER(gscope) {
 	}
 	if ((!specialHandled) && isTypeForCmdKey &&
 	    String.fromCharCode(which).toLowerCase() == "i" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
+	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-I (italic)
 	  fastIncorp(14);
 	  evt.preventDefault();
@@ -3126,7 +3126,7 @@ function OUTER(gscope) {
 	}
 	if ((!specialHandled) && isTypeForCmdKey &&
 	    String.fromCharCode(which).toLowerCase() == "u" &&
-	    (evt.metaKey ||  evt.ctrlKey)) {
+	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-U (underline)
 	  fastIncorp(15);
 	  evt.preventDefault();
@@ -3140,6 +3140,13 @@ function OUTER(gscope) {
 	  fastIncorp(20);
 	  evt.preventDefault();
           doDeleteKey();
+	  specialHandled = true;
+	}
+	if ((!specialHandled) && isTypeForCmdKey &&
+	    String.fromCharCode(which).toLowerCase() == "s" &&
+	    (evt.metaKey || evt.ctrlKey)) {
+	  // cmd-S (save)
+	  evt.preventDefault();
 	  specialHandled = true;
 	}
 
