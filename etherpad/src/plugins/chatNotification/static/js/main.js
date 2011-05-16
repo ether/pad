@@ -4,7 +4,7 @@ function chatNotificationPluginInit() {
 }
 
 //	This function plays sound
-//	It relys on flash player wavplayer.swf
+//	It relays on flash player wavplayer.swf
 //	This player is relesed under GNU GPL v3 licence
 //	https://github.com/francois2metz/WavPlayer
 
