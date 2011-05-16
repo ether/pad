@@ -169,6 +169,10 @@ var padmodals = (function() {
       $(".modaldialog").animate({'opacity': 0}, duration, function () { $("#modaloverlay").hide(); });
       $("#modaloverlay").animate({'opacity': 0}, duration, function () { $("#modaloverlay").hide(); });
     },
+    dismissModal: function() {
+      $(".modaldialog").hide();
+      $("#modaloverlay").hide();
+    },
     hideFeedbackLaterIfNoOtherInteraction: function() {
       return padutils.getCancellableAction('hide-feedbackbox',
                                            function() {
