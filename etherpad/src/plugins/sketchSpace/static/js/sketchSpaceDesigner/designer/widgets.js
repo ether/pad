@@ -56,7 +56,7 @@ dojo.declare("sketchSpaceDesigner.designer.widgets.ColorInput", [dijit.form._For
     this.inherited(arguments, [value]);
   },
   _getValueAttr: function(){
-    return dojox.color.fromHex(this.inherited(arguments));
+   return dojox.color.fromHex(this.value); // Somehow inherited(arguments) stopped working, this is a workaround...
   },
   _onClick: function (event) {
     var widget = this;
