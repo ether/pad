@@ -121,6 +121,7 @@ var padchat = (function(){
 
     return {lineNode:lineNode};
   }
+
   function receiveChatHistoryBlock(block) {
     for(var a in block.historicalAuthorData) {
       var data = block.historicalAuthorData[a];
@@ -138,6 +139,8 @@ var padchat = (function(){
       var line = lines[i];
       addChatLine(line.userId, line.time, line.name, line.lineText, true);
     }
+
+	
 
     if (oldestHistoricalLine > 0) {
       $("a#chatloadmore").css('display', 'block');
@@ -177,6 +180,10 @@ var padchat = (function(){
     if (cssColor) {
       $("#chatlines .chatauthor"+n).css('background',cssColor);
     }
+  }
+
+  function chatNotification() {
+    plugins.callHook("chatNotification");
   }
 
   function sendChat() {
@@ -222,6 +229,7 @@ var padchat = (function(){
           self.scrollToBottom();
         }, 0);
       }
+	chatNotification();
     },
     handleUserJoinOrUpdate: function(userInfo) {
       changeAuthorColorData(userInfo.userId,
