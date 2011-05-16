@@ -22,6 +22,12 @@ var padconnectionstatus = (function() {
     init: function() {
       $('button#forcereconnect').click(function() {
         pad.forceReconnect();
+      }
+	  );
+      $('button#hidedialog').click(function() {
+        padmodals.dismissModal();
+//	This changes name from Etherpad 1.1 to Etherpad 1.1 (Offline) 
+	document.getElementById('topbarBrand').innerHTML = document.getElementById('topbarBrand').innerHTML + " (Offline)";
       });
     },
     connected: function() {

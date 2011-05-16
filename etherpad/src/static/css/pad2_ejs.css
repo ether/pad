@@ -596,8 +596,10 @@ table#otheruserstable { display: none; }
 .cboxdisconnected_initsocketfail #connectionboxinner #reconnect_advise,
 .cboxdisconnected_looping #connectionboxinner #reconnect_advise,
 .cboxdisconnected_slowcommit #connectionboxinner #reconnect_advise,
-.cboxdisconnected_unknown #connectionboxinner #reconnect_advise { display: block; }
+.cboxdisconnected_unknown #connectionboxinner #reconnect_advise { display: block; } 
+.cboxdisconnected_unknown #connectionboxinner #offline_notification { display: block; } 
 .cboxdisconnected div#reconnect_form { display: block; }
+.cboxdisconnected div#hide_dialog{ display: block; }
 .cboxdisconnected .disconnected h2 { display: none; }
 .cboxdisconnected .disconnected .h2_disconnect { display: block; }
 .cboxdisconnected_userdup .disconnected h2.h2_disconnect { display: none; }
@@ -640,6 +642,10 @@ table#otheruserstable { display: none; }
 .cboxreconnecting #connectionboxinner .reconnecting { display: block; }
 
 #reconnect_form button {
+  font-size: 12pt;
+}
+
+#hide_dialog button {
   font-size: 12pt;
 }
 
