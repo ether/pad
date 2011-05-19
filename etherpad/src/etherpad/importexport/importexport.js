@@ -141,7 +141,7 @@ function convertFileSlowly(from, to, bytes) {
   }
   
   if (! utils.hasOffice()) {
-    return "EtherPad is not configured to import or export formats other than <strong>txt</strong> and <strong>html</strong>. Please contact your system administrator for details.";
+    return "EtherPad is running without ConversionServer, so the requested import or export could not be completed. Please contact your system administrator for details.";
   }
   OpenOfficeService.setExecutable(appjet.config["etherpad.soffice"]);
   try {

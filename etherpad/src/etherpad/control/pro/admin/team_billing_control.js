@@ -363,7 +363,7 @@ function _processInvoicePurchase() {
       "\nEmail: ",
       pro_accounts.getSessionProAccount().email
     ].join("\n");
-  var recipient = (globals.isProduction() ? 'sales@etherpad.com' : 'jd@appjet.com');
+  var recipient = (globals.isProduction() ? 'sales@etherpad.com' : 'sales+testing@etherpad.com');
   sendEmail(
     recipient, 
     'sales@etherpad.com', 
