@@ -264,7 +264,7 @@ function render_recover_padtext_get() {
   if (showPadHelp) {
     d.push(P({style: "font-size: 1em; color: #555;"},
              'The pad ID is the same as the URL to the pad, without the leading "/".',
-             '  For example, if the pad lives at http://etherpad.com/foobar,',
+             '  For example, if the pad lives at http://example.com/foobar,',
              ' then the pad ID is "foobar" (without the quotes).'))
   }
 
