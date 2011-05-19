@@ -47,7 +47,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Collaborative real-time editor"
 NAME="etherpad"
-DAEMON_BASE="/usr/local/etherpad"
+DAEMON_BASE="/usr/share/etherpad"
 DAEMON=$DAEMON_BASE/bin/run.sh
 DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
