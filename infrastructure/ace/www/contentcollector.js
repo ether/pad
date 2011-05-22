@@ -360,7 +360,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       if (tname == "br") {
         cc.startNewLine(state);
       }
-      else if (tname == "script" || tname == "style") { 
+      else if (tname == "script" || tname == "style") {
         // ignore
       } else if (tname == "img"){
         var styl = dom.nodeAttr(node, "style");
