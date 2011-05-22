@@ -619,17 +619,17 @@ Changeset.textLinesMutator = function(lines) {
   function skip(N, L, includeInSplice) {
     if (N) {
       if (L) {
-    	skipLines(L, includeInSplice);
+	skipLines(L, includeInSplice);
       }
       else {
-	    if (includeInSplice && ! inSplice) {
-    	  enterSplice();
-	    }
-    	if (inSplice) {
-	      putCurLineInSplice();
-    	}
-	    curCol += N;
-	    //debugPrint("skip");
+	if (includeInSplice && ! inSplice) {
+	  enterSplice();
+	}
+	if (inSplice) {
+	  putCurLineInSplice();
+	}
+	curCol += N;
+	//debugPrint("skip");
       }
     }
   }
@@ -875,13 +875,14 @@ Changeset.composeAttributes = function(att1, att2, resultIsMutation, pool) {
     for(var i=0;i<atts.length;i++) {
       var oldPair = atts[i];
       if (oldPair[0] == pair[0]) {
-	   if (pair[1] || resultIsMutation) {
-    	    oldPair[1] = pair[1];
-	    } else {
-	        atts.splice(i, 1);
-	    }
-        found = true;
-    	break;
+	if (pair[1] || resultIsMutation) {
+	  oldPair[1] = pair[1];
+	}
+	else {
+	  atts.splice(i, 1);
+	}
+	found = true;
+	break;
       }
     }
     if ((! found) && (pair[1] || resultIsMutation)) {
@@ -1055,38 +1056,42 @@ Changeset.mutateAttributionLines = function(cs, lines, pool) {
     //print(csOp.opcode+"/"+csOp.lines+"/"+csOp.attribs+"/"+lineAssem+"/"+lineIter+"/"+(lineIter?lineIter.hasNext():null));
     //print("csOp: "+csOp.toSource());
     if ((! csOp.opcode) && (! attOp.opcode) &&
-        	(! lineAssem) && (! (lineIter && lineIter.hasNext()))) {
+	(! lineAssem) && (! (lineIter && lineIter.hasNext()))) {
       break; // done
-    } else if (csOp.opcode == '=' && csOp.lines > 0 && (! csOp.attribs) && (! attOp.opcode) &&
-	              (! lineAssem) && (! (lineIter && lineIter.hasNext()))) {
-          // skip multiple lines; this is what makes small changes not order of the document size
-          mut.skipLines(csOp.lines);
-          //print("skipped: "+csOp.lines);
-          csOp.opcode = '';
-    } else if (csOp.opcode == '+') {
+    }
+    else if (csOp.opcode == '=' && csOp.lines > 0 && (! csOp.attribs) && (! attOp.opcode) &&
+	     (! lineAssem) && (! (lineIter && lineIter.hasNext()))) {
+      // skip multiple lines; this is what makes small changes not order of the document size
+      mut.skipLines(csOp.lines);
+      //print("skipped: "+csOp.lines);
+      csOp.opcode = '';
+    }
+    else if (csOp.opcode == '+') {
       if (csOp.lines > 1) {
-    	var firstLineLen = csBank.indexOf('\n', csBankIndex) + 1 - csBankIndex;
-    	Changeset.copyOp(csOp, opOut);
-	    csOp.chars -= firstLineLen;
-    	csOp.lines--;
-	    opOut.lines = 1;
-    	opOut.chars = firstLineLen;
-      } else {
-    	Changeset.copyOp(csOp, opOut);
-    	csOp.opcode = '';
+	var firstLineLen = csBank.indexOf('\n', csBankIndex) + 1 - csBankIndex;
+	Changeset.copyOp(csOp, opOut);
+	csOp.chars -= firstLineLen;
+	csOp.lines--;
+	opOut.lines = 1;
+	opOut.chars = firstLineLen;
+      }
+      else {
+	Changeset.copyOp(csOp, opOut);
+	csOp.opcode = '';
       }
       outputMutOp(opOut);
       csBankIndex += opOut.chars;
       opOut.opcode = '';
-    } else {
+    }
+    else {
       if ((! attOp.opcode) && isNextMutOp()) {
-        	nextMutOp(attOp);
+	nextMutOp(attOp);
       }
       //print("attOp: "+attOp.toSource());
       Changeset._slicerZipperFunc(attOp, csOp, opOut, pool);
       if (opOut.opcode) {
-       	outputMutOp(opOut);
-    	opOut.opcode = '';
+	outputMutOp(opOut);
+	opOut.opcode = '';
       }
     }
   }
