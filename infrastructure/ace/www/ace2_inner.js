@@ -1436,7 +1436,7 @@ function OUTER(gscope) {
       lastDirtyNode = (lastDirtyNode && isNodeDirty(lastDirtyNode) && lastDirtyNode);
       if (firstDirtyNode && lastDirtyNode) {
 	var cc = makeContentCollector(isStyled, browser, rep.apool, null,
-                                     className2Author);
+                                     className2Author, lineMarker, objMarker);
 	cc.notifySelection(selection);
 	var dirtyNodes = [];
 	for(var n = firstDirtyNode; n && ! (n.previousSibling &&
@@ -1654,7 +1654,7 @@ function OUTER(gscope) {
             if(isMarkerToken(tokenText, pos)){
                 marker = true;
             } 
-	info.appendSpan(tokenText, tokenClass);
+	info.appendSpan(tokenText, tokenClass, attributes, marker);
       }, lineStartOffset, isTimeUp());
       //else if (entry.text.length > 0) {
 	//info.appendSpan(entry.text, 'dirty');
