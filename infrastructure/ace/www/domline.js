@@ -190,20 +190,19 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
           postHtml = '</li></ol>';
       }
     }
-
     var href = null;
     var simpleTags = null;
     if (cls.indexOf('url') >= 0) {
       cls = cls.replace(/(^| )url:(\S+)/g, function(x0, space, url) {
-         href = url;
-      	 return space+"url";
+	href = url;
+	return space+"url";
       });
     }
     if (cls.indexOf('tag') >= 0) {
       cls = cls.replace(/(^| )tag:(\S+)/g, function(x0, space, tag) {
-    	if (! simpleTags) simpleTags = [];
-    	simpleTags.push(tag.toLowerCase());
-    	return space+tag;
+	if (! simpleTags) simpleTags = [];
+	simpleTags.push(tag.toLowerCase());
+	return space+tag;
       });
     }
 
@@ -254,15 +253,15 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     }
     else if (txt) {
       if (href) {
-        extraOpenTags = extraOpenTags+'<a href="'+
-    	  href.replace(/\"/g, '&quot;')+'">';
-	    extraCloseTags = '</a>'+extraCloseTags;
+	extraOpenTags = extraOpenTags+'<a href="'+
+	  href.replace(/\"/g, '&quot;')+'">';
+	extraCloseTags = '</a>'+extraCloseTags;
       }
       if (simpleTags) {
-    	simpleTags.sort();
-    	extraOpenTags = extraOpenTags+'<'+simpleTags.join('><')+'>';
-	    simpleTags.reverse();
-    	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
+	simpleTags.sort();
+	extraOpenTags = extraOpenTags+'<'+simpleTags.join('><')+'>';
+	simpleTags.reverse();
+	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
       }
       var pTxt = perTextNodeProcess(domline.escapeHTML(txt));
       if(txt.length && /\bace\-placeholder\b/.exec(cls)){
