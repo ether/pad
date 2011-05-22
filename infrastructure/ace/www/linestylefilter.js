@@ -63,30 +63,29 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     var localApool = [], tempApool = [];
    
     function attribsToClasses(attribs) {
-        var classes = '';
+      var classes = '';
         tempApool = [];
-        Changeset.eachAttribNumber(attribs, function(n) {
-            var key = apool.getAttribKey(n);
-    	    if (key) {
+      Changeset.eachAttribNumber(attribs, function(n) {
+	var key = apool.getAttribKey(n);
+	if (key) {
                  tempApool.push(apool.getAttrib(n));
-	             var value = apool.getAttribValue(n);
-    	         if (value) {
-        	       if (key == 'author') {
-	                  classes += ' '+linestylefilter.getAuthorClassName(value);
-   	               }
-                   else if (key == 'list') {
-                       classes += ' list:'+value;
-                   }
-	               else if (linestylefilter.ATTRIB_CLASSES[key]) {
-	                   classes += ' '+linestylefilter.ATTRIB_CLASSES[key];
-        	       } else {
-	                   classes += plugins_.callHookStr("aceAttribsToClasses",
-                          {linestylefilter:linestylefilter, key:key, value:value}, " ", " ", "");
-	               }
-	             }
-	      }
-       });
-       return classes.substring(1);
+	  var value = apool.getAttribValue(n);
+	  if (value) {
+	    if (key == 'author') {
+	      classes += ' '+linestylefilter.getAuthorClassName(value);
+	    }
+            else if (key == 'list') {
+              classes += ' list:'+value;
+            }
+	    else if (linestylefilter.ATTRIB_CLASSES[key]) {
+	      classes += ' '+linestylefilter.ATTRIB_CLASSES[key];
+	   } else {
+	     classes += plugins_.callHookStr("aceAttribsToClasses", {linestylefilter:linestylefilter, key:key, value:value}, " ", " ", "");
+	   }
+	  }
+	}
+      });
+      return classes.substring(1);
     }
 
     var attributionIter = Changeset.opIterator(aline);
@@ -99,38 +98,38 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     goNextOp();
     function nextClasses() {
       if (curIndex < lineEnd) {
-    	extraClasses = nextOpClasses;
-    	leftInAuthor = nextOp.chars;
+	extraClasses = nextOpClasses;
+	leftInAuthor = nextOp.chars;
         extraAttribs = nextAttribs;
         localApool = tempApool;
         tempApool= [];
-	    goNextOp();
+	goNextOp();
     	while (nextOp.opcode && nextOpClasses == extraClasses && extraAttribs == nextAttribs) { 
-	      leftInAuthor += nextOp.chars;
-    	  goNextOp();
-	    }
+	  leftInAuthor += nextOp.chars;
+	  goNextOp();
+	}
       }
     }
     nextClasses();
 
     return function(txt, cls) {
       while (txt.length > 0) {
-    	if (leftInAuthor <= 0) {
-    	  // prevent infinite loop if something funny's going on
+	if (leftInAuthor <= 0) {
+	  // prevent infinite loop if something funny's going on
     	  return nextAfterAuthorColors(txt, cls, localApool, leftInAuthor);
-    	}
-    	var spanSize = txt.length;
-    	if (spanSize > leftInAuthor) {
-	      spanSize = leftInAuthor;
-    	}
-    	var curTxt = txt.substring(0, spanSize);
-       	txt = txt.substring(spanSize);
+	}
+	var spanSize = txt.length;
+	if (spanSize > leftInAuthor) {
+	  spanSize = leftInAuthor;
+	}
+	var curTxt = txt.substring(0, spanSize);
+	txt = txt.substring(spanSize);
     	nextAfterAuthorColors(curTxt, (cls&&cls+" ")+extraClasses, localApool, leftInAuthor);
-    	curIndex += spanSize;
-    	leftInAuthor -= spanSize;
-    	if (leftInAuthor == 0) {
-             nextClasses();
-    	}
+	curIndex += spanSize;
+	leftInAuthor -= spanSize;
+	if (leftInAuthor == 0) {
+	  nextClasses();
+	}
       }
     };
   })();
