@@ -294,7 +294,8 @@ function requireAccount(message) {
       (request.path == "/ep/account/guest-sign-in") ||
       (request.path == "/ep/account/guest-knock") ||
       (request.path == "/ep/account/forgot-password") ||
-      (request.path == "/ep/account/request-account")) {
+      (request.path == "/ep/account/request-account") ||
+      (request.path == "/ep/account/request-account-captcha")) {
     return;
   }
 

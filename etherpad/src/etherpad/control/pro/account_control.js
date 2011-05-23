@@ -23,6 +23,7 @@ import("cache_utils.syncedWithCache");
 import("etherpad.helpers");
 import("etherpad.utils.*");
 import("etherpad.sessions.getSession");
+import("etherpad.sessions.getSessionId");
 import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.pro.domains");
@@ -33,6 +34,11 @@ import("etherpad.pad.pad_security");
 import("etherpad.pad.padutils");
 import("etherpad.pad.padusers");
 import("etherpad.collab.collab_server");
+
+jimport("java.awt.image.BufferedImage");
+jimport("javax.imageio.ImageIO");
+jimport("com.octo.captcha.service.image.ImageCaptchaService");
+jimport("com.octo.captcha.service.image.DefaultManageableImageCaptchaService");
 
 function onRequest() {
   if (!getSession().tempFormData) {
@@ -222,6 +228,26 @@ function render_sign_in_post() {
   _redirectToPostSigninDestination();
 }
 
+function create_captcha()
+{
+    if(!appjet.cache.captchaservice)
+    {
+        appjet.cache.captchaservice = new DefaultManageableImageCaptchaService();
+    }
+
+    captcha = appjet.cache.captchaservice.getImageChallengeForID(getSessionId());
+    return captcha;
+}
+
+function render_request_account_captcha_get() {
+    rendImage = create_captcha();
+    jos = new java.io.ByteArrayOutputStream();
+    ImageIO.write(rendImage, 'PNG', jos);
+    
+    response.setContentType('image/png');
+    response.writeBytes(jos.toByteArray());
+}
+
 function render_request_account_get() {
     _renderTemplate('requestaccount', {
     domain: pro_utils.getFullProDomain(),
@@ -237,9 +263,21 @@ function render_request_account_post() {
 
     var fullname = trim(request.params.fullname);
     var email = trim(request.params.email).toLowerCase();
+    var captcha = request.params.captcha;
     
     getSession().tempFormData.fullname = fullname;
     getSession().tempFormData.email = email;
+    try {
+        isResponseCorrect = appjet.cache.captchaservice.validateResponseForID(getSessionId(), captcha);
+        
+        if(!isResponseCorrect)
+        {
+            _redirOnError("Captcha is incorrect!");
+        }
+    } catch (e) {
+        //should not happen, may be thrown if the id is not valid
+        _redirOnError("Captcha is incorrect!");
+    }
     
     var accountExists = pro_accounts.getAccountByEmail(email, domainId);
     if(typeof accountExists == "undefined")
