@@ -1,3 +1,5 @@
+//megre origin main.js editor.js richtextui.js into this main.js
+//in order to enable code compress
 if(typeof dojo != "undefined"){
     dojo.require("dijit.form.Button");
     dojo.require("dijit.Menu");
@@ -324,6 +326,7 @@ if(typeof dojo != "undefined"){
     dojo.addOnLoad(function() {
         buildColorPalette();
         buildFontStyle();
+        buildDialogs();
     });
 }
 if(typeof window == "object"){
