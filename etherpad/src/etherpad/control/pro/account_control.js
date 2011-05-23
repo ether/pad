@@ -244,33 +244,33 @@ function render_request_account_post() {
     var accountExists = pro_accounts.getAccountByEmail(email, domainId);
     if(typeof accountExists == "undefined")
     {
-	var admins = pro_accounts.listAllDomainAdmins(domainId);
-	
-	admins.forEach(function(admin) {
-	    var subj = "Account request on "+ appjet.config.customBrandingName +" for "+pro_utils.getFullProDomain()+"!";
-	    var toAddr = admin.email;
-	    var fromAddr = pro_utils.getEmailFromAddr();
-	    
-	    var body = renderTemplateAsString('pro/account/request-account-email.ejs', {
-	        signinLink: pro_accounts.getTempRequestAccountUrl(fullname, email),
-	        fullname: fullname,
-	        email: email,
-	        toFullName: admin.fullName,
-	    	toEmail: toAddr,
-		siteName: pro_utils.getFullProDomain()
-	    });
-	    
-	    try {
-		sendEmail(toAddr, fromAddr, subj, {}, body);
-	    } catch (ex) {
-		_redirOnError("Warning: unable to send request account email!");
-	    }
-	    _redirOnNotice("Account requested! You will get an email on success!");
-	});
+        var admins = pro_accounts.listAllDomainAdmins(domainId);
+        
+        admins.forEach(function(admin) {
+            var subj = "Account request on "+ appjet.config.customBrandingName +" for "+pro_utils.getFullProDomain()+"!";
+            var toAddr = admin.email;
+            var fromAddr = pro_utils.getEmailFromAddr();
+            
+            var body = renderTemplateAsString('pro/account/request-account-email.ejs', {
+                signinLink: pro_accounts.getTempRequestAccountUrl(fullname, email),
+                fullname: fullname,
+                email: email,
+                toFullName: admin.fullName,
+                toEmail: toAddr,
+                siteName: pro_utils.getFullProDomain()
+            });
+            
+            try {
+                sendEmail(toAddr, fromAddr, subj, {}, body);
+            } catch (ex) {
+                _redirOnError("Warning: unable to send request account email!");
+            }
+            _redirOnNotice("Account requested! You will get an email on success!");
+        });
     }
     else
     {
-	_redirOnError("Email account already exists!");
+        _redirOnError("Email account already exists!");
     }
 }
 
