@@ -1987,7 +1987,7 @@ function OUTER(gscope) {
   function canApplyChangesetToDocument(changes) {
     return Changeset.oldLen(changes) == rep.alltext.length;
   }
-  
+
   function performDocumentApplyChangeset(changes, insertsAfterSelection) {
     doRepApplyChangeset(changes, insertsAfterSelection);
 
@@ -2553,7 +2553,6 @@ function OUTER(gscope) {
           }
 	});
 
-
         var foundDomAuthor = '';
         eachAttribRun(newAttribs, function(start, end, attribs) {
           var a = Changeset.attribsAttributeValue(attribs, 'author', rep.apool);
@@ -2815,7 +2814,6 @@ function OUTER(gscope) {
 
     var cleanNodeForIndexCache = {};
     var N = rep.lines.length(); // old number of lines
-
     function cleanNodeForIndex(i) {
       // if line (i) in the un-updated line representation maps to a clean node
       // in the document, return that node.
