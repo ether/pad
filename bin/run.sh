@@ -32,4 +32,4 @@ echo $$ > $PID_FILE
 cd "$ETHERPADDIR/etherpad"
 
 # the argument here is the maximum amount of RAM to allocate
-exec bin/run-local.sh --etherpad.soffice="$SOFFICE_BIN" "$@" 256M 
+exec bin/run-local.sh --etherpad.soffice="$SOFFICE_BIN" "$@" 256M
