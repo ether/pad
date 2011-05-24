@@ -28,6 +28,8 @@ import("etherpad.pad.padutils");
 import("etherpad.pad.dbwriter");
 import("etherpad.pad.pad_migrations");
 import("etherpad.pad.pad_security");
+import("etherpad.pro.pro_utils");
+import("etherpad.pro.pro_config");
 import("etherpad.collab.collab_server");
 import("cache_utils.syncedWithCache");
 import("etherpad.admin.plugins");
@@ -380,7 +382,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
           }
           if ((! data.padOptions.guestPolicy) ||
             (data.padOptions.guestPolicy == 'ask')) {
-            data.padOptions.guestPolicy = 'deny';
+            data.padOptions.guestPolicy = (pro_utils.isProDomainRequest() && pro_config.getConfig().openByGuestsAllowed ? 'allow' : 'deny');
           }
           return data.padOptions;
         },

@@ -33,6 +33,7 @@ function _getDefaultConfig() {
   return {
     siteName: _guessSiteName(),
     alwaysHttps: false,
+    openByGuestsAllowed: false,
     defaultPadText: renderTemplateAsString("misc/pad_default.ejs")
   };
 }

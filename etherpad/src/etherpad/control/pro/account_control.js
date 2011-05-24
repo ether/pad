@@ -23,6 +23,7 @@ import("cache_utils.syncedWithCache");
 import("etherpad.helpers");
 import("etherpad.utils.*");
 import("etherpad.sessions.getSession");
+import("etherpad.sessions.getSessionId");
 import("etherpad.pro.pro_accounts");
 import("etherpad.pro.pro_accounts.getSessionProAccount");
 import("etherpad.pro.domains");
@@ -33,6 +34,11 @@ import("etherpad.pad.pad_security");
 import("etherpad.pad.padutils");
 import("etherpad.pad.padusers");
 import("etherpad.collab.collab_server");
+
+jimport("java.awt.image.BufferedImage");
+jimport("javax.imageio.ImageIO");
+jimport("com.octo.captcha.service.image.ImageCaptchaService");
+jimport("com.octo.captcha.service.image.DefaultManageableImageCaptchaService");
 
 function onRequest() {
   if (!getSession().tempFormData) {
@@ -49,6 +55,18 @@ function onRequest() {
 function _redirOnError(m, clearQuery) {
   if (m) {
     getSession().accountFormError = m;
+
+    var dest = request.url;
+    if (clearQuery) {
+      dest = request.path;
+    }
+    response.redirect(dest);
+  }
+}
+
+function _redirOnNotice(m, clearQuery) {
+  if (m) {
+    setSigninNotice(m);
 
     var dest = request.url;
     if (clearQuery) {
@@ -209,6 +227,91 @@ function render_sign_in_post() {
   pro_account_auto_signin.setAutoSigninCookie(request.params.rememberMe);
   _redirectToPostSigninDestination();
 }
+
+function create_captcha()
+{
+    if(!appjet.cache.captchaservice)
+    {
+        appjet.cache.captchaservice = new DefaultManageableImageCaptchaService();
+    }
+
+    captcha = appjet.cache.captchaservice.getImageChallengeForID(getSessionId());
+    return captcha;
+}
+
+function render_request_account_captcha_get() {
+    rendImage = create_captcha();
+    jos = new java.io.ByteArrayOutputStream();
+    ImageIO.write(rendImage, 'PNG', jos);
+    
+    response.setContentType('image/png');
+    response.writeBytes(jos.toByteArray());
+}
+
+function render_request_account_get() {
+    _renderTemplate('requestaccount', {
+    domain: pro_utils.getFullProDomain(),
+    siteName: toHTML(pro_config.getConfig().siteName),
+    fullname: getSession().tempFormData.fullname || "",
+    email: getSession().tempFormData.email || "",
+    noticeDiv: _signinNoticeDiv,
+    });
+}
+
+function render_request_account_post() {
+    var domainId = domains.getRequestDomainId();
+
+    var fullname = trim(request.params.fullname);
+    var email = trim(request.params.email).toLowerCase();
+    var captcha = request.params.captcha;
+    
+    getSession().tempFormData.fullname = fullname;
+    getSession().tempFormData.email = email;
+    try {
+        isResponseCorrect = appjet.cache.captchaservice.validateResponseForID(getSessionId(), captcha);
+        
+        if(!isResponseCorrect)
+        {
+            _redirOnError("Captcha is incorrect!");
+        }
+    } catch (e) {
+        //should not happen, may be thrown if the id is not valid
+        _redirOnError("Captcha is incorrect!");
+    }
+    
+    var accountExists = pro_accounts.getAccountByEmail(email, domainId);
+    if(typeof accountExists == "undefined")
+    {
+        var admins = pro_accounts.listAllDomainAdmins(domainId);
+        
+        admins.forEach(function(admin) {
+            var subj = "Account request on "+ appjet.config.customBrandingName +" for "+pro_utils.getFullProDomain()+"!";
+            var toAddr = admin.email;
+            var fromAddr = pro_utils.getEmailFromAddr();
+            
+            var body = renderTemplateAsString('pro/account/request-account-email.ejs', {
+                signinLink: pro_accounts.getTempRequestAccountUrl(fullname, email),
+                fullname: fullname,
+                email: email,
+                toFullName: admin.fullName,
+                toEmail: toAddr,
+                siteName: pro_utils.getFullProDomain()
+            });
+            
+            try {
+                sendEmail(toAddr, fromAddr, subj, {}, body);
+            } catch (ex) {
+                _redirOnError("Warning: unable to send request account email!");
+            }
+            _redirOnNotice("Account requested! You will get an email on success!");
+        });
+    }
+    else
+    {
+        _redirOnError("Email account already exists!");
+    }
+}
+
 
 function render_guest_sign_in_get() {
   var localPadId = request.params.padId;

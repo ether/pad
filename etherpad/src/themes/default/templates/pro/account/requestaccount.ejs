@@ -19,41 +19,43 @@ limitations under the License. */ %><% helpers.includeJQuery() %>
 <div class="fpcontent">
   <div class="account-container">
 
-  <%= signinNotice() %>
-
-  <form id="signin-form" action="<%= request.path + '?' + request.query %>" method="post">
+  <form id="signin-form" action="<%= request.path %>" method="post">
   <div class="bb bb-signin">
     <div class="bb-top">
       <div class="bb-topleft"><!-- --></div>
       <div class="bb-topright"><!-- --></div>
-      <div class="bb-title">Sign In to <%= siteName %> <%= appjet.config.customBrandingName %></div>
+      <div class="bb-title">Request account for <%= siteName %> <%= appjet.config.customBrandingName %></div>
     </div>
     <div class="bb-in">
       <%= errorDiv() %>
+      <%= noticeDiv() %>
+      <div>
+        <label for="fullname" id="email-label">Full name</label>
+        <input class="textin" type="text" name="fullname" id="fullname" value="<%= fullname
+        %>" />
+        <%= helpers.clearFloats() %>
+      </div>
+      
       <div>
         <label for="email" id="email-label">Email</label>
         <input class="textin" type="text" name="email" id="email" value="<%= email
         %>" />
         <%= helpers.clearFloats() %>
       </div>
-
+      
+      <img src="/ep/account/request-account-captcha" />
+      <%= helpers.clearFloats() %>
       <div>
-        <label for="password" id="password-label">Password</label>
-        <input class="passin" type="password" name="password"
-        id="password"
-        value="<%= password
-        %>" />
+        <label for="captcha" id="capcha-label">Captcha</label>
+        <input class="textin" type="text" name="captcha" id="captcha" value="" />
         <%= helpers.clearFloats() %>
-      </div>
-
       <div>
-        <input type="checkbox" id="rememberMe" name="rememberMe"
-          <%= (rememberMe ? 'checked="on"' : '') %> />
-        <label for="rememberMe" id="rememberMe-label">Remember me on this
-        computer</label>
+        
+      </div>
+    
 
         <button type="submit" class="bluebutton bluebutton120" id="signInButton">
-          Sign In
+	    Request
         </button>
         <%= helpers.clearFloats() %>
       </div>
@@ -61,25 +63,6 @@ limitations under the License. */ %><% helpers.includeJQuery() %>
     </div>
   </div>
   </form>
-
-  <% if (showGuestBox) { %>
-    <form action="/ep/account/guest-sign-in"
-          id="guest-signin-choice"
-          method="get">
-      <input type="hidden" name="padId" value="<%= toHTML(localPadId) %>" />
-      Guests: <button type="submit">Request Guest Access</button>
-    </form>
-  <% } %>
-
-  <div id="bottom-text">
-      <a
-      href="/ep/account/request-account">Request new account</a>
-  </div>
-  <div id="bottom-text">
-      <a
-      href="/ep/account/forgot-password">Recover lost
-      password</a>
-  </div>
 
   </div>
 </div>
