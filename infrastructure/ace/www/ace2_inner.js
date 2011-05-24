@@ -38,6 +38,8 @@ function OUTER(gscope) {
   var editorInfo = parent.editorInfo;
 
   var iframe = window.frameElement;
+  var lineMarker = '*'; 
+  var objMarker  = '+';
   var outerWin = iframe.ace_outerWin;
   iframe.ace_outerWin = null; // prevent IE 6 memory leak
   var sideDiv = iframe.nextSibling;
@@ -218,6 +220,9 @@ function OUTER(gscope) {
   editorInfo.ace_getRep = function () {
     return rep;
   }
+  
+  editorInfo.lineMarker = lineMarker;
+  editorInfo.objMarker  = objMarker;
 
   var currentCallStack = null;
   function inCallStack(type, action) {
@@ -595,8 +600,8 @@ function OUTER(gscope) {
   function setTextSize(size) {
     textSize = size;
     root.style.fontSize = textSize+"px";
-    root.style.lineHeight = textLineHeight()+"px";
-    sideDiv.style.lineHeight = textLineHeight()+"px";
+//    root.style.lineHeight = textLineHeight()+"px"; //modified for dynamic font size
+//    sideDiv.style.lineHeight = textLineHeight()+"px";
     lineMetricsDiv.style.fontSize = textSize+"px";
     scheduler.setTimeout(function() {
       setUpTrackingCSS();
@@ -767,7 +772,7 @@ function OUTER(gscope) {
       else {
         setAttributeOnSelection('author', '');
       }
-    },
+    }
   };
 
   function execCommand(cmd) {
@@ -1101,8 +1106,12 @@ function OUTER(gscope) {
     // tokenFunc function; accesses current value of lineEntry and curDocChar,
     // also mutates curDocChar
     var curDocChar;
-    var tokenFunc = function(tokenText, tokenClass) {
-      lineEntry.domInfo.appendSpan(tokenText, tokenClass);
+    var tokenFunc = function(tokenText, tokenClass, attribs, pos) {
+       var marker = false;
+       if(isMarkerToken(tokenText, pos)){
+                marker = true;
+       } 
+       lineEntry.domInfo.appendSpan(tokenText, tokenClass, attribs, marker);
     };
     if (optModFunc) {
       var f = tokenFunc;
@@ -1260,6 +1269,44 @@ function OUTER(gscope) {
     }
   }
 
+  var preSelection = null; //for drag drop
+  function recordSelection(selection){ //
+     preSelection = null;
+     if(!selection) return;
+     preSelection = {};
+     for(var i in selection){
+        if(typeof selection[i] == "object"){
+            preSelection[i] = {};
+            var local = selection[i];
+            for(var j in local){
+                preSelection[i][j] = local[j];
+            } 
+        } else {
+            preSelection[i] = selection[i];
+        }
+     }
+  }
+
+
+  function observePreviousSelection(){
+    if(preSelection){
+     var selection = preSelection;
+     function topLevel(n) {
+    	if ((!n) || n == root) return null;
+    	while (n && n.parentNode != root) {
+    	  n = n.parentNode;
+	    }
+    	return n;
+      }
+      var node1 = topLevel(selection.startPoint.node);
+      var node2 = topLevel(selection.endPoint.node);
+      if (node1) observeChangesAroundNode(node1);
+      if (node2 && node1 != node2) {
+	    observeChangesAroundNode(node2);
+      }
+    } 
+  }
+
   function observeChangesAroundSelection() {
     if (currentCallStack.observedSelection) return;
     currentCallStack.observedSelection = true;
@@ -1281,6 +1328,8 @@ function OUTER(gscope) {
       if (node2 && node1 != node2) {
 	observeChangesAroundNode(node2);
       }
+      observePreviousSelection();
+      recordSelection(selection);
     }
   }
 
@@ -1301,7 +1350,10 @@ function OUTER(gscope) {
     }
   }
 
+  var imageDragDropLock = false; //lock for image drag drop //set drag affected to "move"
   function incorporateUserChanges(isTimeUp) {
+    
+    if(imageDragDropLock) return false; 
 
     if (currentCallStack.domClean) return false;
 
@@ -1384,7 +1436,7 @@ function OUTER(gscope) {
       lastDirtyNode = (lastDirtyNode && isNodeDirty(lastDirtyNode) && lastDirtyNode);
       if (firstDirtyNode && lastDirtyNode) {
 	var cc = makeContentCollector(isStyled, browser, rep.apool, null,
-                                     className2Author);
+                                     className2Author, lineMarker, objMarker);
 	cc.notifySelection(selection);
 	var dirtyNodes = [];
 	for(var n = firstDirtyNode; n && ! (n.previousSibling &&
@@ -1468,6 +1520,10 @@ function OUTER(gscope) {
     //rep.lexer.lexCharRange(getVisibleCharRange(), function() { return false; });
     //var isTimeUp = newTimeLimit(100);
 
+    //mark delete node
+    forEach(toDeleteAtEnd, function (n) {
+        setAssoc(n, "aceDeleted", true); 
+    }); 
     // do DOM inserts
     p.mark("insert");
     forEach(domInsertsNeeded, function (ins) {
@@ -1555,6 +1611,11 @@ function OUTER(gscope) {
     return (!! STYLE_ATTRIBS[aname]) || (!! OTHER_INCORPED_ATTRIBS[aname]);
   }
 
+  function isMarkerToken(txt, pos){
+        return (pos == 1 && txt && (txt == lineMarker));
+  }
+
+  //must mark deleted line with aceDeleted in order to build ordered list
   function insertDomLines(nodeToAddAfter, infoStructs, isTimeUp) {
     isTimeUp = (isTimeUp || function() { return false; });
 
@@ -1590,8 +1651,12 @@ function OUTER(gscope) {
       else p2.literal(0, "nonopt");
       lastEntry = entry;
       p2.mark("spans");
-      getSpansForLine(entry, function (tokenText, tokenClass) {
-	info.appendSpan(tokenText, tokenClass);
+      getSpansForLine(entry, function (tokenText, tokenClass, attributes, pos) {
+            var marker = false;
+            if(isMarkerToken(tokenText, pos)){
+                marker = true;
+            } 
+	info.appendSpan(tokenText, tokenClass, attributes, marker);
       }, lineStartOffset, isTimeUp());
       //else if (entry.text.length > 0) {
 	//info.appendSpan(entry.text, 'dirty');
@@ -1606,11 +1671,135 @@ function OUTER(gscope) {
 	root.insertBefore(node, nodeToAddAfter.nextSibling);
       }
       nodeToAddAfter = node;
+      var index = rep.lines.indexOfKey(key);
       info.notifyAdded();
       p2.mark("markClean");
       markNodeClean(node);
       p2.end();
+      computeOrderedList(index);
     });
+  }
+
+  function getOrderedListInfo(aceLine, lineNum){
+     //only return useful when it's class name contain ace-orderedlist
+     var info = null;
+     if(orderedListCache[lineNum]) return orderedListCache[lineNum].info;
+     if(aceLine && aceLine.childNodes){
+         forEach(aceLine.childNodes, function(child, index){
+            var cname = child.className;
+            if((child.tagName || "").toLowerCase() == "ol" && /\bace\-orderedlist\b/.exec(cname)){
+               var listType = /(?:^| )list\-(\S+)/.exec(cname);
+               info = {type : "", start : "", index: -1, cname : ""};
+               if(listType){
+                    info.type = listType[1] || "bullet1";
+               } 
+               info.start = child.getAttribute("start") || 0; 
+               info.start = parseInt(isNaN(info.start)? 0 : info.start);
+               info.index = index;
+               info.cname = cname;
+               return true; //only one ol node
+            }
+         });
+     }
+     if(lineNum !== undefined && !isNaN(lineNum)){
+       orderedListCache[lineNum] = {info:info, find : true}; 
+     }
+     return info;
+  }
+
+  function setOrderListStartIndex(node, index, start, lineNum){
+       if(node && index >=0 && index < node.childNodes.length){
+          var listNode = node.childNodes[index];
+          listNode.setAttribute("start", start);
+          listNode.style.listStyleType = "decimal";
+          markNodeClean(node);
+          var info = getOrderedListInfo(node, lineNum);
+          info.start = start;
+          orderedListCache[lineNum] = {info:info, find:true};
+       }
+  }  
+
+  var domLines = [];
+  var orderedListCache  = [];
+
+  function domLinesSnapshot(){
+      var forceUpdate = false;
+      releaseDomLines();
+      forEach(document.body.childNodes, function(node){
+            var cname = node.className || "", id = node.id || "";
+            if(-1 != id.indexOf("magicdomid") && !getAssoc(node, "aceDeleted")){
+                domLines.push(node);
+            } else if(getAssoc(node, "aceDeleted")){
+                var info = getOrderedListInfo(node); 
+                if(info){
+                    forceUpdate = true; //ordered list was deleted
+                }
+            }
+      });
+      return forceUpdate;
+  }
+  
+  function releaseDomLines(){
+      domLines = [];
+      orderedListCache = [];
+  }
+
+  function getPreOrderedListInfo(lineNum, type){
+       var preInfo = {type : "bullet1", start : 0, index: -1, cname : ""}, pInfor,
+             type = type || "bullet1", level = getOrderedListLevel(type);
+       if(lineNum > domLines.length) return;
+       for(var i = lineNum - 1; i >=0; i--){
+            pInfo = getOrderedListInfo(domLines[i], i);
+            if(!pInfo) continue;
+            if(pInfo.type == type){
+                return pInfo;
+            }else if(level > getOrderedListLevel(pInfo.type)){
+                break;
+            }
+       }
+       return preInfo;
+  }
+
+  function computeOrderedList(lineNum){
+      var forceUpdate = domLinesSnapshot(lineNum);
+      if(lineNum < 0 || lineNum > domLines.length){
+           return ; 
+      }
+      var node = domLines[lineNum];
+      var info = getOrderedListInfo(node,lineNum); 
+      if(!info && !forceUpdate) return ;
+      var start = 0, type = info ? info.type : "bullet1";
+      var preInfo = getPreOrderedListInfo(lineNum, type);
+      start = preInfo.start;
+      if(info){
+        start++;
+        setOrderListStartIndex(node, info.index, start, lineNum);
+      }
+      start++;
+      updateFollowedOrderedList(lineNum + 1, start, type);
+      releaseDomLines();
+  }
+
+  function getOrderedListLevel(type){
+        return parseInt(type.replace("bullet", ""));
+  }
+
+  function updateFollowedOrderedList(lineNum, start, type){
+      type = type || "bullet1";
+      var info, node, level = getOrderedListLevel(type);
+      for(var i = lineNum, linesLength = domLines.length; i < linesLength; i++){
+            node = domLines[i]; 
+            info = getOrderedListInfo(node, i);      
+            if(!info) continue;
+            if(info.type == type){
+               setOrderListStartIndex(node, info.index, start, i);         
+               start ++;
+               markNodeClean(node);
+            } else {
+                var preInfo = getPreOrderedListInfo(i, info.type);
+                setOrderListStartIndex(node, info.index, preInfo.start + 1, i);
+            }
+      }
   }
 
   function isCaret() {
@@ -1722,9 +1911,14 @@ function OUTER(gscope) {
 	  after = true;
 	}
 	else {
-	  if (n.firstChild) n = n.firstChild;
-	  else after = true;
-	}
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+            charsLeft--;
+            after = true;
+          } else {
+    	    if (n.firstChild) n = n.firstChild;
+    	    else after = true;
+          }
+    	}
       }
     }
     return {node: lineNode, index:1, maxIndex:1};
@@ -1761,13 +1955,19 @@ function OUTER(gscope) {
       }
       var parNode, prevSib;
       while ((parNode = n.parentNode) != root) {
-	if ((prevSib = n.previousSibling)) {
-	  n = prevSib;
-	  col += nodeText(n).length;
-	}
-	else {
-	  n = parNode;
-	}
+    	if ((prevSib = n.previousSibling)) {
+	      n = prevSib;
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+              col ++;
+          } else {
+        	  col += nodeText(n).length;
+          }
+	    } else {
+    	  n = parNode;
+          if(n.className && /\bace\-placeholder\b/.exec(n.className)){
+              col ++;
+          }
+    	}
       }
       if (n.id == "") console.debug("BAD");
       if (n.firstChild && isBlockElement(n.firstChild)) {
@@ -1850,6 +2050,12 @@ function OUTER(gscope) {
 	nodeToAddAfter = getCleanNodeByKey(rep.lines.atIndex(startLine-1).key);
       }
       else nodeToAddAfter = null;
+
+
+      forEach(keysToDelete, function (k) { //mark delete
+    	var n = doc.getElementById(k);
+    	setAssoc(n, "aceDeleted", true);
+      });
 
       insertDomLines(nodeToAddAfter, map(lineEntries, function (entry) { return entry.domInfo; }),
 		     isTimeUp);
@@ -2060,11 +2266,12 @@ function OUTER(gscope) {
   }
   editorInfo.ace_setAttributeOnSelection = setAttributeOnSelection;
 
-  function toggleAttributeOnSelection(attributeName) {
+  function toggleAttributeOnSelection(attributeName, value) {
     if (!(rep.selStart && rep.selEnd)) return;
 
     var selectionAllHasIt = true;
-    var withIt = Changeset.makeAttribsString('+', [[attributeName, 'true']], rep.apool);
+    value = (value !== undefined)?  value : 'true';
+    var withIt = Changeset.makeAttribsString('+', [[attributeName, value]], rep.apool);
     var withItRegex = new RegExp(withIt.replace(/\*/g,'\\*')+"(\\*|$)");
     function hasIt(attribs) { return withItRegex.test(attribs); }
 
@@ -2105,10 +2312,66 @@ function OUTER(gscope) {
     }
     else {
       performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
-					    [[attributeName,'true']]);
+					    [[attributeName, value]]);
     }
   }
   editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
+
+
+  function isLineMarker(op, startIndex, lineNumber){//need to attributs to supprt
+    if(0 == startIndex && 1 == op.chars && op.attribs){
+        var txt = rep.lines.atIndex(lineNumber).text;
+        if(txt && txt[0] == lineMarker){
+            return true;
+        }
+    }
+    return false;
+  }
+
+  function eraseTextAttributeOnSelection() {
+    if (!(rep.selStart && rep.selEnd)) return;
+
+
+    var objAttribStr = Changeset.makeAttribsString('+', [["aceObject", "true"]], rep.apool);
+    var objAttribRegex = new RegExp(objAttribStr.replace(/\*/g,'\\*')+"(\\*|$)");
+    function isAceObject(attribs) { return objAttribRegex.test(attribs); }
+
+    var clearLists = [];
+    var selStartLine = rep.selStart[0];
+    var selEndLine = rep.selEnd[0];
+    for(var n=selStartLine; n<=selEndLine; n++) {
+      var opIter = Changeset.opIterator(rep.alines[n]);
+      var indexIntoLine = 0;
+      var selectionStartInLine = 0;
+      var selectionEndInLine = rep.lines.atIndex(n).text.length; // exclude newline
+      if (n == selStartLine) {
+    	selectionStartInLine = rep.selStart[1];
+      }
+      if (n == selEndLine) {
+    	selectionEndInLine = rep.selEnd[1];
+      }
+      while (opIter.hasNext()) {
+    	var op = opIter.next();
+    	var opStartInLine = indexIntoLine;
+    	var opEndInLine = opStartInLine + op.chars;
+    	if (! (opEndInLine <= selectionStartInLine || opStartInLine >= selectionEndInLine 
+                || isAceObject(op.attribs) || isLineMarker(op, opStartInLine, n))) { 
+            //in order work efficiently, attributes for object and text may be different
+            Changeset.eachAttribNumber(op.attribs, function(n) {
+                 var key = rep.apool.getAttribKey(n);
+                 if(key !== undefined){
+                    clearLists.push([key, ""]);
+                 }
+            });
+    	}
+	    indexIntoLine = opEndInLine;
+      }
+    }
+
+    performDocumentApplyAttributesToRange(rep.selStart, rep.selEnd,
+					    clearLists);
+  }
+  editorInfo.ace_eraseTextAttributeOnSelection = eraseTextAttributeOnSelection;
 
   function performDocumentReplaceSelection(newText) {
     if (!(rep.selStart && rep.selEnd)) return;
@@ -2536,7 +2799,9 @@ function OUTER(gscope) {
     return str.replace(/[\n\r ]/g, ' ').replace(/\xa0/g, ' ').replace(/\t/g, '        ');
   }
 
-  var _blockElems = { "div":1, "p":1, "pre":1, "li":1, "ol":1, "ul":1 };
+  var _blockElems = { "div":1, "p":1, "pre":1, "li":1, "ol":1, "ul":1 , 
+                      "h1": 1, "h2": 1, "h3": 1, "h4": 1, "h5": 1, "h6": 1,
+                      "blockquote":1};
   function isBlockElement(n) {
     return !!_blockElems[(n.tagName || "").toLowerCase()];
   }
@@ -2698,6 +2963,10 @@ function OUTER(gscope) {
       }
     }
 
+    if(forceDirtyLineNumber != -1){ //hack for image drag drop
+	   splitRange(0, forceDirtyLineNumber);
+       forceDirtyLineNumber = -1;
+    }
     if (N == 0) {
       p.cancel();
       if (! isConsecutive(0)) {
@@ -2830,11 +3099,11 @@ function OUTER(gscope) {
     }
     var lineNum = rep.selStart[0];
     var listType = getLineListType(lineNum);
-
+    var orderedList = (getLineAttribute(lineNum, "orderedlist") == "true");
     performDocumentReplaceSelection('\n');
-    if (listType) {
+    if (listType || orderedList) {
       if (lineNum+1 < rep.lines.length()) {
-        setLineListType(lineNum+1, listType);
+       setLineListType(lineNum+1, listType || "bullet1", orderedList);
       }
     }
     else {
@@ -2854,8 +3123,12 @@ function OUTER(gscope) {
 
     var mods = [];
     var foundLists = false;
+    var ordered = false; 
     for(var n=firstLine;n<=lastLine;n++) {
       var listType = getLineListType(n);
+      if(!ordered){
+          ordered = (getLineAttribute(n, "orderedlist") == "true")
+      }
       if (listType) {
         listType = /([a-z]+)([12345678])/.exec(listType);
         if (listType) {
@@ -2873,7 +3146,7 @@ function OUTER(gscope) {
     }
 
     if (mods.length > 0) {
-      setLineListTypes(mods);
+      setLineListTypes(mods, ordered);
     }
 
     return foundLists;
@@ -2921,7 +3194,8 @@ function OUTER(gscope) {
             var prevLineBlank = (prevLineEntry &&
                                  prevLineEntry.text.length ==
                                  prevLineEntry.lineMarker);
-            if (thisLineListType) {
+            var lineMarker = hasLineMarker(theLine);
+            if (thisLineListType || lineMarker) {
               // this line is a list
               if (prevLineBlank && ! prevLineListType) {
                  // previous line is blank, remove it
@@ -3857,6 +4131,25 @@ function OUTER(gscope) {
       inInternationalComposition = false;
     }
   }
+  
+  //hack for image drag drop
+  var forceDirtyLineNumber = -1; //force line be dirty to collect content
+  function customDragDrop(evt){
+      if(evt.target && (evt.target.tagName || "").toLowerCase() == "img"){
+        imageDragDropLock = true;
+        var node = evt.target.parentNode;
+        while(node && node.parentNode != root){
+            node = node.parentNode;
+        }
+        if(node && (node.id || "").indexOf("magicdomid") != -1){
+           forceDirtyLineNumber = rep.lines.indexOfKey(node.id); 
+        } 
+      }
+  }
+
+  customDragEnd = function(evt){
+      imageDragDropLock = false;
+  }
 
   function bindTheEventHandlers() {
     bindEventHandler(window, "unload", teardown);
@@ -3864,6 +4157,10 @@ function OUTER(gscope) {
     bindEventHandler(document, "keypress", handleKeyEvent);
     bindEventHandler(document, "keyup", handleKeyEvent);
     bindEventHandler(document, "click", handleClick);
+
+    bindEventHandler(document, "dragstart", customDragDrop);
+    bindEventHandler(document, "dragend", customDragEnd); /*can't fire on chrome, only fire in image node*/
+
     bindEventHandler(root, "blur", handleBlur);
     if (browser.msie) {
       bindEventHandler(document, "click", handleIEOuterClick);
@@ -3953,6 +4250,9 @@ function OUTER(gscope) {
 
       enforceEditability();
 
+      if(browser.mozilla){ //disable image resize 
+          doc.execCommand("enableObjectResizing", false, false);
+      } 
       // set up dom and rep
       while (root.firstChild) root.removeChild(root.firstChild);
       var oneEntry = createDomLineEntry("");
@@ -4135,12 +4435,13 @@ function OUTER(gscope) {
     return '';
   }
 
-  function setLineListType(lineNum, listType) {
-    setLineListTypes([[lineNum, listType]]);
+  function setLineListType(lineNum, listType, orderedlist) {
+        setLineListTypes([[lineNum, listType]], orderedlist);
   }
 
-  function setLineListTypes(lineNumTypePairsInOrder) {
+  function setLineListTypes(lineNumTypePairsInOrder, orderedlist) {
     var loc = [0,0];
+    orderedlist = (orderedlist === true) ? true : "";
     var builder = Changeset.builder(rep.lines.totalWidth());
     for(var i=0;i<lineNumTypePairsInOrder.length;i++) {
       var pair = lineNumTypePairsInOrder[i];
@@ -4149,10 +4450,10 @@ function OUTER(gscope) {
       buildKeepRange(builder, loc, (loc = [lineNum,0]));
       if (getLineListType(lineNum)) {
         // already a line marker
-        if (listType) {
+        if (listType || orderedlist || hasUsefulLineAttributes(lineNum, ['list', 'orderedlist', 'insertorder'])) {
           // make different list type
           buildKeepRange(builder, loc, (loc = [lineNum,1]),
-                         [['list',listType]], rep.apool);
+                         [['list',listType], ["orderedlist", orderedlist]], rep.apool);
         }
         else {
           // remove list marker
@@ -4161,11 +4462,17 @@ function OUTER(gscope) {
       }
       else {
         // currently no line marker
-        if (listType) {
-          // add a line marker
-          builder.insert('*', [['author', thisAuthor],
+        if (listType){
+          var style = getLineAttribute(lineNum, "list"); 
+          if("ace-none-linestyle" == style) {
+              // add a line marker
+             builder.insert(lineMarker, [['author', thisAuthor],
                                ['insertorder', 'first'],
-                               ['list', listType]], rep.apool);
+                               ['list', listType], ["orderedlist", orderedlist]], rep.apool);
+          } else if ("ace-linestyle" == style){
+             buildKeepRange(builder, loc, (loc = [lineNum,1]),
+                         [['list',listType], ["orderedlist", orderedlist]], rep.apool);
+          }
         }
       }
     }
@@ -4188,7 +4495,7 @@ function OUTER(gscope) {
 
     var allLinesAreList = true;
     for(var n=firstLine;n<=lastLine;n++) {
-      if (! getLineListType(n)) {
+      if (! getLineListType(n) || getLineAttribute(n, "orderedlist") == "true") {
         allLinesAreList = false;
         break;
       }
@@ -4202,6 +4509,118 @@ function OUTER(gscope) {
     setLineListTypes(mods);
   }
   editorInfo.ace_doInsertUnorderedList = doInsertUnorderedList;
+
+
+  function  setLineAttribute(target, attributeName, value){
+        var loc = [0, 0];
+        var builder = Changeset.builder(rep.lines.totalWidth());
+        for(var i = 0, len = target.length; i < len; i++){
+           var lineNum = target[i], style; 
+           buildKeepRange(builder, loc, (loc = [lineNum,0]));
+           style = getLineAttribute(lineNum, attributeName); 
+           switch(style){
+                case "ace-none-linestyle":
+                    if(!value) continue;
+                    builder.insert(lineMarker, [['author', thisAuthor],
+                               [attributeName, value]], rep.apool);
+                    break;
+                case "ace-linestyle":
+                default:
+                    if(value || hasUsefulLineAttributes(lineNum, [attributeName])){
+                        buildKeepRange(builder, loc, (loc = [lineNum,1]),
+                                 [[attributeName, value]], rep.apool);
+                    } else { 
+                        buildRemoveRange(builder, loc, (loc = [lineNum,1]));
+                    }
+                    break;
+           }
+        }   
+        var cs = builder.toString();
+        if (! Changeset.isIdentity(cs)) {
+          performDocumentApplyChangeset(cs);
+        }
+  }
+
+  function hasUsefulLineAttributes(lineNum, exclude){
+        var aline = rep.alines[lineNum], ret = false;
+        if (aline) {
+          var opIter = Changeset.opIterator(aline);
+          if (opIter.hasNext()) { //all line attribute were put in the first attribute 
+            op = opIter.next();
+            var lineText = rep.lines.atIndex(lineNum).text;
+            if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
+                 var excludeObj = {}, exclude = exclude || [];
+//               exclude.push("author");
+                 forEach(exclude, function(name){
+                    excludeObj[name] = true;
+                 }); 
+                 Changeset.eachAttribNumber(op.attribs, function(n) {
+                    var key = rep.apool.getAttribKey(n);
+                    if(!excludeObj[key]){
+                        ret = true;
+                        return true;
+                    }
+                 }); 
+            }
+          }
+        }
+        return ret
+  }
+
+  function hasLineMarker(lineNum){
+       return hasUsefulLineAttributes(lineNum);
+  }
+
+  function  getLineAttribute(lineNum, attributeName){
+        var value = "", ret = "ace-none-linestyle", op;
+        var aline = rep.alines[lineNum];
+        if (aline) {
+          var opIter = Changeset.opIterator(aline);
+          if (opIter.hasNext()) { //all line attribute were put in the first attribute 
+            op = opIter.next();
+            ret = Changeset.opAttributeValue(op, attributeName, rep.apool);
+            if(!ret){
+               var lineText = rep.lines.atIndex(lineNum).text;
+               if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
+                   ret = "ace-linestyle";
+                }else{
+                   ret = "ace-none-linestyle";
+                }
+            }
+          }
+        }
+        return ret;
+  }
+
+  function toggleAttributeOnLine(attributeName, value){
+    if (! (rep.selStart && rep.selEnd)) {
+      return;
+    }
+
+    var firstLine, lastLine;
+    firstLine = rep.selStart[0];
+    lastLine = Math.max(firstLine,
+                        rep.selEnd[0] - ((rep.selEnd[1] == 0) ? 1 : 0));
+    var changes = [], unchanges = [],  attribute = "";
+    for(var i = firstLine; i <= lastLine; i++){
+       attribute = getLineAttribute(i, attributeName); 
+       if(attribute != value){
+         changes.push(i);
+       }else{
+         unchanges.push(i);
+       }
+    }
+    var target;
+    if(changes.length == 0){
+        target = unchanges;
+        value = "" ; //all the same attribute, just remove this attribute
+    } else {
+        target = changes; //set attribute for all line
+    }
+    setLineAttribute(target, attributeName, value);
+  }
+ 
+  editorInfo.ace_toggleAttributeOnLine = toggleAttributeOnLine;
 
   var mozillaFakeArrows = (browser.mozilla && (function() {
     // In Firefox 2, arrow keys are unstable while DOM-manipulating

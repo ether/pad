@@ -60,12 +60,15 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     var curIndex = 0;
     var extraClasses;
     var leftInAuthor;
-
+    var localApool = [], tempApool = [];
+   
     function attribsToClasses(attribs) {
       var classes = '';
+        tempApool = [];
       Changeset.eachAttribNumber(attribs, function(n) {
 	var key = apool.getAttribKey(n);
 	if (key) {
+                 tempApool.push(apool.getAttrib(n));
 	  var value = apool.getAttribValue(n);
 	  if (value) {
 	    if (key == 'author') {
@@ -86,18 +89,22 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
     }
 
     var attributionIter = Changeset.opIterator(aline);
-    var nextOp, nextOpClasses;
+    var nextOp, nextOpClasses, nextAttribs;
     function goNextOp() {
       nextOp = attributionIter.next();
       nextOpClasses = (nextOp.opcode && attribsToClasses(nextOp.attribs));
+      nextAttribs = nextOp.attribs;
     }
     goNextOp();
     function nextClasses() {
       if (curIndex < lineEnd) {
 	extraClasses = nextOpClasses;
 	leftInAuthor = nextOp.chars;
+        extraAttribs = nextAttribs;
+        localApool = tempApool;
+        tempApool= [];
 	goNextOp();
-	while (nextOp.opcode && nextOpClasses == extraClasses) {
+    	while (nextOp.opcode && nextOpClasses == extraClasses && extraAttribs == nextAttribs) { 
 	  leftInAuthor += nextOp.chars;
 	  goNextOp();
 	}
@@ -109,7 +116,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
       while (txt.length > 0) {
 	if (leftInAuthor <= 0) {
 	  // prevent infinite loop if something funny's going on
-	  return nextAfterAuthorColors(txt, cls);
+    	  return nextAfterAuthorColors(txt, cls, localApool, leftInAuthor);
 	}
 	var spanSize = txt.length;
 	if (spanSize > leftInAuthor) {
@@ -117,7 +124,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	}
 	var curTxt = txt.substring(0, spanSize);
 	txt = txt.substring(spanSize);
-	nextAfterAuthorColors(curTxt, (cls&&cls+" ")+extraClasses);
+    	nextAfterAuthorColors(curTxt, (cls&&cls+" ")+extraClasses, localApool, leftInAuthor);
 	curIndex += spanSize;
 	leftInAuthor -= spanSize;
 	if (leftInAuthor == 0) {
@@ -179,14 +186,14 @@ linestylefilter.getRegexpFilter = function (regExp, tag) {
 
     var handleRegExpMatchsAfterSplit = (function() {
       var curIndex = 0;
-      return function(txt, cls) {
+      return function(txt, cls, attribs, pos) {
 	var txtlen = txt.length;
 	var newCls = cls;
 	var regExpMatch = regExpMatchForIndex(curIndex);
 	if (regExpMatch) {
 	  newCls += " "+tag+":"+regExpMatch;
 	}
-	textAndClassFunc(txt, newCls);
+	textAndClassFunc(txt, newCls, attribs, pos);
 	curIndex += txtlen;
       };
     })();
@@ -214,9 +221,9 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
     nextPointIndex++;
   }
 
-  function spanHandler(txt, cls) {
+  function spanHandler(txt, cls, attribs, pos) {
     if ((! splitPointsOpt) || nextPointIndex >= splitPointsOpt.length) {
-      func(txt, cls);
+      func(txt, cls, attribs, pos);
       idx += txt.length;
     }
     else {
@@ -224,7 +231,7 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
       var pointLocInSpan = splitPoints[nextPointIndex] - idx;
       var txtlen = txt.length;
       if (pointLocInSpan >= txtlen) {
-	func(txt, cls);
+	func(txt, cls, attribs, pos);
 	idx += txt.length;
 	if (pointLocInSpan == txtlen) {
 	  nextPointIndex++;
@@ -232,12 +239,12 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
       }
       else {
 	if (pointLocInSpan > 0) {
-	  func(txt.substring(0, pointLocInSpan), cls);
+	  func(txt.substring(0, pointLocInSpan), cls, attribs, pos);
 	  idx += pointLocInSpan;
 	}
 	nextPointIndex++;
 	// recurse
-	spanHandler(txt.substring(pointLocInSpan), cls);
+	spanHandler(txt.substring(pointLocInSpan), cls, attribs, pos);
       }
     }
   }
@@ -279,8 +286,17 @@ linestylefilter.populateDomLine = function(textLine, aline, apool,
     text = text.substring(0, text.length-1);
   }
 
-  function textAndClassFunc(tokenText, tokenClass) {
-    domLineObj.appendSpan(tokenText, tokenClass);
+  function isMarkerToken(txt, pos){
+        var lineMarker = "*";
+        return (pos == 1 && txt && (txt == lineMarker));
+  }
+
+  function textAndClassFunc(tokenText, tokenClass, apool, pos) {
+    var marker = false;
+    if(isMarkerToken(tokenText, pos)){
+                marker = true;
+    }
+    domLineObj.appendSpan(tokenText, tokenClass, apool, marker);
   }
 
   var func = linestylefilter.getFilterStack(text, textAndClassFunc);

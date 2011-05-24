@@ -25,7 +25,7 @@ function sanitizeUnicode(s) {
 }
 
 function makeContentCollector(collectStyles, browser, apool, domInterface,
-                              className2Author) {
+                              className2Author, lineMarker, objMarker) {
   browser = browser || {};
 
   var plugins_;
@@ -57,6 +57,13 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     nodeAttr: function(n, a) {
       return n.getAttribute(a);
     },
+    nodeAttributes : function(n){
+       var attribs = {}, na = n.attributes;
+       for(var i = 0, len = na.length; i < len; i++){
+            attribs[na[i].name] = na[i].value; 
+       }
+       return attribs;
+    },
     optNodeInnerHTML: function(n) {
       return n.innerHTML;
     }
@@ -79,18 +86,31 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     var attribsArray = [];
     var attribsBuilder = null;
     var op = Changeset.newOp('+');
+    var lineMarkerAttribString = "";
     var self = {
       length: function() { return textArray.length; },
       atColumnZero: function() {
         return textArray[textArray.length-1] === "";
       },
       startNew: function() {
+        self.checkLineMarker();
         textArray.push("");
         self.flush(true);
         attribsBuilder = Changeset.smartOpAssembler();
       },
       textOfLine: function(i) { return textArray[i]; },
+      addLineMarkerAttrib : function(aStr){
+          lineMarkerAttribString += aStr; 
+      },
+      checkLineMarker : function(){
+         if(lineMarkerAttribString && 0 == textArray[textArray.length -1].length){
+            var aStr = lineMarkerAttribString;
+            lineMarkerAttribString = "";
+            lines.appendText(lineMarker, aStr); 
+         }
+      },
       appendText: function(txt, attrString) {
+        self.checkLineMarker(); 
         textArray[textArray.length-1] += txt;
         //dmesg(txt+" / "+attrString);
         op.attribs = attrString;
@@ -101,6 +121,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       attribLines: function() { return attribsArray; },
       // call flush only when you're done
       flush: function(withNewline) {
+        self.checkLineMarker();
         if (attribsBuilder) {
           attribsArray.push(attribsBuilder.toString());
           attribsBuilder = null;
@@ -137,7 +158,8 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
   function _pointHere(charsAfter, state) {
     var ln = lines.length()-1;
     var chr = lines.textOfLine(ln).length;
-    if (chr == 0 && state.listType && state.listType != 'none') {
+    if (chr == 0 && ((state.listType && state.listType != 'none')
+                     || state.lineMarker)) {
       chr += 1; // listMarker
     }
     chr += charsAfter;
@@ -207,7 +229,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     var lst = [];
     for(var a in state.attribs) {
       if (state.attribs[a]) {
-        lst.push([a,'true']);
+        lst.push([a, state.localValues[a]]);
       }
     }
     if (state.authorLevel > 0) {
@@ -221,7 +243,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     state.attribString = Changeset.makeAttribsString('+', lst, apool);
   }
   function _produceListMarker(state) {
-    lines.appendText('*', Changeset.makeAttribsString(
+      lines.addLineMarkerAttrib(Changeset.makeAttribsString(
       '+', [['list', state.listType],
             ['insertorder', 'first']],
       apool));
@@ -232,6 +254,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       if (atBeginningOfLine && state.listType && state.listType != 'none') {
         _produceListMarker(state);
       }
+      state.lineMarker = false;
     }
     lines.startNew();
   }
@@ -242,15 +265,33 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       endPoint = selection.endPoint;
     }
   };
-  cc.doAttrib = function(state, na) {
+  cc.doAttrib = function(state, na, value) {
+    value = (value === undefined) ? true : value;
     state.localAttribs = (state.localAttribs || []);
     state.localAttribs.push(na);
+    state.localValues[na] = value;
     cc.incrementAttrib(state, na);
   };
+  cc.doLineAttrib = function(state, na, value){
+    value = (value === undefined) ? true : value;
+    lines.addLineMarkerAttrib(Changeset.makeAttribsString(
+        '+', [[na, value]],
+        apool));
+    state.lineMarker = true;
+  };
+  cc.doObjAttrib = function(state, na, value){
+    value = (value === undefined) ? true : value;
+    lines.appendText(objMarker, Changeset.makeAttribsString(
+        '+', [["aceObject", "true"],[na, value]],
+        apool) + (state.attribString || ""));
+  };
+ 
   cc.collectContent = function (node, state) {
     if (! state) {
       state = {flags: {/*name -> nesting counter*/},
-	       localAttribs: null,
+    	       localAttribs: null,
+               localValues :{/* attribute : value */},
+               lineMarker : false,
                attribs: {/*name -> nesting counter*/},
                attribString: ''};
     }
@@ -321,11 +362,17 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
       }
       else if (tname == "script" || tname == "style") {
         // ignore
-      }
-      else if (! isEmpty) {
+      } else if (tname == "img"){
         var styl = dom.nodeAttr(node, "style");
         var cls = dom.nodeProp(node, "className");
-
+        var attribs = dom.nodeAttributes(node);
+	    plugins_.callHook('collectContentPre', {cc: cc, state:state,
+                     tname:tname, styl:styl, cls:cls, attribs : attribs});
+      } else if (! isEmpty) {
+        var styl = dom.nodeAttr(node, "style");
+        var cls = dom.nodeProp(node, "className");
+        var attribs = dom.nodeAttributes(node);
+ 
         var isPre = (tname == "pre");
         if ((! isPre) && browser.safari) {
           isPre = (styl && /\bwhite-space:\s*pre\b/i.exec(styl));
@@ -334,7 +381,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         var oldListTypeOrNull = null;
         var oldAuthorOrNull = null;
         if (collectStyles) {
-	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+	  plugins_.callHook('collectContentPre', {cc: cc, state:state, tname:tname, styl:styl, cls:cls, attribs : attribs});
           if (tname == "b" || (styl && /\bfont-weight:\s*bold\b/i.exec(styl)) ||
               tname == "strong") {
 	    cc.doAttrib(state, "bold");
@@ -351,7 +398,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
               tname == "del") {
 	   cc.doAttrib(state, "strikethrough");
           }
-          if (tname == "ul") {
+          if (tname == "ol") {
             var type;
             var rr = cls &&  /(?:^| )list-(bullet[12345678])\b/.exec(cls);
             type = rr && rr[1] || "bullet"+
@@ -384,7 +431,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
         }
 
         if (collectStyles) {
-	  plugins_.callHook('collectContentPost', {cc: cc, state:state, tname:tname, styl:styl, cls:cls});
+	  plugins_.callHook('collectContentPost', {cc: cc, state:state, tname:tname, styl:styl, cls:cls, attribs: attribs});
         }
 
         if (isPre) cc.decrementFlag(state, 'preMode');

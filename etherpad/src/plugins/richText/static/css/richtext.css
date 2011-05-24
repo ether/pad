@@ -1,0 +1,53 @@
+ul, ol, li {
+  padding: 0;
+  margin: 0;
+}
+ul { margin-left: 1.5em; }
+ul ul { margin-left: 0 !important; }
+ul.list-bullet1 { margin-left: 2em; }
+ul.list-bullet2 { margin-left: 3em; }
+ul.list-bullet3 { margin-left: 4.5em; }
+ul.list-bullet4 { margin-left: 6em; }
+ul.list-bullet5 { margin-left: 7.5em; }
+ul.list-bullet6 { margin-left: 9em; }
+ul.list-bullet7 { margin-left: 10.5em; }
+ul.list-bullet8 { margin-left: 12em; }
+
+ul { list-style-type: disc; }
+ul.list-bullet1 { list-style-type: disc; }
+ul.list-bullet2 { list-style-type: circle; }
+ul.list-bullet3 { list-style-type: square; }
+ul.list-bullet4 { list-style-type: disc; }
+ul.list-bullet5 { list-style-type: circle; }
+ul.list-bullet6 { list-style-type: square; }
+ul.list-bullet7 { list-style-type: disc; }
+ul.list-bullet8 { list-style-type: circle; }
+
+ol { margin-left: 1.5em; }
+ol ol { margin-left: 0 !important; }
+ol.list-bullet1 { margin-left: 2em; }
+ol.list-bullet2 { margin-left: 3em; }
+ol.list-bullet3 { margin-left: 4.5em; }
+ol.list-bullet4 { margin-left: 6em; }
+ol.list-bullet5 { margin-left: 7.5em; }
+ol.list-bullet6 { margin-left: 9em; }
+ol.list-bullet7 { margin-left: 10.5em; }
+ol.list-bullet8 { margin-left: 12em; }
+
+ol { list-style-type: disc; }
+ol.list-bullet1 { list-style-type: disc; }
+ol.list-bullet2 { list-style-type: circle; }
+ol.list-bullet3 { list-style-type: square; }
+ol.list-bullet4 { list-style-type: disc; }
+ol.list-bullet5 { list-style-type: circle; }
+ol.list-bullet6 { list-style-type: square; }
+ol.list-bullet7 { list-style-type: disc; }
+ol.list-bullet8 { list-style-type: circle;} 
+
+
+.richquotestyle{
+    background-color: #E5ECF9;
+    border:1px solid gray;
+    margin: 0.5em;
+}
+

@@ -59,7 +59,10 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     result.node = {innerHTML: '', className: ''};
   }
 
-  var html = [];
+  var html = [];  //html content include all blockref content
+  var blockHTML = [];
+  /**@pram{Array} a set of options {tag, {attrs}} */
+  var noderef = [], blockref = [];
   var preHtml, postHtml;
   var curHTML = null;
   function processSpaces(s) {
@@ -69,17 +72,122 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
   var perTextNodeProcess = (doesWrap ? identity : processSpaces);
   var perHtmlLineProcess = (doesWrap ? processSpaces : identity);
   var lineClass = 'ace-line';
-  result.appendSpan = function(txt, cls) {
-    if (cls.indexOf('list') >= 0) {
+
+  function attr2String(attrs){
+     var str = "";
+     for(var i in attrs){
+       str += " "+ i + "='";
+       if(typeof attrs[i] == "object"){ 
+          //may only used for style
+          var temp = "";
+          for(var j in attrs[i]){
+            temp = j + ":" + attrs[i][j] + ";";
+          }  
+          str += temp;
+       }else{
+           str += attrs[i];
+       } 
+       str += "'"
+     }
+     return str;
+  }
+
+  function mergeRef(ref){
+        //combine same ref element
+        var map = {}, index = -1; 
+        var ret = [];
+        for(var i = 0, len = ref.length; i < len; i++){
+            if(!ref[i].tag) continue;
+            ref[i].tag = ref[i].tag.toLowerCase();
+            index = map[ref[i].tag]; 
+            if(isNaN(index)){
+                //create new item 
+                index = ret.push(ref[i]) - 1;
+                map[ref[i].tag] = index;
+            }else{
+                //merge attributes
+                var localAttrs = {}, attr;
+                for(var j in ref[i].attrs){
+                  if(ret[index].attrs[j] === undefined || (typeof ret[index].attrs[j] != "object")){
+                     ret[index].attrs[j] = ref[i].attrs[j];
+                  }else{
+                     for(var m in ref[i].attrs[j]){
+                        ret[index].attrs[j][m] = ref[i].attrs[j][m];
+                     }
+                  } 
+                }
+            }
+        }
+        return ret;
+  }
+
+  function ref2html(ref){
+      var ret = {preHtml:"", postHtml:""};
+      ref = mergeRef(ref);
+      for(var i = 0, len = ref.length; i < len; i++){
+            ret.preHtml += "<" + ref[i].tag +" class='" + (ref[i].className || "") + "' " + attr2String(ref[i].attrs) + ">";
+            ret.postHtml = "</" + ref[i].tag + ">" + ret.postHtml;
+      }
+      return ret;
+  }
+
+  function flushBlock(){ //tag order ?
+       var br = ref2html(blockref);
+       html.push(br.preHtml + blockHTML.join("") + br.postHtml);
+       blockref = [];
+       blockHTML = [];
+  }
+  /**
+   * add two more parameters
+   * @param{string} txt current working text
+   * @param{string} cls classname
+   * @param{Array} attributes text attributes
+   * @param{boolean} is the txt is marker for line or .. 
+   *
+   * e.g
+   * <div class="ace-line"><!--node reference-->
+   *   some text here <!-- block reference && text content -->
+   * </div>
+   * <div class="ace-line"><!--node reference-->
+   *    <ol>
+   *        <li><!--block reference>
+   *            <h1>Title Here</h1><--text content-->
+   *        </li>
+   *        <li><!--block reference-->
+   *            Some text here <--text content-->
+   *        </li>
+   *    </ol>
+   * </div>
+   *
+   * using classname as the parameters for building dom line is deprecated, 
+   * attributes may be a better choice.
+   * Blockref and noderef used to solve the problem which is first in h1 and ol
+   * h1 works in block reference, so it can only change current block
+   * however, ol works in node reference, it will influence all the content 
+   * This also means noderef(ol) has a high priority than blockref(h1)
+   * blockref may be equal to noderef in most cases, except in the above case.
+   * the elements in reference are order-independent
+   * */
+  result.appendSpan = function(txt, cls, attributes, lineMarker) {  
+    if(lineMarker){ //TODO mark a lineMarker using attrbute "ace-lineMarker"
+        result.lineMarker +=txt.length;
+        txt = "";
+    }
+    var orderedlist = !!(/\bace\-orderedlist\b/.exec(cls));
+    if (cls.indexOf('list') >= 0 || orderedlist) { 
       var listType = /(?:^| )list:(\S+)/.exec(cls);
       if (listType) {
         listType = listType[1];
-        if (listType) {
-          preHtml = '<ul class="list-'+listType+'"><li>';
-          postHtml = '</li></ul>';
+        if(orderedlist){
+            listType += " ace-orderedlist";
         }
-        result.lineMarker += txt.length;
-        return; // don't append any text
+        if (listType) {
+          preHtml = '<ol class="list-'+listType+'"><li>'; //chrome can't support ul with start attribute 
+          postHtml = '</li></ol>';
+        }
+      } else if(orderedlist){
+          preHtml = '<ol class="list-bullet1 ace-orderedlist"><li>'; 
+          postHtml = '</li></ol>';
       }
     }
     var href = null;
@@ -116,6 +224,30 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
       extraCloseTags = modifier.extraCloseTags+extraCloseTags;
     });
 
+    var attStr = "";
+    plugins_.callHook(
+        "aceCreateStructDomLine", {domline:domline, cls:cls, attributes: attributes}
+    ).map(function(modifier){ 
+        if(modifier.cls){
+            cls += " " + modifier.cls;
+        }
+        if(modifier.attStr !== undefined){
+            attStr += modifier.attStr; 
+        }
+        if(modifier.noderef){
+           noderef = noderef.concat(modifier.noderef);
+        }
+        if(modifier.blockref){
+           blockref = blockref.concat(modifier.blockref);
+        }
+        if(modifier.extraOpenTags){
+            extraOpenTags = extraOpenTags+modifier.extraOpenTags;
+        }
+        if(modifier.extraCloseTags){
+            extraCloseTags = modifier.extraCloseTags+extraCloseTags;
+        }
+    });
+
     if ((! txt) && cls) {
       lineClass = domline.addToLineClass(lineClass, cls);
     }
@@ -131,8 +263,12 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	simpleTags.reverse();
 	extraCloseTags = '</'+simpleTags.join('></')+'>'+extraCloseTags;
       }
-      html.push('<span class="',cls||'','">',extraOpenTags,
-		perTextNodeProcess(domline.escapeHTML(txt)),
+      var pTxt = perTextNodeProcess(domline.escapeHTML(txt));
+      if(txt.length && /\bace\-placeholder\b/.exec(cls)){
+        pTxt = ""; //don't display text for object marker
+      }
+      blockHTML.push('<span class="',cls||'','"'+ attStr +'>',extraOpenTags,
+		        pTxt,
                 extraCloseTags,'</span>');
     }
   };
@@ -142,6 +278,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     result.lineMarker = 0;
   };
   function writeHTML() {
+    flushBlock();
     var newHTML = perHtmlLineProcess(html.join(''));
     if (! newHTML) {
       if ((! document) || (! optBrowser)) {
@@ -154,6 +291,9 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     if (nonEmpty) {
       newHTML = (preHtml||'')+newHTML+(postHtml||'');
     }
+    var ret = ref2html(noderef);
+    newHTML = ret.preHtml + newHTML + ret.postHtml;
+    noderef = [];
     html = preHtml = postHtml = null; // free memory
     if (newHTML !== curHTML) {
       curHTML = newHTML;

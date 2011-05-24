@@ -51,11 +51,17 @@ function _updateInitialReferrer(data) {
   log.custom("referers", {referer: ref});
 }
 
+function hasPortNumber(){
+    var host = (request.host|| ""), port = "";
+    return host.indexOf(":") >= 0; 
+}
+
 function _getScopedDomain(subDomain) {
   var d = request.domain;
-  if (d.indexOf(".") == -1) {
+  if (d.indexOf(".") == -1 || hasPortNumber()) {
     // special case for "localhost".  For some reason, firefox does not like cookie domains
     // to be ".localhost".
+    // if the host has port number, the domain will be undefined, special work for chrome
     return undefined;
   }
   if (subDomain) {
