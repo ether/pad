@@ -6,6 +6,7 @@ dojo.require("dijit.form.Button");
 dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.designer.modes.Edit], {
   isOutlineMouseDown: false,
   isMoving: false,
+  minMarqueeSize: 10,
 
   cursorBboxOutlineDefinitions: {select: [{color:{r:128,g:0,b:128,a:1}, width:1, style:"solid"}, {color:{r:196,g:0,b:196,a:1}, width:1, style:"solid"}]},
 
@@ -85,15 +86,8 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
   },
 
   onShapeMouseDown: function (shape, event) {
-    this.inherited(arguments);
-    if (event.button == 0)
-      this.onOutlineMouseDown(event);
-  },
-
-  onShapeMouseUp: function (shape, event) {
-    this.inherited(arguments);
-    if (event.button == 0 && !this.isOutlineMoving)
-      this.designer.selection.toggleShape(shape, !event.ctrlKey);
+    this.downShape = shape;
+    this.onMouseDown(event);
   },
 
   onKeyUp: function (event) {
@@ -205,20 +199,26 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.inherited(arguments);
     if (this.isOutlineMoving) {
       this.designer.selection.applyToShapes("save");
-   } else if (this.isOutlineMouseDown) {
-   } else {
+    } else if (this.isOutlineMouseDown) {
+    } else {
+      var bbox = this.getCurrentCursorBbox();
       if (event.button == dojo.mouseButtons.LEFT) {
-        if (event.ctrlKey) {
- 	  this.designer.selection.toggleShapesByBbox(this.getCurrentCursorBbox());
+        if (bbox.width < this.minMarqueeSize && bbox.height < this.minMarqueeSize && this.downShape !== undefined) {
+          this.designer.selection.toggleShape(this.downShape, !event.ctrlKey);
         } else {
- 	  this.designer.selection.clear();
- 	  this.designer.selection.addShapesByBbox(this.getCurrentCursorBbox());
+	  if (event.ctrlKey) {
+	    this.designer.selection.toggleShapesByBbox(bbox);
+	  } else {
+	    this.designer.selection.clear();
+	    this.designer.selection.addShapesByBbox(bbox);
+	  }
         }
       }
     }
     this.removeCursorBboxOutline("zoom");
     this.isOutlineMouseDown = false;
     this.isOutlineMoving = false;
+    this.downShape = undefined;
   },
 
   onMouseMove: function(event) {
