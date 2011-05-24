@@ -4,6 +4,8 @@ dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner.designer.modes.Zoom], {
+  minMarqueeSize: 5,
+
   constructor: function (zoomIn) {
     this.inherited(arguments, []);
     this.initialZoomIn = zoomIn;
@@ -61,7 +63,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     this.inherited(arguments);
     if (event.button == dojo.mouseButtons.LEFT) {
       this.removeCursorBboxOutline("zoom");
-      if (this.orig == this.mouse) {
+      if (Math.abs(this.orig.x - this.mouse.x) < this.minMarqueeSize && Math.abs(this.orig.y - this.mouse.y) < this.minMarqueeSize) {
         if (this.designer.options.zoomIn)
  	  this.onZoom(1.0 + this.zoomFactor, this.orig.x, this.orig.y);
 	else
