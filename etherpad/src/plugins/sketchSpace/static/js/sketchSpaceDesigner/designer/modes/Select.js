@@ -53,8 +53,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
       this.outline.outlineCornerBL = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
       this.outline.outlineCornerTH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
       this.outline.outlineCornerBH = dojox.gfx.utils.deserialize(this.outline, {shape:{type:"rect", x:bbox.width-2, y:bbox.height-2, width:4, height:4}, stroke:{color:{r:128,g:128,b:128,a:1},width:1}, fill:{r:196,g:196,b:196,a:1}});
-
-      this.outline.onMouseDownHandle = this.outline.connect("onmousedown", this, this.onOutlineMouseDown);
     }
   },
 
@@ -187,21 +185,34 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
 
   onMouseDown: function (event) {
     this.inherited(arguments);
-    if (!this.isOutlineMouseDown && !this.isOutlineMoving) {
+//    if (!this.isOutlineMouseDown && !this.isMoving) {
       if (event.button == dojo.mouseButtons.LEFT) {
         this.orig = this.mouse = this.getCurrentGlobalMouse(event);
-        this.addCursorBboxOutline("select");
+	if (!event.ctrlKey && this.designer.selection.getBbox().containsPoint(this.mouse)) {
+	  this.isOutlineMouseDown = true;
+	  this.designer.selection.orig = this.getCurrentMouse(event, this.designer.selection.parent);
+	  if (!this.outline) return;
+	  this.outline.originalMatrix = this.outline.matrix;
+	  this.designer.selection.applyToShapes(function () {
+	    this.originalMatrix = this.matrix;
+	  });
+        } else {
+          this.addCursorBboxOutline("select");
+        }
       }
-    }
+//    }
   },
 
   onMouseUp: function(event) {
     this.inherited(arguments);
-    if (this.isOutlineMoving) {
+    var bbox = this.getCurrentCursorBbox();
+
+    if (this.isMoving) {
       this.designer.selection.applyToShapes("save");
     } else if (this.isOutlineMouseDown) {
+//      if (event.ctrlKey & this.downShape !== undefined)
+//        this.designer.selection.toggleShape(this.downShape, !event.ctrlKey);
     } else {
-      var bbox = this.getCurrentCursorBbox();
       if (event.button == dojo.mouseButtons.LEFT) {
         if (bbox.width < this.minMarqueeSize && bbox.height < this.minMarqueeSize && this.downShape !== undefined) {
           this.designer.selection.toggleShape(this.downShape, !event.ctrlKey);
@@ -217,7 +228,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     }
     this.removeCursorBboxOutline("zoom");
     this.isOutlineMouseDown = false;
-    this.isOutlineMoving = false;
+    this.isMoving = false;
     this.downShape = undefined;
   },
 
@@ -225,7 +236,7 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     this.inherited(arguments);
 
     if (this.isOutlineMouseDown && this.outline) {
-      this.isOutlineMoving = true;
+      this.isMoving = true;
 
       var move = this.getCurrentMove(event);
       this.outline.setTransform(dojox.gfx.matrix.multiply(this.outline.originalMatrix, move));
@@ -237,17 +248,6 @@ dojo.declare("sketchSpaceDesigner.designer.modes.Select", [sketchSpaceDesigner.d
     }
   },
 
-  getContainerShape: function () { return this.designer.surface; },
-
-  onOutlineMouseDown: function(event) {
-    this.isOutlineMouseDown = true;
-    this.orig = this.getCurrentMouse(event);
-    this.designer.selection.orig = this.getCurrentMouse(event, this.designer.selection.parent);
-    if (!this.outline) return;
-    this.outline.originalMatrix = this.outline.matrix;
-    this.designer.selection.applyToShapes(function () {
-      this.originalMatrix = this.matrix;
-    });
-  }
+  getContainerShape: function () { return this.designer.surface; }
 
 });
