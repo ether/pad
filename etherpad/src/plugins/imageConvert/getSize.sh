@@ -18,13 +18,13 @@ if [ "$mime" == "application/pdf" ]; then
   getPageOrientation () {
     {
       tmp="$(mktemp)"
-      pdftoppm -png -f 1 -l 1 -scale-to 200 "$1" "$tmp"
+      pdftoppm -png -f $2 -l $2 -scale-to 200 "$1" "$tmp"
       identify -format "%[fx:w]\n%[fx:h]" "$tmp"*.png
       rm "$tmp"*
     } | orderToOrientation
   }
 
-  SHOULD_BE_ORIENTATION="$(getPageOrientation "$filename")"
+  SHOULD_BE_ORIENTATION="$(getPageOrientation "$filename" "$page")"
 
   pdfinfo -f $page -l $page "$filename" | grep "Page.*size:" | sed -e "s+Page.*size: *\([0-9.]*\) x \([0-9.]*\) .*+\1\n\2+g" | {
     read width
