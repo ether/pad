@@ -4,6 +4,8 @@ dojo.require("sketchSpaceDesigner.designer.modes.Zoom");
 dojo.require("sketchSpaceDesigner.designer.bbox");
 
 dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner.designer.modes.Zoom], {
+  minMarqueeSize: 10,
+
   constructor: function (zoomIn) {
     this.inherited(arguments, []);
     this.initialZoomIn = zoomIn;
@@ -61,13 +63,13 @@ dojo.declare("sketchSpaceDesigner.designer.modes.ZoomPlus", [sketchSpaceDesigner
     this.inherited(arguments);
     if (event.button == dojo.mouseButtons.LEFT) {
       this.removeCursorBboxOutline("zoom");
-      if (this.orig == this.mouse) {
+      var bbox = this.getCurrentCursorBbox();
+      if (bbox.width < this.minMarqueeSize && bbox.height < this.minMarqueeSize) {
         if (this.designer.options.zoomIn)
  	  this.onZoom(1.0 + this.zoomFactor, this.orig.x, this.orig.y);
 	else
 	  this.onZoom(1.0 / (1.0 + this.zoomFactor), this.orig.x, this.orig.y);
       } else {
-        var bbox = sketchSpaceDesigner.designer.bbox.Bbox().addPoints([this.orig, this.mouse]);
 	var originalMatrix = this.designer.surface_transform._getRealMatrix();
 
         var hScale = this.designer.surface_size.width / bbox.width;

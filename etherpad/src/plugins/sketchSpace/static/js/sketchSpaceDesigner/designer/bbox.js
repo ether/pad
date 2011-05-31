@@ -183,6 +183,10 @@ dojo.declare("sketchSpaceDesigner.designer.bbox.Bbox", [], {
     return other.isEqual(other.copy().add(this));
   },
 
+  containsPoint: function (point) {
+    return point.x >= this.x && point.y >= this.y && point.x <= this.x + this.width && point.y <= this.y + this.height;
+  },
+
   toString: function () {
     return "" + this.x + "," + this.y + ":" + this.width + "," + this.height;
   }
