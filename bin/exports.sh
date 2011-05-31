@@ -36,6 +36,14 @@ if [ `uname` == "FreeBSD" ]; then
         export SCALA_LIBRARY_JAR="/usr/local/share/scala-2.7.7/lib/scala-library.jar"
         export PATH="$JAVA_HOME/bin:$SCALA_HOME/bin:/usr/local/mysql/bin:$PATH"
         export MYSQL_CONNECTOR_JAR="/usr/local/share/java/classes/mysql-connector-java.jar"
+elif [[ $(uname -s) == CYGWIN* ]]; then
+        export JAVA_HOME="C:\Etherpad\JDK1.6_23"
+        export SCALA_HOME="C:\Etherpad\scala-2.7.4.final"
+        export JAVA="$JAVA_HOME\bin\java"
+        export SCALA="$SCALA_HOME\bin\scala"
+        export SCALA_LIBRARY_JAR="$SCALA_HOME\lib\scala-library.jar"
+        export PATH="$JAVA_HOME\bin:$SCALA_HOME\bin:$PATH"
+        export MYSQL_CONNECTOR_JAR="C:\Etherpad\mysql-connector-java-5.1.16\mysql-connector-java-5.1.16-bin.jar"
 else
         [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
         [ -e "/usr/lib/jvm/java-6-sun" ] && export JAVA_HOME="/usr/lib/jvm/java-6-sun"
@@ -67,4 +75,3 @@ if ! [ -e "$SCALA" ]; then
         echo "Scala cannot be found '$SCALA' not found - Download it here: http://www.scala-lang.org/"
         exit 1
 fi
-

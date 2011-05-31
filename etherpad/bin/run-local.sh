@@ -65,12 +65,28 @@ if [ ! -z $1 ]; then
     fi
 fi
 
-CP="appjet-eth-dev.jar:data"
-for f in lib/*.jar; do
-    CP="$CP:$f"
-done
+CP=""
+if [[ $(uname -s) == CYGWIN* ]]; then
+    _tmp=`readlink -f "appjet-eth-dev.jar"`
+    CP=`cygpath -wp "${_tmp}"`
+    _tmp=`readlink -f "data"`
+    CP="${CP}\;"`cygpath -wp "${tmp}"`
+    for f in `readlink -f "lib/*.jar"`; do
+            CP="$CP\;"`cygpath -wp "${f}"`
+    done
+else
+    CP="appjet-eth-dev.jar:data"
+    for f in lib/*.jar; do
+        CP="$CP:$f"
+    done
+fi
+
 
 if [ -z "$JAVA" ]; then
+    JAVA=java
+fi
+
+if [[ $(uname -s) == CYGWIN* ]]; then
     JAVA=java
 fi
 
