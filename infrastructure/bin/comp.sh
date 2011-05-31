@@ -32,7 +32,13 @@ fi
 echo compiling with \'$CC\'...
 
 CP=`bin/classpath.sh`
-CP="build/:${CP}"
+
+if [[ $(uname -s) == CYGWIN* ]]; then
+    _tmp=`readlink -f build`
+    CP="${CP}\;"`cygpath -wp "${_tmp}"`
+else
+    CP="build/:${CP}"
+fi
 
 if [ -z "$OBFUSC" ]; then
     OBFUSC=0
@@ -183,17 +189,24 @@ echo "copying files..."
 cp net.appjet.ajstdlib/streaming-client.js build/net/appjet/ajstdlib/
 if [ $OBFUSC ] ; then
     echo obfuscating...
-    scala -classpath $CP:. net.appjet.bodylock.compressor \
-	build/net/appjet/ajstdlib/streaming-client.js
+    if [[ $(uname -s) == CYGWIN* ]]; then
+        scala -classpath $CP net.appjet.bodylock.compressor \
+        build/net/appjet/ajstdlib/streaming-client.js
+    else
+        scala -classpath $CP:. net.appjet.bodylock.compressor \
+        build/net/appjet/ajstdlib/streaming-client.js
+    fi
 fi
 
 cp net.appjet.ajstdlib/streaming-iframe.html build/net/appjet/ajstdlib/
 mkdir -p build/net/appjet/ajstdlib/modules
 
+JSFILES=`find framework-src -name '*.js'`
+
 echo "building javascript classfiles..."
 scala -classpath $CP net.appjet.bodylock.Compiler \
     -destination=build/net/appjet/ajstdlib/ \
     -cutPrefix=framework-src \
-    `find framework-src -name '*.js'`
+    $JSFILES
 
 echo "done."

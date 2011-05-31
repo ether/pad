@@ -59,3 +59,27 @@ etherpad*.deb in the directory one level above your current directory.
 
 * To run it, do etc/init.d/etherpad start
 
+OPTION #3. INSTALLING ON WINDOWS SYSTEMS WITH CYGWIN
+
+* Install the dependencies in paths that do not contain spaces: cygwin, Scala 2.7, Sun Java JDK 6 or OpenJDK 6, libmysql-java
+
+* Uninstall gcj if it's installed as it seems to interfere with the
+  Scala compiler.  You can safely reinstall it after compiling Etherpad
+  if you want to.
+
+* Run bin/build.sh
+
+* Create a MySQL database "etherpad" and a database user "etherpad"
+
+* Copy etherpad/etc/etherpad.localdev-default.properties to etherpad/etc/etherpad.local.properties
+
+* Edit etherpad/etc/etherpad.local.properties and set
+   etherpad.SQL_JDBC_URL
+       Example etherpad.SQL_JDBC_URL = jdbc:mysql://localhost:3306/etherpad
+   etherpad.SQL_PASSWORD
+   etherpad.SQL_USERNAME = etherpad
+   etherpad.adminPass
+   topdomains
+       Example: topdomains = yourhostname.com,localhost
+
+* You can now run etherpad via bin/run.sh 

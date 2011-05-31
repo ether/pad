@@ -63,7 +63,12 @@ cp ../buildcache/JAR/appjet.jar ./
 
 echo "making JAR..."
 mv appjet.jar /tmp/appjet.jar
-$JAR -uf /tmp/appjet.jar . #META-INF com javax org net uk v scala dojox
+if [[ $(uname -s) == CYGWIN* ]]; then
+    _tmp=`readlink -f "/tmp/appjet.jar"`
+    $JAR uf `cygpath -wp "${_tmp}"` . #META-INF com javax org net uk v scala dojox
+else
+    $JAR -uf /tmp/appjet.jar . #META-INF com javax org net uk v scala dojox
+fi
 mv /tmp/appjet.jar ./
 
 echo "cleaning up..."

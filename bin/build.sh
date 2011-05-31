@@ -31,6 +31,7 @@ cp "$ETHERPADDIR"/infrastructure/build/appjet.jar $ETHERPADDIR/etherpad/appjet-e
 rm -rf "$ETHERPADDIR"/infrastructure/{appjet,build,buildjs,buildcache}
 
 # Rebuild modules
+if [[ $(uname -s) != CYGWIN* ]]; then
 (
   cd "$ETHERPADDIR"
   ls etherpad/src/plugins/ | while read name; do
@@ -42,3 +43,4 @@ rm -rf "$ETHERPADDIR"/infrastructure/{appjet,build,buildjs,buildcache}
     )
   done
 )
+fi

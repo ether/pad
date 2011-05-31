@@ -15,14 +15,8 @@
 #  limitations under the License.
 
 CP="./"
-
-if [[ $(uname -s) == CYGWIN* ]]; then
-    for f in `readlink -f "lib/*.jar"`; do
-        CP="${CP}\;"`cygpath -wp "${f}"`
-    done
-else
-    for f in `ls lib/*.jar`; do
-        CP="${CP}:${f}"
-    done
-fi
+for f in `readlink -f "lib/*.jar"`; do
+    CP="${CP}\;"`cygpath -wp "${f}"`
+done
 echo $CP
+

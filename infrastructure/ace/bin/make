@@ -1,7 +1,15 @@
 #!/bin/sh
 mkdir -p ../../etherpad/src/etherpad/collab/ace
 mkdir -p ../../etherpad/src/static/js
-exec scala -nocompdaemon -classpath lib/yuicompressor-2.4-appjet.jar:lib/rhino-js-1.7r1.jar $0 $@
+
+JARFILES="."
+if [[ $(uname -s) == CYGWIN* ]]; then
+    CP=`bin/classpath.sh`
+    exec scala -classpath $CP $0 $@
+else
+    exec scala -nocompdaemon -classpath lib/yuicompressor-2.4-appjet.jar:lib/rhino-js-1.7r1.jar $0 $@
+fi
+
 !#
 
 import java.io._;
