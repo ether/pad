@@ -1,0 +1,36 @@
+<html>
+<head>
+   <title>Web Fonts</title>
+   <script type="text/javascript">
+     var webFonts=['Artifika', 'Lora', 'Limelight', 
+            'Playfair Display', 'Carter One', 'Paytone One', 
+            'Holtwood One SC', 'Tangerine', 'Droid Sans', 'Kranky'];
+     window.onload=function(){
+    	webFonts.sort();
+    	var url = [
+	    	"http://fonts.googleapis.com/css?family=",
+    		"",
+	    	"&text=",
+    		""
+	    ];
+    	for(var i = 0, len = webFonts.length; i < len; i++){
+	    	var font = webFonts[i] || "";
+		    var link = document.createElement("link");
+    		var node = document.createElement("div");
+    		link.rel = "stylesheet";
+	    	link.type = "text/css";
+    		url[1] = font.replace(/\ /g,"+");
+	    	url[3] = encodeURIComponent(font);
+    		link.href = url.join("");
+	    	document.head.appendChild(link);
+    		node.style.fontFamily = font + " , serif";
+	    	node.style.fontSize = "40px";
+    		node.innerHTML = font;
+	    	document.body.appendChild(node);
+	    }
+     }
+     </script>
+ </head>
+ <body>
+</body>
+ </html>

@@ -92,32 +92,62 @@ function styleMenuList(name, style, values, callback, selectedIndex){
     });
     dojo.byId(name + "placeholder").appendChild(button.domNode);
 } 
-	
-function familyLists(values, callback, selectedIndex){
-	var strList = [
-	   "<span style='",
-	   "font-family",
-	   ":",
-	   "", //value
-	   "'>",
-	   "", //value
-	   "</span>" 		  
-	];
+
+function getSafeFontFamily(name){
+    return "\""+ name + "\" , serif";
+}
+
+function getWebFontURL(name, text, style){
+   	var url = [
+    	"http://fonts.googleapis.com/css?family=",
+   		"",
+    	"&text=",
+   		""
+    ];
+   	url[1] = name.replace(/\ /g,"+");
+    if(!text){
+        url[2] = "";
+    } else {
+        url[3] = encodeURIComponent(text);
+    }
+    return url.join("");
+}
+
+function familyLists(webFonts, callback, selectedIndex){
+   	webFonts.sort();
+    var strList = [
+       "<span style='",
+       "font-family",
+       ":",
+       "", //value
+       "'>",
+       "", //value
+       "</span>"          
+    ];
 	var opts = [];
 	selectedIndex = selectedIndex || 0;
-	for(var i = 0, len = values.length; i < len; i++){
-		strList[3] = strList[5] = values[i];
+
+   	for(var i = 0, len = webFonts.length; i < len; i++){
+    	var font = webFonts[i] || "";
+	    var link = document.createElement("link");
+   		link.rel = "stylesheet";
+    	link.type = "text/css";
+   		link.href = getWebFontURL(font, font);
+    	document.head.appendChild(link);
+   		strList[3] = getSafeFontFamily(font);
+        strList[5] = font;
 		opts.push({
 			label : strList.join(""),
-			value : values[i]	
+			value : font
 		});
-	}	
-	strList[3] = strList[5] = values[selectedIndex];
+    }
+	strList[3] = getSafeFontFamily(webFonts[selectedIndex]);
+    strList[5] = webFonts[selectedIndex];
 	var select = new dijit.form.Select({
 	    id: 'fontfamilysetter',
 		label : strList.join(""),
-		value : values[selectedIndex],
-	    style: { width: '130px', overflow:"hidden" },
+		value :  getSafeFontFamily(webFonts[selectedIndex]),
+	    style: { width: '130px', overflow:"hidden"},
 	    forceWidth : true,
 		onChange : function(val){
 			if(callback){
@@ -183,8 +213,10 @@ function preDefinedList(lists, name, selectedIndex, callback){
 function buildFontStyle(){
 	var sizes = ["10px", "12px", "16px", 
 			"18px", "24px", "32px", "48px"];
-	var families = ["Arial", "Arial Black", "Comic Sans MS", 
-			"Georgia", "Times New Roman", "\u5b8b\u4f53", "\u6977\u4f53"]; 
+    var families =['Artifika', 'Lora', 'Limelight', 
+            'Playfair Display', 'Carter One', 'Paytone One', 
+            'Holtwood One SC', 'Tangerine', 'Droid Sans', 'Kranky'];
+    
     var preDefined = [
             {title:"Heading 1", value : "h1", tagName : "h1", className :""},
             {title:"Heading 2", value : "h2", tagName : "h2", className :""},
@@ -343,6 +375,20 @@ var richTextClient = {
     getRecordSelection : function(){
         return this.localSelection;
     },
+    webFontCache:{},
+    loadWebFont:function(value){
+        if(!richTextClient.webFontCache[value]){
+            richTextClient.webFontCache[value] = true;
+            var doc = Ace2Editor.registry[1].editor.getDebugProperty("document"); //unsafe
+            var link = doc.createElement("link");
+    	    link.rel = "stylesheet";
+            link.type = "text/css";
+            value = value.replace(/'"/g, "");
+            link.href = getWebFontURL(value);
+            doc.head.appendChild(link);
+         } 
+                   
+    },
     execCommand : function(cmd, value){
          switch(cmd){
              case "textAlign":
@@ -409,10 +455,16 @@ var richTextClient = {
                     ace.ace_toggleAttributeOnLine(cmd, value);  
                 }, cmd, true);
                 break; 
+              case "fontFamily":
+                padeditor.ace.callWithAce(function (ace) {
+                    richTextClient.loadWebFont(value);
+                    ace.ace_toggleAttributeOnSelection(cmd, value);
+                }, cmd, true);
+                break;
               default:
                 padeditor.ace.callWithAce(function (ace) {
                     ace.ace_toggleAttributeOnSelection(cmd, value);
-                 }, cmd, true);
+                }, cmd, true);
          }
          padeditor.ace.focus();
     },
@@ -517,7 +569,8 @@ var richTextClient = {
                         style["font-size"] = pool[1];
                         break;
                     case "fontFamily":
-                        style["font-family"] = pool[1];
+                        richTextClient.loadWebFont(pool[1]);
+                        style["font-family"] = getSafeFontFamily(pool[1]);
                         break;
                     case "width":
                         style["width"] = pool[1];

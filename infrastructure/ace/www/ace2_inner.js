@@ -4536,7 +4536,7 @@ function OUTER(gscope) {
             var lineText = rep.lines.atIndex(lineNum).text;
             if(op.chars == 1 && op.attribs && lineText.length && lineMarker == lineText[0]){
                  var excludeObj = {}, exclude = exclude || [];
-//               exclude.push("author");
+                 exclude.push("author");
                  forEach(exclude, function(name){
                     excludeObj[name] = true;
                  }); 
