@@ -193,7 +193,9 @@ def doMake {
   val destDir = "build";
   var code = getFile(srcDir+"/ace2_outer.js");
 
-  val useCompression = true; //if (isEtherPad) false else true;
+  val useCompression = false; //if (isEtherPad) false else true; //run etherpad in ace debug mode
+  val useInclude  = (args.length >= 3 && args(2) == "merge");
+  if(useInclude){
 
   code = stringReplace(code, "\\$\\$INCLUDE_([A-Z_]+)\\([\"']([^\"']+)[\"']\\)", false, (m:MatchResult) => {
     val includeType = m.group(1);
@@ -233,7 +235,7 @@ def doMake {
       //case _ => "$$INCLUDE_"+includeType+"(\"../www/"+path+"\")";
     }
   });
-
+  }
   if (useCompression) code = compressJS(code, true);
 
   putFile(code, destDir+"/ace2bare.js");

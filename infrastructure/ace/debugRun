@@ -1,0 +1,13 @@
+#deploy ace in debug mode
+echo "Ace Local building"
+
+if [ $# -ne 0 ]; then
+	flag="merge"
+	echo "Merge all script into a single file..."  
+else
+	flag="include"
+	echo "Using include for delopy..."
+	cp ./www/*js ./../../etherpad/src/static/js/
+	cp ./www/*css ./../../etherpad/src/static/js/
+fi
+bin/make normal etherpad $flag

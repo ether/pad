@@ -128,20 +128,41 @@ function Ace2Editor() {
   // and compressed, putting the compressed code from the named file directly into the
   // source here.
 
+
+  var tagInclude = function(fileName, prefix, suffix){
+	if(!fileName) return false;
+	var lists = fileName.split(" ");
+	var str = "";
+	var path =  "/static/js/";
+	for(var i = 0, len = lists.length; i < len; i++){
+		str += prefix + path + lists[i] + suffix;
+	}
+	str = "'" + str + "'";
+	return str;
+  }
+ 
+  var IncludeScript = function(fileName){
+    return tagInclude(fileName,'\\x3cscript type=text/javascript src=', '>\\x3c/script>');
+  }
+
+  var IncludeCSS = function(fileName){
+
+  }
+
   var $$INCLUDE_CSS = function(fileName) {
-    return '<link rel="stylesheet" type="text/css" href="'+fileName+'"/>';
+    return '<link rel="stylesheet" type="text/css" href="/static/js/'+fileName+'"/>';
   };
   var $$INCLUDE_JS = function(fileName) {
-    return '\x3cscript type="text/javascript" src="'+fileName+'">\x3c/script>';
+    return IncludeScript(fileName);
   };
   var $$INCLUDE_JS_DEV = $$INCLUDE_JS;
   var $$INCLUDE_CSS_DEV = $$INCLUDE_CSS;
 
   var $$INCLUDE_CSS_Q = function(fileName) {
-    return '\'<link rel="stylesheet" type="text/css" href="'+fileName+'"/>\'';
+    return tagInclude(fileName,'<link type="text/css" rel="stylesheet" href="', '"/>');
   };
   var $$INCLUDE_JS_Q = function(fileName) {
-    return '\'\\x3cscript type="text/javascript" src="'+fileName+'">\\x3c/script>\'';
+    return IncludeScript(fileName);
   };
   var $$INCLUDE_JS_Q_DEV = $$INCLUDE_JS_Q;
   var $$INCLUDE_CSS_Q_DEV = $$INCLUDE_CSS_Q;

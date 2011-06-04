@@ -5006,4 +5006,10 @@ function OUTER(gscope) {
 
 };
 
-OUTER(this);
+try{
+    OUTER(this); //run in production mode
+} catch(e){
+   	window.onload = function(){
+    	OUTER(this); //run in debug mode
+	}
+}
