@@ -9,8 +9,6 @@ if(typeof dojo != "undefined"){
     dojo.require("dijit.form.ValidationTextBox");
 }
 
-
-
 function colorPalette(name, img, callback){ 
 	//html && dom string must follow a sepecify rule see the html content in the test file
 	var Palette = new dijit.ColorPalette({
@@ -43,12 +41,16 @@ function colorPalette(name, img, callback){
 }
 
 function buildColorPalette(){ //build text-color and background-color palette
-	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){
-          richTextexecCommand("color", val);
-     });
-	colorPalette("bg", "/static/img/plugins/richText/bgcolor.gif", function(val){
-          richTextexecCommand("backgroundColor", val);
-     });
+    if(document.getElementById("textColorPalette")){
+    	colorPalette("text", "/static/img/plugins/richText/textcolor.gif", function(val){
+              richTextexecCommand("color", val);
+         });
+    }
+    if(document.getElementById("bgColorPalette")){
+    	colorPalette("bg", "/static/img/plugins/richText/bgcolor.gif", function(val){
+              richTextexecCommand("backgroundColor", val);
+         });
+    }
 }
 
 function styleMenuList(name, style, values, callback, selectedIndex){
@@ -228,18 +230,24 @@ function buildFontStyle(){
             {title:"Content", value : "content", tagName : "span", className :""}
     ];
 
-    styleMenuList("fontsize", "font-size", sizes, function(val){
-          richTextexecCommand("fontSize", val);
-    });	
+    if(document.getElementById("fontsizeplaceholder")){
+        styleMenuList("fontsize", "font-size", sizes, function(val){
+              richTextexecCommand("fontSize", val);
+        });	
+    }
 	//styleMenuList("fontfamily", "font-family",
 	//families, function(val){alert(val)}); //how to set fix width in dojo?
-	familyLists(families, function(val){
-          richTextexecCommand("fontFamily", val);
-    });
+	if(document.getElementById("fontfamilyplaceholder")){
+    	familyLists(families, function(val){
+              richTextexecCommand("fontFamily", val);
+        });
+    }
 
-    preDefinedList(preDefined, "preDefinedStyle", 0, function(val){
-          richTextexecCommand("preDefinedStyle", val);
-    });
+    if(document.getElementById("preDefinedStyleplaceholder")){
+        preDefinedList(preDefined, "preDefinedStyle", 0, function(val){
+              richTextexecCommand("preDefinedStyle", val);
+        });
+    }
 }
 
 function isFunction(func){

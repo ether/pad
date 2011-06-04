@@ -40,3 +40,10 @@ h6 {
     border:1px solid gray;
 }
 
+.claro .dijitButton .dijitButtonNode,
+.claro .dijitDropDownButton .dijitButtonNode,
+.claro .dijitComboButton .dijitButtonNode,
+.claro .dijitToggleButton .dijitButtonNode {
+  background-image: none;
+  background-color: #ffffff;
+}

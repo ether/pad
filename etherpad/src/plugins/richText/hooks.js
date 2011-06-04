@@ -4,6 +4,7 @@ import("etherpad.utils.*");
 import("etherpad.globals.*");
 import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 import("etherpad.helpers");
+import("plugins.richText.richTextConfig");
 
 
 function initRunTime(){
@@ -19,7 +20,7 @@ function initRunTime(){
 
 function editBarItemsLeftPad(arg) {
   initRunTime();
-  return arg.template.include('richTextEditbarButtons.ejs', undefined, ['richText']);
+  return arg.template.include('richTextEditbarButtons.ejs', richTextConfig.richTextConfig, ['richText']);
 }
 
 function editBarItemsLeftPadView(){

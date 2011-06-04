@@ -1,12 +1,27 @@
 <td>&nbsp;&nbsp;</td>
 <td><img src="/static/img/jun09/pad/editbar_groupleft.gif" width="2" height="24"></td>
 <td class="editbarbutton editbargroupsfirst">
-  <a href="javascript:richTextexecCommand('orderedlist')" title="Ordered List"><img src="/static/img/plugins/richText/orderedlist.gif"></a>
+  <%if(orderedList) {%>
+      <a href="javascript:richTextexecCommand('orderedlist')" title="Ordered List">
+        <img src="/static/img/plugins/richText/orderedlist.gif"></a>
+  <%}%>
 </td>
 <%
    //"brush.gif"
-   var lists = ["justifyleft.gif", "justifyright.gif", "justifycenter.gif", "justifyjustify.gif",
-		  "Eraser.gif", "image.gif", "link.gif", "unlink.gif"];
+   var lists = [];
+   if(textAlign){
+     var aligns = ["justifyleft.gif", "justifyright.gif", "justifycenter.gif", "justifyjustify.gif"];
+     lists = lists.concat(aligns);
+    }
+	if(erase){
+      lists.push("Eraser.gif");
+    }
+    if(image){
+      lists.push("image.gif");
+    }
+    if(link){
+      lists.concat(["link.gif", "unlink.gif"]);
+    } 
 %>
 <% for(var i = 0, len = lists.length; i < len; i++){%>
 	<td class="editbarbutton">
@@ -16,17 +31,27 @@
 <td><img src="/static/img/jun09/pad/editbar_groupright.gif" width="2" height="24"></td>
 <td>&nbsp;&nbsp;</td>
 <td>
+    <% if(textColor){%>
         <span id="textColorPalette">
 		<span id = "textCPplaceholder"></span>
         </span>
+    <%}%>
+    <% if(bgColor){%>
 	<span id="bgColorPalette">
 		<span id = "bgCPplaceholder"></span>
         </span>
+    <%}%>
+    <% if(fontSize){%>
 	<span id="fontsizeplaceholder">
 	</span>
+    <%}%>
+    <% if(fontFamily){%>
 	<span id="fontfamilyplaceholder" style="width:100px;">
 	</span>
+    <%}%>
+    <% if(predefined){%>
 	<span id="preDefinedStyleplaceholder" style="width:100px;">
 	</span>
+    <%}%>
 </td>
 <td></td>
