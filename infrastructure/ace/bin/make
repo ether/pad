@@ -1,7 +1,7 @@
 #!/bin/sh
 mkdir -p ../../etherpad/src/etherpad/collab/ace
 mkdir -p ../../etherpad/src/static/js
-exec scala -classpath lib/yuicompressor-2.4-appjet.jar:lib/rhino-js-1.7r1.jar $0 $@
+exec scala -nocompdaemon -classpath lib/yuicompressor-2.4-appjet.jar:lib/rhino-js-1.7r1.jar $0 $@
 !#
 
 import java.io._;
@@ -193,9 +193,7 @@ def doMake {
   val destDir = "build";
   var code = getFile(srcDir+"/ace2_outer.js");
 
-  val useCompression = false; //if (isEtherPad) false else true; //run etherpad in ace debug mode
-  val useInclude  = (args.length >= 3 && args(2) == "merge");
-  if(useInclude){
+  val useCompression = true; //if (isEtherPad) false else true;
 
   code = stringReplace(code, "\\$\\$INCLUDE_([A-Z_]+)\\([\"']([^\"']+)[\"']\\)", false, (m:MatchResult) => {
     val includeType = m.group(1);
@@ -235,7 +233,7 @@ def doMake {
       //case _ => "$$INCLUDE_"+includeType+"(\"../www/"+path+"\")";
     }
   });
-  }
+
   if (useCompression) code = compressJS(code, true);
 
   putFile(code, destDir+"/ace2bare.js");
