@@ -1,13 +1,25 @@
 #deploy ace in debug mode
+#  ./debugRun 
+#      deploy ace in debug mode
+#  ./debugRun clean
+#      deploy ace in compress mode
 echo "Ace Local building"
 
-if [ $# -ne 0 ]; then
+debugPath="./../../etherpad/src/static/js/acedebug"
+
+if [ $# -ne 0 ]; then  #clean
 	flag="merge"
 	echo "Merge all script into a single file..."  
+    if [ ! -d $debugPath ]; then
+        rm -rf $debugPath 
+    fi
 else
 	flag="include"
 	echo "Using include for delopy..."
-	cp ./www/*js ./../../etherpad/src/static/js/
-	cp ./www/*css ./../../etherpad/src/static/js/
+    if [ ! -d $debugPath ]; then
+        mkdir $debugPath 
+    fi
+	cp ./www/*js  $debugPath 
+	cp ./www/*css $debugPath 
 fi
 bin/make normal etherpad $flag

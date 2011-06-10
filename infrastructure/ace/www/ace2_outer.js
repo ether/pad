@@ -128,12 +128,12 @@ function Ace2Editor() {
   // and compressed, putting the compressed code from the named file directly into the
   // source here.
 
-
+  var debugPath = "/static/js/acedebug/"
   var tagInclude = function(fileName, prefix, suffix){
 	if(!fileName) return false;
 	var lists = fileName.split(" ");
 	var str = "";
-	var path =  "/static/js/";
+	var path =  debugPath;
 	for(var i = 0, len = lists.length; i < len; i++){
 		str += prefix + path + lists[i] + suffix;
 	}
@@ -150,7 +150,7 @@ function Ace2Editor() {
   }
 
   var $$INCLUDE_CSS = function(fileName) {
-    return '<link rel="stylesheet" type="text/css" href="/static/js/'+fileName+'"/>';
+    return '<link rel="stylesheet" type="text/css" href="' + debugPath + fileName + '"/>';
   };
   var $$INCLUDE_JS = function(fileName) {
     return IncludeScript(fileName);
