@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 mkdir -p ../../etherpad/src/etherpad/collab/ace
 mkdir -p ../../etherpad/src/static/js
 
