@@ -208,6 +208,9 @@ object config {
   @ConfigParam("password for authentication to mail server. Default: no authentication.")
               { val argName = "password" } 
   def smtpPass = stringOrElse("smtpPass", "");
+  @ConfigParam("true or false to use starttls (TLS authentication) when connecting to mail server. Default: false.")
+              { val argName = "smtpStartTls" }
+  def smtpStartTls = stringOrElse("smtpStartTls", "false");
 
   // comet
   @ConfigParam("prefix for all comet requests. Required to use Comet system.")
