@@ -58,6 +58,7 @@ jimport("java.lang.System.out.println");
 
 jimport("net.appjet.oui.cometlatencies");
 jimport("net.appjet.oui.appstats");
+jimport("org.mindrot.BCrypt");
 
 
 //----------------------------------------------------------------
@@ -1311,6 +1312,16 @@ function render_pro_domain_accounts() {
   var accounts = sqlobj.selectMulti('pro_accounts', {}, {});
   var domains = sqlobj.selectMulti('pro_domains', {}, {});
 
+  if (request.method == "POST") {
+    accounts.forEach(function(u) {
+      var pwd = request.params["password_" + u.email];
+      if (pwd != undefined && pwd != '') {
+        /* Ugly hack since we're not on a domain, so we can't really use pro_domains.*  functions */
+	sqlobj.update('pro_accounts', {id: u.id}, {passwordHash: BCrypt.hashpw(pwd, BCrypt.gensalt(10))});
+      }
+    });
+  }
+
   // build domain map
   var domainMap = {};
   domains.forEach(function(d) { domainMap[d.id] = d; });
@@ -1321,21 +1332,24 @@ function render_pro_domain_accounts() {
   var t = TABLE({border: 1});
   t.push(TR(TH("email"),
             TH("domain"),
-            TH("lastLogin")));
+            TH("lastLogin"),
+	    TH("password")));
   accounts.forEach(function(u) {
     t.push(TR(TD(u.email),
               TD(domainMap[u.domainId].subDomain+"."+request.domain),
-              TD(u.lastLoginDate)));
+              TD(u.lastLoginDate),
+	      TD(INPUT({type: "password", name: "password_" + u.email}))));
   });
 
   b.push(t);
+  b.push(INPUT({type: "submit", value: "Save"}));
 
   renderHtml("admin/dynamic.ejs",
    {
     config: appjet.config,
     bodyClass: 'nonpropad',
     title: 'Pro accounts',
-    content: b
+    content: FORM({method: "POST", action: request.path}, b)
    });
 
 }

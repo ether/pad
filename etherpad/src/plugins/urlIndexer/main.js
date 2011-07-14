@@ -4,11 +4,11 @@ import("sqlbase.sqlobj");
 import("sqlbase.sqlcommon");
 
 function urlIndexerInit() {
- this.hooks = ['padModelWriteToDB', 'handlePath', 'docbarItemsTagBrowser'];
+ this.hooks = ['padModelWriteToDB', 'queryFormat', 'docbarItemsSearch'];
  this.description = 'Indexes URLs linked to in pads so that they can be displayed outside pads, searched for etc.';
  this.padModelWriteToDB = hooks.padModelWriteToDB;
- this.handlePath = hooks.handlePath;
- this.docbarItemsTagBrowser = hooks.docbarItemsTagBrowser;
+ this.queryFormat = hooks.queryFormat;
+ this.docbarItemsSearch = hooks.docbarItemsSearch;
 
  this.install = install;
  this.uninstall = uninstall;

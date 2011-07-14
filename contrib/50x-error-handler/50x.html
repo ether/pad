@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>This Etherpad instance is having some difficulties at the moment</title>
+
+<script type="text/javascript">
+var reload_page_after = (30 + (parseInt(Math.random() * 90)));
+var reload = false;
+function update_restart_in()
+{
+	var el = document.getElementById('restart-in');
+	var now = new Date;
+	now = parseInt(now.valueOf() / 1000);
+	// How much time has passed since the watcher script last could connect?
+	var since = now - last_updated;
+	// A script check if piratepad.net is accessible every 3 minutes.
+	// The timeout is 8 minutes so the restart is 60 seconds after the timeout.
+	var diff = (timeout + 60) - since;
+
+
+	var update = diff;
+	if(Math.abs(diff) > 60)
+	{
+		update = talky_time(diff);
+	}
+
+	el.innerHTML = update;
+	// If piratepad should've been restarted start the timer to reload this page!
+	if(diff <= 0 && reload == false)
+	{
+		reload = true;
+		window.setTimeout("window.location.reload()", reload_page_after * 1000);
+	}
+
+	window.setTimeout(update_restart_in, 1000);
+}
+
+function set_reload_time(val)
+{
+	document.getElementById('reload-time').innerHTML = talky_time(val);
+}
+
+function talky_time(seconds)
+{
+	var sec = seconds % 60;
+	var mins = (seconds - sec) / 60;
+	if(mins > 0 && !(mins == 1 && sec == 0))
+		return mins + " minute" + ((mins > 1) ? "s" : "") + " and " + sec;
+	else
+		return seconds;
+}
+</script>
+<script type="text/javascript" src="last-updated.js"></script>
+</head>
+<body onLoad="set_reload_time(reload_page_after); update_restart_in();">
+<div>
+	<p>
+		This Etherpad instance is having some difficulties at the moment, but should be back on track soon!<br>
+		Please try again or wait for the timeout below.
+	</p>
+	<p>
+		An automatic restart of Etherpad will occur in <span id="restart-in">UNKNOWN</span> seconds.<br>
+		This page will automatically reload <span id="reload-time">A RANDOM NUMBER OF</span> seconds after Etherpad should've been restarted.
+	</p>
+</div>
+</body>
+</html>

@@ -14,11 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */ %>
 <%
- template.inherit('page.ejs');
- helpers.setHtmlTitle("EtherPad: Browse tags");
- helpers.includeCss("plugins/twitterStyleTags/tagBrowser.css");
+ template.inherit('browser.ejs');
+ helpers.setHtmlTitle("Search pads");
  helpers.includeCss("plugins/twitterStyleTags/pad.css");
- helpers.addToHead('\n<link rel="alternate" href="' + helpers.updateToUrl({format:'rss'}) + '" type="application/rss+xml" title="Query results as RSS" />\n');
 
  function inArray(item, arr) {
    for (var i = 0; i < arr.length; i++)
@@ -28,97 +26,27 @@ limitations under the License. */ %>
  }
 %>
 <% template.define('docBarTitle', function() { var ejs_data=''; %>
-  <td id="docbarpadtitle"><span>Browse Tags</span></td>
+  <td id="docbarpadtitle"><span>Search pads</span></td>
 <% return ejs_data; }); %>
 
-<%
-  template.define('docBarItems', function() {
-    return template.callHookStr('docbarItemsTagBrowserPad', {}, '', '', '') +
-           template.callHookStr('docbarItemsTagBrowser', {}, '', '', '');
-  });
-%>
-
-<% template.define('sideBar', function() { var ejs_data=''; %>
-  <div id="padusers">
-   <% if (isProAccountEnabled()) { %>
-     <a href="/ep/pad/newpad" style="padding: 25px 0" class="bigbutton">
-      Create new pad
-     </a>       
-     <a href="/ep/pro-signup/" style="padding: 25px 0" class="bigbutton">
-      Create new team
-     </a>
-   <% } else { %>
-     <a href="/ep/pad/newpad" id="home-newpad">
-      Create new pad
-     </a>
-   <% } %>
-  </div>
-
-  <div id="hdraggie"><!-- --></div>
-
-  <div id="padchat"><iframe src="<%= config['motdPage'] %>" width="100%" height="100%"></iframe></div>
-<% return ejs_data; }); %>
-
-<% template.define('editBarItemsLeft', function() { var ejs_data=''; %>
-  <td>
-    <h1>
-      Query:
-      <% var querySummary = template.callHook('querySummary', {}); %>
-      <% if (tags.length == 0 && antiTags.length == 0 && querySummary.length == 0) { %>
-	Latest changed pads
-      <% } else { %>
-	<% for (i = 0; i < tags.length; i++) { %>
-	  <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.filter(function (tag) { return tag != tags[i]}), antiTags)}) %>" class="padtag" title="<%= tags[i] %> matches">#<%= tags[i] %></a>
-	<% } %>
-	<% for (i = 0; i < antiTags.length; i++) { %>
-	  <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags, antiTags.filter(function (tag) { return tag != antiTags[i]}))}) %>" class="anti_padtag" title="<%= antiTags[i] %> matches">!#<%= antiTags[i] %></a>
-	<% } %>
-	<% for (i = 0; i < querySummary.length; i++) { %>
-	  <%= querySummary[i] %>
-	<% } %>
-      <% } %>
-    </h1>
-  </td>
-<% return ejs_data; }); %>
-
-<% template.define('contentArea', function() { var ejs_data=''; %>
-  <div id="editorcontainer">
-   <div class="query-refiner">
-    <%: template.use('queryRefiner', function() { var ejs_data=''; %>
-     <div>
-       <h1>Search for pads that have the tag</h1>
-       <% for (i = 0; i < newTags.length; i++) { %>
-	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([newTags[i].tagname]),antiTags)}) %>" class="padtag" title="<%= newTags[i].matches %> matches">#<%= newTags[i].tagname %></a>
-       <% } %>
-
-       <h1>Search for pads that <em>don't</em> have the tag</h1>
-       <% for (i = 0; i < newTags.length; i++) { %>
-	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags,antiTags.concat([newTags[i].tagname]))}) %>" class="anti_padtag" title="<%= newTags[i].antimatches %> matches">!#<%= newTags[i].tagname %></a>
-       <% } %>
-     </div>
-     <%= template.callHookStr('queryRefiner', {}, '', '', '')  %>
-    <% return ejs_data; }); %>
-   </div>
-
-   <dl>
-    <%: template.use('queryResult', function() { var ejs_data=''; %>
-     <% for (i = 0; i < matchingPads.length; i++) { %>
-     <%
-	  var matchingPadId = matchingPads[i].ID;
-	  var matchingPadUrl = matchingPadId;
-	  if (!inArray('writable', matchingPads[i].TAGS)) {
-	    matchingPadId = padIdToReadonly(matchingPads[i].ID);
-	    matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
-	  }
-     %>
-      <dt><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><dt>
-      <dd>
-       <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
-	<a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingPads[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
-       <% } %>
-      </dd>
-     <% } %>
-    <% return ejs_data; }); %>
-   </dl>
-  </div>
+<% template.define('queryResult', function() { var ejs_data=''; %>
+  <% for (i = 0; i < matchingPads.length; i++) { %>
+  <%
+       var matchingPadId = matchingPads[i].ID;
+       var matchingPadUrl = matchingPadId;
+       if (!inArray('writable', matchingPads[i].TAGS)) {
+	 matchingPadId = padIdToReadonly(matchingPads[i].ID);
+	 matchingPadUrl = 'ep/pad/view/' + matchingPadId + '/latest';
+       } else if (padutils.isProPadId(matchingPadId)) {
+         matchingPadId = padutils.globalToLocalId(matchingPadId);
+	 matchingPadUrl = matchingPadId;
+       }
+  %>
+   <dt><a href="/<%= matchingPadUrl %>"><%= matchingPadId %></a><dt>
+   <dd>
+    <% for (j = 0; j < matchingPads[i].TAGS.length; j++) { %>
+     <a href="<%= helpers.updateToUrl({query:tagQuery.tagsToQuery(tags.concat([matchingPads[i].TAGS[j]]), antiTags)}) %>" class="padtag" title="<%= matchingPads[i].TAGS[j] %> matches">#<%= matchingPads[i].TAGS[j] %></a>
+    <% } %>
+   </dd>
+  <% } %>
 <% return ejs_data; }); %>

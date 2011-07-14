@@ -84,6 +84,19 @@ function getQueryToSql(tags, antiTags, querySql) {
   info.n = 0;
   var i;
 
+  for (i = 0; i < tags.length; i++) {
+    tag = tags[i];
+    joinArray.push(
+     stringFormat(
+      'join PAD_TAG as pt%(n)s on ' +
+      ' pt%(n)s.PAD_ID = p.ID ' +
+      'join TAG as t%(n)s on ' +
+      ' t%(n)s.ID = pt%(n)s.TAG_ID ' +
+      ' and t%(n)s.NAME = ? ',
+      info));
+    joinParamArray.push(tag);
+    info.n += 1;
+  }
   for (i = 0; i < antiTags.length; i++) {
     tag = antiTags[i];
     exceptArray.push(
@@ -98,19 +111,6 @@ function getQueryToSql(tags, antiTags, querySql) {
     exceptParamArray.push(tag);
     info.n += 1;
   }
-  for (i = 0; i < tags.length; i++) {
-    tag = tags[i];
-    joinArray.push(
-     stringFormat(
-      'join PAD_TAG as pt%(n)s on ' +
-      ' pt%(n)s.PAD_ID = p.ID ' +
-      'join TAG as t%(n)s on ' +
-      ' t%(n)s.ID = pt%(n)s.TAG_ID ' +
-      ' and t%(n)s.NAME = ? ',
-      info));
-    joinParamArray.push(tag);
-    info.n += 1;
-  }
 
   info["joins"] = joinArray.join(' ');
   info["excepts"] = exceptArray.join(' ');
@@ -123,12 +123,12 @@ function getQueryToSql(tags, antiTags, querySql) {
     '  p.ID ' +
     ' from ' +
     '  %(queryTable)s as p ' +
-    '  %(joins)s ' +
     '  %(excepts)s ' +
+    '  %(joins)s ' +
     ' %(wheres)s ' +
     ') ',
     info),
-   params: queryParams.concat(joinParamArray).concat(exceptParamArray)};
+   params: queryParams.concat(exceptParamArray).concat(joinParamArray)};
 }
 
 /* Returns the sql to count the number of results from some other
@@ -172,6 +172,7 @@ function newTagsSql(querySql) {
   var queryNrSql = nrSql(querySql);
   info["query_nr_sql"] = queryNrSql.sql;
   queryNrParams = queryNrSql.params;
+
   return {
    sql: stringFormat('' +
     'select ' +
@@ -186,7 +187,6 @@ function newTagsSql(querySql) {
     'where ' +
     ' tp.TAG_ID = t.ID ' +
     ' and tp.PAD_ID in %(query_post_table)s ' +
-    ' and tp.PAD_ID NOT LIKE \'%$%\'' +
     'group by t.NAME, tn.total ' +
     'having ' +
     ' count(tp.PAD_ID) > 0 and count(tp.PAD_ID) < tn.total ' +
@@ -198,7 +198,7 @@ function newTagsSql(querySql) {
 }
 
 /* Select the X last changed matching pads and some extra information
- * on them. Except the Pro Pads*/
+ * on them. */
 function padInfoSql(querySql, limit, offset) {
   var sql = '' +
    'select ' +
@@ -211,8 +211,6 @@ function padInfoSql(querySql, limit, offset) {
    '    m.id = q.ID ' +
    '  join PAD_TAG_CACHE as c on ' +
    '    c.PAD_ID = q.ID ' +
-   'where ' +
-   '  m.id NOT LIKE \'%$%\'' +
    'order by ' +
    '  m.lastWriteTime desc ';
   if (limit != undefined)
