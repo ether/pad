@@ -27,7 +27,7 @@ def superpack(input: String): String = {
   def containsSpecialChar(str: String) = str.exists(specialCharsSet.contains(_));
   
   val toks:Array[String] = (
-    "@|[a-zA-Z0-9]+|[^@a-zA-Z0-9]{1,3}").r.findAllIn(input).collect.toArray;
+    "@|[a-zA-Z0-9]+|[^@a-zA-Z0-9]{1,3}").r.findAllIn(input).toArray;
   
   val stringCounts = {
     val m = new scala.collection.mutable.HashMap[String,Int];
@@ -49,9 +49,9 @@ def superpack(input: String): String = {
   val thingsToReplace:Seq[String] = estimatedSavings.map(_._1);
   assert(encodeNames.length >= thingsToReplace.length);
   
-  val replacements = Map(thingsToReplace.elements.zipWithIndex.map({
+  val replacements = Map(thingsToReplace.iterator.zipWithIndex.map({
     case (str, i) => (str, encodeNames(i));
-  }).collect:_*);
+  }).toSeq:_*);
   def encode(tk: String) = if (replacements.contains(tk)) replacements(tk) else tk;
   
   val afterReplace = toks.map(encode(_)).mkString.replaceAll(
@@ -125,7 +125,7 @@ def doMake {
     val buf = new Array[Char](1024);
     var numRead = 0;
     while({ numRead = reader.read(buf); numRead } != -1) {
-      builder.append(buf, 0, numRead);
+      builder.appendAll(buf, 0, numRead);
     }
     reader.close;
     return builder.toString;
@@ -312,7 +312,7 @@ def remakeLoop {
 	    filter(! _.getName.endsWith("~")).
 	    filter(! _.getName.endsWith("#")).
 	    filter(! _.getName.startsWith(".")).map(_.lastModified).
-	    reduceLeft(Math.max(_:Long,_:Long)));
+	    reduceLeft(math.max(_:Long,_:Long)));
   }
   
   var madeStamp:Long = 0;

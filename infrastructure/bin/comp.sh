@@ -132,7 +132,7 @@ function genappserver {
 	-target 1.5 \
 	$APPSERVERJAVAFILES
     $CC \
-	-classpath $CP \
+	-classpath $CP:$1 \
 	-d $1 \
 	-target:jvm-1.5 \
 	$ARGS \
