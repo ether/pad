@@ -1531,3 +1531,29 @@ function render_reset_subscription() {
     content: body
    });
 }
+
+function render_delete_pad() {
+  var body = DIV();
+  body.push("Delete Pad");
+  if (request.isGet) {
+    body.push(FORM({method: "POST"},
+                   "padId: ", INPUT({type: "text", name: "padId"}), 
+BUTTON({name: "delete"}, "Delete")));
+  } else if (request.isPost) {
+    var localPadId = request.params.padId;
+    model.accessPadGlobal(localPadId, function(pad) {
+            collab_server.bootUsersFromPad(pad, "deleted");
+            pad.destroy();
+    });
+    dbwriter.taskFlushPad(localPadId, "delete");
+  }
+  body.push(A({href: request.path}, html("&laquo; back")));
+  renderHtml("admin/dynamic.ejs",
+   {
+    config: appjet.config,
+    bodyClass: 'nonpropad',
+    title: 'Delete Pad',
+    content: body
+   });
+
+}
