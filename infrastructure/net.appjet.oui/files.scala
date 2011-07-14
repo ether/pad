@@ -158,7 +158,7 @@ class JarOrNotFile(root: String, fname: String) extends Subscriber[Message[Unit]
   val fileSep = "/";
   val isJar = (root == null);
   val streamBase = if (isJar) getClass().getResource((classBase+fname).replaceAll("/+", "/")) else null;
-  val file = if (! isJar) FileCache.file(root+fileSep+fname, this) else null;
+  lazy val file = if (! isJar) FileCache.file(root+fileSep+fname, this) else null;
 
   def openStream() = {
     if (isJar) streamBase.openStream;

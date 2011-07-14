@@ -28,4 +28,4 @@ source "$ETHERPADDIR/bin/ooffice.sh"
 cd "$ETHERPADDIR/etherpad"
 
 # the argument here is the maximum amount of RAM to allocate
-exec bin/run-local.sh --etherpad.soffice="$SOFFICE_BIN" "$@" 256M
+exec bin/run-local.sh 256M --etherpad.soffice="$SOFFICE_BIN" "$@"
