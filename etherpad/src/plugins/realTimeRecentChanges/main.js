@@ -3,12 +3,12 @@ import("plugins.realTimeRecentChanges.hooks");
 import("plugins.realTimeRecentChanges.static.js.main");
 
 function realTimeRecentChangesInit() {
- this.hooks = ['handlePath', 'docbarItemsTagBrowser'];
+ this.hooks = ['handlePath', 'docbarItemsSearch'];
  this.client = new main.realTimeRecentChangesInit();
  this.description = 'Real-Time Recent Changes modifies the twitterStyleTags Tag Browser to update in real time.';
 
  this.handlePath = hooks.handlePath;
- this.docbarItemsTagBrowser = hooks.docbarItemsTagBrowser;
+ this.docbarItemsSearch = hooks.docbarItemsSearch;
 
  this.install = install;
  this.uninstall = uninstall;

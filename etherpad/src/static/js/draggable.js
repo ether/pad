@@ -113,7 +113,7 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
       var leftWidth = state.leftWidth + change;
       if (leftWidth < state.minLeft) { leftWidth = state.minLeft; }
       if (leftWidth > state.maxLeft) { leftWidth = state.maxLeft; }
-      
+      change = leftWidth - state.leftWidth;
 
       var rightWidth = state.rightWidth - change;
       newSepWidth = sepWidth;
@@ -125,7 +125,6 @@ function makeResizableHPane(left, sep, right, minLeft, minRight, sepWidth, sepOf
 
       if (change == 0) {
 	if (rightWidth != minRight || state.lastRightWidth == undefined) {
-	 console.log({rightWidth:rightWidth, minRight:minRight});
 	  state.lastRightWidth = rightWidth;
 	  rightWidth = minRight;
         } else {

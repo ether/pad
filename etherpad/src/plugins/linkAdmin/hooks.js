@@ -1,6 +1,6 @@
 import("etherpad.log");
 import("etherpad.utils.*");
 
-function docbarItemsTagBrowser() {
-    return ["<td class='docbarbutton'><a href='/ep/admin'>Admin</a></td>"];
+function docbarItemsSearch() {
+    return ["<td class='docbarbutton highlight'><a href='/ep/admin'>Admin</a></td>"];
 }

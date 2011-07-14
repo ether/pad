@@ -3,7 +3,7 @@
 
 function RTRCrunMainLoop(){
   setTimeout('RTRCrunMainLoop()', 5000);
-  $.getJSON("http://" + host + "/ep/tag/?format=json",
+  $.getJSON("http://" + host + "/ep/search?format=json",
       function(data){
         RTRCdoSomethingWithJSON(data);
   });
@@ -31,7 +31,7 @@ function RTRCdoSomethingWithJSON(json){
                 for (j = 0; j < json.matchingPads[i].TAGS.length; j++){
 
                     tagString = tagString + '&nbsp; ' +
-                        '<a href=http://' + host + '/ep/tag/?query=' +
+                        '<a href=http://' + host + '/ep/search?query=' +
                         json.matchingPads[i].TAGS[j] +
                         ' class="padtag" + title="' + json.matchingPads[i].TAGS[j] + 
                         ' matches">#' + json.matchingPads[i].TAGS[j] + '</a>';

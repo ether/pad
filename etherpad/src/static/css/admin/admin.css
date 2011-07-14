@@ -61,3 +61,13 @@
 .mousover_parent:hover .mouseover_child {
  display: block;
 }
+
+#AdminWelcome
+{ font-size:1.4em;}
+
+.installed
+{ color:green;width:60px;}
+
+.notinstalled
+{ color:red; width:60px; }
+

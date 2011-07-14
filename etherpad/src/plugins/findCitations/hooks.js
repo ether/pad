@@ -24,7 +24,10 @@ function queryToSql(args) {
 }
 
 function querySummary() {
- return [utils.renderTemplateAsString("findCitationsQuerySummary.ejs", {}, ['findCitations'])];
+  var res = utils.renderTemplateAsString("findCitationsQuerySummary.ejs", {}, ['findCitations']);
+  if (res.replace(new RegExp("^[ \n]*"), "").replace(new RegExp("[ \n]*$"), "") == '')
+    return [];
+  return [res];
 }
 
 function queryRefiner() {
