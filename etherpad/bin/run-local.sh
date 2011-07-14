@@ -106,6 +106,6 @@ exec $JAVA -classpath $CP \
     $JAVA_OPTS \
     net.appjet.oui.main \
     --configFile=${cfg_file} \
-    --maxThreads=${MAXTHREADS}
+    --maxThreads=${MAXTHREADS} \
     "$@"
 

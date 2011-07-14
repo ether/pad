@@ -96,7 +96,7 @@ object main {
     }
   }
 
-  val startupExecutable = (new FixedDiskLibrary(new SpecialJarOrNotFile(config.ajstdlibHome, "onstartup.js"))).executable;
+  lazy val startupExecutable = (new FixedDiskLibrary(new SpecialJarOrNotFile(config.ajstdlibHome, "onstartup.js"))).executable;
   def runOnStartup() {
     execution.runOutOfBand(startupExecutable, "Startup", None, { error => 
       error match {

@@ -26,3 +26,5 @@ debian/files
 etherpad/src/plugins/fileUpload/upload
 build-stamp
 infrastructure/lib/mysql-*.jar
+.DS_Store
+strace.out
