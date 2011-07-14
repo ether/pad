@@ -512,6 +512,7 @@ function render_reconnect() {
   var userId = (padutils.getPrefsCookieUserId() || undefined);
   var hasClientErrors = false;
   var uniqueId;
+  var errorMessage;
   try {
     var obj = fastJSON.parse(request.params.diagnosticInfo);
     uniqueId = obj.uniqueId;
