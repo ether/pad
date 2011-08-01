@@ -149,7 +149,7 @@ function familyLists(webFonts, callback, selectedIndex){
 	    id: 'fontfamilysetter',
 		label : strList.join(""),
 		value :  getSafeFontFamily(webFonts[selectedIndex]),
-	    style: { width: '130px', overflow:"hidden"},
+//	    style: { width: '130px', overflow:"hidden"}, //enable or disable font family lists resize 
 	    forceWidth : true,
 		onChange : function(val){
 			if(callback){

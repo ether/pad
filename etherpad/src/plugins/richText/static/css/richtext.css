@@ -44,6 +44,13 @@ ol.list-bullet6 { list-style-type: square; }
 ol.list-bullet7 { list-style-type: disc; }
 ol.list-bullet8 { list-style-type: circle;} 
 
+ul, ol, li {
+    font-weight: bold;
+}
+
+li span {
+    font-weight: normal;
+}
 
 h1{
     font-size:3em;
@@ -73,6 +80,11 @@ h5{
 h6 { 
     font-size:1em;
     font-weight:bold;
+}
+
+h1, h2, h3, h4, h5, h6{
+    margin:0.5em 0;
+    padding:0;
 }
 
 .richquotestyle{
