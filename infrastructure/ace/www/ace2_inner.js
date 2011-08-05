@@ -1830,6 +1830,19 @@ function OUTER(gscope) {
     }
   }
 
+  function handleReturnStyle(){
+    if (isCaret() && caretColumn() == 0 && caretLine() > 0) {
+       var lineNum = caretLine();
+       var thisLine = rep.lines.atIndex(lineNum);
+       var prevLine = rep.lines.prev(thisLine);
+       var thisLineText = (thisLine.text || '').trim();
+       if (!thisLineText) {
+          console.info(lineNum);
+          thisLine.lineNode.innerHTML="<span style='font-weight:bold'> </span>";
+          markNodeClean(thisLine.lineNode)
+       }
+    }
+  }
 
   function setupMozillaCaretHack(lineNum) {
     // This is really ugly, but by god, it works!
@@ -3102,6 +3115,7 @@ function OUTER(gscope) {
     else {
       handleReturnIndentation();
     }
+    handleReturnStyle();
   }
 
   function doIndentOutdent(isOut) {
