@@ -135,12 +135,19 @@ function getPadHTML(pad, revNum) {
           } else {
             var attribName = apool.getAttribKey(a);
             var attribValue = apool.getAttribValue(a);
+            
+            println('***********************************************');
+            plugins.callHook(
+              "exportInlineStyle",{name:attribName, value: attribValue}
+            ).map(function(modifier){
+            
+            });
+            println('***********************************************');
             if (isSpanStyle(attribName)){
               var cssRuleName = getCSSRuleName(attribName);   
               spanStyleList[cssRuleName] = attribValue;
               useSpan = true;
             } else {
-               println("Each Attribute : " + a  + " " + attribName + ' = '+ attribValue);
                var attStr = "";
                switch (attribName){
                 case "imgSrc":
@@ -309,7 +316,6 @@ function getPadHTML(pad, revNum) {
 }
 
 function isLineMarker(op, startChar, apool){
-  println('isLineAttribute ' + op.chars + " " + startChar);
   if(1 == op.chars && '*' == startChar && op.attribs){
     return true;
   }
@@ -325,7 +331,6 @@ function _analyzeLine(text, aline, apool) {
   line.lineOp = null;
   if (aline) {
     var opIter = Changeset.opIterator(aline);
-    println(aline);
     if (opIter.hasNext()) {
       var op = opIter.next(); 
       var listType = Changeset.opAttributeValue(op, 'list', apool);
@@ -344,7 +349,6 @@ function _analyzeLine(text, aline, apool) {
     }
   }
   if (lineMarker) {
-    println("IsLine")
     line.text = text.substring(1);
     line.aline = Changeset.subattribution(aline, 1);
   }
