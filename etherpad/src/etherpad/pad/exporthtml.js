@@ -15,7 +15,8 @@
  */
 
 import("etherpad.collab.ace.easysync2.Changeset");
-
+import("etherpad.admin.plugins");
+jimport("java.lang.System.out.println");
 function getPadPlainText(pad, revNum) {
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
@@ -42,13 +43,15 @@ function getPadPlainText(pad, revNum) {
 function getPadHTML(pad, revNum) {
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
+  println("=================Section Header===========================");
   var textLines = atext.text.slice(0,-1).split('\n');
   var attribLines = Changeset.splitAttributionLines(atext.attribs, atext.text);
 
   var apool = pad.pool();
-
   var tags = ['b','i','u','s'];
   var props = ['bold','italic','underline','strikethrough'];
+  var spanStyle = ['color', 'backgroundColor', 'fontSize', 
+                    'fontFamily', 'width', 'height'];
   var anumMap = {};
   props.forEach(function(propName, i) {
     var propTrueNum = apool.putAttrib([propName,true], true);
@@ -58,6 +61,8 @@ function getPadHTML(pad, revNum) {
   });
 
   function getLineHTML(text, attribs) {
+    println("Get Line HTML Text " + text);
+    println("Get Line HTML Attributes " + attribs);
     var propVals = [false, false, false];
     var ENTER = 1;
     var STAY = 2;
@@ -83,6 +88,22 @@ function getPadHTML(pad, revNum) {
       assem.append('>');
     }
 
+    /**
+     * conver fontSize to font-size
+     */
+    function getCSSRuleName(name){
+      return (name || "").replace(/([A-Z])/g,function(_, s){return '-' + s.toLowerCase()})
+    }
+
+    function isSpanStyle(name){
+       for(var i = 0, len = spanStyle.length; i < len; i++){
+            if (name == spanStyle[i]){
+                return true;
+            }
+       }
+       return false;
+    }
+
     var urls = _findURLs(text);
 
     var idx = 0;
@@ -98,6 +119,9 @@ function getPadHTML(pad, revNum) {
       while (iter.hasNext()) {
         var o = iter.next();
         var propChanged = false;
+        var useSpan = false;
+        var spanStyleList = {};
+        var isAceObject = false;
         Changeset.eachAttribNumber(o.attribs, function(a) {
           if (a in anumMap) {
             var i = anumMap[a]; // i = 0 => bold, etc.
@@ -107,6 +131,28 @@ function getPadHTML(pad, revNum) {
             }
             else {
               propVals[i] = STAY;
+            }
+          } else {
+            var attribName = apool.getAttribKey(a);
+            var attribValue = apool.getAttribValue(a);
+            if (isSpanStyle(attribName)){
+              var cssRuleName = getCSSRuleName(attribName);   
+              spanStyleList[cssRuleName] = attribValue;
+              useSpan = true;
+            } else {
+               println("Each Attribute : " + a  + " " + attribName + ' = '+ attribValue);
+               var attStr = "";
+               switch (attribName){
+                case "imgSrc":
+                    attStr= "<img src=\"" + attribValue + "\" />";
+                    assem.append(attStr);  
+                    break;
+                case "aceObject":
+                    isAceObject = true;
+                    break;
+                default:
+                    break;
+               }
             }
           }
         });
@@ -163,7 +209,21 @@ function getPadHTML(pad, revNum) {
         }
         var s = taker.take(chars);
 
-        assem.append(_escapeHTML(s));
+        if (useSpan) {
+            var openSpan = "<span style=\"";   
+            for (var style in spanStyleList){
+                openSpan += style + ":" + spanStyleList[style] + ";";
+            }
+            openSpan += "\">";
+            assem.append(openSpan);
+        } 
+        if(!(isAceObject && 1 == chars)){
+            assem.append(_escapeHTML(s));
+        }
+        if (useSpan) {
+            var closeSpan = "</span>";
+            assem.append(closeSpan);
+        }
       } // end iteration over spans in line
 
       for(var i=propVals.length-1; i>=0; i--) {
@@ -203,6 +263,7 @@ function getPadHTML(pad, revNum) {
     var line = _analyzeLine(textLines[i], attribLines[i], apool);
     var lineContent = getLineHTML(line.text, line.aline);
 
+    println("Content : " + lineContent);
     if (line.listLevel || lists.length > 0) {
       // do list stuff
       var whichList = -1; // index into lists or -1
@@ -247,16 +308,27 @@ function getPadHTML(pad, revNum) {
   return pieces.join('');
 }
 
+function isLineMarker(op, startChar, apool){
+  println('isLineAttribute ' + op.chars + " " + startChar);
+  if(1 == op.chars && '*' == startChar && op.attribs){
+    return true;
+  }
+  return false;
+}
+
 function _analyzeLine(text, aline, apool) {
   var line = {};
 
   // identify list
   var lineMarker = 0;
   line.listLevel = 0;
+  line.lineOp = null;
   if (aline) {
     var opIter = Changeset.opIterator(aline);
+    println(aline);
     if (opIter.hasNext()) {
-      var listType = Changeset.opAttributeValue(opIter.next(), 'list', apool);
+      var op = opIter.next(); 
+      var listType = Changeset.opAttributeValue(op, 'list', apool);
       if (listType) {
         lineMarker = 1;
         listType = /([a-z]+)([12345678])/.exec(listType);
@@ -265,9 +337,14 @@ function _analyzeLine(text, aline, apool) {
           line.listLevel = Number(listType[2]);
         }
       }
+      if(isLineMarker(op, text[0], apool)) {
+        lineMarker = 1;
+        line.lineOp = op;
+      }
     }
   }
   if (lineMarker) {
+    println("IsLine")
     line.text = text.substring(1);
     line.aline = Changeset.subattribution(aline, 1);
   }

@@ -2311,7 +2311,7 @@ function OUTER(gscope) {
   editorInfo.ace_toggleAttributeOnSelection = toggleAttributeOnSelection;
 
 
-  function isLineMarker(op, startIndex, lineNumber){//need to attributs to supprt
+  function isLineMarker(op, startIndex, lineNumber){//TODO need attributes supprt
     if(0 == startIndex && 1 == op.chars && op.attribs){
         var txt = rep.lines.atIndex(lineNumber).text;
         if(txt && txt[0] == lineMarker){
