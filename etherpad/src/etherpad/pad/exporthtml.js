@@ -48,10 +48,9 @@ function getPadHTML(pad, revNum) {
   var attribLines = Changeset.splitAttributionLines(atext.attribs, atext.text);
 
   var apool = pad.pool();
+
   var tags = ['b','i','u','s'];
   var props = ['bold','italic','underline','strikethrough'];
-  var spanStyle = ['color', 'backgroundColor', 'fontSize', 
-                    'fontFamily', 'width', 'height'];
   var anumMap = {};
   props.forEach(function(propName, i) {
     var propTrueNum = apool.putAttrib([propName,true], true);
@@ -88,22 +87,6 @@ function getPadHTML(pad, revNum) {
       assem.append('>');
     }
 
-    /**
-     * conver fontSize to font-size
-     */
-    function getCSSRuleName(name){
-      return (name || "").replace(/([A-Z])/g,function(_, s){return '-' + s.toLowerCase()})
-    }
-
-    function isSpanStyle(name){
-       for(var i = 0, len = spanStyle.length; i < len; i++){
-            if (name == spanStyle[i]){
-                return true;
-            }
-       }
-       return false;
-    }
-
     var urls = _findURLs(text);
 
     var idx = 0;
@@ -119,9 +102,10 @@ function getPadHTML(pad, revNum) {
       while (iter.hasNext()) {
         var o = iter.next();
         var propChanged = false;
-        var useSpan = false;
-        var spanStyleList = {};
         var isAceObject = false;
+        var extraOpenTags = "";
+        var extraCloseTags = "";
+        var attributes = [];
         Changeset.eachAttribNumber(o.attribs, function(a) {
           if (a in anumMap) {
             var i = anumMap[a]; // i = 0 => bold, etc.
@@ -132,35 +116,24 @@ function getPadHTML(pad, revNum) {
             else {
               propVals[i] = STAY;
             }
-          } else {
-            var attribName = apool.getAttribKey(a);
-            var attribValue = apool.getAttribValue(a);
-            
-            println('***********************************************');
-            plugins.callHook(
-              "exportInlineStyle",{name:attribName, value: attribValue}
-            ).map(function(modifier){
-            
-            });
-            println('***********************************************');
-            if (isSpanStyle(attribName)){
-              var cssRuleName = getCSSRuleName(attribName);   
-              spanStyleList[cssRuleName] = attribValue;
-              useSpan = true;
-            } else {
-               var attStr = "";
-               switch (attribName){
-                case "imgSrc":
-                    attStr= "<img src=\"" + attribValue + "\" />";
-                    assem.append(attStr);  
-                    break;
-                case "aceObject":
-                    isAceObject = true;
-                    break;
-                default:
-                    break;
-               }
-            }
+          }
+          var attribObj = {};
+          attribObj.name = apool.getAttribKey(a);
+          attribObj.value = apool.getAttribValue(a);
+          attributes.push(attribObj);
+        });
+        plugins.callHook(
+          "exportInlineStyle",{attributes:attributes}
+        ).map(function(modifier){
+          if(!modifier) return ;
+          if (modifier.isAceObject) {
+            isAceObject = true;
+          }  
+          if (modifier.extraOpenTags) {
+            extraOpenTags = extraOpenTags+modifier.extraOpenTags;
+          }
+          if (modifier.extraCloseTags) {
+            extraCloseTags = modifier.extraCloseTags+extraCloseTags;
           }
         });
         for(var i=0;i<propVals.length;i++) {
@@ -216,21 +189,11 @@ function getPadHTML(pad, revNum) {
         }
         var s = taker.take(chars);
 
-        if (useSpan) {
-            var openSpan = "<span style=\"";   
-            for (var style in spanStyleList){
-                openSpan += style + ":" + spanStyleList[style] + ";";
-            }
-            openSpan += "\">";
-            assem.append(openSpan);
-        } 
+        assem.append(extraOpenTags);
         if(!(isAceObject && 1 == chars)){
             assem.append(_escapeHTML(s));
         }
-        if (useSpan) {
-            var closeSpan = "</span>";
-            assem.append(closeSpan);
-        }
+        assem.append(extraCloseTags);
       } // end iteration over spans in line
 
       for(var i=propVals.length-1; i>=0; i--) {
