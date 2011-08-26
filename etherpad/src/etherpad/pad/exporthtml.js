@@ -231,8 +231,34 @@ function getPadHTML(pad, revNum) {
   var lists = []; // e.g. [[1,'bullet'], [3,'bullet'], ...]
   for(var i=0;i<textLines.length;i++) {
     var line = _analyzeLine(textLines[i], attribLines[i], apool);
+    //get line marker style before content style
+    var extraOpenTags = "", extraCloseTags = "";
+    if(line.lineMarker){
+      var attributes = [];
+      Changeset.eachAttribNumber(line.attribs, function(a) {
+        var attribObj = {};
+        attribObj.name = apool.getAttribKey(a);
+        attribObj.value = apool.getAttribValue(a);
+        attributes.push(attribObj);
+      });
+      
+      plugins.callHook(
+        "exportLineMarkerStyle",{attributes:attributes}
+      ).map(function(modifier){
+        if(!modifier) return ;
+        if (modifier.extraOpenTags) {
+          extraOpenTags = extraOpenTags+modifier.extraOpenTags;
+        }
+        if (modifier.extraCloseTags) {
+          extraCloseTags = modifier.extraCloseTags+extraCloseTags;
+        }
+      });
+    }
+    if (extraOpenTags) {
+      pieces.push(extraOpenTags);
+    }
     var lineContent = getLineHTML(line.text, line.aline);
-
+    
     println("Content : " + lineContent);
     if (line.listLevel || lists.length > 0) {
       // do list stuff
@@ -272,13 +298,16 @@ function getPadHTML(pad, revNum) {
     else {
       pieces.push(lineContent, '<br\n/>');
     }
+    if(extraCloseTags){
+      pieces.push(extraCloseTags,'\n');
+    }
   }
   pieces.push(new Array(lists.length+1).join('</li></ul\n>'));
 
   return pieces.join('');
 }
 
-function isLineMarker(op, startChar, apool){
+function isLineMarker(op, startChar, apool){ //TODO use line-marker attribute
   if(1 == op.chars && '*' == startChar && op.attribs){
     return true;
   }
@@ -291,7 +320,8 @@ function _analyzeLine(text, aline, apool) {
   // identify list
   var lineMarker = 0;
   line.listLevel = 0;
-  line.lineOp = null;
+  line.attribs = "";
+  line.lineMarker = false;
   if (aline) {
     var opIter = Changeset.opIterator(aline);
     if (opIter.hasNext()) {
@@ -307,13 +337,14 @@ function _analyzeLine(text, aline, apool) {
       }
       if(isLineMarker(op, text[0], apool)) {
         lineMarker = 1;
-        line.lineOp = op;
+        line.attribs = op.attribs;
       }
     }
   }
   if (lineMarker) {
     line.text = text.substring(1);
     line.aline = Changeset.subattribution(aline, 1);
+    line.lineMarker = true;
   }
   else {
     line.text = text;

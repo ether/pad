@@ -5,7 +5,7 @@ import("plugins.richText.static.js.main");
 
 function richTextInit() {
     this.hooks = ['editBarItemsLeftPad', 'editBarItemsLeftPadView', 'aceAttribsToClasses', 
-                  'aceCreateDomLine', 'aceCreateStructDomLine', 'exportInlineStyle'];
+                  'aceCreateDomLine', 'aceCreateStructDomLine', 'exportInlineStyle', 'exportLineMarkerStyle'];
     this.description = 'Rich Text editing in etherpad';
     this.client = new main.richTextInit();
     this.editBarItemsLeftPad = hooks.editBarItemsLeftPad;
@@ -14,6 +14,7 @@ function richTextInit() {
     this.aceCreateDomLine = main.aceCreateDomLine;
     this.aceCreateStructDomLine = main.aceCreateStructDomLine; 
     this.exportInlineStyle = importexport.exportInlineStyle;
+    this.exportLineMarkerStyle = importexport.exportLineMarkerStyle;
     this.install = install;
     this.uninstall = uninstall;
 }

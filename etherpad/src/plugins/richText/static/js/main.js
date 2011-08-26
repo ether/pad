@@ -611,7 +611,7 @@ var richTextClient = {
                                 temp.className = "richquotestyle";
                                 break;
                             default:
-                                tep = {};
+                                temp = {};
                                 
                         }
                         blockref.push(temp);

@@ -61,3 +61,37 @@ function exportInlineStyle(args){
   }
   return [result];
 }
+
+
+function exportLineMarkerStyle(args){
+   var result = {
+    extraOpenTags  : "",
+    extraCloseTags : ""
+  }  
+  if (args && args.attributes) {
+    var name = "", value = "";
+    for(var i = 0, len = args.attributes.length; i < len; i++){
+      name  = args.attributes[i].name;
+      value = args.attributes[i].value;
+      switch(name){
+        case "textAlign":
+          result.extraOpenTags += "<div style=\"text-align:"+ value + "\">";
+          result.extraCloseTags = "</div>" + result.extraCloseTags;
+          break;
+        case "preDefinedStyle":
+          if (value == "blockquote") {
+            result.extraOpenTags += "<blockquote class=\"richquotestyle\" " +i //TODO add style sheet support
+                  "style=\"background-color: #E5ECF9;border:1px solid gray;margin: 0.5em;\">";
+            result.extraCloseTags = "</blockquote>" + result.extraCloseTags;
+          } else {
+            result.extraOpenTags += "<" + value + ">";
+            result.extraCloseTags = "</" + value + ">" + result.extraCloseTags;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  return [result];
+}
