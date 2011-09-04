@@ -209,9 +209,17 @@ function _trimDomNode(n) {
   trimBeginningOrEnd(n, true);
 }
 
+//convert "$Attribute" in sever side into "Attribute" in client
+function _safeAttributeName(name){
+  name = name || "";
+  if("$" == name[0]){
+    name = name.substr(1);
+  }
+  return name;
+}
+
 function htmlToAText(html, apool) {
   println("=============Import Section Header=================");
-  println("[html]" + html);
   var body = _htmlBody2js(html);
   _trimDomNode(body);
 
@@ -232,19 +240,22 @@ function htmlToAText(html, apool) {
       return (((typeof n) == "object") && n.children && n.children[i]) || null;
     },
     nodeProp: function(n, p) {
-      return (((typeof n) == "object") && n.attrs && n.attrs[p]) || null;
+      if("className" == p){
+        p = "class";
+      }
+      return (((typeof n) == "object") && n.attrs && (n.attrs[p] || n.attrs["$" + p])) || null;
     },
     nodeAttr: function(n, a) {
-      return (((typeof n) == "object") && n.attrs && n.attrs[a]) || null;
+      return (((typeof n) == "object") && n.attrs && (n.attrs[a] || n.attrs["$" + a])) || null;
     },
     nodeAttributes : function(n){
-       var attribs = {}, na = n.attributes;
-       if(na){
-         for(var i = 0, len = na.length; i < len; i++){
-              attribs[na[i].name] = na[i].value; 
-         }   
-       }
-       return attribs;
+      var attribs = {}, na = n.attrs;
+      if(na){
+        for(var name in na){
+          attribs[_safeAttributeName(name)] = na[name];
+        }
+      }
+      return attribs;
     },
     optNodeInnerHTML: function(n) {
       return null;

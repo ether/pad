@@ -35,6 +35,9 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     plugins_ = parent.parent.plugins;
   }
 
+  lineMarker = lineMarker || '*';
+  objMarker  = objMarker  || '+';
+
   var dom = domInterface || {
     isNodeText: function(n) {
       return (n.nodeType == 3);
