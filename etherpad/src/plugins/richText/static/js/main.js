@@ -515,8 +515,7 @@ var richTextClient = {
         if(args.tname){
             var style = richTextClient.evalStyleString(args.styl), tname = args.tname.toLowerCase(),
                 attribs = args.attribs;
-            if( "span" == tname){
-                if(!style) return ;
+            if(style){
                 var lists = ["color", "font-family", "font-size", "background-color"], name;
                 for(var i = 0, len = lists.length; i < len; i++){
                     name = lists[i];
@@ -524,7 +523,8 @@ var richTextClient = {
                         args.cc.doAttrib(args.state, richTextClient.formatStyleName(name), style[name]);
                     }
                 }
-            } else if( "div" == tname &&  -1 == (args.cls || "").indexOf("ace-line")){
+            }
+            if( "div" == tname &&  -1 == (args.cls || "").indexOf("ace-line")){
                 if(!style) return ;
                 var lists = ["text-align"], name;
                 for(var i = 0, len = lists.length; i < len; i++){
@@ -552,6 +552,35 @@ var richTextClient = {
                 args.cc.doAttrib(args.state, "link", attribs.href);
             } 
         }
+    },
+    collectReturnStyle : function(args){
+        var attribs = args.attributes;
+        var style = {};
+        for(var i = 0, len = attribs.length; i < len; i++) {
+            switch(attribs[i].name){
+                case "bold":
+                     style["fontWeight"] = "bold";
+                     break;
+                case "italic":
+                     style["fontStyle"] = "italic";
+                     break;
+                case "underline":
+                     style["textDecoration"] = "underline";
+                     break;
+                case "strikethrough":
+                     style["textDecoration"] = "line-through"
+                     break;
+                case "color":
+                case "fontSize":
+                case "fontFamily":
+                case "backgroundColor":
+                     style[attribs[i].name] = attribs[i].value;
+                     break;
+                default:
+                     break;
+            }
+        }
+        return [style];
     },
     parseCommand : function(args){
         if(!args) return ;
@@ -642,13 +671,14 @@ var richTextClient = {
 function richTextInit() {
   this.hooks = ['aceAttribsToClasses', 'aceCreateDomLine',
 	 'collectContentPre', 'collectContentPost', 'aceCreateStructDomLine',
-     'aceInitInnerdocbodyHead'];
+     'aceInitInnerdocbodyHead', 'collectReturnStyleFromALine'];
   this.aceAttribsToClasses = aceAttribsToClasses;
   this.aceCreateDomLine = aceCreateDomLine;
   this.collectContentPre = collectContentPre;
   this.collectContentPost = collectContentPost;
   this.aceCreateStructDomLine = aceCreateStructDomLine;
   this.aceInitInnerdocbodyHead = aceInitInnerdocbodyHead;
+  this.collectReturnStyleFromALine = aceCollectReturnStyle;
 }
 if(typeof richTextClient == "undefined"){
     var richTextClient ={
@@ -690,6 +720,10 @@ function collectContentPre(args) {
 
 function aceInitInnerdocbodyHead(args){
     args.iframeHTML.push('\'<link rel="stylesheet" type="text/css" href="/static/css/plugins/richText/richtext.css"/>\'');
+}
+
+function aceCollectReturnStyle(args){
+    return richTextClient.collectReturnStyle(args);
 }
 
 function collectContentPost(args) {

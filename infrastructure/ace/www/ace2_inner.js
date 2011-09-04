@@ -1830,6 +1830,28 @@ function OUTER(gscope) {
     }
   }
 
+  function getLastStyleInLine(num){
+    var attribs = [];
+    if(num < 0 || num >= rep.alines.length){
+      return attribs;
+    }
+    var opIter = Changeset.opIterator(rep.alines[num]), lastOp = {}, attrStr = null;
+    while(opIter.hasNext()){
+      attrStr = lastOp.attribs;
+      lastOp = opIter.next();
+    }
+    if(attrStr){
+      Changeset.eachAttribNumber(attrStr, function(n) {
+        var obj = {};
+        obj.name  = rep.apool.getAttribKey(n);
+        obj.value = rep.apool.getAttribValue(n);
+        console.info("[" + obj.name + "] : " + obj.value);
+        attribs.push(obj);
+      });
+    }
+    return attribs;
+  }
+
   function handleReturnStyle(){
     if (isCaret() && caretColumn() == 0 && caretLine() > 0) {
        var lineNum = caretLine();
@@ -1837,8 +1859,20 @@ function OUTER(gscope) {
        var prevLine = rep.lines.prev(thisLine);
        var thisLineText = (thisLine.text || '').trim();
        if (!thisLineText) {
-          console.info(lineNum);
-          thisLine.lineNode.innerHTML="<span style='font-weight:bold'> </span>";
+          var attribs = getLastStyleInLine(lineNum - 1);
+          var plugins_;
+          if (typeof(plugins)!='undefined') {
+            plugins_ = plugins;
+          } else {
+            plugins_ = parent.parent.plugins;
+          }
+          plugins_.callHook(
+            'collectReturnStyleFromALine', {attributes : attribs}
+          ).map(function(styles){
+            for(var name in styles){
+              thisLine.lineNode.style[name] = styles[name];
+            }
+          });
           markNodeClean(thisLine.lineNode)
        }
     }
