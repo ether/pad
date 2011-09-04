@@ -296,7 +296,7 @@ function render_import2() {
 
   var newBytes;
   try {
-    newBytes = importexport.convertFile(state.type, "html", state.bytes);
+    newBytes = importexport.convertFileSlowly(state.type, "html", state.bytes);
   } catch (e) {
     if (e.javaException instanceof org.mortbay.jetty.RetryRequest) {
       throw e.javaException;

@@ -20,6 +20,7 @@ jimport("org.ccil.cowan.tagsoup.PYXWriter");
 jimport("java.io.StringReader");
 jimport("java.io.StringWriter");
 jimport("org.xml.sax.InputSource");
+jimport("java.lang.System.out.println");
 
 import("etherpad.collab.ace.easysync2.{Changeset,AttribPool}");
 import("etherpad.collab.ace.contentcollector.makeContentCollector");
@@ -40,6 +41,52 @@ function _html2pyx(html) {
   p.parse(s);
   return w.toString().replace(/\r\n|\r|\n/g, '\n');
 }
+
+// added the following logic - JHOLMES
+var indentation = '';
+
+function trimLeadingWhitespace(str) {
+  while (str.substring(0, 1) == ' ') { 
+    str = str.substring(1);
+  }
+  return str;
+}
+
+// for every .5in of text-indent, insert a tab character, which will be coverted to 7 non-breaking spaces
+// if the text-indent CSS rule's value is not specified in inches, simply insert a single tab character
+function indentToNbsp(val) {
+  if (val.indexOf('in') > -1) {
+    var theValueIndex = val.indexOf('in');
+    var theValue = val.substring(0, theValueIndex);
+    var theNum   = new Number(theValue);
+    var spaces   = Math.round(theNum * 2);
+    for (y = 0; y < spaces; y++) {
+      indentation = indentation + '\t';
+    }
+  }
+  else {
+    indentation = indentation + '\t';
+  }
+}
+
+function parseForIndentation(inlineStyle) {
+  var cssDeclaration;
+  var cssProperty;
+  var cssValue;
+  var cssRules = inlineStyle.split(';');
+  for (x = 0; x < cssRules.length; x++) {
+    if (cssRules[x] != '') {
+      cssDeclaration = cssRules[x].split(':');
+      cssProperty    = trimLeadingWhitespace(cssDeclaration[0]);
+      cssValue       = trimLeadingWhitespace(cssDeclaration[1]);
+      if (cssProperty == 'text-indent') {
+        indentToNbsp(cssValue);
+      }
+    }
+  }
+  return indentation;
+}
+// end of logic added here - JHOLMES
 
 function _htmlBody2js(html) {
   var pyx = _html2pyx(html);
@@ -79,6 +126,11 @@ function _htmlBody2js(html) {
       var value = pyxUnescape(v.substring(spaceIndex+1));
       topNode.attrs = (topNode.attrs || {});
       topNode.attrs['$'+key] = value;
+      // added the following logic here - JHOLMES
+      if ((key.toLowerCase() == "style") && (value.indexOf('text-indent') > -1)) {
+        indentation = parseForIndentation(value);
+      }
+      // end of logic added here - JHOLMES
     }
     else if (t == '-') {
       if (v == "\\n") {
@@ -92,11 +144,14 @@ function _htmlBody2js(html) {
         if (topNode.children.length > 0 &&
             ((typeof topNode.children[topNode.children.length-1]) == "string")) {
           // coallesce
-          topNode.children.push(topNode.children.pop() + v);
+          // prepend the indentation value here then clear the valuable - JHOLMES
+          topNode.children.push(indentation + topNode.children.pop() + v);
         }
         else {
-          topNode.children.push(v);
+          // prepend the indentation value here then clear the valuable - JHOLMES
+          topNode.children.push(indentation + v);
         }
+        indentation = "";
       }
     }
     else if (t == ')') {
@@ -155,6 +210,8 @@ function _trimDomNode(n) {
 }
 
 function htmlToAText(html, apool) {
+  println("=============Import Section Header=================");
+  println("[html]" + html);
   var body = _htmlBody2js(html);
   _trimDomNode(body);
 
@@ -180,6 +237,15 @@ function htmlToAText(html, apool) {
     nodeAttr: function(n, a) {
       return (((typeof n) == "object") && n.attrs && n.attrs[a]) || null;
     },
+    nodeAttributes : function(n){
+       var attribs = {}, na = n.attributes;
+       if(na){
+         for(var i = 0, len = na.length; i < len; i++){
+              attribs[na[i].name] = na[i].value; 
+         }   
+       }
+       return attribs;
+    },
     optNodeInnerHTML: function(n) {
       return null;
     }
@@ -188,7 +254,15 @@ function htmlToAText(html, apool) {
   var cc = makeContentCollector(true, null, apool, dom);
   for(var i=0; i<dom.nodeNumChildren(body); i++) {
     var n = dom.nodeChild(body, i);
-    cc.collectContent(n);
+    try{
+      cc.collectContent(n);
+    } catch (e) {
+      println("****Error Message*********");
+      for(var i in e) {
+        println("[" + i  + "] : " + e[i]);
+      }
+      throw e;
+    }
   }
   cc.notifyNextNode(null);
   var ccData = cc.finish();

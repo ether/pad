@@ -59,8 +59,10 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     },
     nodeAttributes : function(n){
        var attribs = {}, na = n.attributes;
-       for(var i = 0, len = na.length; i < len; i++){
-            attribs[na[i].name] = na[i].value; 
+       if(na) {
+        for(var i = 0, len = na.length; i < len; i++){
+             attribs[na[i].name] = na[i].value; 
+        }
        }
        return attribs;
     },
@@ -398,7 +400,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
               tname == "del") {
 	   cc.doAttrib(state, "strikethrough");
           }
-          if (tname == "ol") {
+          if ((tname == "ol") || tname == "ul") {
             var type;
             var rr = cls &&  /(?:^| )list-(bullet[12345678])\b/.exec(cls);
             type = rr && rr[1] || "bullet"+
