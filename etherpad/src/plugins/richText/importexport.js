@@ -26,6 +26,29 @@ function isSpanStyle(name){
   return false;
 }
 
+var MAX_LIST_LEVEL = 10;
+var olRecorder = new Array(MAX_LIST_LEVEL);
+var olFlag = false;
+
+function getOlIndex(level){
+  if(level >= MAX_LIST_LEVEL || level < 0){
+    return 1;
+  }
+  var index = (olRecorder[level] || 0);
+  index ++;
+  olRecorder[level] = index;
+  for(var i = level + 1; i < MAX_LIST_LEVEL; i++){
+    olRecorder[i] = 0;
+  }
+  return index;
+}
+
+function afterExport(){
+  for(var i = 0; i < MAX_LIST_LEVEL; i++){
+    olRecorder[i] = 0;
+  }
+}
+
 function exportInlineStyle(args){
   var result = {
     isAceObject    : false,
@@ -70,15 +93,16 @@ function exportInlineStyle(args){
 }
 
 function exportLineMarkerStyle(args){
-   var result = {
+  var result = {
     extraOpenTags  : "",
     extraCloseTags : ""
   }  
   if (args && args.attributes) {
-    var name = "", value = "";
+    var name = "", value = "", level = 1, index = 1;
     for(var i = 0, len = args.attributes.length; i < len; i++){
       name  = args.attributes[i].name;
       value = args.attributes[i].value;
+      println("[Line Style] Name :" + name + " Value : " + value);
       switch(name){
         case "textAlign":
           result.extraOpenTags += "<div style=\"text-align:"+ value + "\">";
@@ -93,6 +117,22 @@ function exportLineMarkerStyle(args){
             result.extraOpenTags += "<" + value + ">";
             result.extraCloseTags = "</" + value + ">" + result.extraCloseTags;
           }
+          break;
+        case "list":
+          if(value && value.length > 6){
+            level = parseInt(value.substr(6)) || 1;
+            println("Get level :" + value.substr(6) + " level : " + level);
+          }
+          break;
+        case "orderedlist":
+          index = getOlIndex(level);
+          println("Get Index : " + index + " Using Level : " + level);
+          for(var step = 1; step < level; step++){
+            result.extraOpenTags += "<ol style=\"list-style-type:none;\"><li>";
+            result.extraCloseTags += "</li></ol>" + result.extraCloseTags;
+          }
+          result.extraOpenTags += "<ol start=\"" + index + "\"><li>";
+          result.extraCloseTags += "</li></ol>" + result.extraCloseTags;
           break;
         default:
           break;
@@ -141,6 +181,11 @@ function collectContentPre(args){
   if(args.tname){
       var style = evalStyleString(args.styl), tname = args.tname.toLowerCase(),
           attribs = args.attribs;
+      if("ol" == tname){
+        olFlag = true;
+      } else if("ul" == tname){
+        olFlag = false;
+      }
       if( "span" == tname){
           if(!style) return ;
           var lists = ["color", "font-family", "font-size", "background-color"], name;

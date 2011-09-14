@@ -41,6 +41,7 @@ function getPadPlainText(pad, revNum) {
 }
 
 function getPadHTML(pad, revNum) {
+  plugins.callHook("beforeExport",{});
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
   println("=================Section Header===========================");
@@ -60,8 +61,6 @@ function getPadHTML(pad, revNum) {
   });
 
   function getLineHTML(text, attribs) {
-    println("Get Line HTML Text " + text);
-    println("Get Line HTML Attributes " + attribs);
     var propVals = [false, false, false];
     var ENTER = 1;
     var STAY = 2;
@@ -259,8 +258,7 @@ function getPadHTML(pad, revNum) {
     }
     var lineContent = getLineHTML(line.text, line.aline);
     
-    println("Content : " + lineContent);
-    if (line.listLevel || lists.length > 0) {
+    if (!line.orderedList && (line.listLevel || lists.length > 0)) {
       // do list stuff
       var whichList = -1; // index into lists or -1
       if (line.listLevel) {
@@ -279,31 +277,32 @@ function getPadHTML(pad, revNum) {
       else if (whichList == -1) {
         if (line.text) {
           // non-blank line, end all lists
-          pieces.push(new Array(lists.length+1).join('</li></ul\n>'));
+          pieces.push(new Array(lists.length+1).join('</li></ul>\n'));
           lists.length = 0;
-          pieces.push(lineContent, '<br\n/>');
+          pieces.push(lineContent, '<br/>\n');
         }
         else {
-          pieces.push('<br/><br\n/>');
+          pieces.push('<br/><br/>\n');
         }
       }
       else {
         while (whichList < lists.length-1) {
-          pieces.push('</li></ul\n>');
+          pieces.push('</li></ul>\n');
           lists.length--;
         }
-        pieces.push('</li\n><li>', lineContent || '<br/>');
+        pieces.push('</li>\n<li>', lineContent || '<br/>');
       }
     }
     else {
-      pieces.push(lineContent, '<br\n/>');
+      pieces.push(lineContent, '<br/>\n');
     }
     if(extraCloseTags){
       pieces.push(extraCloseTags,'\n');
     }
   }
-  pieces.push(new Array(lists.length+1).join('</li></ul\n>'));
+  pieces.push(new Array(lists.length+1).join('</li></ul>\n'));
 
+  plugins.callHook("afterExport",{});
   return pieces.join('');
 }
 
@@ -322,11 +321,13 @@ function _analyzeLine(text, aline, apool) {
   line.listLevel = 0;
   line.attribs = "";
   line.lineMarker = false;
+  line.orderedList = false;
   if (aline) {
     var opIter = Changeset.opIterator(aline);
     if (opIter.hasNext()) {
       var op = opIter.next(); 
       var listType = Changeset.opAttributeValue(op, 'list', apool);
+      line.orderedList = Changeset.opAttributeValue(op, 'orderedlist', apool);
       if (listType) {
         lineMarker = 1;
         listType = /([a-z]+)([12345678])/.exec(listType);

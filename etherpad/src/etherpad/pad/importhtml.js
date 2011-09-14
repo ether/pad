@@ -220,6 +220,7 @@ function _safeAttributeName(name){
 
 function htmlToAText(html, apool) {
   println("=============Import Section Header=================");
+  println(html)
   var body = _htmlBody2js(html);
   _trimDomNode(body);
 
