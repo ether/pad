@@ -177,12 +177,14 @@ function isStyledBlockElement (tagName){
   return !! tagReg.test(tagName || "");
 }
 
+var importOlLevel = 0;
 function collectContentPre(args){
   if(args.tname){
       var style = evalStyleString(args.styl), tname = args.tname.toLowerCase(),
           attribs = args.attribs;
       if("ol" == tname){
         olFlag = true;
+        importOlLevel ++;
       } else if("ul" == tname){
         olFlag = false;
       }
@@ -215,8 +217,9 @@ function collectContentPre(args){
               }
           }
           args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
-      } else if("ol" == tname && /\bace\-orderedlist\b/.exec(args.cls)){
+      } else if("li" == tname && olFlag){
           args.cc.doLineAttrib(args.state, "orderedlist", "true");
+//          args.cc.doAttrib(args.state, "list", "bullet" + importOlLevel);
       } else if(isStyledBlockElement(tname)){ //predefined style
           args.cc.doLineAttrib(args.state, "preDefinedStyle", tname);
       } else if("a" == tname && attribs.href){
@@ -225,6 +228,8 @@ function collectContentPre(args){
   }
 }
 
-function collectContentPost(){
-
+function collectContentPost(args){
+  if("ol" == args.tname){
+      importOlLevel --;
+  }
 }
