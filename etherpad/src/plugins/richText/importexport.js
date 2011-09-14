@@ -171,6 +171,11 @@ function evalStyleString (str){
   return style;
 }
 
+var _blockElems = { "div":1, "p":1, "pre":1};
+function isBlockElement(tagName) {
+  return !!_blockElems[(tagName || "").toLowerCase()];
+}
+
 function isStyledBlockElement (tagName){
   var tagLists = ["h1", "h2", "h3", "h4", "h5", "h6", "blockquote"];
   var tagReg = new RegExp(tagLists.join("|"));
@@ -197,14 +202,24 @@ function collectContentPre(args){
                   args.cc.doAttrib(args.state, getJsRuleName(name), style[name]);
               }
           }
-      } else if( "div" == tname &&  -1 == (args.cls || "").indexOf("ace-line")){
-          if(!style) return ;
-          var lists = ["text-align"], name;
-          for(var i = 0, len = lists.length; i < len; i++){
+      } else if(isBlockElement(tname)){
+          if(style) {
+            var lists = ["text-align"], name;
+            for(var i = 0, len = lists.length; i < len; i++){
               name = lists[i];
               if(style[name]){
                   args.cc.doLineAttrib(args.state, getJsRuleName(name), style[name]);
               }
+            }
+          }
+          var attLists = [{attr : "align", command : "text-align"}]; //trick for soffice
+          for(var i = 0, len = attLists.length; i < len; i++){
+            var attr = attLists[i].attr;
+            var cmd  = attLists[i].command;
+            var val  = attribs[attr] || attribs[ attr.toUpperCase()];
+            if(val){
+              args.cc.doLineAttrib(args.state, getJsRuleName(cmd), val.toLowerCase());
+            }
           }
       } else if("img" == tname){
           if(style){
