@@ -458,7 +458,9 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
     }
     if (isBlock) {
       if (lines.length()-1 == startLine) {
+        // %APPJET%: if(!("p" == tname && state.listType)){ //trick for html convert on server
         cc.startNewLine(state);
+        // %APPJET%: }
       }
       else {
         _ensureColumnZero(state);

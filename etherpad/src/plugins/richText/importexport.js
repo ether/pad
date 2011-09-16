@@ -98,7 +98,7 @@ function exportLineMarkerStyle(args){
     extraCloseTags : ""
   }  
   if (args && args.attributes) {
-    var name = "", value = "", level = 1, index = 1;
+    var name = "", value = "", level = 1, index = 1, ol = false;
     for(var i = 0, len = args.attributes.length; i < len; i++){
       name  = args.attributes[i].name;
       value = args.attributes[i].value;
@@ -125,18 +125,21 @@ function exportLineMarkerStyle(args){
           }
           break;
         case "orderedlist":
-          index = getOlIndex(level);
-          println("Get Index : " + index + " Using Level : " + level);
-          for(var step = 1; step < level; step++){
-            result.extraOpenTags += "<ol style=\"list-style-type:none;\"><li>";
-            result.extraCloseTags += "</li></ol>" + result.extraCloseTags;
-          }
-          result.extraOpenTags += "<ol start=\"" + index + "\"><li>";
-          result.extraCloseTags += "</li></ol>" + result.extraCloseTags;
+          ol = true;
           break;
         default:
           break;
       }
+    }
+    if(ol){
+      index = getOlIndex(level);
+      println("Get Index : " + index + " Using Level : " + level);
+      for(var step = 1; step < level; step++){
+        result.extraOpenTags += "<ol style=\"list-style-type:none;\"><li>";
+        result.extraCloseTags = "</li></ol>" + result.extraCloseTags;
+      }
+      result.extraOpenTags += "<ol start=\"" + index + "\"><li>";
+      result.extraCloseTags = "</li></ol>" + result.extraCloseTags;
     }
   }
   return [result];
@@ -183,6 +186,14 @@ function isStyledBlockElement (tagName){
 }
 
 var importOlLevel = 0;
+
+function getSafeOlLevel(){
+  if(importOlLevel > 0 && importOlLevel < MAX_LIST_LEVEL){
+    return importOlLevel;
+  }
+  return 1;
+}
+
 function collectContentPre(args){
   if(args.tname){
       var style = evalStyleString(args.styl), tname = args.tname.toLowerCase(),
@@ -190,6 +201,7 @@ function collectContentPre(args){
       if("ol" == tname){
         olFlag = true;
         importOlLevel ++;
+        println("Enter Ol " + importOlLevel);
       } else if("ul" == tname){
         olFlag = false;
       }
@@ -233,8 +245,8 @@ function collectContentPre(args){
           }
           args.cc.doObjAttrib(args.state, "imgSrc", attribs.src);
       } else if("li" == tname && olFlag){
+          args.cc.doLineAttrib(args.state, "list", "bullet" + getSafeOlLevel());
           args.cc.doLineAttrib(args.state, "orderedlist", "true");
-//          args.cc.doAttrib(args.state, "list", "bullet" + importOlLevel);
       } else if(isStyledBlockElement(tname)){ //predefined style
           args.cc.doLineAttrib(args.state, "preDefinedStyle", tname);
       } else if("a" == tname && attribs.href){
