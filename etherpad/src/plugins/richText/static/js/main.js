@@ -370,6 +370,21 @@ if(typeof dojo != "undefined"){
     });
 }
 if(typeof window == "object"){
+
+function formatColor(color){
+  if (color.substr(0, 1) === '#'){
+    return color;
+  }else if (color.indexOf('rgb') > 0){
+    var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
+    var red = parseInt(digits[2]);
+    var green = parseInt(digits[3]);
+    var blue = parseInt(digits[4]);
+    var rgb = blue | (green << 8) | (red << 16);
+    return digits[1] + '#' + rgb.toString(16);
+  }else{
+    return '#000000';
+  }
+};
 var richTextClient = {
     localSelection :{
         selStart : [],
@@ -490,7 +505,7 @@ var richTextClient = {
         var style = null;
         if(str && str.length){
             style = {};
-            var pairs = str.split(/;|,/);
+            var pairs = str.split(/;/);
             for(var i = 0, len = pairs.length; i < len; i++){
                 var pair = pairs[i].split(":");
                 if(pair && pair.length == 2){
@@ -568,9 +583,12 @@ var richTextClient = {
                      style["textDecoration"] = "underline";
                      break;
                 case "strikethrough":
+                case "s":
                      style["textDecoration"] = "line-through"
                      break;
                 case "color":
+                    style[attribs[i].name] = formatColor(attribs[i].value);
+                    break;
                 case "fontSize":
                 case "fontFamily":
                 case "backgroundColor":
