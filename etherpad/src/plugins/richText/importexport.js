@@ -251,6 +251,23 @@ function collectContentPre(args){
           args.cc.doLineAttrib(args.state, "preDefinedStyle", tname);
       } else if("a" == tname && attribs.href){
           args.cc.doAttrib(args.state, "link", attribs.href);
+      } else if("font" == tname){
+          var attLists = [{attr : "size", command : "font-size"},
+                          {attr : "color", command : "color"}]; //trick for soffice
+          //fixt font size
+          var size = attribs["size"] || attribs["SIZE"];
+          if(size && !isNaN(size)){
+            attribs["size"] = parseInt(size * 13 / 3) + "px"; //13px and 3 is default font size
+            attribs["SIZE"] = "";
+          }
+          for(var i = 0, len = attLists.length; i < len; i++){
+            var attr = attLists[i].attr;
+            var cmd  = attLists[i].command;
+            var val  = attribs[attr] || attribs[ attr.toUpperCase()];
+            if(val){
+              args.cc.doAttrib(args.state, getJsRuleName(cmd), val.toLowerCase());
+            }
+          }
       }
   }
 }
