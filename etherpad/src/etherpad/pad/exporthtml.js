@@ -16,7 +16,7 @@
 
 import("etherpad.collab.ace.easysync2.Changeset");
 import("etherpad.admin.plugins");
-jimport("java.lang.System.out.println");
+
 function getPadPlainText(pad, revNum) {
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
@@ -44,7 +44,6 @@ function getPadHTML(pad, revNum) {
   plugins.callHook("beforeExport",{});
   var atext = ((revNum !== undefined) ? pad.getInternalRevisionAText(revNum) :
                pad.atext());
-  println("=================Section Header===========================");
   var textLines = atext.text.slice(0,-1).split('\n');
   var attribLines = Changeset.splitAttributionLines(atext.attribs, atext.text);
 
@@ -127,7 +126,7 @@ function getPadHTML(pad, revNum) {
           if(!modifier) return ;
           if (modifier.isAceObject) {
             isAceObject = true;
-          }  
+          }
           if (modifier.extraOpenTags) {
             extraOpenTags = extraOpenTags+modifier.extraOpenTags;
           }
@@ -240,7 +239,6 @@ function getPadHTML(pad, revNum) {
         attribObj.value = apool.getAttribValue(a);
         attributes.push(attribObj);
       });
-      
       plugins.callHook(
         "exportLineMarkerStyle",{attributes:attributes}
       ).map(function(modifier){
@@ -257,7 +255,6 @@ function getPadHTML(pad, revNum) {
       pieces.push(extraOpenTags);
     }
     var lineContent = getLineHTML(line.text, line.aline);
-    
     if (!line.orderedList && (line.listLevel || lists.length > 0)) {
       // do list stuff
       var whichList = -1; // index into lists or -1
@@ -325,7 +322,7 @@ function _analyzeLine(text, aline, apool) {
   if (aline) {
     var opIter = Changeset.opIterator(aline);
     if (opIter.hasNext()) {
-      var op = opIter.next(); 
+      var op = opIter.next();
       var listType = Changeset.opAttributeValue(op, 'list', apool);
       line.orderedList = Changeset.opAttributeValue(op, 'orderedlist', apool);
       if (listType) {

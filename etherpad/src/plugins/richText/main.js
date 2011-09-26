@@ -4,7 +4,7 @@ import("plugins.richText.importexport");
 import("plugins.richText.static.js.main");
 
 function richTextInit() {
-    this.hooks = ['editBarItemsLeftPad', 'editBarItemsLeftPadView', 'aceAttribsToClasses', 
+    this.hooks = ['editBarItemsLeftPad', 'editBarItemsLeftPadView', 'aceAttribsToClasses',
                   'aceCreateDomLine', 'aceCreateStructDomLine', 'exportInlineStyle', 'exportLineMarkerStyle',
                   'collectContentPre', 'collectContentPost', 'afterExport'];
     this.description = 'Rich Text editing in etherpad';

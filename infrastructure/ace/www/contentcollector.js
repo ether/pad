@@ -64,7 +64,7 @@ function makeContentCollector(collectStyles, browser, apool, domInterface,
        var attribs = {}, na = n.attributes;
        if(na) {
         for(var i = 0, len = na.length; i < len; i++){
-             attribs[na[i].name] = na[i].value; 
+             attribs[na[i].name] = na[i].value;
         }
        }
        return attribs;

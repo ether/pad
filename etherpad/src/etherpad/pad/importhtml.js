@@ -20,7 +20,6 @@ jimport("org.ccil.cowan.tagsoup.PYXWriter");
 jimport("java.io.StringReader");
 jimport("java.io.StringWriter");
 jimport("org.xml.sax.InputSource");
-jimport("java.lang.System.out.println");
 
 import("etherpad.collab.ace.easysync2.{Changeset,AttribPool}");
 import("etherpad.collab.ace.contentcollector.makeContentCollector");
@@ -46,7 +45,7 @@ function _html2pyx(html) {
 var indentation = '';
 
 function trimLeadingWhitespace(str) {
-  while (str.substring(0, 1) == ' ') { 
+  while (str.substring(0, 1) == ' ') {
     str = str.substring(1);
   }
   return str;
@@ -219,8 +218,6 @@ function _safeAttributeName(name){
 }
 
 function htmlToAText(html, apool) {
-  println("=============Import Section Header=================");
-  println(html)
   var body = _htmlBody2js(html);
   _trimDomNode(body);
 
@@ -266,15 +263,7 @@ function htmlToAText(html, apool) {
   var cc = makeContentCollector(true, null, apool, dom);
   for(var i=0; i<dom.nodeNumChildren(body); i++) {
     var n = dom.nodeChild(body, i);
-    try{
-      cc.collectContent(n);
-    } catch (e) {
-      println("****Error Message*********");
-      for(var i in e) {
-        println("[" + i  + "] : " + e[i]);
-      }
-      throw e;
-    }
+    cc.collectContent(n);
   }
   cc.notifyNextNode(null);
   var ccData = cc.finish();

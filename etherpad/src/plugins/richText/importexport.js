@@ -54,7 +54,7 @@ function exportInlineStyle(args){
     isAceObject    : false,
     extraOpenTags  : "",
     extraCloseTags : ""
-  }  
+  }
   if (args && args.attributes) {
     var useSpan = false;
     var spanStyleList = {};
@@ -62,7 +62,7 @@ function exportInlineStyle(args){
       attribName  = args.attributes[i].name;
       attribValue = args.attributes[i].value;
       if (isSpanStyle(attribName)){
-        var cssRuleName = getCSSRuleName(attribName);   
+        var cssRuleName = getCSSRuleName(attribName);
         spanStyleList[cssRuleName] = attribValue;
         useSpan = true;
       } else {
@@ -81,7 +81,7 @@ function exportInlineStyle(args){
     }
   }
   if (useSpan) {
-    var openSpan = "<span style=\"";   
+    var openSpan = "<span style=\"";
     for (var style in spanStyleList){
       openSpan += style + ":" + spanStyleList[style] + ";";
     }
@@ -96,13 +96,12 @@ function exportLineMarkerStyle(args){
   var result = {
     extraOpenTags  : "",
     extraCloseTags : ""
-  }  
+  }
   if (args && args.attributes) {
     var name = "", value = "", level = 1, index = 1, ol = false;
     for(var i = 0, len = args.attributes.length; i < len; i++){
       name  = args.attributes[i].name;
       value = args.attributes[i].value;
-      println("[Line Style] Name :" + name + " Value : " + value);
       switch(name){
         case "textAlign":
           result.extraOpenTags += "<div style=\"text-align:"+ value + "\">";
@@ -121,7 +120,6 @@ function exportLineMarkerStyle(args){
         case "list":
           if(value && value.length > 6){
             level = parseInt(value.substr(6)) || 1;
-            println("Get level :" + value.substr(6) + " level : " + level);
           }
           break;
         case "orderedlist":
@@ -133,7 +131,6 @@ function exportLineMarkerStyle(args){
     }
     if(ol){
       index = getOlIndex(level);
-      println("Get Index : " + index + " Using Level : " + level);
       for(var step = 1; step < level; step++){
         result.extraOpenTags += "<ol style=\"list-style-type:none;\"><li>";
         result.extraCloseTags = "</li></ol>" + result.extraCloseTags;
@@ -201,7 +198,6 @@ function collectContentPre(args){
       if("ol" == tname){
         olFlag = true;
         importOlLevel ++;
-        println("Enter Ol " + importOlLevel);
       } else if("ul" == tname){
         olFlag = false;
       }
