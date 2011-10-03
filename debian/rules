@@ -59,7 +59,6 @@ install: build
 	mv debian/etherpad/usr/share/etherpad/etherpad/etc debian/etherpad/etc/etherpad
 	ln -s /etc/etherpad debian/etherpad/usr/share/etherpad/etherpad/etc
 
-	mkdir -p debian/etherpad/var/log/etherpad
 	mkdir -p debian/etherpad/usr/share/lintian/overrides
 	cp debian/source/lintian-overrides debian/etherpad/usr/share/lintian/overrides/etherpad
 
