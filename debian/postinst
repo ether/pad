@@ -53,6 +53,7 @@ if ! getent passwd etherpad > /dev/null ; then
 fi
 
 # Give user the rights to write into the log & data directory
+mkdir -p "/var/log/etherpad"
 chown -R etherpad:etherpad "/var/log/etherpad"
 chown -R etherpad:etherpad "/usr/share/etherpad/etherpad/data"
 # Give user the rights do write everywhere, did not yet figure
