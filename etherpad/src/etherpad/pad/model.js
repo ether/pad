@@ -508,6 +508,11 @@ function isPadLockHeld(padId) {
   return GlobalSynchronizer.isHeld(lockName);
 }
 
+function getPadGuestPolicy(padId) {
+  var padmeta = _getPadMetaData(padId);
+  return padmeta.dataRoot.padOptions.guestPolicy;
+}
+
 /**
  * Get pad meta-data object, which is stored in SQL as JSON
  * but cached in appjet.cache.  Returns null if pad doesn't

@@ -110,7 +110,7 @@ function render_all_pads_get() {
   _renderListPage(
     pro_pad_db.listAllDomainPads(),
     "all pads",
-    ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+    ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_all_pads_zip_get() {
@@ -148,7 +148,7 @@ function render_my_pads_get() {
   _renderListPage(
       pro_pad_db.listMyPads(),
       "pads created by me",
-      ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+      ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_archived_pads_get() {
@@ -158,7 +158,7 @@ function render_archived_pads_get() {
   _renderListPage(
       pro_pad_db.listArchivedPads(),
       "archived pads",
-      ['secure', 'title', 'lastEditedDate', 'actions']);
+      ['title', 'public', 'secure', 'lastEditedDate', 'actions']);
 }
 
 function render_edited_by_get() {
@@ -167,7 +167,7 @@ function render_edited_by_get() {
   _renderListPage(
     pro_pad_db.listPadsByEditor(editorId),
     "pads edited by "+editorName,
-    ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+    ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_delete_post() {
