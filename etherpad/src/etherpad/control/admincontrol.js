@@ -262,7 +262,7 @@ function renderCometStats() {
 
 
   if (lastStats.isDefined()) {
-    d.push(P("Realtime transport latency percentiles (microseconds):"));
+    d.push(P("Realtime transport latency percentiles (milliseconds):"));
     var ul = UL();
     lastStats.map(scalaF1(function(s) {
       ['50', '90', '95', '99', 'max'].forEach(function(id) {
@@ -271,12 +271,14 @@ function renderCometStats() {
           fn = ("p"+fn);
           id = id+"%";
         }
-        ul.push(LI(id, ": <", s[fn](), html("&micro;"), "s"));
+        ul.push(LI( html("<div style='width:99px; text-align:right;'><div style='float:left'>"), id, ": ", 
+                    html("</div>"), " < ", parseInt(0.001 * s[fn]()), html(" ms</div>") ));
+        
       });
     }));
     d.push(ul);
   } else {
-    d.push(P("Still collecting data... check back in a minutes."));
+    d.push(P("Still collecting data... check back in a minute."));
   }
 
  /*    ["p50", "p90", "p95", "p99", "max"].forEach(function(id) {
