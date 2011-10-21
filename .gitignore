@@ -29,3 +29,5 @@ etherpad/src/plugins/fileUpload/upload
 build-stamp
 infrastructure/lib/mysql-*.jar
 .DS_Store
+etherpad/src/static/favicon.ico
+etherpad/src/static/robots.txt
