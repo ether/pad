@@ -58,13 +58,6 @@ if [ -x "/usr/bin/perl" ]; then
 	fi
 fi
 
-if [ ! -z $1 ]; then
-    if [ ! '-' = `echo $1 | head -c 1` ]; then
-        MXRAM="$1";
-        shift;
-    fi
-fi
-
 CP=""
 if [[ $(uname -s) == CYGWIN* ]]; then
     _tmp=`readlink -f "appjet-eth-dev.jar"`
@@ -95,11 +88,28 @@ cfg_file=./etc/etherpad.local.properties
 if [ ! -f $cfg_file ]; then
   cfg_file=./etc/etherpad.localdev-default.properties
 fi
-if [[ $1 == "--cfg" ]]; then
-  cfg_file=${2}
-  shift;
-  shift;
-fi
+while [ $# -gt 0 ] ; do
+  case "$1" in
+    --cfg)
+      cfg_file="${2}"
+      shift
+      shift
+      ;;
+    --etherpad.soffice=*)
+# not used?
+      soffice=`echo $1 | sed 's/^[^=]*=//'`
+      shift
+      ;;
+    -*)
+      echo "Unknown option $1" >&2
+      shift
+      ;;
+    *)
+      MXRAM="$1";
+      shift
+      ;;
+  esac
+done
 
 echo "Maximum ram: $MXRAM"
 echo "Maximum thread count: $MAXTHREADS"
