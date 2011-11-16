@@ -3,14 +3,14 @@ Section: contrib/httpd
 Priority: extra
 Maintainer: Etherpad Foundation (Packaging) <packaging@etherpad.org>
 Build-Depends: po-debconf, debhelper (>= 7)
-Build-Depends-indep: dbconfig-common, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), scala-library (>= 2.7)
+Build-Depends-indep: dbconfig-common, openjdk-6-jdk | sun-java6-sdk, mysql-client, libmysql-java, scala (>= 2.7), scala-library (>= 2.7)
 Build-Conflicts: libgcj-common, java-gcj-compat-headless, java-gcj-compat, gcj-4.3-base
 Standards-Version: 3.8.4
 Homepage: http://github.com/ether/pad
 
 Package: etherpad
 Architecture: all
-Depends: ${misc:Depends}, sun-java6-jdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
+Depends: ${misc:Depends}, openjdk-6-jdk | sun-java6-sdk, mysql-client, libmysql-java, scala (>= 2.7), mysql-server, m4
 Pre-Depends: dbconfig-common, debconf, adduser
 Recommends: perl, python-uno
 Description:  A web-based word processor that allows people to work
