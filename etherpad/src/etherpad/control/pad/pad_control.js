@@ -288,6 +288,9 @@ function _checkIfDeleted(pad) {
         response.stop();
       }
     });
+  } else if (pad.getIsDeleted()) {
+    renderNoticeString("This pad has been deleted.");
+    response.stop();
   }
 }
 

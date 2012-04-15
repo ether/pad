@@ -473,6 +473,15 @@ function render_padinspector_get() {
     response.write("on pad "+padId+": setSupportsTimeSlider("+v+")");
     response.stop();
   }
+  if (request.params.setisdeleted) {
+    var v = (String(request.params.setisdeleted).toLowerCase() ==
+             'true');
+    model.accessPadGlobal(padId, function(pad) {
+      pad.setIsDeleted(v);
+    });
+    response.write("on pad "+padId+": setIsDeleted("+v+")");
+    response.stop();
+  }
   model.accessPadGlobal(padId, function(pad) {
     if (! pad.exists()) {
       response.write("Pad not found: /"+padId);
@@ -517,6 +526,13 @@ function render_padinspector_get() {
         }
         else {
           div.push(P(A({href: qpath({setsupportstimeslider: 'true'})}, 'show slider')));
+        }
+        var isDeleted = pad.getIsDeleted();
+	if (!isDeleted) {
+	  div.push(P(A({href: qpath({setisdeleted: 'true'})}, 'set pad deleted')));
+	}
+        else {
+          div.push(P(A({href: qpath({setisdeleted: 'false'})}, 'remove flag deleted')));
         }
       }
     }
