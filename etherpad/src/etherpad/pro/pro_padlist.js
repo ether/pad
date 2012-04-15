@@ -20,6 +20,7 @@ import("stringutils");
 
 import("etherpad.utils.*");
 import("etherpad.helpers");
+import("etherpad.pad.model");
 import("etherpad.pad.padutils");
 import("etherpad.collab.collab_server");
 
@@ -58,14 +59,18 @@ function _getColumnMeta() {
   }
 
   addAvailableColumn('public', {
-    title: "",
+    title: "Public",
     render: function(p) {
-      // TODO: implement an icon with hover text that says public vs.
-      // private
-      return "";
+      globalPadId = padutils.getGlobalPadId(p.localPadId);
+      var guestPolicy = model.getPadGuestPolicy(globalPadId);
+      if (guestPolicy == "allow") {
+        return IMG({src: '/static/img/jun09/pad/public.gif'});
+      } else {
+        return "";
+      }
     },
-    cmpFn: function(a,b) {
-      return 0; // not sort-able
+    sortFn: function(a,b) {
+      return cmp(model.getPadGuestPolicy(padutils.getGlobalPadId(a.localPadId)), model.getPadGuestPolicy(padutils.getGlobalPadId(b.localPadId)));
     }
   });
   addAvailableColumn('secure', {
