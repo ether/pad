@@ -46,9 +46,9 @@ function _renderPadNav() {
   var d = DIV({id: "padlist-nav"});
   var ul = UL();
   var items = [
-    ['allpads', 'all-pads', "All Pads"],
-    ['mypads', 'my-pads', "My Pads"],
-    ['archivedpads', 'archived-pads', "Archived Pads"]
+    ['allpads', 'all-pads', helpers.translate("PRO_PADLIST_TITLE_ALL_PADS")],
+    ['mypads', 'my-pads', helpers.translate("PRO_PADLIST_TITLE_MY_PADS")],
+    ['archivedpads', 'archived-pads', helpers.translate("PRO_PADLIST_TITLE_ARCHIVED_PADS")]
   ];
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
@@ -61,7 +61,7 @@ function _renderPadNav() {
   ul.push(html(helpers.clearFloats()));
   d.push(ul);
   d.push(FORM({id: "newpadform", method: "get", action: "/ep/pad/newpad"},
-          INPUT({type: "submit", value: "New Pad"})));
+          INPUT({type: "submit", value: helpers.translate("PRO_PADLIST_TITLE_NEW_PAD") })));
   d.push(html(helpers.clearFloats()));
   return d;
 }
@@ -110,7 +110,7 @@ function render_all_pads_get() {
   _renderListPage(
     pro_pad_db.listAllDomainPads(),
     "all pads",
-    ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+    ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_all_pads_zip_get() {
@@ -148,7 +148,7 @@ function render_my_pads_get() {
   _renderListPage(
       pro_pad_db.listMyPads(),
       "pads created by me",
-      ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+      ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_archived_pads_get() {
@@ -158,7 +158,7 @@ function render_archived_pads_get() {
   _renderListPage(
       pro_pad_db.listArchivedPads(),
       "archived pads",
-      ['secure', 'title', 'lastEditedDate', 'actions']);
+      ['title', 'public', 'secure', 'lastEditedDate', 'actions']);
 }
 
 function render_edited_by_get() {
@@ -167,7 +167,7 @@ function render_edited_by_get() {
   _renderListPage(
     pro_pad_db.listPadsByEditor(editorId),
     "pads edited by "+editorName,
-    ['secure', 'title', 'lastEditedDate', 'editors', 'actions']);
+    ['title', 'public', 'secure', 'lastEditedDate', 'editors', 'actions']);
 }
 
 function render_delete_post() {

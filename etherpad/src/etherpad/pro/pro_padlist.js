@@ -20,6 +20,7 @@ import("stringutils");
 
 import("etherpad.utils.*");
 import("etherpad.helpers");
+import("etherpad.pad.model");
 import("etherpad.pad.padutils");
 import("etherpad.collab.collab_server");
 
@@ -58,14 +59,18 @@ function _getColumnMeta() {
   }
 
   addAvailableColumn('public', {
-    title: "",
+    title: "Public",
     render: function(p) {
-      // TODO: implement an icon with hover text that says public vs.
-      // private
-      return "";
+      globalPadId = padutils.getGlobalPadId(p.localPadId);
+      var guestPolicy = model.getPadGuestPolicy(globalPadId);
+      if (guestPolicy == "allow") {
+        return IMG({src: '/static/img/jun09/pad/public.gif'});
+      } else {
+        return "";
+      }
     },
-    cmpFn: function(a,b) {
-      return 0; // not sort-able
+    sortFn: function(a,b) {
+      return cmp(model.getPadGuestPolicy(padutils.getGlobalPadId(a.localPadId)), model.getPadGuestPolicy(padutils.getGlobalPadId(b.localPadId)));
     }
   });
   addAvailableColumn('secure', {
@@ -82,7 +87,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('title', {
-    title: "Title",
+    title: helpers.translate("PRO_PADLIST_TABLE_TITLE"),
     render: function(p) {
       var t = padutils.getProDisplayTitle(p.localPadId, p.title);
       return A({href: "/"+p.localPadId}, t);
@@ -93,7 +98,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('creatorId', {
-    title: "Creator",
+    title: helpers.translate("PRO_PADLIST_TABLE_CREATOR"),
     render: function(p) {
       return pro_accounts.getFullNameById(p.creatorId);
     },
@@ -103,7 +108,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('createdDate', {
-    title: "Created",
+    title: helpers.translate("PRO_PADLIST_TABLE_CREATED"),
     render: function(p) {
       return timeAgo(p.createdDate);
     },
@@ -112,7 +117,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('lastEditorId', {
-    title: "Last Editor",
+    title: helpers.translate("PRO_PADLIST_TABLE_LAST_EDITOR"),
     render: function(p) {
       if (p.lastEditorId) {
         return pro_accounts.getFullNameById(p.lastEditorId);
@@ -128,7 +133,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('editors', {
-    title: "Editors",
+    title: helpers.translate("PRO_PADLIST_TABLE_EDITORS"),
     render: function(p) {
       var editors = [];
       p.proAttrs.editors.forEach(function(editorId) {
@@ -147,7 +152,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('lastEditedDate', {
-    title: "Last Edited",
+    title: helpers.translate("PRO_PADLIST_TABLE_LAST_EDITED"),
     render: function(p) {
       if (p.lastEditedDate) {
         return timeAgo(p.lastEditedDate);
@@ -160,7 +165,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('localPadId', {
-    title: "Path"
+    title: helpers.translate("PRO_PADLIST_TABLE_PATH")
   });
   addAvailableColumn('actions', {
     title: "",
@@ -170,7 +175,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('connectedUsers', {
-    title: "Connected Users",
+    title: helpers.translate("PRO_PADLIST_TABLE_CONNECTED_USERS"),
     render: function(p) {
       var names = [];
       padutils.accessPadLocal(p.localPadId, function(pad) {
