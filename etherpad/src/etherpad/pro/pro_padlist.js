@@ -87,7 +87,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('title', {
-    title: helpers.translate("PRO_PADLIST_TABLE_TITLE"),
+    title: "Title",
     render: function(p) {
       var t = padutils.getProDisplayTitle(p.localPadId, p.title);
       return A({href: "/"+p.localPadId}, t);
@@ -98,7 +98,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('creatorId', {
-    title: helpers.translate("PRO_PADLIST_TABLE_CREATOR"),
+    title: "Creator",
     render: function(p) {
       return pro_accounts.getFullNameById(p.creatorId);
     },
@@ -108,7 +108,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('createdDate', {
-    title: helpers.translate("PRO_PADLIST_TABLE_CREATED"),
+    title: "Created",
     render: function(p) {
       return timeAgo(p.createdDate);
     },
@@ -117,7 +117,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('lastEditorId', {
-    title: helpers.translate("PRO_PADLIST_TABLE_LAST_EDITOR"),
+    title: "Last Editor",
     render: function(p) {
       if (p.lastEditorId) {
         return pro_accounts.getFullNameById(p.lastEditorId);
@@ -133,7 +133,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('editors', {
-    title: helpers.translate("PRO_PADLIST_TABLE_EDITORS"),
+    title: "Editors",
     render: function(p) {
       var editors = [];
       p.proAttrs.editors.forEach(function(editorId) {
@@ -152,7 +152,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('lastEditedDate', {
-    title: helpers.translate("PRO_PADLIST_TABLE_LAST_EDITED"),
+    title: "Last Edited",
     render: function(p) {
       if (p.lastEditedDate) {
         return timeAgo(p.lastEditedDate);
@@ -165,7 +165,7 @@ function _getColumnMeta() {
     }
   });
   addAvailableColumn('localPadId', {
-    title: helpers.translate("PRO_PADLIST_TABLE_PATH")
+    title: "Path"
   });
   addAvailableColumn('actions', {
     title: "",
@@ -175,7 +175,7 @@ function _getColumnMeta() {
   });
 
   addAvailableColumn('connectedUsers', {
-    title: helpers.translate("PRO_PADLIST_TABLE_CONNECTED_USERS"),
+    title: "Connected Users",
     render: function(p) {
       var names = [];
       padutils.accessPadLocal(p.localPadId, function(pad) {

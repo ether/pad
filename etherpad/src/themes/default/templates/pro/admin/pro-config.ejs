@@ -43,6 +43,13 @@ limitations under the License. */ %>
              <%= config.openByGuestsAllowed ? 'checked="on"' : '' %> />
     </td>
   </tr>
+  <tr>
+    <th valign="top">New pads are public?</th>
+    <td valign="top">
+      <input type="checkbox" id="newPadsPublic" name="newPadsPublic"
+             <%= config.newPadsPublic ? 'checked="on"' : '' %> />
+    </td>
+  </tr>
 
   <tr>
     <th valign="top">Default pad text:</th>

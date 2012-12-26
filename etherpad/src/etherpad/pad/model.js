@@ -383,7 +383,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
           }
           if ((! data.padOptions.guestPolicy) ||
             (data.padOptions.guestPolicy == 'ask')) {
-            data.padOptions.guestPolicy = (pro_utils.isProDomainRequest() && pro_config.getConfig().openByGuestsAllowed ? 'allow' : 'deny');
+            data.padOptions.guestPolicy = (pro_utils.isProDomainRequest() && (pro_config.getConfig().newPadsPublic || pro_config.getConfig().openByGuestsAllowed) ? 'allow' : 'deny');
           }
           return data.padOptions;
         },
