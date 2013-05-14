@@ -45,6 +45,7 @@ elif [[ $(uname -s) == CYGWIN* ]]; then
         export PATH="$JAVA_HOME\bin:$SCALA_HOME\bin:$PATH"
         export MYSQL_CONNECTOR_JAR="C:\Etherpad\mysql-connector-java-5.1.16\mysql-connector-java-5.1.16-bin.jar"
 else
+        [ -e "/usr/lib/jvm/java-6-openjdk-amd64" ] && export JAVA_HOME="/usr/lib/jvm/java-6-openjdk-amd64"
         [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
         [ -e "/usr/lib/jvm/java-6-sun" ] && export JAVA_HOME="/usr/lib/jvm/java-6-sun"
         [ -e "/usr/lib/jvm/java-6-openjdk" ] && export JAVA_OPTS="-Xbootclasspath/p:../infrastructure/lib/rhino-js-1.7r1.jar:/usr/share/java/scala-library.jar" 
