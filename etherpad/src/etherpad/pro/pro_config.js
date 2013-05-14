@@ -34,6 +34,7 @@ function _getDefaultConfig() {
     siteName: _guessSiteName(),
     alwaysHttps: false,
     openByGuestsAllowed: false,
+    newPadsPublic: false,
     defaultPadText: renderTemplateAsString("misc/pad_default.ejs")
   };
 }

@@ -228,6 +228,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 	  meta.status.lastAccess = t;
           meta.status.dirty = true;
           meta.supportsTimeSlider = true;
+	  meta.deleted = false;
 
 	  var firstChangeset;
 	  if (typeof(optText) == "string") {
@@ -382,7 +383,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
           }
           if ((! data.padOptions.guestPolicy) ||
             (data.padOptions.guestPolicy == 'ask')) {
-            data.padOptions.guestPolicy = (pro_utils.isProDomainRequest() && pro_config.getConfig().openByGuestsAllowed ? 'allow' : 'deny');
+            data.padOptions.guestPolicy = (pro_utils.isProDomainRequest() && (pro_config.getConfig().newPadsPublic || pro_config.getConfig().openByGuestsAllowed) ? 'allow' : 'deny');
           }
           return data.padOptions;
         },
@@ -454,6 +455,16 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 
           return cs;
         },
+	getIsDeleted: function() {
+	  if (!('deleted' in meta)) {
+	    return false;
+	  } else {
+	    return !! meta.deleted;
+	  }
+	},
+        setIsDeleted: function(v) {
+	  meta.deleted = v;
+	},
         getSupportsTimeSlider: function() {
           if (! ('supportsTimeSlider' in meta)) {
             if (padutils.isProPadId(padId)) {
@@ -506,6 +517,11 @@ function doWithPadLock(padId, func) {
 function isPadLockHeld(padId) {
   var lockName = "document/"+padId;
   return GlobalSynchronizer.isHeld(lockName);
+}
+
+function getPadGuestPolicy(padId) {
+  var padmeta = _getPadMetaData(padId);
+  return padmeta.dataRoot.padOptions.guestPolicy;
 }
 
 /**

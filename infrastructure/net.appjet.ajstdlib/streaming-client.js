@@ -752,7 +752,7 @@ function WebSocket(id) {
       timeout(timeouts, "initialConnect", 15000, cancelConnect)
 
       if (canUseSubdomains) {
-        var streamurl = "//"+randomVar()+".comet."+host+channelPath()+"&channel=streaming&type=iframe&new=yes&create="+(socket.readyState == socket.OPEN ? "no" : "yes")+"&seq="+lastReceivedSeqNumber;
+        var streamurl = "//"+host+channelPath()+"&channel=streaming&type=iframe&new=yes&create="+(socket.readyState == socket.OPEN ? "no" : "yes")+"&seq="+lastReceivedSeqNumber;
         log("stream to: "+streamurl);
         if ($ && $.browser.opera) {
           // set up the opera stream; requires jquery because, why not?
@@ -823,7 +823,7 @@ function WebSocket(id) {
 
   // long-polling related stuff.
   function iframePath(key) {
-    return "//"+key+".comet."+host+"%contextPath%/xhrXdFrame";
+    return "//"+host+"%contextPath%/xhrXdFrame?" + key;
   }
 
   function createHiddenDiv() {

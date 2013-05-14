@@ -48,7 +48,7 @@ function _getPadTextBytes(padId, revNum) {
     return null;
   }
   return padutils.accessPadLocal(padId, function(pad) {
-    if (pad.exists()) {
+    if (pad.exists() && !pad.getIsDeleted()) {
       var txt = exporthtml.getPadPlainText(pad, revNum);
       return (new java.lang.String(txt)).getBytes("UTF-8");
     } else {
@@ -62,7 +62,7 @@ function _getPadHtmlBytes(padId, revNum, noDocType) {
     return null;
   }
   var html = padutils.accessPadLocal(padId, function(pad) {
-    if (pad.exists()) {
+    if (pad.exists() && !pad.getIsDeleted()) {
       return exporthtml.getPadHTMLDocument(pad, revNum, noDocType);
     }
   });

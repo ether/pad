@@ -33,7 +33,7 @@ function createRequestObject() {
 }
 var host = window.location.host;
 var oldDomain = document.domain;
-var newDomain = oldDomain.substring(oldDomain.indexOf(".", oldDomain.indexOf(".")+1)+1);
+var newDomain = oldDomain;
 
 function doAction(method, uri, async, headers, body, cb) {
   try {
@@ -64,7 +64,7 @@ function doAbort(xhr) {
 }
 document.domain = newDomain;
 window.onload = function() {
-  var doneKey = 'done_'+oldDomain.split(".", 2)[0];
+  var doneKey = 'done_'+document.location.search.substr(1);
     setTimeout(function() {
       window.parent[doneKey]();
     }, 0);

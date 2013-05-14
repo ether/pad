@@ -62,6 +62,12 @@ limitations under the License. */ %><% helpers.includeCss("pro/account.css") %>
 </table>
 </form>
 
+<h2>Deactivate</h2>
+
+<form method="post" action="/ep/account/deactivate-account">
+  <input type="submit" id="deactivateSubmit" onclick="javascript:return confirm('Do you really want to deactivate your account? You cannot log in after this action!');" value="Deactivate account">
+</form>
+
 </div>
 </div>
 

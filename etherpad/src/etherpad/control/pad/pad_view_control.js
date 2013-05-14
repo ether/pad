@@ -72,6 +72,7 @@ function onRequest() {
       atextForWire = getATextForWire(pad, rev.revNum);
       savedRevisions = revisions.getRevisionList(pad);
       supportsSlider = pad.getSupportsTimeSlider();
+      deleted = pad.getIsDeleted();
     }, 'r');
 
     var _add = function(dict, anotherdict) {
@@ -79,6 +80,9 @@ function onRequest() {
         dict[key] = anotherdict[key];
       }
       return dict;
+    }
+    if (deleted) {
+      return false;
     }
 
     var getAdaptiveChangesetsArray = function(array, start, granularity) {

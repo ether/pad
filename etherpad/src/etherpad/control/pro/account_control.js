@@ -161,6 +161,15 @@ function render_update_password_post() {
   response.redirect('/ep/account/');
 }
 
+function render_deactivate_account_get() {
+  response.redirect('/ep/account/');
+}
+
+function render_deactivate_account_post() {
+  pro_accounts.setDeleted(getSessionProAccount());
+  response.redirect('/ep/account/');
+}
+
 //--------------------------------------------------------------------------------
 // signin/signout
 //--------------------------------------------------------------------------------
