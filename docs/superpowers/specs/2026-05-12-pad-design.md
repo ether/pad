@@ -127,7 +127,7 @@ The `etherpad-client` crate is published independently so future `etherpad-deskt
 
 Reusable Rust crate. Implements:
 
-- **Socket.io v4 client** — likely `rust-socketio` (validated by a prerequisite spike before full design lands; see §11).
+- **Socket.io v4 client** — likely `rust-socketio` (validated by a prerequisite spike before full implementation lands; see §11).
 - **Changeset codec** — parse/serialize `Z:N>M|...` format.
 - **OT primitives** — `apply`, `compose`, `inverse`, `follow`/`transform`.
 - **Pad session lifecycle** — `CLIENT_READY`, author colors, cursor positions, `USER_NEWINFO` presence events.
@@ -137,12 +137,12 @@ Every public API call is exercised by the conformance test suite against the JS 
 
 ### 4.4 Config / First-run (`src/config/`)
 
-- **Config file:** `~/.config/pad/config.json`
+- **Config file:** `~/.config/pad/config.json` (example shape; `remote` value is illustrative — actual default selected at first-run from `scanner.etherpad.org`, see §12 #3)
   ```json
   {
-    "remote": "https://pad.etherpad.org",
+    "remote": "https://example-etherpad.org",
     "apikey": null,
-    "consented_remotes": ["https://pad.etherpad.org"],
+    "consented_remotes": ["https://example-etherpad.org"],
     "telemetry": false
   }
   ```
@@ -286,16 +286,15 @@ Identical to §5.3 from here on
 
 | Binding | Action |
 |---|---|
-| `M-S` | Share (open/refresh share overlay) |
+| `M-S` | Share (open/refresh share overlay). When already shared, the overlay includes an `[U]nshare` action — avoids needing a separate `M-U` binding that would collide with Undo. |
 | `M-A` | Toggle persistent author list overlay |
 | `M-C` | Copy share URL to clipboard (via OSC 52) |
 | `M-Q` | Re-display QR overlay |
-| `M-U` | (collision with undo) — Unshare uses a sub-prompt under `M-S` instead |
 
 ### 6.3 Multi-author display
 
 - Each remote author rendered as a colored cell at their cursor position.
-- 8-color palette (xterm 1–7 minus black) deterministically picked from `hash(author-id) mod 7`. Legible without 256-color support.
+- 8-color palette using xterm colors 1–7 (red, green, yellow, blue, magenta, cyan, white) deterministically picked from `hash(author-id) mod 7`. Legible without 256-color support.
 - Floating name label appears for ~1 s on connect/move, then fades.
 - `M-A` toggles a persistent author list overlay in the top-right corner.
 - The local user's cursor stays the terminal default cursor (no special color).
