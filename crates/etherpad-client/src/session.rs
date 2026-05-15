@@ -18,6 +18,22 @@ pub struct SessionConfig {
     pub protocol_version: u32,
 }
 
+/// Typed envelope for inbound socket.io frames.
+pub enum InboundEvent {
+    /// A remote-authored changeset that should apply to the local pad.
+    Changeset(Changeset),
+    /// A peer joined the pad. May fire on every USER_NEWINFO heartbeat too —
+    /// callers should treat repeated joins as idempotent.
+    UserJoin {
+        author_id: String,
+        display_name: Option<String>,
+    },
+    /// A peer left the pad.
+    UserLeave { author_id: String },
+    /// Anything else — typed presence events, ACK_COMMIT, presence beats, etc.
+    Other,
+}
+
 pub struct PadSession {
     socket: Box<dyn Socket>,
     cfg: SessionConfig,
@@ -148,6 +164,57 @@ impl PadSession {
 
     pub async fn disconnect(&mut self) -> Result<()> {
         self.socket.disconnect().await
+    }
+
+    /// Like `pump_once`, but returns a typed `InboundEvent` so callers can
+    /// distinguish changesets, presence joins, and presence leaves. Used by
+    /// `pad`'s share-network task.
+    pub async fn pump_once_event(&mut self) -> Result<InboundEvent> {
+        let msg = self
+            .socket
+            .recv()
+            .await
+            .ok_or_else(|| ClientError::Protocol("socket closed".into()))?;
+        let kind = msg["type"].as_str().unwrap_or("");
+        if kind == "COLLABROOM" {
+            let inner = &msg["data"];
+            match inner["type"].as_str().unwrap_or("") {
+                "NEW_CHANGES" => {
+                    if let Some(wire) = inner["changeset"].as_str() {
+                        let cs = parse_changeset(wire)?;
+                        if let Some(rev) = inner["newRev"].as_u64() {
+                            self.rev = rev as u32;
+                        }
+                        return Ok(InboundEvent::Changeset(cs));
+                    }
+                }
+                "ACCEPT_COMMIT" => {
+                    if let Some(rev) = inner["newRev"].as_u64() {
+                        self.rev = rev as u32;
+                    }
+                }
+                "USER_NEWINFO" => {
+                    let user_info = &inner["userInfo"];
+                    let author_id = user_info["userId"].as_str().unwrap_or("").to_string();
+                    let display = user_info["name"].as_str().map(|s| s.to_string());
+                    if !author_id.is_empty() {
+                        return Ok(InboundEvent::UserJoin {
+                            author_id,
+                            display_name: display,
+                        });
+                    }
+                }
+                "USER_LEAVE" => {
+                    let user_info = &inner["userInfo"];
+                    let author_id = user_info["userId"].as_str().unwrap_or("").to_string();
+                    if !author_id.is_empty() {
+                        return Ok(InboundEvent::UserLeave { author_id });
+                    }
+                }
+                _ => {}
+            }
+        }
+        Ok(InboundEvent::Other)
     }
 }
 

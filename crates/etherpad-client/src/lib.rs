@@ -18,5 +18,5 @@ mod reconnect;
 
 pub use error::ClientError;
 pub use reconnect::Reconnect;
-pub use session::{PadSession, SessionConfig};
+pub use session::{InboundEvent, PadSession, SessionConfig};
 pub use socket::{Socket, TungsteniteSocket};

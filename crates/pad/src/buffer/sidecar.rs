@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 
 pub type BufferId = Uuid;
@@ -95,6 +96,29 @@ impl SidecarHandle {
         let path = self.dir().join("meta.json");
         let raw = serde_json::to_string_pretty(&self.meta)?;
         fs::write(path, raw)?;
+        Ok(())
+    }
+
+    /// Snapshot the buffer's current text to `pre-share-<ts>.snapshot`. Called
+    /// just before an `M-S` share attaches to a remote so the user can always
+    /// recover their pre-share content via `pad --restore`.
+    pub fn pre_share_snapshot(&self, buf: &crate::buffer::Buffer) -> anyhow::Result<()> {
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let path = self.dir().join(format!("pre-share-{ts}.snapshot"));
+        fs::write(path, buf.text())?;
+        Ok(())
+    }
+
+    /// Snapshot the buffer's current text to `pre-merge.snapshot`. Overwrites
+    /// any previous one. Called when an inbound remote changeset would land on
+    /// top of a long pending-outbound queue, as a safety net against bad OT
+    /// rebases.
+    pub fn pre_merge_snapshot(&self, buf: &crate::buffer::Buffer) -> anyhow::Result<()> {
+        let path = self.dir().join("pre-merge.snapshot");
+        fs::write(path, buf.text())?;
         Ok(())
     }
 }

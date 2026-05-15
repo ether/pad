@@ -22,6 +22,10 @@ pub enum KeyAction {
     Help,       // ^G
     CursorPos,  // ^C
     Suspend,    // ^Z
+    Share,         // M-S
+    ToggleAuthors, // M-A
+    CopyShareUrl,  // M-C
+    ReshowQr,      // M-Q
     Unbound,    // ^S and other dead keys
 }
 
@@ -47,6 +51,10 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
             'r' => KeyAction::Replace,
             'u' => KeyAction::Undo,
             'e' => KeyAction::Redo,
+            's' => KeyAction::Share,
+            'a' => KeyAction::ToggleAuthors,
+            'c' => KeyAction::CopyShareUrl,
+            'q' => KeyAction::ReshowQr,
             _ => KeyAction::Unbound,
         },
         (KeyCode::Char(c), false, false) => KeyAction::InsertChar(c),
