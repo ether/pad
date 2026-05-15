@@ -2,7 +2,6 @@ use crate::buffer::Buffer;
 use crate::buffer::sidecar::{PendingEntry, PendingLog, SidecarHandle};
 use crate::cli::Mode;
 use crate::config::paths;
-use crate::input;
 use crate::keymap::KeyAction;
 use crate::tui::Tui;
 use std::path::PathBuf;
@@ -60,7 +59,8 @@ impl App {
         })
     }
 
-    pub fn run(&mut self, tui: &mut Tui) -> anyhow::Result<()> {
+    pub async fn run(&mut self, tui: &mut Tui) -> anyhow::Result<()> {
+        let mut keys = crate::input::spawn_event_task();
         while !self.quit_requested {
             let prompt: Option<(&str, &str)> = match &self.state {
                 AppState::SaveAsPrompt(input) => Some(("File Name to Write", input.as_str())),
@@ -75,8 +75,12 @@ impl App {
             };
             let show_help = matches!(self.state, AppState::HelpOverlay);
             tui.draw_app(&self.buffer, &self.file_label, prompt, show_help)?;
-            if let Some(action) = input::next_action(Duration::from_millis(50))? {
-                self.handle(action)?;
+
+            let tick = tokio::time::sleep(Duration::from_millis(50));
+            tokio::pin!(tick);
+            tokio::select! {
+                Some(action) = keys.recv() => { self.handle(action)?; }
+                _ = &mut tick => {}
             }
         }
         Ok(())

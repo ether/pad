@@ -242,6 +242,19 @@ impl Buffer {
         Ok(())
     }
 
+    /// Length of the rope in chars (Etherpad changeset units).
+    pub fn text_len(&self) -> u32 {
+        self.rope.len_chars() as u32
+    }
+
+    /// Wipe and replace the rope content. Used by the share layer when
+    /// applying a remote changeset whose effect was already computed against
+    /// `text()`. Marks the buffer dirty.
+    pub fn replace_all_text(&mut self, new_text: &str) {
+        self.rope = Rope::from_str(new_text);
+        self.dirty = true;
+    }
+
     pub fn cut_line(&mut self) {
         let line_idx = self.cursor.line;
         if line_idx >= self.rope.len_lines() {

@@ -1,14 +1,20 @@
 use crate::keymap::{KeyAction, key_to_action};
-use crossterm::event::{self, Event};
-use std::time::Duration;
+use crossterm::event::{Event, EventStream};
+use futures_util::StreamExt;
+use tokio::sync::mpsc;
 
-/// Block on the next key event for up to `timeout`. Returns None on timeout.
-pub fn next_action(timeout: Duration) -> anyhow::Result<Option<KeyAction>> {
-    if !event::poll(timeout)? {
-        return Ok(None);
-    }
-    match event::read()? {
-        Event::Key(ev) => Ok(Some(key_to_action(ev))),
-        _ => Ok(None),
-    }
+/// Spawn a tokio task that reads crossterm events and forwards each KeyAction
+/// over an unbounded mpsc channel. Returns the receiver.
+pub fn spawn_event_task() -> mpsc::UnboundedReceiver<KeyAction> {
+    let (tx, rx) = mpsc::unbounded_channel();
+    tokio::spawn(async move {
+        let mut stream = EventStream::new();
+        while let Some(evt) = stream.next().await {
+            let Ok(Event::Key(ke)) = evt else { continue };
+            if tx.send(key_to_action(ke)).is_err() {
+                break;
+            }
+        }
+    });
+    rx
 }

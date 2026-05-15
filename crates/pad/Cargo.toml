@@ -20,8 +20,9 @@ path = "src/main.rs"
 [dependencies]
 etherpad-client = { path = "../etherpad-client" }
 tokio = { workspace = true }
+futures-util = { workspace = true }
 ratatui = { workspace = true }
-crossterm = { workspace = true }
+crossterm = { version = "0.29", features = ["event-stream"] }
 ropey = { workspace = true }
 uuid = { workspace = true }
 dirs = { workspace = true }
