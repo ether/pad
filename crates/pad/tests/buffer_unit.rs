@@ -58,3 +58,70 @@ fn from_text_preserves_initial_clean_state() {
     assert_eq!(b.text(), "hello");
     assert!(!b.is_dirty());
 }
+
+#[test]
+fn cut_then_uncut_round_trips_line() {
+    let mut b = Buffer::from_text("alpha\nbravo\ncharlie");
+    b.move_cursor_to(CursorPos { line: 1, col: 0 });
+    b.cut_line();
+    assert_eq!(b.text(), "alpha\ncharlie");
+    b.uncut();
+    assert_eq!(b.text(), "alpha\nbravo\ncharlie");
+}
+
+#[test]
+fn search_finds_first_match_forward() {
+    let mut b = Buffer::from_text("alpha\nbeta\nalpha");
+    b.move_cursor_to(CursorPos { line: 0, col: 0 });
+    let found = b.search_forward("alpha");
+    assert_eq!(found, Some(CursorPos { line: 0, col: 0 }));
+    b.move_cursor_to(CursorPos { line: 0, col: 1 });
+    let next = b.search_forward("alpha");
+    assert_eq!(next, Some(CursorPos { line: 2, col: 0 }));
+}
+
+#[test]
+fn search_returns_none_when_missing() {
+    let b = Buffer::from_text("alpha\nbeta");
+    assert_eq!(b.search_forward("zeta"), None);
+}
+
+#[test]
+fn replace_one_replaces_first_match() {
+    let mut b = Buffer::from_text("foo bar foo");
+    b.replace_one("foo", "FOO");
+    assert_eq!(b.text(), "FOO bar foo");
+}
+
+#[test]
+fn replace_all_replaces_all_matches() {
+    let mut b = Buffer::from_text("foo bar foo");
+    let n = b.replace_all("foo", "FOO");
+    assert_eq!(n, 2);
+    assert_eq!(b.text(), "FOO bar FOO");
+}
+
+#[test]
+fn undo_reverses_insert() {
+    let mut b = Buffer::empty();
+    b.snapshot_for_undo();
+    b.insert_char('a');
+    b.snapshot_for_undo();
+    b.insert_char('b');
+    b.undo();
+    assert_eq!(b.text(), "a");
+    b.undo();
+    assert_eq!(b.text(), "");
+}
+
+#[test]
+fn redo_replays_undone_edits() {
+    let mut b = Buffer::empty();
+    b.snapshot_for_undo();
+    b.insert_char('a');
+    b.snapshot_for_undo();
+    b.insert_char('b');
+    b.undo();
+    b.redo();
+    assert_eq!(b.text(), "ab");
+}

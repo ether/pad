@@ -1,9 +1,14 @@
+pub mod clipboard;
 pub mod line_endings;
+pub mod search;
 pub mod sidecar;
+pub mod undo;
 pub use line_endings::LineEnding;
 
+use clipboard::LineClipboard;
 use ropey::Rope;
 use std::path::Path;
+use undo::{Snapshot, UndoStack};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CursorPos {
@@ -17,6 +22,8 @@ pub struct Buffer {
     dirty: bool,
     pref_col: usize,
     line_ending: LineEnding,
+    clipboard: LineClipboard,
+    undo: UndoStack,
 }
 
 impl Buffer {
@@ -27,6 +34,8 @@ impl Buffer {
             dirty: false,
             pref_col: 0,
             line_ending: LineEnding::Lf,
+            clipboard: LineClipboard::default(),
+            undo: UndoStack::new(),
         }
     }
 
@@ -38,6 +47,8 @@ impl Buffer {
             dirty: false,
             pref_col: 0,
             line_ending: LineEnding::Lf,
+            clipboard: LineClipboard::default(),
+            undo: UndoStack::new(),
         }
     }
 
@@ -50,6 +61,8 @@ impl Buffer {
             dirty: false,
             pref_col: 0,
             line_ending: ending,
+            clipboard: LineClipboard::default(),
+            undo: UndoStack::new(),
         }
     }
 
@@ -227,5 +240,115 @@ impl Buffer {
         std::fs::write(path, text).map_err(|e| anyhow::anyhow!("write failed: {e}"))?;
         self.mark_clean();
         Ok(())
+    }
+
+    pub fn cut_line(&mut self) {
+        let line_idx = self.cursor.line;
+        if line_idx >= self.rope.len_lines() {
+            return;
+        }
+        let line_start = self.rope.line_to_char(line_idx);
+        let line_end = if line_idx + 1 < self.rope.len_lines() {
+            self.rope.line_to_char(line_idx + 1)
+        } else {
+            self.rope.len_chars()
+        };
+        if line_start == line_end {
+            return;
+        }
+        let cut: String = self.rope.slice(line_start..line_end).into();
+        self.clipboard.last_cut = Some(cut);
+        self.rope.remove(line_start..line_end);
+        self.dirty = true;
+        if self.cursor.line >= self.line_count() && self.cursor.line > 0 {
+            self.cursor.line -= 1;
+        }
+        self.cursor.col = 0;
+        self.pref_col = 0;
+    }
+
+    pub fn uncut(&mut self) {
+        let Some(text) = self.clipboard.last_cut.clone() else {
+            return;
+        };
+        let line_start = self.rope.line_to_char(self.cursor.line);
+        self.rope.insert(line_start, &text);
+        self.dirty = true;
+        let lines_in_paste = text.matches('\n').count();
+        if lines_in_paste > 0 {
+            self.cursor.line += lines_in_paste;
+            self.cursor.col = 0;
+        } else {
+            self.cursor.col = text.chars().count();
+        }
+        self.pref_col = self.cursor.col;
+    }
+
+    pub fn search_forward(&self, needle: &str) -> Option<CursorPos> {
+        let start = self.cursor_char_idx();
+        search::search_forward(&self.rope, needle, start)
+    }
+
+    pub fn replace_one(&mut self, needle: &str, replacement: &str) -> bool {
+        let Some(pos) = self.search_forward(needle) else {
+            return false;
+        };
+        let start_char = self.rope.line_to_char(pos.line) + pos.col;
+        let needle_chars = needle.chars().count();
+        self.rope.remove(start_char..start_char + needle_chars);
+        self.rope.insert(start_char, replacement);
+        self.dirty = true;
+        true
+    }
+
+    pub fn replace_all(&mut self, needle: &str, replacement: &str) -> usize {
+        if needle.is_empty() {
+            return 0;
+        }
+        let saved = self.cursor;
+        self.move_cursor_to(CursorPos { line: 0, col: 0 });
+        let mut count = 0;
+        while self.replace_one(needle, replacement) {
+            count += 1;
+        }
+        self.move_cursor_to(saved);
+        count
+    }
+
+    pub fn snapshot_for_undo(&mut self) {
+        self.undo.push(Snapshot {
+            rope: self.rope.clone(),
+            cursor: self.cursor,
+        });
+    }
+
+    pub fn undo(&mut self) {
+        let Some(prev) = self.undo.past.pop() else {
+            return;
+        };
+        let now = Snapshot {
+            rope: self.rope.clone(),
+            cursor: self.cursor,
+        };
+        self.undo.future.push(now);
+        self.rope = prev.rope;
+        self.cursor = prev.cursor;
+        self.pref_col = self.cursor.col;
+        self.dirty = true;
+    }
+
+    pub fn redo(&mut self) {
+        let Some(next) = self.undo.future.pop() else {
+            return;
+        };
+        let now = Snapshot {
+            rope: self.rope.clone(),
+            cursor: self.cursor,
+        };
+        self.undo.past.push(now);
+        self.rope = next.rope;
+        self.cursor = next.cursor;
+        self.pref_col = self.cursor.col;
+        self.dirty = true;
     }
 }
