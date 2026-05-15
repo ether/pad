@@ -1,4 +1,5 @@
 pub mod line_endings;
+pub mod sidecar;
 pub use line_endings::LineEnding;
 
 use ropey::Rope;
