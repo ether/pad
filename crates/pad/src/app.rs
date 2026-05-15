@@ -70,7 +70,9 @@ impl App {
                 let label = path.display().to_string();
                 (buf, sc, Some(path), label)
             }
-            Mode::Recover => unreachable!("Recover mode dispatches through recover::run"),
+            Mode::Recover | Mode::Restore | Mode::Setup | Mode::JoinUrl(_) => {
+                unreachable!("dispatched by main()")
+            }
         };
         let pending_log = PendingLog::open(&sidecar)?;
         Ok(Self {
@@ -158,6 +160,9 @@ impl App {
             return Ok(());
         };
         while let Ok(cs) = share.inbound_rx.try_recv() {
+            if share.outbound.pending_len() > 50 {
+                let _ = self.sidecar.pre_merge_snapshot(&self.buffer);
+            }
             crate::share::inbound::apply_remote(&mut self.buffer, &cs, &share.outbound)?;
         }
         while let Ok(p) = share.presence_rx.try_recv() {
@@ -235,11 +240,8 @@ impl App {
                     })?;
                     self.buffer.backspace();
                     if let Some(share) = self.share.as_mut() {
-                        let cs = crate::share::bridge::changeset_for_delete(
-                            pre_len,
-                            off - 1,
-                            deleted,
-                        );
+                        let cs =
+                            crate::share::bridge::changeset_for_delete(pre_len, off - 1, deleted);
                         share.outbound.send(cs)?;
                     }
                 }
@@ -256,8 +258,10 @@ impl App {
                         .nth(off as usize)
                         .map(|c| c.to_string())
                         .unwrap_or_default();
-                    self.pending_log
-                        .append(&PendingEntry::Delete { offset: off, len: 1 })?;
+                    self.pending_log.append(&PendingEntry::Delete {
+                        offset: off,
+                        len: 1,
+                    })?;
                     self.buffer.delete_char_forward();
                     if let Some(share) = self.share.as_mut() {
                         let cs = crate::share::bridge::changeset_for_delete(pre_len, off, deleted);
@@ -378,6 +382,24 @@ impl App {
         self.start_share_with_pad_id(remote, &pad_id).await
     }
 
+    /// Build an App that joins a remote pad. Buffer is seeded from remote's
+    /// initial text. No collision check — joining means the remote IS the truth.
+    pub async fn from_join_url(p: crate::share::url_parse::ParsedPadUrl) -> anyhow::Result<Self> {
+        let mut app = Self::from_mode(Mode::Untitled)?;
+        let handles = crate::share::network::connect(&p.remote_base, &p.pad_id)
+            .await
+            .map_err(|e| anyhow::anyhow!("connect: {}", e.message))?;
+        app.attach_share(
+            &p.remote_base,
+            &p.pad_id,
+            handles,
+            /*seed=*/ false,
+            /*from_remote=*/ true,
+        )
+        .await?;
+        Ok(app)
+    }
+
     pub async fn start_share_with_pad_id(
         &mut self,
         remote: &str,
@@ -402,8 +424,10 @@ impl App {
             };
             return Ok(());
         }
-        self.attach_share(remote, pad_id, handles, /*seed=*/ true, /*from_remote=*/ false)
-            .await
+        self.attach_share(
+            remote, pad_id, handles, /*seed=*/ true, /*from_remote=*/ false,
+        )
+        .await
     }
 
     pub async fn attach_share(
@@ -430,11 +454,7 @@ impl App {
         let mut authors = std::collections::HashSet::new();
         authors.insert(handles.author_id.clone());
 
-        let url = format!(
-            "{}/p/{}",
-            remote_base.trim_end_matches('/'),
-            pad_id
-        );
+        let url = format!("{}/p/{}", remote_base.trim_end_matches('/'), pad_id);
         let qr = crate::share::qr::ansi(&url);
 
         self.share = Some(ShareState {

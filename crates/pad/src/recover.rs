@@ -85,6 +85,93 @@ fn offset_to_pos(buf: &Buffer, off: usize) -> crate::buffer::CursorPos {
     }
 }
 
+pub struct Snapshot {
+    pub path: PathBuf,
+    pub kind: SnapshotKind,
+    pub buffer_id: BufferId,
+}
+
+pub enum SnapshotKind {
+    PreShare(u64),
+    PreMerge,
+}
+
+pub fn list_snapshots(state_root: &Path) -> anyhow::Result<Vec<Snapshot>> {
+    let mut out = Vec::new();
+    if !state_root.exists() {
+        return Ok(out);
+    }
+    for entry in fs::read_dir(state_root)? {
+        let entry = entry?;
+        let dir = entry.path();
+        if !dir.is_dir() {
+            continue;
+        }
+        let Some(name) = dir.file_name().and_then(|s| s.to_str()) else {
+            continue;
+        };
+        let Ok(id) = uuid::Uuid::parse_str(name) else {
+            continue;
+        };
+        for sub in fs::read_dir(&dir)? {
+            let sub = sub?;
+            let p = sub.path();
+            let Some(n) = p.file_name().and_then(|s| s.to_str()) else {
+                continue;
+            };
+            if let Some(ts_str) = n
+                .strip_prefix("pre-share-")
+                .and_then(|s| s.strip_suffix(".snapshot"))
+            {
+                let ts: u64 = ts_str.parse().unwrap_or(0);
+                out.push(Snapshot {
+                    path: p,
+                    kind: SnapshotKind::PreShare(ts),
+                    buffer_id: id,
+                });
+            } else if n == "pre-merge.snapshot" {
+                out.push(Snapshot {
+                    path: p,
+                    kind: SnapshotKind::PreMerge,
+                    buffer_id: id,
+                });
+            }
+        }
+    }
+    Ok(out)
+}
+
+pub fn run_restore(state_root: &Path) -> anyhow::Result<()> {
+    let snaps = list_snapshots(state_root)?;
+    if snaps.is_empty() {
+        println!("No snapshots found.");
+        return Ok(());
+    }
+    println!("Available snapshots:");
+    for (i, s) in snaps.iter().enumerate() {
+        let label = match s.kind {
+            SnapshotKind::PreShare(ts) => format!("pre-share @ {ts}"),
+            SnapshotKind::PreMerge => "pre-merge".to_string(),
+        };
+        println!("  [{}] {} (buffer {})", i + 1, label, s.buffer_id);
+    }
+    println!("\nSelect a snapshot to view (or q to quit):");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    let input = input.trim();
+    if input.eq_ignore_ascii_case("q") {
+        return Ok(());
+    }
+    let idx: usize = input.parse()?;
+    let chosen = &snaps[idx - 1];
+    let contents = fs::read_to_string(&chosen.path)?;
+    println!("Snapshot content (paste into a fresh pad with `pad` to recover):");
+    println!("----------");
+    println!("{contents}");
+    println!("----------");
+    Ok(())
+}
+
 pub fn run(state_root: &Path) -> anyhow::Result<()> {
     let candidates = list_recoverable(state_root)?;
     if candidates.is_empty() {

@@ -5,6 +5,8 @@ pub mod network;
 pub mod osc52;
 pub mod outbound;
 pub mod qr;
+pub mod scanner;
+pub mod url_parse;
 
 use etherpad_client::changeset::Changeset;
 use outbound::OutboundQueue;

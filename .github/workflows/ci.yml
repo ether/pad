@@ -26,3 +26,5 @@ jobs:
         run: cargo bench -p etherpad-client --bench changeset -- --test
       - name: pad bench (smoke)
         run: cargo bench -p pad --bench cold_open -- --test
+      - name: pad share PTY tests
+        run: cargo test -p pad --test share_pty_e2e --test share_url_parse

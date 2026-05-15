@@ -1565,6 +1565,7 @@ dependencies = [
  "proptest",
  "qrcode",
  "ratatui",
+ "reqwest",
  "ropey",
  "serde",
  "serde_json",
@@ -1572,6 +1573,7 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "tracing",
+ "url",
  "uuid",
 ]
 

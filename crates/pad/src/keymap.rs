@@ -9,24 +9,24 @@ pub enum KeyAction {
     Right,
     Up,
     Down,
-    WriteOut,   // ^O
-    Exit,       // ^X
-    InsertFile, // ^R
-    Cut,        // ^K
-    Uncut,      // ^U
-    WhereIs,    // ^W
-    Replace,    // M-R
-    GotoLine,   // ^_
-    Undo,       // M-U
-    Redo,       // M-E
-    Help,       // ^G
-    CursorPos,  // ^C
-    Suspend,    // ^Z
+    WriteOut,      // ^O
+    Exit,          // ^X
+    InsertFile,    // ^R
+    Cut,           // ^K
+    Uncut,         // ^U
+    WhereIs,       // ^W
+    Replace,       // M-R
+    GotoLine,      // ^_
+    Undo,          // M-U
+    Redo,          // M-E
+    Help,          // ^G
+    CursorPos,     // ^C
+    Suspend,       // ^Z
     Share,         // M-S
     ToggleAuthors, // M-A
     CopyShareUrl,  // M-C
     ReshowQr,      // M-Q
-    Unbound,    // ^S and other dead keys
+    Unbound,       // ^S and other dead keys
 }
 
 pub fn key_to_action(ev: KeyEvent) -> KeyAction {
