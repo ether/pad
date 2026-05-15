@@ -17,5 +17,5 @@ mod attrib_pool;
 mod reconnect;
 
 pub use error::ClientError;
-// pub use session::PadSession; // lands with Task 12
-// pub use reconnect::Reconnect; // lands with Task 13
+pub use reconnect::Reconnect;
+// pub use session::PadSession; // lands with Task 12 (deferred — spike gate)
