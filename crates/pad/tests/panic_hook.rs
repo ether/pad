@@ -1,4 +1,4 @@
-use pad::panic_hook::{install_panic_hook, PanicSink};
+use pad::panic_hook::{PanicSink, install_panic_hook};
 use std::sync::{Arc, Mutex};
 
 #[test]

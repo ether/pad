@@ -64,13 +64,9 @@ impl App {
         while !self.quit_requested {
             let prompt: Option<(&str, &str)> = match &self.state {
                 AppState::SaveAsPrompt(input) => Some(("File Name to Write", input.as_str())),
-                AppState::DirtyExitPrompt => {
-                    Some(("Save modified buffer? (Y/N, ^C cancel)", ""))
-                }
+                AppState::DirtyExitPrompt => Some(("Save modified buffer? (Y/N, ^C cancel)", "")),
                 AppState::SearchPrompt(input) => Some(("Search", input.as_str())),
-                AppState::ReplaceFromPrompt(input) => {
-                    Some(("Search (to replace)", input.as_str()))
-                }
+                AppState::ReplaceFromPrompt(input) => Some(("Search (to replace)", input.as_str())),
                 AppState::ReplaceToPrompt { to, .. } => Some(("Replacement", to.as_str())),
                 AppState::GotoLinePrompt(input) => Some(("Goto line", input.as_str())),
                 AppState::InsertFilePrompt(input) => Some(("File to insert", input.as_str())),
@@ -127,8 +123,10 @@ impl App {
             KeyAction::DeleteForward => {
                 self.buffer.snapshot_for_undo();
                 let off = self.buffer.cursor_offset();
-                self.pending_log
-                    .append(&PendingEntry::Delete { offset: off, len: 1 })?;
+                self.pending_log.append(&PendingEntry::Delete {
+                    offset: off,
+                    len: 1,
+                })?;
                 self.buffer.delete_char_forward();
             }
             KeyAction::Left => self.buffer.move_left(),

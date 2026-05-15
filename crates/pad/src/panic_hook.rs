@@ -30,7 +30,7 @@ pub fn install_panic_hook(sink: PanicSink) {
 
 fn restore_terminal() -> std::io::Result<()> {
     use crossterm::execute;
-    use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
+    use crossterm::terminal::{LeaveAlternateScreen, disable_raw_mode};
     let _ = disable_raw_mode();
     let mut stdout = std::io::stdout();
     let _ = execute!(stdout, LeaveAlternateScreen);

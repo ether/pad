@@ -11,7 +11,8 @@ fn append_then_read_back() {
         text: "hi".into(),
     })
     .unwrap();
-    log.append(&PendingEntry::Delete { offset: 1, len: 1 }).unwrap();
+    log.append(&PendingEntry::Delete { offset: 1, len: 1 })
+        .unwrap();
     drop(log);
     let entries = PendingLog::read_all(&sc).unwrap();
     assert_eq!(entries.len(), 2);

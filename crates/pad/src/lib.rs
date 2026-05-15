@@ -5,4 +5,5 @@ pub mod config;
 pub mod input;
 pub mod keymap;
 pub mod panic_hook;
+pub mod recover;
 pub mod tui;

@@ -10,7 +10,10 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, buffer: &Buffer) {
     let width = area.width;
     let mut visual_lines: Vec<Line<'_>> = Vec::new();
     let mut cursor_visual: Option<(u16, u16)> = None;
-    let CursorPos { line: cline, col: ccol } = buffer.cursor();
+    let CursorPos {
+        line: cline,
+        col: ccol,
+    } = buffer.cursor();
 
     for li in 0..buffer.line_count() {
         let line = buffer.line(li);

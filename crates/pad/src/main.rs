@@ -10,14 +10,13 @@ fn main() -> anyhow::Result<()> {
     install_panic_hook(file_sink(paths::state_root()));
     match args.mode() {
         Mode::Recover => {
-            eprintln!("--recover not yet implemented (Plan 2 Task 23).");
-            std::process::exit(2);
+            pad::recover::run(&paths::state_root())?;
+            Ok(())
         }
         mode => {
             let mut tui = Tui::enter()?;
             let mut app = App::from_mode(mode)?;
-            app.run(&mut tui)?;
-            Ok(())
+            app.run(&mut tui)
         }
     }
 }

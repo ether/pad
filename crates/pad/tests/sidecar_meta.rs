@@ -6,7 +6,10 @@ fn new_sidecar_creates_dir_with_buffer_id() {
     let state_root = tempdir().unwrap();
     let sc = SidecarHandle::new_untitled(state_root.path()).expect("new");
     assert!(sc.dir().exists(), "sidecar dir must exist");
-    assert!(sc.dir().join("meta.json").exists(), "meta.json must be written");
+    assert!(
+        sc.dir().join("meta.json").exists(),
+        "meta.json must be written"
+    );
     assert!(!sc.buffer_id().to_string().is_empty());
 }
 
