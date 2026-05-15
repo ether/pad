@@ -16,7 +16,6 @@ pub mod socket;
 mod attrib_pool;
 mod reconnect;
 
-// Re-exports land in later tasks once the symbols exist:
-// pub use error::ClientError;
-// pub use session::PadSession;
-// pub use reconnect::Reconnect;
+pub use error::ClientError;
+// pub use session::PadSession; // lands with Task 12
+// pub use reconnect::Reconnect; // lands with Task 13
