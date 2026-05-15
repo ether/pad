@@ -1,0 +1,6 @@
+{
+  "name": "delete 'll' from 'hello'",
+  "kind": "apply",
+  "input": { "text": "hello", "changeset": "Z:5<2=2-2=1$ll" },
+  "expected": { "text": "heo" }
+}

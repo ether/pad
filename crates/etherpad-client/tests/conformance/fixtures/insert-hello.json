@@ -1,0 +1,6 @@
+{
+  "name": "insert 'hello' into empty doc",
+  "kind": "apply",
+  "input": { "text": "", "changeset": "Z:0>5+5$hello" },
+  "expected": { "text": "hello" }
+}

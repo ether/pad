@@ -1,0 +1,9 @@
+{
+  "name": "compose: insert 'AB' then insert 'C'",
+  "kind": "compose",
+  "compose": {
+    "a": "Z:0>2+2$AB",
+    "b": "Z:2>1=2+1$C"
+  },
+  "expected": { "changeset": "Z:0>3+3$ABC" }
+}
