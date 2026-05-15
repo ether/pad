@@ -1,0 +1,31 @@
+[package]
+name = "etherpad-client"
+version = "0.1.0-dev"
+description = "Reusable Rust client for the Etherpad socket.io + changeset protocol."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+categories = ["network-programming", "text-editors"]
+keywords = ["etherpad", "ot", "collaboration", "changeset"]
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+rust_socketio = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+proptest = "1"
+tokio = { workspace = true, features = ["test-util"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+tracing-subscriber = "0.3"
+
+[[bench]]
+name = "changeset"
+harness = false
