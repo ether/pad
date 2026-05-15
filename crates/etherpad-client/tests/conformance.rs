@@ -34,8 +34,7 @@ struct Expected {
 
 #[test]
 fn conformance() {
-    let dir: PathBuf =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/conformance/fixtures");
+    let dir: PathBuf = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/conformance/fixtures");
     let mut count = 0usize;
     let mut failures = Vec::new();
     for entry in fs::read_dir(&dir).expect("fixtures dir") {
@@ -44,8 +43,8 @@ fn conformance() {
             continue;
         }
         let raw = fs::read_to_string(&path).unwrap();
-        let f: Fixture = serde_json::from_str(&raw)
-            .unwrap_or_else(|e| panic!("parse {}: {e}", path.display()));
+        let f: Fixture =
+            serde_json::from_str(&raw).unwrap_or_else(|e| panic!("parse {}: {e}", path.display()));
         count += 1;
         let ok = match f.kind.as_str() {
             "apply" => {

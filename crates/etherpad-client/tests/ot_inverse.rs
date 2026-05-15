@@ -25,11 +25,7 @@ fn base36(mut n: u32) -> String {
     let mut out = Vec::new();
     while n > 0 {
         let d = (n % 36) as u8;
-        out.push(if d < 10 {
-            b'0' + d
-        } else {
-            b'a' + (d - 10)
-        });
+        out.push(if d < 10 { b'0' + d } else { b'a' + (d - 10) });
         n /= 36;
     }
     out.reverse();

@@ -1,4 +1,4 @@
-use etherpad_client::changeset::{parser::parse, OpCode};
+use etherpad_client::changeset::{OpCode, parser::parse};
 
 #[test]
 fn parse_empty_identity() {

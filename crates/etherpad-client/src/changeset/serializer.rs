@@ -54,11 +54,7 @@ fn to_base36(n: u32) -> String {
     let mut n = n;
     while n > 0 {
         let d = (n % 36) as u8;
-        buf.push(if d < 10 {
-            b'0' + d
-        } else {
-            b'a' + (d - 10)
-        });
+        buf.push(if d < 10 { b'0' + d } else { b'a' + (d - 10) });
         n /= 36;
     }
     buf.reverse();

@@ -1,4 +1,4 @@
-use etherpad_client::changeset::{parser::parse, serializer::serialize, Changeset, Op, OpCode};
+use etherpad_client::changeset::{Changeset, Op, OpCode, parser::parse, serializer::serialize};
 use proptest::prelude::*;
 
 #[test]
@@ -54,7 +54,11 @@ fn serialize_keep_delete() {
 
 fn arb_op() -> impl Strategy<Value = Op> {
     (
-        prop_oneof![Just(OpCode::Insert), Just(OpCode::Delete), Just(OpCode::Keep)],
+        prop_oneof![
+            Just(OpCode::Insert),
+            Just(OpCode::Delete),
+            Just(OpCode::Keep)
+        ],
         1u32..50,
         0u32..3,
         prop::collection::vec(0u32..16, 0..3),

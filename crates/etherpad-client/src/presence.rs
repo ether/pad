@@ -69,7 +69,10 @@ mod tests {
             buckets[c.0 as usize] += 1;
         }
         for b in buckets {
-            assert!(b > 0, "every color bucket should see at least one hit over 100 authors");
+            assert!(
+                b > 0,
+                "every color bucket should see at least one hit over 100 authors"
+            );
         }
     }
 }

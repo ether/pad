@@ -1,6 +1,6 @@
 use rust_socketio::{
-    asynchronous::{Client, ClientBuilder},
     Event, Payload,
+    asynchronous::{Client, ClientBuilder},
 };
 use std::time::Duration;
 use tokio::sync::mpsc;
@@ -36,7 +36,9 @@ async fn main() -> anyhow::Result<()> {
             let tx = tx_any.clone();
             Box::pin(async move {
                 let s = match payload {
-                    Payload::Text(v) => format!("any[{evt:?}]:{}", serde_json::to_string(&v).unwrap()),
+                    Payload::Text(v) => {
+                        format!("any[{evt:?}]:{}", serde_json::to_string(&v).unwrap())
+                    }
                     Payload::Binary(b) => format!("any[{evt:?}]:binary({} bytes)", b.len()),
                     _ => format!("any[{evt:?}]:other"),
                 };
