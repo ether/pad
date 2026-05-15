@@ -93,8 +93,12 @@ impl App {
             AppState::GotoLinePrompt(_) => self.handle_goto_line(action),
             AppState::InsertFilePrompt(_) => self.handle_insert_file(action),
             AppState::HelpOverlay | AppState::FlashMessage(_) => {
+                // Dismiss the overlay AND apply the dismissing keystroke — otherwise
+                // sequences like `^C` (cursor pos) → `^X` (exit) would silently swallow
+                // the ^X. Plain InsertChars get re-applied too, matching nano's "any
+                // key dismisses" plus the user's likely intent.
                 self.state = AppState::Editing;
-                Ok(())
+                self.handle_editing(action)
             }
         }
     }
