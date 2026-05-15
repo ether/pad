@@ -13,18 +13,26 @@ keywords = ["etherpad", "ot", "collaboration", "changeset"]
 
 [dependencies]
 tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
+reqwest = { workspace = true }
+http = { workspace = true }
+async-trait = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
-rust_socketio = { workspace = true }
 url = { workspace = true }
+
+[features]
+mock-socket = []
 
 [dev-dependencies]
 proptest = "1"
 tokio = { workspace = true, features = ["test-util"] }
 criterion = { version = "0.5", features = ["html_reports"] }
 tracing-subscriber = "0.3"
+reqwest = { workspace = true, features = ["json"] }
 
 [[bench]]
 name = "changeset"

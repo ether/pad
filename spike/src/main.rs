@@ -29,9 +29,7 @@ const PAD_ID: &str = "spike-target";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Step 1: fetch the HttpOnly token cookie via GET /p/<padid>.
-    let http = reqwest::Client::builder()
-        .cookie_store(true)
-        .build()?;
+    let http = reqwest::Client::builder().cookie_store(true).build()?;
     let pad_url = format!("http://{ETHERPAD_HOST}/p/{PAD_ID}");
     eprintln!("[spike] GET {pad_url}");
     let resp = http.get(&pad_url).send().await.context("GET /p/<padid>")?;

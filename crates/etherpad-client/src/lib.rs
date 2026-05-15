@@ -18,4 +18,5 @@ mod reconnect;
 
 pub use error::ClientError;
 pub use reconnect::Reconnect;
-// pub use session::PadSession; // lands with Task 12 (deferred — spike gate)
+pub use session::{PadSession, SessionConfig};
+pub use socket::{Socket, TungsteniteSocket};
