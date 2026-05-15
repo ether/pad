@@ -10,15 +10,21 @@ use etherpad_client::session::{PadSession, SessionConfig};
 use etherpad_client::socket::TungsteniteSocket;
 use std::time::Duration;
 
-const ETHERPAD_BASE: &str = "http://localhost:9001";
-const PAD_ID: &str = "etherpad-client-integration";
+fn etherpad_base() -> String {
+    std::env::var("PAD_ETHERPAD_BASE").unwrap_or_else(|_| "http://localhost:9001".to_string())
+}
 
-async fn etherpad_reachable() -> bool {
+fn pad_id() -> String {
+    std::env::var("PAD_ETHERPAD_PAD_ID")
+        .unwrap_or_else(|_| "etherpad-client-integration".to_string())
+}
+
+async fn etherpad_reachable(base: &str) -> bool {
     let c = reqwest::Client::builder()
-        .timeout(Duration::from_millis(500))
+        .timeout(Duration::from_secs(5))
         .build();
     let Ok(c) = c else { return false };
-    c.get(ETHERPAD_BASE).send().await.is_ok()
+    c.get(base).send().await.is_ok()
 }
 
 #[tokio::test]
@@ -27,23 +33,26 @@ async fn handshake_against_real_etherpad() {
         eprintln!("PAD_SKIP_DOCKER set, skipping");
         return;
     }
-    if !etherpad_reachable().await {
-        eprintln!("Etherpad not reachable on :9001, skipping (set up via spike/README.md)");
+    let base = etherpad_base();
+    let pid = pad_id();
+    if !etherpad_reachable(&base).await {
+        eprintln!("Etherpad not reachable at {base}, skipping");
         return;
     }
+    eprintln!("target: {base}/p/{pid}");
 
-    let cookie = TungsteniteSocket::fetch_pad_cookie(ETHERPAD_BASE, PAD_ID)
+    let cookie = TungsteniteSocket::fetch_pad_cookie(&base, &pid)
         .await
         .expect("fetch_pad_cookie");
     eprintln!("cookie: {cookie}");
 
-    let mut socket = TungsteniteSocket::new(ETHERPAD_BASE, Some(cookie));
+    let mut socket = TungsteniteSocket::new(&base, Some(cookie));
     socket.connect().await.expect("ws connect");
 
     let mut session = PadSession::new(
         Box::new(socket),
         SessionConfig {
-            pad_id: PAD_ID.into(),
+            pad_id: pid.clone(),
             token: "t.integration-legacy".into(),
             protocol_version: 2,
         },

@@ -206,16 +206,19 @@ impl App {
         match action {
             KeyAction::InsertChar(c) => {
                 self.buffer.snapshot_for_undo();
-                let pre_len = self.buffer.text_len();
                 let pre_offset = self.buffer.cursor_offset();
+                // Capture old text only if we'll need it (when shared) — cheap
+                // for plan-2 doc sizes, optimize later for huge files.
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
                 self.pending_log.append(&PendingEntry::Insert {
                     offset: pre_offset,
                     text: c.to_string(),
                 })?;
                 self.buffer.insert_char(c);
                 if let Some(share) = self.share.as_mut() {
+                    let pre_text = pre_text.unwrap();
                     let cs = crate::share::bridge::changeset_for_insert(
-                        pre_len,
+                        &pre_text,
                         pre_offset,
                         &c.to_string(),
                     );
@@ -226,10 +229,8 @@ impl App {
                 let off = self.buffer.cursor_offset();
                 if off > 0 {
                     self.buffer.snapshot_for_undo();
-                    let pre_len = self.buffer.text_len();
-                    let deleted = self
-                        .buffer
-                        .text()
+                    let pre_text = self.buffer.text();
+                    let deleted = pre_text
                         .chars()
                         .nth((off - 1) as usize)
                         .map(|c| c.to_string())
@@ -240,20 +241,22 @@ impl App {
                     })?;
                     self.buffer.backspace();
                     if let Some(share) = self.share.as_mut() {
-                        let cs =
-                            crate::share::bridge::changeset_for_delete(pre_len, off - 1, deleted);
+                        let cs = crate::share::bridge::changeset_for_delete(
+                            &pre_text,
+                            off - 1,
+                            deleted,
+                        );
                         share.outbound.send(cs)?;
                     }
                 }
             }
             KeyAction::DeleteForward => {
                 self.buffer.snapshot_for_undo();
-                let pre_len = self.buffer.text_len();
+                let pre_text = self.buffer.text();
+                let pre_len = pre_text.chars().count() as u32;
                 let off = self.buffer.cursor_offset();
                 if off < pre_len {
-                    let deleted = self
-                        .buffer
-                        .text()
+                    let deleted = pre_text
                         .chars()
                         .nth(off as usize)
                         .map(|c| c.to_string())
@@ -264,7 +267,9 @@ impl App {
                     })?;
                     self.buffer.delete_char_forward();
                     if let Some(share) = self.share.as_mut() {
-                        let cs = crate::share::bridge::changeset_for_delete(pre_len, off, deleted);
+                        let cs = crate::share::bridge::changeset_for_delete(
+                            &pre_text, off, deleted,
+                        );
                         share.outbound.send(cs)?;
                     }
                 }
@@ -447,7 +452,7 @@ impl App {
 
         let mut outbound = crate::share::outbound::OutboundQueue::new(handles.outbound_tx);
         if seed_with_local && !self.buffer.text().is_empty() && handles.initial_text.is_empty() {
-            let cs = crate::share::bridge::changeset_for_insert(0, 0, &self.buffer.text());
+            let cs = crate::share::bridge::changeset_for_insert("", 0, &self.buffer.text());
             outbound.send(cs)?;
         }
 

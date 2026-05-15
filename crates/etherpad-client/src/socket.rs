@@ -232,12 +232,21 @@ pub mod tungstenite_socket {
                     }
                     // Socket.IO EVENT frame: `42[...]`.
                     if let Some(rest) = frame.strip_prefix("42") {
+                        if std::env::var("PAD_SOCKET_DEBUG").is_ok() {
+                            eprintln!(
+                                "[socket] <- 42{}",
+                                if rest.len() > 200 { &rest[..200] } else { rest }
+                            );
+                        }
                         if let Ok(arr) = serde_json::from_str::<Value>(rest)
                             && let Some(payload) = arr.get(1).cloned()
                         {
                             let _ = inbox_tx.send(payload);
                         }
                         continue;
+                    }
+                    if std::env::var("PAD_SOCKET_DEBUG").is_ok() {
+                        eprintln!("[socket] <- {frame}");
                     }
                     // Server-initiated DISCONNECT `41`: close the reader.
                     if frame == "41" {
@@ -267,6 +276,16 @@ pub mod tungstenite_socket {
                 .as_ref()
                 .ok_or_else(|| ClientError::Socket("not connected".into()))?;
             let mut w = writer.lock().await;
+            if std::env::var("PAD_SOCKET_DEBUG").is_ok() {
+                eprintln!(
+                    "[socket] -> {}",
+                    if frame.len() > 200 {
+                        &frame[..200]
+                    } else {
+                        &frame
+                    }
+                );
+            }
             w.send(Message::text(frame))
                 .await
                 .map_err(|e| ClientError::Socket(format!("emit: {e}")))?;

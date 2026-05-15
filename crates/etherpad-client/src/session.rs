@@ -104,11 +104,16 @@ impl PadSession {
     }
 
     /// Send a local changeset built against the current `rev`.
+    ///
+    /// USER_CHANGES is dispatched as a COLLABROOM envelope (see
+    /// PadMessageHandler.ts line 522) — top-level `type: USER_CHANGES` would
+    /// be silently ignored.
     pub async fn send_changeset(&mut self, cs: &Changeset) -> Result<()> {
         let payload = json!({
             "component": "pad",
-            "type": "USER_CHANGES",
+            "type": "COLLABROOM",
             "data": {
+                "type": "USER_CHANGES",
                 "baseRev": self.rev,
                 "changeset": serialize_changeset(cs),
                 "apool": { "numToAttrib": {}, "nextNum": 0 }
