@@ -1,21 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Install `pad` — the nano-class terminal editor with Etherpad collab.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/ether/pad/main/install.sh | sh
 #
+# POSIX sh — works under dash (Debian/Ubuntu default for /bin/sh), bash,
+# zsh, busybox sh. We deliberately do NOT use `pipefail` since dash
+# doesn't support it.
+#
 # Picks the fastest path that works on the system:
-#   1. If `cargo` is on PATH, install the latest release via
+#   1. If `cargo` is on PATH, install via
 #      `cargo install --locked --git https://github.com/ether/pad pad`.
 #   2. Else, ask the user to install Rust (we don't want to silently
 #      rustup-init their shell).
-#
-# Honours $CARGO_HOME / $RUSTUP_HOME if set; otherwise installs into
-# ~/.cargo/bin which Cargo puts on PATH for users who installed via
-# rustup. If you installed Rust some other way and ~/.cargo/bin isn't
-# on your PATH, the script tells you where the binary landed.
 
-set -euo pipefail
+set -eu
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 warn() { printf '\033[33m%s\033[0m\n' "$*"; }
