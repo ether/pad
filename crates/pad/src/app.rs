@@ -129,6 +129,7 @@ impl App {
                 .as_ref()
                 .map(|s| crate::tui::status_bar::ShareBadge {
                     author_count: s.authors.len(),
+                    url: s.share_url(),
                 });
             let authors_vec: Vec<String>;
             let authors_arg = if self.show_authors {
@@ -408,9 +409,20 @@ impl App {
                 }
             }
             KeyAction::Share => {
-                if let Some(share) = self.share.take() {
-                    share.unshare();
-                    self.state = AppState::FlashMessage("Unshared.".into());
+                // M-S is the user's "show me the pad URL" shortcut. When
+                // already connected, surface the share overlay (URL + QR)
+                // so it can be copied or scanned. When NOT connected,
+                // start a share with the persisted remote.
+                //
+                // Earlier behavior toggled connect/disconnect on M-S,
+                // which was a footgun — pressing M-S once on a connected
+                // pad disconnected the user (with no easy way back),
+                // and pressing it a second time hit "No remote configured"
+                // when they'd joined via URL (no `pad --setup` ever run).
+                if let Some(share) = &self.share {
+                    let url = share.share_url();
+                    let qr = crate::share::qr::ansi(&url);
+                    self.state = AppState::ShareOverlay { url, qr };
                 } else {
                     let remote = self.persisted_remote();
                     match remote {
