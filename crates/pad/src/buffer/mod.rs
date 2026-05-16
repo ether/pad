@@ -215,12 +215,27 @@ impl Buffer {
         )
     }
 
-    pub fn backspace(&mut self) {
+    /// Backspace. Returns `Some((offset_of_deleted_char, deleted_string))`
+    /// if a char was actually removed; `None` when the buffer refused
+    /// (cursor at start-of-doc, OR removing the only trailing '\n' would
+    /// strand the doc without one — Etherpad needs every pad to end with
+    /// '\n' or the browser-side applyToAttribution / setDocAText crashes).
+    /// Callers that emit outbound changesets MUST gate the send on `Some`
+    /// — sending a wire that strands the trailing '\n' kicks the watching
+    /// browser session off the pad.
+    pub fn backspace(&mut self) -> Option<(u32, String)> {
         let char_idx = self.cursor_char_idx();
         if char_idx == 0 {
-            return;
+            return None;
         }
         let prev = self.rope.char(char_idx - 1);
+        let total = self.rope.len_chars();
+        let would_strand_trailing_nl = prev == '\n'
+            && char_idx == total
+            && (total < 2 || self.rope.char(total - 2) != '\n');
+        if would_strand_trailing_nl {
+            return None;
+        }
         // Capture previous line's length BEFORE mutation when we'll need it.
         let prev_line_len = if prev == '\n' && self.cursor.line > 0 {
             self.line(self.cursor.line - 1).chars().count()
@@ -236,26 +251,33 @@ impl Buffer {
             self.cursor.col -= 1;
         }
         self.pref_col = self.cursor.col;
+        Some((char_idx as u32 - 1, prev.to_string()))
     }
 
-    pub fn delete_char_forward(&mut self) {
+    /// Delete the char at the cursor (Delete-forward / Ctrl-D). Returns
+    /// `Some((offset_of_deleted_char, deleted_string))` if a char was
+    /// actually removed; `None` when nothing-to-delete OR removing would
+    /// strand the trailing '\n'. Callers MUST gate outbound changesets on
+    /// `Some` — see [`backspace`] for the same trailing-'\n' rationale.
+    pub fn delete_char_forward(&mut self) -> Option<(u32, String)> {
         let char_idx = self.cursor_char_idx();
         if char_idx >= self.rope.len_chars() {
-            return;
+            return None;
         }
-        // Don't delete the trailing '\n' if it's the only '\n' the pad has
-        // left — Etherpad's "pad always ends with \n" invariant must hold,
-        // and downstream browser clients crash in offsetOfEntry on a fully
-        // empty rep.lines.
         let total = self.rope.len_chars();
+        // Mirror backspace's invariant guard, in the symmetric direction:
+        // if the char-at-cursor is the only '\n' AND it sits at the doc
+        // end, removing it would leave the pad without a trailing '\n'.
         if char_idx + 1 == total
             && self.rope.char(char_idx) == '\n'
             && !self.rope.slice(0..char_idx).chars().any(|c| c == '\n')
         {
-            return;
+            return None;
         }
+        let deleted = self.rope.char(char_idx).to_string();
         self.rope.remove(char_idx..char_idx + 1);
         self.dirty = true;
+        Some((char_idx as u32, deleted))
     }
 
     pub(crate) fn cursor_char_idx(&self) -> usize {

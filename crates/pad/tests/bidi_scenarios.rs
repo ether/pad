@@ -680,6 +680,72 @@ async fn ctrl_k_then_ctrl_u_round_trips() {
 }
 
 // ===========================================================================
+// 15h. BACKSPACE-THE-ONLY-NEWLINE — user-reported: "deleting the line break
+//      after the last char on the first line (so no line breaks left in the
+//      pad) breaks the browser." Backspacing from line 1 col 0 of "abc\n"
+//      would join the last content line into the trailing-empty line and
+//      leave the rope as "abc" — no trailing '\n'. Browsers then drop the
+//      session in applyToAttribution / setDocAText.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn backspace_cannot_strand_trailing_newline() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("bksp-nl");
+    let url = format!("{base}/p/{pad_id}");
+
+    let mut watcher = fresh_session(&base, &pad_id, "t.bksp-nl-W").await;
+    let mut watcher_rep = watcher.initial_text().to_string();
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+
+    let mut p = spawn_pad(&url);
+    // Position cursor at end of pre-existing line content, then Down-arrow
+    // to the trailing-empty line and try to backspace the only '\n'. The
+    // buffer must refuse so we never emit a Delete that strands the trailing
+    // '\n' on the wire.
+    p.send([0x1b, b'[', b'B'].as_slice()).expect("down"); // ESC [ B = Down
+    std::thread::sleep(Duration::from_millis(200));
+    // Hammer backspace a few times — must be a no-op when the trailing '\n'
+    // is the only newline.
+    for _ in 0..5 {
+        p.send([0x7fu8].as_slice()).expect("bksp");
+        std::thread::sleep(Duration::from_millis(80));
+    }
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    while let Ok(Some(cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        let cur_len = watcher_rep.chars().count() as u32;
+        assert_eq!(
+            cs.old_len, cur_len,
+            "browser-view length mismatch: cs.old_len={} watcher_rep.len={}",
+            cs.old_len, cur_len
+        );
+        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
+            .expect("apply cs to watcher rep");
+    }
+    watcher_handle.abort();
+
+    assert!(
+        watcher_rep.ends_with('\n'),
+        "pad text must end with \\n; got {watcher_rep:?}"
+    );
+}
+
 // 15g. ENTER MANY THEN TYPE — user-reported: "wrote ..., a bunch of empty
 //      lines, then 'hello'" produced wire `Z:1h>6|g=1h*0+6$hello ` (insert
 //      past the trailing \n) and the browser asserted "line assembler not

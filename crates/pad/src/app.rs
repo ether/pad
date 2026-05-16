@@ -272,24 +272,17 @@ impl App {
                 }
             }
             KeyAction::Backspace => {
-                let off = self.buffer.cursor_offset();
-                if off > 0 {
-                    self.buffer.snapshot_for_undo();
-                    let pre_text = self.buffer.text();
-                    let deleted = pre_text
-                        .chars()
-                        .nth((off - 1) as usize)
-                        .map(|c| c.to_string())
-                        .unwrap_or_default();
+                self.buffer.snapshot_for_undo();
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                if let Some((offset, deleted)) = self.buffer.backspace() {
                     self.pending_log.append(&PendingEntry::Delete {
-                        offset: off - 1,
+                        offset,
                         len: 1,
                     })?;
-                    self.buffer.backspace();
                     if let Some(share) = self.share.as_mut() {
                         let cs = crate::share::bridge::changeset_for_delete(
-                            &pre_text,
-                            off - 1,
+                            &pre_text.unwrap(),
+                            offset,
                             deleted,
                         );
                         share.outbound.send(cs)?;
@@ -298,23 +291,17 @@ impl App {
             }
             KeyAction::DeleteForward => {
                 self.buffer.snapshot_for_undo();
-                let pre_text = self.buffer.text();
-                let pre_len = pre_text.chars().count() as u32;
-                let off = self.buffer.cursor_offset();
-                if off < pre_len {
-                    let deleted = pre_text
-                        .chars()
-                        .nth(off as usize)
-                        .map(|c| c.to_string())
-                        .unwrap_or_default();
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                if let Some((offset, deleted)) = self.buffer.delete_char_forward() {
                     self.pending_log.append(&PendingEntry::Delete {
-                        offset: off,
+                        offset,
                         len: 1,
                     })?;
-                    self.buffer.delete_char_forward();
                     if let Some(share) = self.share.as_mut() {
                         let cs = crate::share::bridge::changeset_for_delete(
-                            &pre_text, off, deleted,
+                            &pre_text.unwrap(),
+                            offset,
+                            deleted,
                         );
                         share.outbound.send(cs)?;
                     }
