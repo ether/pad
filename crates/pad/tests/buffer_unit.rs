@@ -124,6 +124,21 @@ fn move_to_document_start_and_end() {
 }
 
 #[test]
+fn insert_str_normalises_crlf_to_lf() {
+    // Many terminals deliver bracketed-paste with '\r' line terminators
+    // (or '\r\n' on Windows clipboards). The underlying rope must store
+    // '\n' so Etherpad's pad ends up with real line breaks, not literal
+    // '\r' characters that render as "cursor to col 0" but don't split
+    // lines server-side. Normalize in insert_str so both the local
+    // rope and the outbound changeset bank contain only '\n'.
+    let mut b = Buffer::from_text("X\n");
+    b.move_cursor_to(CursorPos { line: 0, col: 1 });
+    let (_, actual) = b.insert_str("a\r\nb\rc");
+    assert_eq!(actual, "a\nb\nc");
+    assert_eq!(b.text(), "Xa\nb\nc\n");
+}
+
+#[test]
 fn insert_str_at_trailing_empty_keeps_local_and_wire_in_sync() {
     // Regression for Wikipedia-paste bug: pasting a multi-char block at
     // the trailing-empty line via insert_str inserted the synth-'\n'

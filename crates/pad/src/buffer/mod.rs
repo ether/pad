@@ -273,6 +273,23 @@ impl Buffer {
     /// `(rope_offset_of_insert, text_actually_inserted)` — see
     /// [`insert_char`] for why the inserted text can differ from `s`.
     pub fn insert_str(&mut self, s: &str) -> (u32, String) {
+        // Normalize line terminators. Many terminals deliver bracketed
+        // paste with '\r' (lone CR, classic Mac) or '\r\n' (Windows
+        // clipboard / many web pages copied via xclip), and crossterm
+        // hands those through to us verbatim. Etherpad's pad text is
+        // strictly '\n'-terminated; '\r' bytes don't split lines on the
+        // server but render as "cursor to col 0" in the terminal — so
+        // without normalization the user saw the paste appear correct
+        // in the terminal but the server-side pad ended up as one long
+        // line. Replace CRLF first so we don't double-convert a CR
+        // that's part of a CRLF pair.
+        let normalized: String;
+        let s = if s.contains('\r') {
+            normalized = s.replace("\r\n", "\n").replace('\r', "\n");
+            normalized.as_str()
+        } else {
+            s
+        };
         if s.is_empty() {
             return (self.cursor_char_idx() as u32, String::new());
         }
