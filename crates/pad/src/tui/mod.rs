@@ -10,7 +10,7 @@ use crate::buffer::Buffer;
 use crossterm::event::{DisableBracketedPaste, EnableBracketedPaste};
 use crossterm::execute;
 use crossterm::terminal::{
-    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
+    EnterAlternateScreen, LeaveAlternateScreen, SetTitle, disable_raw_mode, enable_raw_mode,
 };
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
@@ -39,6 +39,13 @@ impl Tui {
         let backend = CrosstermBackend::new(std::io::stdout());
         let terminal = Terminal::new(backend)?;
         Ok(Self { terminal })
+    }
+
+    /// Set the host terminal's window title via OSC 2. Most terminals honour
+    /// this; a few (e.g. Linux console) silently ignore.
+    pub fn set_title(&mut self, title: &str) -> anyhow::Result<()> {
+        execute!(std::io::stdout(), SetTitle(title))?;
+        Ok(())
     }
 
     pub fn draw_app(

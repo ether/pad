@@ -91,7 +91,14 @@ impl App {
 
     pub async fn run(&mut self, tui: &mut Tui) -> anyhow::Result<()> {
         let mut keys = crate::input::spawn_event_task();
+        let mut last_title = String::new();
         while !self.quit_requested {
+            // Update window title if it changed (cheap; OSC 2 is small).
+            let title = self.window_title();
+            if title != last_title {
+                let _ = tui.set_title(&title);
+                last_title = title;
+            }
             // Drain inbound + presence from share (non-blocking) before drawing.
             self.drain_share_channels()?;
 
@@ -413,6 +420,27 @@ impl App {
 
     fn persisted_remote(&self) -> Option<String> {
         crate::config::Config::load().ok().and_then(|c| c.remote)
+    }
+
+    /// Compute the host terminal's window title. Format:
+    ///   - shared:   `<pad-id> @ <host>`   e.g. `hello_world @ pad-dev.etherpad.org`
+    ///   - file:     `pad — <basename>`    e.g. `pad — README.md`
+    ///   - untitled: `pad — New Buffer`
+    fn window_title(&self) -> String {
+        if let Some(share) = &self.share {
+            let host = url::Url::parse(&share.remote_base)
+                .ok()
+                .and_then(|u| u.host_str().map(|s| s.to_string()))
+                .unwrap_or_else(|| share.remote_base.clone());
+            return format!("{} @ {}", share.pad_id, host);
+        }
+        let basename = self
+            .file_path
+            .as_ref()
+            .and_then(|p| p.file_name())
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_else(|| self.file_label.clone());
+        format!("pad — {}", basename)
     }
 
     fn derive_pad_id(&self) -> String {
