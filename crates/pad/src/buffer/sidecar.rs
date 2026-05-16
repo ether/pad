@@ -146,7 +146,19 @@ pub struct PendingLog {
 impl PendingLog {
     pub fn open(sc: &SidecarHandle) -> anyhow::Result<Self> {
         let path = sc.pending_log_path();
-        let file = OpenOptions::new().create(true).append(true).open(path)?;
+        // `.write(true)` alongside `.append(true)` is redundant on Unix
+        // (and clippy's `ineffective_open_options` flags it), but on
+        // Windows the difference is load-bearing: append-only handles
+        // grant FILE_APPEND_DATA only, so `SetEndOfFile` — what
+        // `set_len(0)` in `truncate()` below lowers to — fails with
+        // "Access is denied (os error 5)". Adding `write` ORs in
+        // FILE_WRITE_DATA so the truncate path works.
+        #[allow(clippy::ineffective_open_options)]
+        let file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .append(true)
+            .open(path)?;
         Ok(Self { file })
     }
 
