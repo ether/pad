@@ -7,6 +7,7 @@ pub mod softwrap;
 pub mod status_bar;
 
 use crate::buffer::Buffer;
+use crossterm::event::{DisableBracketedPaste, EnableBracketedPaste};
 use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
@@ -34,7 +35,7 @@ impl Tui {
     pub fn enter() -> anyhow::Result<Self> {
         enable_raw_mode()?;
         let mut stdout = std::io::stdout();
-        execute!(stdout, EnterAlternateScreen)?;
+        execute!(stdout, EnterAlternateScreen, EnableBracketedPaste)?;
         let backend = CrosstermBackend::new(std::io::stdout());
         let terminal = Terminal::new(backend)?;
         Ok(Self { terminal })
@@ -105,6 +106,6 @@ impl Drop for Tui {
     fn drop(&mut self) {
         let _ = disable_raw_mode();
         let mut stdout = std::io::stdout();
-        let _ = execute!(stdout, LeaveAlternateScreen);
+        let _ = execute!(stdout, DisableBracketedPaste, LeaveAlternateScreen);
     }
 }

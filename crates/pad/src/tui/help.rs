@@ -6,13 +6,17 @@ pub fn render(frame: &mut Frame<'_>, area: Rect) {
     let text = "\
 pad — nano-faithful editor
 
-  ^O  Write Out (save)        ^X  Exit
-  ^R  Insert file             ^K  Cut line
-  ^U  Uncut (paste)           ^W  Where Is (search)
-  M-R Replace                 ^_  Goto line
-  M-U Undo                    M-E Redo
-  ^G  Help (this screen)      ^C  Cursor position
-  ^Z  Suspend to shell
+  Ctrl-O  Write Out (save)        Ctrl-X  Exit
+  Ctrl-R  Insert file             Ctrl-K  Cut line
+  Ctrl-U  Uncut (paste)           Ctrl-W  Where Is (search)
+  Alt-R   Replace                 Ctrl-_  Goto line
+  Alt-U   Undo                    Alt-E   Redo
+  Ctrl-G  Help (this screen)      Ctrl-C  Cursor position
+  Ctrl-Z  Suspend to shell
+
+Collaboration:
+  Alt-S   Share / Unshare         Alt-A   Authors overlay
+  Alt-C   Copy share URL          Alt-Q   Re-show QR
 
 Press any key to dismiss.";
     let p = Paragraph::new(text).block(Block::default().title(" Help ").borders(Borders::ALL));

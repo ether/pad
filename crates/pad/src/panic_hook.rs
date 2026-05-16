@@ -29,11 +29,12 @@ pub fn install_panic_hook(sink: PanicSink) {
 }
 
 fn restore_terminal() -> std::io::Result<()> {
+    use crossterm::event::DisableBracketedPaste;
     use crossterm::execute;
     use crossterm::terminal::{LeaveAlternateScreen, disable_raw_mode};
     let _ = disable_raw_mode();
     let mut stdout = std::io::stdout();
-    let _ = execute!(stdout, LeaveAlternateScreen);
+    let _ = execute!(stdout, DisableBracketedPaste, LeaveAlternateScreen);
     Ok(())
 }
 

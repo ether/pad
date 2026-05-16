@@ -5,7 +5,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 
 pub fn render(frame: &mut Frame<'_>, area: Rect, url: &str, qr_ansi: &str) {
     let body = format!(
-        "Shared at:\n  {url}\n\n{qr_ansi}\n\n[M-S to unshare]   [M-C copy URL]   any key dismiss",
+        "Shared at:\n  {url}\n\n{qr_ansi}\n\n[Alt-S unshare]   [Alt-C copy URL]   any key dismiss",
     );
     let p = Paragraph::new(body)
         .block(Block::default().title(" Share ").borders(Borders::ALL))

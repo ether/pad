@@ -22,6 +22,13 @@ pub struct SessionConfig {
 pub enum InboundEvent {
     /// A remote-authored changeset that should apply to the local pad.
     Changeset(Changeset),
+    /// Server accepted the most recent `send_changeset` and bumped `rev` to
+    /// `new_rev`. The session's internal `rev` is already updated by the time
+    /// this event is returned. Senders must wait for this before issuing the
+    /// next `send_changeset` — Etherpad will reject a back-to-back send whose
+    /// `baseRev` matches the older rev but whose `old_len` reflects the new
+    /// (locally-applied) length.
+    AckCommit { new_rev: u32 },
     /// A peer joined the pad. May fire on every USER_NEWINFO heartbeat too —
     /// callers should treat repeated joins as idempotent.
     UserJoin {
@@ -30,7 +37,7 @@ pub enum InboundEvent {
     },
     /// A peer left the pad.
     UserLeave { author_id: String },
-    /// Anything else — typed presence events, ACK_COMMIT, presence beats, etc.
+    /// Anything else — typed presence events, presence beats, server hints.
     Other,
 }
 
@@ -196,6 +203,7 @@ impl PadSession {
                 "ACCEPT_COMMIT" => {
                     if let Some(rev) = inner["newRev"].as_u64() {
                         self.rev = rev as u32;
+                        return Ok(InboundEvent::AckCommit { new_rev: rev as u32 });
                     }
                 }
                 "USER_NEWINFO" => {

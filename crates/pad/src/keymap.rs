@@ -3,6 +3,9 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KeyAction {
     InsertChar(char),
+    /// Atomic paste — a single block of text that should land in one mutation
+    /// + one outbound Changeset. Bracketed-paste comes through this path.
+    InsertText(String),
     Backspace,
     DeleteForward,
     Left,

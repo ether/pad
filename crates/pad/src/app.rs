@@ -225,6 +225,29 @@ impl App {
                     share.outbound.send(cs)?;
                 }
             }
+            KeyAction::InsertText(s) => {
+                // Atomic paste — one snapshot, one buffer mutation, one
+                // outbound Changeset. Bracketed paste from the terminal
+                // arrives here as a single chunk.
+                if s.is_empty() {
+                    return Ok(());
+                }
+                self.buffer.snapshot_for_undo();
+                let pre_offset = self.buffer.cursor_offset();
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                self.pending_log.append(&PendingEntry::Insert {
+                    offset: pre_offset,
+                    text: s.clone(),
+                })?;
+                self.buffer.insert_str(&s);
+                if let Some(share) = self.share.as_mut() {
+                    let pre_text = pre_text.unwrap();
+                    let cs = crate::share::bridge::changeset_for_insert(
+                        &pre_text, pre_offset, &s,
+                    );
+                    share.outbound.send(cs)?;
+                }
+            }
             KeyAction::Backspace => {
                 let off = self.buffer.cursor_offset();
                 if off > 0 {
@@ -443,6 +466,7 @@ impl App {
         seed_with_local: bool,
         seed_buffer_from_remote: bool,
     ) -> anyhow::Result<()> {
+        let auto_show_overlay = !seed_buffer_from_remote;
         let _ = self.sidecar.pre_share_snapshot(&self.buffer);
 
         if seed_buffer_from_remote {
@@ -472,7 +496,14 @@ impl App {
             net_task: handles.task,
             authors,
         });
-        self.state = AppState::ShareOverlay { url, qr };
+        // When joining a URL the user already has the URL — don't slam a
+        // full-screen QR at them. M-Q (Alt-Q) reshows it on demand.
+        if auto_show_overlay {
+            self.state = AppState::ShareOverlay { url, qr };
+        } else {
+            self.state = AppState::FlashMessage(format!("Joined {url}"));
+            let _ = qr;
+        }
         Ok(())
     }
 
