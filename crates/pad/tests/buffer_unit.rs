@@ -124,6 +124,69 @@ fn move_to_document_start_and_end() {
 }
 
 #[test]
+fn insert_str_at_trailing_empty_keeps_local_and_wire_in_sync() {
+    // Regression for Wikipedia-paste bug: pasting a multi-char block at
+    // the trailing-empty line via insert_str inserted the synth-'\n'
+    // after the FIRST char in the wire accumulator but at the END of
+    // the rope locally — server and local diverged, content visible
+    // through the browser was right but the local buffer had a
+    // different shape. The fix synthesizes the trailing '\n' once,
+    // appended to the WHOLE pasted block, so the rope and the returned
+    // accumulator are byte-identical.
+    let mut b = Buffer::from_text("X\n");
+    b.move_cursor_to(CursorPos { line: 1, col: 0 }); // trailing-empty
+    let (pos, actual) = b.insert_str("Hello world");
+    assert_eq!(pos, 2);
+    assert_eq!(actual, "Hello world\n");
+    assert_eq!(b.text(), "X\nHello world\n");
+    assert_eq!(b.cursor(), CursorPos { line: 1, col: 11 });
+}
+
+#[test]
+fn insert_str_at_trailing_empty_with_internal_newlines() {
+    let mut b = Buffer::from_text("X\n");
+    b.move_cursor_to(CursorPos { line: 1, col: 0 });
+    let (pos, actual) = b.insert_str("Hello\nworld");
+    assert_eq!(pos, 2);
+    assert_eq!(actual, "Hello\nworld\n");
+    assert_eq!(b.text(), "X\nHello\nworld\n");
+    assert_eq!(b.cursor(), CursorPos { line: 2, col: 5 });
+}
+
+#[test]
+fn insert_str_at_trailing_empty_already_ends_with_newline() {
+    let mut b = Buffer::from_text("X\n");
+    b.move_cursor_to(CursorPos { line: 1, col: 0 });
+    // s already ends with \n — don't double-synth.
+    let (pos, actual) = b.insert_str("Hello world\n");
+    assert_eq!(pos, 2);
+    assert_eq!(actual, "Hello world\n");
+    assert_eq!(b.text(), "X\nHello world\n");
+}
+
+#[test]
+fn insert_str_in_middle_of_line() {
+    let mut b = Buffer::from_text("abc\n");
+    b.move_cursor_to(CursorPos { line: 0, col: 2 });
+    let (pos, actual) = b.insert_str("XY");
+    assert_eq!(pos, 2);
+    assert_eq!(actual, "XY");
+    assert_eq!(b.text(), "abXYc\n");
+    assert_eq!(b.cursor(), CursorPos { line: 0, col: 4 });
+}
+
+#[test]
+fn insert_str_multiline_in_middle_of_line() {
+    let mut b = Buffer::from_text("abc\n");
+    b.move_cursor_to(CursorPos { line: 0, col: 2 });
+    let (pos, actual) = b.insert_str("X\nY");
+    assert_eq!(pos, 2);
+    assert_eq!(actual, "X\nY");
+    assert_eq!(b.text(), "abX\nYc\n");
+    assert_eq!(b.cursor(), CursorPos { line: 1, col: 1 });
+}
+
+#[test]
 fn page_down_moves_n_lines() {
     let mut b = Buffer::from_text("a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n");
     b.move_to_document_start();

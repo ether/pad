@@ -276,17 +276,57 @@ impl Buffer {
         if s.is_empty() {
             return (self.cursor_char_idx() as u32, String::new());
         }
-        let mut first_pos: Option<u32> = None;
-        let mut acc = String::with_capacity(s.len() + 1);
-        for c in s.chars() {
-            let (pos, inserted) = self.insert_char(c);
-            first_pos.get_or_insert(pos);
-            acc.push_str(&inserted);
+        let char_idx = self.cursor_char_idx();
+        let total = self.rope.len_chars();
+        // Same trailing-empty detection as `insert_char`. When the cursor
+        // sits at the implicit trailing-empty line (one past the last
+        // '\n'), inserting raw bytes would push past the doc's trailing
+        // '\n' and break Etherpad's invariant. Synthesize a single
+        // trailing '\n' at the END of the whole pasted block — NOT
+        // after the first char.
+        //
+        // The earlier per-char loop synthesized "c\n" via the first
+        // insert_char and then appended the rest after the synth-\n in
+        // the rope (correctly), but the accumulator captured "c\n" +
+        // rest with the '\n' BETWEEN them — so the outbound changeset's
+        // bank didn't match what landed in the rope and the server
+        // ended up with content split across two lines while the local
+        // buffer had it on one (visible to the user as "pasting big
+        // content goes backwards", since the divergence accumulated
+        // strangely under sustained inserts). Doing one rope.insert
+        // with one synth-\n keeps the rope and the returned text
+        // byte-identical.
+        let on_trailing_empty = total > 0
+            && char_idx == total
+            && self.rope.char(total - 1) == '\n';
+        let needs_synth_nl = on_trailing_empty && !s.ends_with('\n');
+        let actual_text: String = if needs_synth_nl {
+            let mut owned = String::with_capacity(s.len() + 1);
+            owned.push_str(s);
+            owned.push('\n');
+            owned
+        } else {
+            s.to_string()
+        };
+        self.rope.insert(char_idx, &actual_text);
+        self.dirty = true;
+        // Cursor lands at the end of the USER-typed content. The synth
+        // '\n' (if any) is implementation detail — cursor should NOT
+        // sit on the new trailing-empty line.
+        let user_nl_count = s.matches('\n').count();
+        let last_line_chars = s
+            .rsplit('\n')
+            .next()
+            .map(|t| t.chars().count())
+            .unwrap_or(0);
+        if user_nl_count > 0 {
+            self.cursor.line += user_nl_count;
+            self.cursor.col = last_line_chars;
+        } else {
+            self.cursor.col += s.chars().count();
         }
-        (
-            first_pos.unwrap_or_else(|| self.cursor_char_idx() as u32),
-            acc,
-        )
+        self.pref_col = self.cursor.col;
+        (char_idx as u32, actual_text)
     }
 
     /// Backspace. Returns `Some((offset_of_deleted_char, deleted_string))`

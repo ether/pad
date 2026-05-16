@@ -7,9 +7,7 @@ pub mod softwrap;
 pub mod status_bar;
 
 use crate::buffer::Buffer;
-use crossterm::event::{
-    DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture,
-};
+use crossterm::event::{DisableBracketedPaste, EnableBracketedPaste};
 use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, SetTitle, disable_raw_mode, enable_raw_mode,
@@ -42,17 +40,13 @@ impl Tui {
     pub fn enter() -> anyhow::Result<Self> {
         enable_raw_mode()?;
         let mut stdout = std::io::stdout();
-        // EnableMouseCapture lets us see scroll-wheel events (we bind
-        // them to Up/Down in input.rs so the caret follows the wheel).
-        // Side effect: terminal-level text selection now requires
-        // holding Shift while dragging — that's the conventional
-        // tradeoff editors like vim/htop already enforce.
-        execute!(
-            stdout,
-            EnterAlternateScreen,
-            EnableBracketedPaste,
-            EnableMouseCapture,
-        )?;
+        // Mouse capture intentionally OFF: hijacking the mouse to feed
+        // scroll-wheel events to the editor would also swallow
+        // right-click / text-select in the host terminal, which users
+        // expect to work for paste / copy-into-other-app. PgUp / PgDn
+        // / Ctrl-Y / Ctrl-V cover the scrolling use case from the
+        // keyboard.
+        execute!(stdout, EnterAlternateScreen, EnableBracketedPaste)?;
         let backend = CrosstermBackend::new(std::io::stdout());
         let terminal = Terminal::new(backend)?;
         Ok(Self {
@@ -139,11 +133,6 @@ impl Drop for Tui {
     fn drop(&mut self) {
         let _ = disable_raw_mode();
         let mut stdout = std::io::stdout();
-        let _ = execute!(
-            stdout,
-            DisableMouseCapture,
-            DisableBracketedPaste,
-            LeaveAlternateScreen,
-        );
+        let _ = execute!(stdout, DisableBracketedPaste, LeaveAlternateScreen);
     }
 }
