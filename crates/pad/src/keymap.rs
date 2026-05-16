@@ -12,6 +12,14 @@ pub enum KeyAction {
     Right,
     Up,
     Down,
+    /// Home / ^A — start of current line.
+    LineStart,
+    /// End / ^E — end of current line.
+    LineEnd,
+    /// M-\\ or M-< or Ctrl-Home — top of document.
+    DocumentStart,
+    /// M-/ or M-> or Ctrl-End — end of document content.
+    DocumentEnd,
     WriteOut,      // ^O
     Exit,          // ^X
     InsertFile,    // ^R
@@ -48,6 +56,24 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
             'c' => KeyAction::CursorPos,
             'z' => KeyAction::Suspend,
             's' => KeyAction::Unbound,
+            // Ctrl-\ (and its synonym Ctrl-|) is nano's canonical Replace
+            // binding. Char comes through as '\\' on most terminals.
+            '\\' | '|' => KeyAction::Replace,
+            // Nano-canonical emacs-style cursor + edit alternatives. Users
+            // who came from nano (or readline) have these in muscle memory:
+            //   ^A / ^E — beginning / end of line
+            //   ^B / ^F — back / forward one cell  (= Left / Right)
+            //   ^P / ^N — previous / next line     (= Up / Down)
+            //   ^D       — delete forward          (= Delete key)
+            //   ^H       — backspace                (= Backspace key)
+            'a' => KeyAction::LineStart,
+            'e' => KeyAction::LineEnd,
+            'b' => KeyAction::Left,
+            'f' => KeyAction::Right,
+            'p' => KeyAction::Up,
+            'n' => KeyAction::Down,
+            'd' => KeyAction::DeleteForward,
+            'h' => KeyAction::Backspace,
             _ => KeyAction::Unbound,
         },
         (KeyCode::Char(c), _, true) => match c.to_ascii_lowercase() {
@@ -58,6 +84,12 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
             'a' => KeyAction::ToggleAuthors,
             'c' => KeyAction::CopyShareUrl,
             'q' => KeyAction::ReshowQr,
+            'g' => KeyAction::GotoLine,
+            // M-, and M-< — jump to top of document. M-. and M-> — jump
+            // to end. Nano's canonical pair; the angle-bracket variants
+            // are easier on keyboards where comma/period are unshifted.
+            ',' | '<' => KeyAction::DocumentStart,
+            '.' | '>' => KeyAction::DocumentEnd,
             _ => KeyAction::Unbound,
         },
         (KeyCode::Char(c), false, false) => KeyAction::InsertChar(c),
@@ -77,6 +109,10 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
         (KeyCode::Right, _, _) => KeyAction::Right,
         (KeyCode::Up, _, _) => KeyAction::Up,
         (KeyCode::Down, _, _) => KeyAction::Down,
+        (KeyCode::Home, true, _) => KeyAction::DocumentStart,
+        (KeyCode::Home, _, _) => KeyAction::LineStart,
+        (KeyCode::End, true, _) => KeyAction::DocumentEnd,
+        (KeyCode::End, _, _) => KeyAction::LineEnd,
         _ => KeyAction::Unbound,
     }
 }

@@ -152,6 +152,53 @@ impl Buffer {
         self.cursor.col = self.pref_col.min(line_len);
     }
 
+    /// Nano's Ctrl-A / Home — jump to column 0 of the current line.
+    pub fn move_to_line_start(&mut self) {
+        self.cursor.col = 0;
+        self.pref_col = 0;
+    }
+
+    /// Nano's Ctrl-E / End — jump to end of the current line (just BEFORE
+    /// any trailing '\n', so subsequent typing stays on the same line).
+    pub fn move_to_line_end(&mut self) {
+        let len = self.line(self.cursor.line).chars().count();
+        self.cursor.col = len;
+        self.pref_col = len;
+    }
+
+    /// Nano's M-\\ or M-< — jump to the very top.
+    pub fn move_to_document_start(&mut self) {
+        self.cursor.line = 0;
+        self.cursor.col = 0;
+        self.pref_col = 0;
+    }
+
+    /// Nano's M-/ or M-> — jump to end of meaningful content. For docs that
+    /// end with '\n' (Etherpad's invariant when shared) this is the end of
+    /// the last NON-EMPTY line, not the trailing-empty line — typing there
+    /// would otherwise need the trailing-'\n' synthesis path in
+    /// `insert_char` and the UX is "land where the content actually ends".
+    pub fn move_to_document_end(&mut self) {
+        let total = self.rope.len_chars();
+        if total == 0 {
+            self.cursor = CursorPos { line: 0, col: 0 };
+            self.pref_col = 0;
+            return;
+        }
+        let last_is_nl = self.rope.char(total - 1) == '\n';
+        let target_line = if last_is_nl && self.line_count() >= 2 {
+            self.line_count() - 2
+        } else {
+            self.line_count() - 1
+        };
+        let target_col = self.line(target_line).chars().count();
+        self.cursor = CursorPos {
+            line: target_line,
+            col: target_col,
+        };
+        self.pref_col = target_col;
+    }
+
     /// Insert a single char at the cursor and advance. Returns
     /// `(rope_offset_of_insert, text_actually_inserted)` so callers building
     /// outbound changesets can use the SAME bytes that landed in the rope —

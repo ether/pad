@@ -225,12 +225,53 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
     // counts and a-delete interleaving. The trivial-typing batch handles the
     // 80% case (typing without newlines) without touching the complicated
     // compose paths.
+    // Etherpad's web client uses commitDelay = 500ms — it sends at most
+    // one USER_CHANGES per 500ms even when keystrokes are arriving faster.
+    // We mirror that here so the rate of NEW_CHANGES that downstream
+    // browsers must apply matches what they'd see from a peer browser,
+    // not 2-3x higher (which trips a known DOM-render scramble in
+    // Etherpad's web client under rapid remote NEW_CHANGES — verified out
+    // of band via Node-side `applyToAText` watcher).
+    let commit_delay = std::time::Duration::from_millis(500);
+
     let task = tokio::spawn(async move {
         let mut session = session;
         let mut queue: VecDeque<(Changeset, usize)> = VecDeque::new();
         let mut in_flight_count: usize = 0;
         let mut awaiting_ack = false;
+        // Earliest moment we're allowed to start the next send.
+        // `tokio::time::Instant::now()` initially so the first cs ships
+        // immediately; bumped to `now + commit_delay` after each send.
+        let mut next_send_allowed = tokio::time::Instant::now();
         loop {
+            // Fold the queue first so the deadline-arm sees a single
+            // entry and the outbound-arm's tail-merge has the chance to
+            // catch every chain.
+            while queue.len() >= 2 {
+                let Some((a, ac)) = queue.pop_front() else { break };
+                let Some((b, bc)) = queue.pop_front() else { break };
+                match concat_inserts(&a, &b) {
+                    Some(merged) => {
+                        queue.push_front((merged, ac + bc));
+                    }
+                    None => {
+                        queue.push_front((b, bc));
+                        queue.push_front((a, ac));
+                        break;
+                    }
+                }
+            }
+
+            // Deadline future — only "armed" when there's something to
+            // send AND we're not blocked on an ACK. Otherwise sleep for a
+            // long no-op so the select! still has 3 arms.
+            let ready_to_send = !awaiting_ack && !queue.is_empty();
+            let deadline = if ready_to_send {
+                next_send_allowed
+            } else {
+                tokio::time::Instant::now() + std::time::Duration::from_secs(3600)
+            };
+
             tokio::select! {
                 outbound = outbound_rx.recv() => {
                     let Some(cs) = outbound else { break };
@@ -249,11 +290,17 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                     if !merged {
                         queue.push_back((cs, 1));
                     }
-                    // If nothing's in flight, send the front of the queue.
-                    if !awaiting_ack && let Some((next, count)) = queue.pop_front() {
+                    // Note: we deliberately DO NOT send eagerly here. The
+                    // next-send-allowed deadline gates dispatch so chars
+                    // typed within `commit_delay` of the previous send get
+                    // a chance to merge into the same wire message.
+                }
+                _ = tokio::time::sleep_until(deadline), if ready_to_send => {
+                    if let Some((next, count)) = queue.pop_front() {
                         if session.send_changeset(&next).await.is_err() { break; }
                         in_flight_count = count;
                         awaiting_ack = true;
+                        next_send_allowed = tokio::time::Instant::now() + commit_delay;
                     }
                 }
                 pumped = session.pump_once_event() => {
@@ -267,39 +314,12 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                             }
                             in_flight_count = 0;
                             awaiting_ack = false;
-                            // Before sending the next queued cs, fold the
-                            // ENTIRE queue together via concat_inserts. While
-                            // we were awaiting the in-flight ACK, app.rs
-                            // could have pushed more cs's that the tail-only
-                            // merge couldn't reach (e.g. typing → Enter →
-                            // typing, where the Enter broke the chain). The
-                            // browser-side DOM render bug compounds with the
-                            // number of NEW_CHANGES it has to apply, so
-                            // collapsing N queued cs's into 1 wire message
-                            // is what keeps the live view in sync for fast
-                            // typists.
-                            while queue.len() >= 2 {
-                                let Some((a, ac)) = queue.pop_front() else { break };
-                                let Some((b, bc)) = queue.pop_front() else { break };
-                                match concat_inserts(&a, &b) {
-                                    Some(merged) => {
-                                        queue.push_front((merged, ac + bc));
-                                    }
-                                    None => {
-                                        // Can't merge — Delete in the mix, or
-                                        // positions don't chain. Put b back
-                                        // and ship `a` next.
-                                        queue.push_front((b, bc));
-                                        queue.push_front((a, ac));
-                                        break;
-                                    }
-                                }
-                            }
-                            if let Some((next, count)) = queue.pop_front() {
-                                if session.send_changeset(&next).await.is_err() { break; }
-                                in_flight_count = count;
-                                awaiting_ack = true;
-                            }
+                            // Don't send immediately — let the deadline
+                            // arm fire so commit_delay is honored across
+                            // ACK boundaries too. next_send_allowed is
+                            // already set to (last_send_time + delay), so
+                            // the deadline-arm will fire as soon as the
+                            // delay window elapses.
                         }
                         Ok(etherpad_client::session::InboundEvent::UserJoin { author_id, display_name }) => {
                             let _ = presence_tx.send(PresenceEvent::Join { author_id, display_name });

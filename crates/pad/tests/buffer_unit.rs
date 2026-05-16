@@ -92,6 +92,45 @@ fn search_returns_none_when_missing() {
 }
 
 #[test]
+fn move_to_line_start_and_end() {
+    let mut b = Buffer::from_text("hello world\nsecond line\n");
+    b.move_cursor_to(CursorPos { line: 0, col: 5 });
+    b.move_to_line_start();
+    assert_eq!(b.cursor(), CursorPos { line: 0, col: 0 });
+    b.move_to_line_end();
+    assert_eq!(b.cursor(), CursorPos { line: 0, col: 11 });
+}
+
+#[test]
+fn move_to_line_end_clamps_at_actual_line_length() {
+    // From a long line, move down to a shorter line — line_end must go to
+    // the shorter line's actual end, not preserve the long line's col.
+    let mut b = Buffer::from_text("longest line here\nshort\n");
+    b.move_cursor_to(CursorPos { line: 1, col: 0 });
+    b.move_to_line_end();
+    assert_eq!(b.cursor(), CursorPos { line: 1, col: 5 });
+}
+
+#[test]
+fn move_to_document_start_and_end() {
+    let mut b = Buffer::from_text("a\nb\nc\n");
+    b.move_cursor_to(CursorPos { line: 2, col: 1 });
+    b.move_to_document_start();
+    assert_eq!(b.cursor(), CursorPos { line: 0, col: 0 });
+    b.move_to_document_end();
+    // doc ends with '\n' → cursor sits at end of last content line,
+    // not on the trailing-empty line.
+    assert_eq!(b.cursor(), CursorPos { line: 2, col: 1 });
+}
+
+#[test]
+fn move_to_document_end_no_trailing_newline() {
+    let mut b = Buffer::from_text("a\nb");
+    b.move_to_document_end();
+    assert_eq!(b.cursor(), CursorPos { line: 1, col: 1 });
+}
+
+#[test]
 fn replace_one_replaces_first_match() {
     let mut b = Buffer::from_text("foo bar foo");
     b.replace_one("foo", "FOO");

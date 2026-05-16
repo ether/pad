@@ -326,6 +326,10 @@ impl App {
             KeyAction::Right => self.buffer.move_right(),
             KeyAction::Up => self.buffer.move_up(),
             KeyAction::Down => self.buffer.move_down(),
+            KeyAction::LineStart => self.buffer.move_to_line_start(),
+            KeyAction::LineEnd => self.buffer.move_to_line_end(),
+            KeyAction::DocumentStart => self.buffer.move_to_document_start(),
+            KeyAction::DocumentEnd => self.buffer.move_to_document_end(),
             KeyAction::WriteOut => {
                 if let Some(p) = self.file_path.clone() {
                     self.buffer.save_to_file(&p)?;
