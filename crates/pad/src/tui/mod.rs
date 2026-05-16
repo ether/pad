@@ -2,6 +2,7 @@ pub mod author_overlay;
 pub mod editor_view;
 pub mod help;
 pub mod prompts;
+pub mod sanitize;
 pub mod share_overlay;
 pub mod softwrap;
 pub mod status_bar;

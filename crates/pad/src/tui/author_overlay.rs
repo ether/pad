@@ -1,3 +1,4 @@
+use crate::tui::sanitize;
 use ratatui::Frame;
 use ratatui::layout::{Margin, Rect};
 use ratatui::style::{Color, Style};
@@ -6,10 +7,14 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 pub fn render(frame: &mut Frame<'_>, area: Rect, authors: &[String], self_id: &str) {
     let mut lines = Vec::new();
     for a in authors {
+        // Author IDs are server-supplied — strip terminal escapes so a
+        // hostile co-author can't inject ANSI via their userId. See
+        // tui::sanitize.
+        let safe = sanitize::for_terminal(a);
         let label = if a == self_id {
-            format!("{a} (you)")
+            format!("{safe} (you)")
         } else {
-            a.clone()
+            safe.into_owned()
         };
         lines.push(label);
     }
