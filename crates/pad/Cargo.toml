@@ -1,6 +1,6 @@
 [package]
 name = "pad"
-version = "0.1.0"
+version = "0.1.1"
 description = "Nano-class terminal text editor with optional real-time collaboration backed by Etherpad."
 homepage = "https://github.com/ether/pad"
 readme = "../../README.md"
