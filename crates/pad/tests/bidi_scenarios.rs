@@ -628,6 +628,223 @@ async fn paste_then_cut() {
 }
 
 // ===========================================================================
+// 15c. CTRL-K THEN CTRL-U — cut a line then immediately paste it back.
+//      Regression for browser "doRepApplyChangeset length mismatch: X/Y" —
+//      length mismatch in inbound NEW_CHANGES means our changesets'
+//      claimed old_len drifted from the server-side text length.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn ctrl_k_then_ctrl_u_round_trips() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("kuround");
+    let url = format!("{base}/p/{pad_id}");
+    // Pre-seed the pad with two lines, so the cut target isn't "the only
+    // line" (which is the special would_empty path).
+    let mut a = fresh_session(&base, &pad_id, "t.kuround-A").await;
+    let init = a.initial_text().to_string();
+    let seed_cs = cs_insert_at_end(&init, "first-line\nsecond-line\nthird-line\n");
+    a.send_changeset(&seed_cs).await.unwrap();
+    let _ = tokio::time::timeout(Duration::from_secs(5), async {
+        while let Ok(e) = a.pump_once_event().await {
+            if matches!(e, InboundEvent::AckCommit { .. }) {
+                return;
+            }
+        }
+    })
+    .await;
+    a.disconnect().await.ok();
+
+    let mut p = spawn_pad(&url);
+    // Cursor is positioned at end of meaningful content on join — likely
+    // last non-empty line. Hit ^K to cut, then ^U to paste back.
+    p.send([0x0Bu8].as_slice()).expect("^K");
+    std::thread::sleep(Duration::from_millis(2000));
+    p.send([0x15u8].as_slice()).expect("^U");
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    // After cut+uncut the pad should still contain all three seeded lines.
+    assert!(
+        final_text.contains("first-line"),
+        "first-line missing after cut+uncut: {final_text:?}"
+    );
+    assert!(
+        final_text.contains("second-line"),
+        "second-line missing after cut+uncut: {final_text:?}"
+    );
+    assert!(
+        final_text.contains("third-line"),
+        "third-line missing after cut+uncut: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 15f. RAPID CUT+UNCUT — same as 15e but back-to-back with no delay between
+//      ^K and ^U, so the cut may still be in flight when uncut is queued.
+//      This was the user's actual interaction speed.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn browser_sees_rapid_cut_uncut() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("brrapid");
+    let url = format!("{base}/p/{pad_id}");
+    let mut watcher = fresh_session(&base, &pad_id, "t.brrapid-W").await;
+    let mut watcher_rep = watcher.initial_text().to_string();
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+    let mut p = spawn_pad(&url);
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "RAPID-MARKER-XYZ".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(30));
+    }
+    std::thread::sleep(Duration::from_millis(1500));
+    // BACK-TO-BACK ^K then ^U with no delay.
+    p.send([0x0Bu8].as_slice()).expect("^K");
+    p.send([0x15u8].as_slice()).expect("^U");
+    std::thread::sleep(Duration::from_millis(5000));
+    exit_pad(&mut p);
+    while let Ok(Some(cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        let cur_len = watcher_rep.chars().count() as u32;
+        assert_eq!(
+            cs.old_len, cur_len,
+            "browser-view length mismatch: cs.old_len={} watcher_rep.len={} \
+             (cs={:?} cur={:?})",
+            cs.old_len, cur_len, cs, watcher_rep
+        );
+        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
+            .expect("apply cs to watcher rep");
+    }
+    watcher_handle.abort();
+    assert!(
+        watcher_rep.contains("RAPID-MARKER-XYZ"),
+        "marker missing from watcher rep: {watcher_rep:?}"
+    );
+}
+
+// 15e. BROWSER VIEW OF CUT+UNCUT — simulate a browser watching the pad while
+//      our terminal does ^K + ^U. Verifies each inbound NEW_CHANGES applies
+//      to the running rep without the "doRepApplyChangeset length mismatch"
+//      that bricks pad-dev's web UI.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn browser_sees_cut_uncut_consistently() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("brkucons");
+    let url = format!("{base}/p/{pad_id}");
+
+    // Watcher session — connects FIRST so it joins at the initial revision
+    // before the pad sends any USER_CHANGES of ours. We then apply every
+    // NEW_CHANGES to a running String and assert no length mismatch.
+    let mut watcher = fresh_session(&base, &pad_id, "t.brkucons-W").await;
+    let mut watcher_rep = watcher.initial_text().to_string();
+
+    // Pump task — runs the watcher's recv loop into a channel of (changeset,
+    // newRev) the test thread can drain.
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+
+    // Drive the terminal: type a marker, then ^K, then ^U.
+    let mut p = spawn_pad(&url);
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "ROUNDTRIP-MARKER-ABC".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(40));
+    }
+    std::thread::sleep(Duration::from_millis(1500));
+    p.send([0x0Bu8].as_slice()).expect("^K");
+    std::thread::sleep(Duration::from_millis(1500));
+    p.send([0x15u8].as_slice()).expect("^U");
+    std::thread::sleep(Duration::from_millis(3500));
+    exit_pad(&mut p);
+
+    // Apply every received NEW_CHANGES to our watcher's running rep, the way
+    // the browser's doRepApplyChangeset would. A length mismatch here is
+    // the same failure surface as the user-reported error.
+    while let Ok(Some(cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        let cur_len = watcher_rep.chars().count() as u32;
+        assert_eq!(
+            cs.old_len, cur_len,
+            "browser-view length mismatch: cs.old_len={} watcher_rep.len={} \
+             (cs={:?} cur={:?})",
+            cs.old_len, cur_len, cs, watcher_rep
+        );
+        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
+            .expect("apply cs to watcher rep");
+    }
+    watcher_handle.abort();
+
+    assert!(
+        watcher_rep.contains("ROUNDTRIP-MARKER-ABC"),
+        "marker missing from watcher rep: {watcher_rep:?}"
+    );
+}
+
+// 15d. TYPE-THEN-CUT-THEN-UNCUT — common user flow: type some content,
+//      hit ^K, then immediately ^U. User-reported "doRepApplyChangeset
+//      length mismatch: 53/65".
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn type_then_ctrl_k_then_ctrl_u() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("tkuround");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    // Type some content on a fresh line.
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "TYPED-CONTENT-BEFORE-CUT".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    std::thread::sleep(Duration::from_millis(2000));
+    // ^K to cut current line
+    p.send([0x0Bu8].as_slice()).expect("^K");
+    std::thread::sleep(Duration::from_millis(2000));
+    // ^U to paste back
+    p.send([0x15u8].as_slice()).expect("^U");
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains("TYPED-CONTENT-BEFORE-CUT"),
+        "marker missing after type+cut+uncut: {final_text:?}"
+    );
+}
+
+// ===========================================================================
 // 15b. MULTI-LINE PASTE ALONE — same paste body as 15 but without the cut,
 //      to isolate whether multi-line paste itself is reaching the server.
 // ===========================================================================
