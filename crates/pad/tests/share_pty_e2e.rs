@@ -1,3 +1,6 @@
+#![cfg(unix)]
+// Unix-PTY harness (expectrl + `env`). See pty_smoke.rs for rationale.
+
 use expectrl::{Eof, Expect, spawn};
 use std::time::Duration;
 use tempfile::tempdir;

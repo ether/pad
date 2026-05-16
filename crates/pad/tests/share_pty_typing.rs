@@ -6,6 +6,9 @@
 //! individual InsertChar actions lands as the expected forward string on
 //! the server.
 
+#![cfg(unix)]
+// Unix-PTY harness (expectrl + `env`); self-skips without PAD_ETHERPAD_BASE.
+
 use etherpad_client::Socket;
 use etherpad_client::session::{PadSession, SessionConfig};
 use etherpad_client::socket::TungsteniteSocket;

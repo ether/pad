@@ -10,6 +10,11 @@
 //!   5. Open a fresh PadSession to the same pad and assert the pasted URL
 //!      is present in the resulting pad text.
 
+#![cfg(unix)]
+// Unix-PTY harness (expectrl + `env`). Self-skips when PAD_ETHERPAD_BASE
+// is unset; the file is also gated to Unix so Windows CI doesn't try to
+// build the PTY harness at all.
+
 use etherpad_client::Socket;
 use etherpad_client::session::{PadSession, SessionConfig};
 use etherpad_client::socket::TungsteniteSocket;

@@ -13,6 +13,9 @@
 //! Tests deliberately use a unique pad_id per case so failures don't
 //! cross-contaminate. --test-threads=1 keeps the rate-limit footprint low.
 
+#![cfg(unix)]
+// Unix-PTY harness (expectrl + `env`); self-skips without PAD_ETHERPAD_BASE.
+
 use etherpad_client::Socket;
 use etherpad_client::changeset::{Changeset, Op, OpCode};
 use etherpad_client::session::{InboundEvent, PadSession, SessionConfig};

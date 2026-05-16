@@ -1,3 +1,8 @@
+#![cfg(unix)]
+// expectrl uses real Unix PTYs here, and `spawn` commands rely on the
+// `env` binary which doesn't exist on Windows. Gate the whole file so
+// Windows CI runs everything else cleanly.
+
 use expectrl::{Eof, Expect, spawn};
 use std::time::Duration;
 use tempfile::tempdir;

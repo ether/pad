@@ -6,7 +6,11 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  # Lint runs on a single OS — rustfmt is byte-identical across
+  # platforms and clippy doesn't catch additional issues on macOS or
+  # Windows that Linux misses for our codebase. Keeping it on one
+  # runner trims ~3 min off the critical path.
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,13 +22,52 @@ jobs:
         run: cargo fmt --all --check
       - name: clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
-      - name: unit + property + conformance
+
+  # Test matrix covers Linux + macOS + Windows. Sam's double-char
+  # regression (KeyEventKind::Press filter) is invisible on Linux —
+  # only the Windows runner exercises that crossterm code path.
+  #
+  # PTY integration tests are gated `#![cfg(unix)]` at the file level
+  # (see crates/pad/tests/share_pty_*.rs); Windows runs the rest.
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: build
+        run: cargo build --workspace --exclude etherpad-client-spike
+      - name: unit + property + conformance + integration
         run: cargo test --workspace --exclude etherpad-client-spike --lib --tests
+
+  # Perf budget is wall-clock sensitive — runner CPU varies wildly
+  # across OS and even between back-to-back GitHub runner allocations.
+  # Pinning to ubuntu-latest gives us a stable baseline; running it
+  # across the matrix would just produce flaky red builds.
+  perf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: pad perf budget (release)
         run: cargo test -p pad --test perf_budget --release
+
+  # `cargo bench -- --test` compiles benches and runs each one once
+  # to verify they don't panic. Linux-only — benches share the
+  # wall-clock sensitivity of the perf budget.
+  bench-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: etherpad-client bench (smoke)
         run: cargo bench -p etherpad-client --bench changeset -- --test
       - name: pad bench (smoke)
         run: cargo bench -p pad --bench cold_open -- --test
-      - name: pad share PTY tests
-        run: cargo test -p pad --test share_pty_e2e --test share_url_parse
+

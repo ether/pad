@@ -10,6 +10,9 @@
 //!      server state for the browser's edits).
 //!   3. Times the first-roundtrip so we can quantify "slow".
 
+#![cfg(unix)]
+// Unix-PTY harness (expectrl + `env`); self-skips without PAD_ETHERPAD_BASE.
+
 use etherpad_client::Socket;
 use etherpad_client::changeset::{Changeset, Op, OpCode};
 use etherpad_client::session::{InboundEvent, PadSession, SessionConfig};
