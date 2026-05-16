@@ -199,6 +199,17 @@ impl Buffer {
         if char_idx >= self.rope.len_chars() {
             return;
         }
+        // Don't delete the trailing '\n' if it's the only '\n' the pad has
+        // left — Etherpad's "pad always ends with \n" invariant must hold,
+        // and downstream browser clients crash in offsetOfEntry on a fully
+        // empty rep.lines.
+        let total = self.rope.len_chars();
+        if char_idx + 1 == total
+            && self.rope.char(char_idx) == '\n'
+            && !self.rope.slice(0..char_idx).chars().any(|c| c == '\n')
+        {
+            return;
+        }
         self.rope.remove(char_idx..char_idx + 1);
         self.dirty = true;
     }
@@ -258,16 +269,32 @@ impl Buffer {
     /// Cut the line under the cursor. Returns `(char_offset_of_cut_start,
     /// cut_text)` so the caller can emit a matching outbound Changeset when
     /// shared. Returns None if there was nothing to cut.
+    ///
+    /// **Invariant:** if cutting would empty the rope AND the final char is
+    /// a `\n`, the trailing `\n` is preserved. Etherpad's pad text invariant
+    /// is "always ends with `\n`"; an empty pad makes downstream browser
+    /// clients crash in `applyChangesetToDocument:offsetOfEntry` trying to
+    /// walk an empty `rep.lines`.
     pub fn cut_line(&mut self) -> Option<(u32, String)> {
         let line_idx = self.cursor.line;
         if line_idx >= self.rope.len_lines() {
             return None;
         }
         let line_start = self.rope.line_to_char(line_idx);
-        let line_end = if line_idx + 1 < self.rope.len_lines() {
+        let raw_end = if line_idx + 1 < self.rope.len_lines() {
             self.rope.line_to_char(line_idx + 1)
         } else {
             self.rope.len_chars()
+        };
+        if line_start == raw_end {
+            return None;
+        }
+        let would_empty = line_start == 0 && raw_end == self.rope.len_chars();
+        let last_is_nl = raw_end > 0 && self.rope.char(raw_end - 1) == '\n';
+        let line_end = if would_empty && last_is_nl {
+            raw_end - 1
+        } else {
+            raw_end
         };
         if line_start == line_end {
             return None;

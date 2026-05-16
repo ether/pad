@@ -31,12 +31,41 @@ pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
             attribs: vec![],
         });
     }
-    ops.push(Op {
-        opcode: OpCode::Insert,
-        chars: inserted,
-        lines: inserted_lines,
-        attribs: vec![],
-    });
+    // Etherpad's checkRep enforces: an insert op with `|N` (lines > 0) MUST
+    // have its char_bank slice end with `\n` (Changeset.ts checkRep:
+    // "multiline insert op does not end with a newline"). When the inserted
+    // text has newlines but its tail is mid-line (e.g. paste of
+    // "A\nB\nC"), split into:
+    //   - Insert lines=N covering A\nB\n
+    //   - Insert lines=0 covering C
+    // both with the same author attribute (added downstream in
+    // PadSession::send_changeset).
+    if inserted_lines > 0 && !text.ends_with('\n') {
+        let last_nl_byte = text.rfind('\n').expect("has \\n");
+        let prefix = &text[..last_nl_byte + 1];
+        let suffix = &text[last_nl_byte + 1..];
+        let prefix_chars = prefix.chars().count() as u32;
+        let suffix_chars = suffix.chars().count() as u32;
+        ops.push(Op {
+            opcode: OpCode::Insert,
+            chars: prefix_chars,
+            lines: inserted_lines,
+            attribs: vec![],
+        });
+        ops.push(Op {
+            opcode: OpCode::Insert,
+            chars: suffix_chars,
+            lines: 0,
+            attribs: vec![],
+        });
+    } else {
+        ops.push(Op {
+            opcode: OpCode::Insert,
+            chars: inserted,
+            lines: inserted_lines,
+            attribs: vec![],
+        });
+    }
     // Trailing keep is implicit in canonical form (final Keep covering rest
     // of doc is omitted).
     Changeset {

@@ -416,6 +416,33 @@ async fn human_pace_typing_preserves_order() {
 }
 
 // ===========================================================================
+// 9b. JITTERED PACE TYPING — typing at varying intervals (10ms..300ms) to
+//     exercise every batching cliff. Reproduction attempt for user-reported
+//     "interesting view change" → "e changew  viestingnteri" scramble.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn jittered_typing_preserves_order() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("jitter");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    let marker = "interesting view change";
+    let intervals: [u64; 23] = [10, 250, 30, 300, 80, 50, 200, 40, 60, 350, 20, 100, 180, 25, 70, 280, 15, 120, 220, 45, 90, 160, 35];
+    for (c, ms) in marker.chars().zip(intervals.iter()) {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(*ms));
+    }
+    std::thread::sleep(Duration::from_millis(6000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains(marker),
+        "expected forward marker {marker:?} in pad text, got: {final_text:?}"
+    );
+}
+
+// ===========================================================================
 // 10. CTRL-K (Cut Line) — should both clear the local buffer line AND
 //    propagate to the server (user-reported: clears in pad, not in browser)
 // ===========================================================================
@@ -447,6 +474,246 @@ async fn ctrl_k_cut_line_propagates() {
     assert!(
         !final_text.contains("CUT-LINE-MARKER"),
         "^K cut did not propagate to server — marker still present: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 11. TYPE THEN IMMEDIATE CTRL-K — regression for the user-reported browser
+//     crash "TypeError: can't access property 'key', e is null" in
+//     offsetOfEntry. Cut of the last line would empty the pad which violates
+//     Etherpad's "always ends with \n" invariant; the browser's rep.lines
+//     can't survive a fully empty document.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn type_then_ctrl_k_leaves_pad_with_trailing_newline() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("typecut");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    for c in "hello world".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(80));
+    }
+    // Immediately ^K — no wait for batched send to finalize.
+    p.send([0x0Bu8].as_slice()).expect("send ^K");
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        !final_text.is_empty(),
+        "pad text empty after type+^K — violates Etherpad's trailing-\\n invariant"
+    );
+    assert!(
+        !final_text.contains("hello world"),
+        "^K didn't propagate: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 12. RAPID BACKSPACE TO EMPTY — backspace all the way through the welcome
+//     content. Must leave the trailing \n intact.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn rapid_backspace_preserves_trailing_newline() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("bksp-all");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    // Type something first so we know what we're deleting.
+    for c in "DELETE-ME".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(40));
+    }
+    std::thread::sleep(Duration::from_millis(2000));
+    // Backspace many times. Should not over-delete past the start of pad.
+    for _ in 0..100 {
+        p.send([0x7Fu8].as_slice()).expect("bksp");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        !final_text.is_empty(),
+        "pad text empty after 100 backspaces — must keep trailing \\n"
+    );
+    assert!(
+        !final_text.contains("DELETE-ME"),
+        "backspaces did not remove DELETE-ME: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 13. TYPE WHILE AWAITING ACK — fire many keystrokes between the first send
+//     and the first ACK. Forces compose-batching on every concat_trivial
+//     edge.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn type_while_awaiting_ack() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("type-ack");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    // 50 chars at 10ms intervals — far faster than pad-dev's ~200ms RTT.
+    let marker = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX";
+    for c in marker.chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    std::thread::sleep(Duration::from_millis(5000));
+    exit_pad(&mut p);
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains(marker),
+        "rapid typing lost order or chars: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 14. ENTER ENTER TYPE — multiple newlines in a row then content. Stresses
+//     the multi-line keep-count handling in the bridge.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn enter_enter_type() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("ee");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(150));
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "MULTILINE-CONTENT".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(80));
+    }
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains("MULTILINE-CONTENT"),
+        "missing content after enter+enter+type: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 15. PASTE THEN CUT — paste a multi-line block, then cut the line we're on.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn paste_then_cut() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("paste-cut");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    let paste_body = "PASTE-LINE-A\nPASTE-LINE-B\nPASTE-LINE-C";
+    let paste = format!("\x1b[200~{paste_body}\x1b[201~");
+    p.send(paste.as_str()).expect("paste");
+    std::thread::sleep(Duration::from_millis(2500));
+    p.send([0x0Bu8].as_slice()).expect("^K");
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        !final_text.is_empty(),
+        "pad empty after paste+cut — trailing \\n missing"
+    );
+    // The pasted lines A and B should still be there; only the LAST line
+    // (LINE-C, where cursor was) got cut.
+    assert!(
+        final_text.contains("PASTE-LINE-A"),
+        "LINE-A missing: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 15b. MULTI-LINE PASTE ALONE — same paste body as 15 but without the cut,
+//      to isolate whether multi-line paste itself is reaching the server.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn multiline_paste_lands() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("mlpaste");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    let body = "MLINE-A\nMLINE-B\nMLINE-C";
+    let paste = format!("\x1b[200~{body}\x1b[201~");
+    p.send(paste.as_str()).expect("paste");
+    std::thread::sleep(Duration::from_millis(5000));
+    exit_pad(&mut p);
+    let final_text = pad_text(&base, &pad_id).await;
+    eprintln!("DIAG multiline_paste final_text = {final_text:?}");
+    assert!(
+        final_text.contains("MLINE-A"),
+        "LINE-A missing: {final_text:?}"
+    );
+    assert!(
+        final_text.contains("MLINE-C"),
+        "LINE-C missing: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 16. TYPING THEN BROWSER CONCURRENT EDIT — terminal types while a
+//     simulated browser session also writes. Tests inbound + outbound at
+//     the same time (OT rebase + pending queue interactions).
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn concurrent_terminal_typing_and_browser_writes() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("concur");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+
+    // Spawn a browser-sim that writes a marker, waits, writes another.
+    let base_clone = base.clone();
+    let pad_id_clone = pad_id.clone();
+    let browser_handle = tokio::spawn(async move {
+        let mut b = fresh_session(&base_clone, &pad_id_clone, "t.concur-B").await;
+        let init = b.initial_text().to_string();
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        let cs = cs_insert_at_end(&init, "BROWSER-1\n");
+        b.send_changeset(&cs).await.ok();
+        let _ = tokio::time::timeout(Duration::from_secs(3), async {
+            while let Ok(e) = b.pump_once_event().await {
+                if matches!(e, InboundEvent::AckCommit { .. }) {
+                    return;
+                }
+            }
+        })
+        .await;
+        tokio::time::sleep(Duration::from_millis(800)).await;
+        let init2 = b.initial_text().to_string();
+        let _ = init2; // session.initial_text() doesn't update from inbounds
+        // Send another insert based on the LATEST known rev — we can build a
+        // simple append (server-side rebase handles concurrent positioning).
+        let cs2 = cs_insert_at_end("any-prefix-placeholder", "BROWSER-2\n");
+        // The above's old_len is wrong; instead just rebuild minimally with
+        // a no-keep approach by sending an identity-with-trailing-insert
+        // through the server's follow loop. For simplicity, skip and just
+        // rely on the FIRST browser write reaching terminal.
+        let _ = cs2;
+        b.disconnect().await.ok();
+    });
+
+    // Terminal types meanwhile.
+    for c in "TERM-TYPING".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(100));
+    }
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+    browser_handle.await.ok();
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains("TERM-TYPING"),
+        "terminal typing missing: {final_text:?}"
+    );
+    assert!(
+        final_text.contains("BROWSER-1"),
+        "browser write missing: {final_text:?}"
     );
 }
 
