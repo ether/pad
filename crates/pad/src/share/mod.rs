@@ -20,6 +20,7 @@ pub struct ShareState {
     pub outbound: OutboundQueue,
     pub inbound_rx: mpsc::UnboundedReceiver<Changeset>,
     pub presence_rx: mpsc::UnboundedReceiver<network::PresenceEvent>,
+    pub ack_rx: mpsc::UnboundedReceiver<()>,
     pub net_task: JoinHandle<()>,
     pub authors: std::collections::HashSet<String>,
 }

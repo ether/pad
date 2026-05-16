@@ -159,11 +159,29 @@ impl App {
         let Some(mut share) = self.share.take() else {
             return Ok(());
         };
+        // Drain ACK signals FIRST — these pop oldest entries off the local
+        // OutboundQueue so the subsequent apply_remote OT-rebase only walks
+        // changesets that the server hasn't accepted yet. Without this drain,
+        // an inbound NEW_CHANGES rebases against stale acked-but-not-popped
+        // entries and `ot::follow` panics with a length mismatch.
+        while share.ack_rx.try_recv().is_ok() {
+            share.outbound.ack_one();
+        }
         while let Ok(cs) = share.inbound_rx.try_recv() {
             if share.outbound.pending_len() > 50 {
                 let _ = self.sidecar.pre_merge_snapshot(&self.buffer);
             }
-            crate::share::inbound::apply_remote(&mut self.buffer, &cs, &share.outbound)?;
+            // Be defensive: a length-mismatch from `follow` means our local
+            // view drifted from the server's. Snapshot pre-merge, log, and
+            // skip the bad remote rather than crash the editor.
+            if let Err(e) =
+                crate::share::inbound::apply_remote(&mut self.buffer, &cs, &share.outbound)
+            {
+                let _ = self.sidecar.pre_merge_snapshot(&self.buffer);
+                self.state = AppState::FlashMessage(format!(
+                    "Remote change skipped (OT mismatch): {e}. pre-merge snapshot saved.",
+                ));
+            }
         }
         while let Ok(p) = share.presence_rx.try_recv() {
             match p {
@@ -493,6 +511,7 @@ impl App {
             outbound,
             inbound_rx: handles.inbound_rx,
             presence_rx: handles.presence_rx,
+            ack_rx: handles.ack_rx,
             net_task: handles.task,
             authors,
         });

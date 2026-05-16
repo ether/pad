@@ -20,6 +20,9 @@ pub struct NetworkHandles {
     pub outbound_tx: mpsc::UnboundedSender<Changeset>,
     pub inbound_rx: mpsc::UnboundedReceiver<Changeset>,
     pub presence_rx: mpsc::UnboundedReceiver<PresenceEvent>,
+    /// One () per ACCEPT_COMMIT. The App uses this to drain its local
+    /// OutboundQueue so OT rebases only walk truly-unacked changesets.
+    pub ack_rx: mpsc::UnboundedReceiver<()>,
     pub task: tokio::task::JoinHandle<()>,
     pub author_id: String,
     pub rev: u32,
@@ -69,6 +72,7 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
     let (outbound_tx, mut outbound_rx) = mpsc::unbounded_channel::<Changeset>();
     let (inbound_tx, inbound_rx) = mpsc::unbounded_channel::<Changeset>();
     let (presence_tx, presence_rx) = mpsc::unbounded_channel::<PresenceEvent>();
+    let (ack_tx, ack_rx) = mpsc::unbounded_channel::<()>();
 
     // Serialized-send design: maintain a local FIFO of pending changesets.
     // Send the head; mark `awaiting_ack`. When ACCEPT_COMMIT arrives (or the
@@ -97,6 +101,10 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                             if inbound_tx.send(cs).is_err() { break; }
                         }
                         Ok(etherpad_client::session::InboundEvent::AckCommit { .. }) => {
+                            // Tell the App to drain one entry from its
+                            // OutboundQueue — keeps apply_remote's OT rebase
+                            // walking only truly-unacked changesets.
+                            let _ = ack_tx.send(());
                             awaiting_ack = false;
                             if let Some(cs) = pending.pop_front() {
                                 if session.send_changeset(&cs).await.is_err() { break; }
@@ -122,6 +130,7 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
         outbound_tx,
         inbound_rx,
         presence_rx,
+        ack_rx,
         task,
         author_id,
         rev,
