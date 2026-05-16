@@ -115,15 +115,48 @@ impl PadSession {
     /// USER_CHANGES is dispatched as a COLLABROOM envelope (see
     /// PadMessageHandler.ts line 522) — top-level `type: USER_CHANGES` would
     /// be silently ignored.
+    ///
+    /// Every Insert op gets decorated with the author attribute (`*0`) and the
+    /// matching apool entry is sent. WITHOUT this, Etherpad accepts the
+    /// changeset but the resulting AText is malformed (length of `attribs`
+    /// drifts from length of `text`), and downstream BROWSER clients then
+    /// throw "mismatch error setting raw text in setDocAText" trying to
+    /// reconcile their local copy with the server's pad state.
     pub async fn send_changeset(&mut self, cs: &Changeset) -> Result<()> {
+        use crate::changeset::OpCode;
+
+        let mut decorated_ops = Vec::with_capacity(cs.ops.len());
+        let mut needs_pool = false;
+        for op in &cs.ops {
+            let mut new_op = op.clone();
+            if matches!(op.opcode, OpCode::Insert) && new_op.attribs.is_empty() {
+                new_op.attribs = vec![0];
+                needs_pool = true;
+            }
+            decorated_ops.push(new_op);
+        }
+        let decorated = Changeset {
+            old_len: cs.old_len,
+            net_delta: cs.net_delta,
+            ops: decorated_ops,
+            char_bank: cs.char_bank.clone(),
+        };
+        let apool = if needs_pool {
+            json!({
+                "numToAttrib": { "0": ["author", self.author_id.as_str()] },
+                "nextNum": 1
+            })
+        } else {
+            json!({ "numToAttrib": {}, "nextNum": 0 })
+        };
         let payload = json!({
             "component": "pad",
             "type": "COLLABROOM",
             "data": {
                 "type": "USER_CHANGES",
                 "baseRev": self.rev,
-                "changeset": serialize_changeset(cs),
-                "apool": { "numToAttrib": {}, "nextNum": 0 }
+                "changeset": serialize_changeset(&decorated),
+                "apool": apool,
             }
         });
         self.socket.emit("message", payload).await
