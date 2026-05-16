@@ -49,6 +49,12 @@ pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
 
 /// Build a Changeset that deletes `deleted_text` (which lives at offset `pos`
 /// in the document `old_text`).
+///
+/// **Wire-format note:** Etherpad's `checkRep` asserts the `char_bank` is
+/// EMPTY at the end of a changeset — only Insert ops consume from it. So
+/// despite our knowing what the deleted text is, the bank STAYS empty.
+/// The deleted chars are reconstructed server-side from the source text
+/// + op.chars (see Changeset.ts `applyToText` case `-`).
 pub fn changeset_for_delete(old_text: &str, pos: u32, deleted_text: String) -> Changeset {
     let old_len = old_text.chars().count() as u32;
     let deleted_chars = deleted_text.chars().count() as u32;
@@ -74,6 +80,6 @@ pub fn changeset_for_delete(old_text: &str, pos: u32, deleted_text: String) -> C
         old_len,
         net_delta: -(deleted_chars as i64),
         ops,
-        char_bank: deleted_text,
+        char_bank: String::new(),
     }
 }

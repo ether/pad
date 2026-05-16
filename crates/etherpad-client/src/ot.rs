@@ -31,18 +31,17 @@ pub fn apply(cs: &Changeset, text: &str) -> Result<String> {
                 text_cursor = end;
             }
             OpCode::Delete => {
+                // Etherpad canonical form: Delete consumes ONLY from the source
+                // text. The char_bank is reserved for Inserts. Earlier our
+                // bridge wrongly stuffed deleted text into the bank, which
+                // caused Etherpad's checkRep to reject our changesets as
+                // "excess characters in the charBank".
                 let end = text_cursor + n;
                 if end > text_chars.len() {
                     return Err(ClientError::ApplyChangeset(
                         "delete past end of text".into(),
                     ));
                 }
-                if bank_cursor + n > bank_chars.len() {
-                    return Err(ClientError::ApplyChangeset(
-                        "delete consumes past end of char bank".into(),
-                    ));
-                }
-                bank_cursor += n;
                 text_cursor = end;
             }
             OpCode::Insert => {
@@ -294,6 +293,9 @@ pub fn inverse(cs: &Changeset, text: &str) -> Result<Changeset> {
                 bank_cursor += n;
             }
             OpCode::Delete => {
+                // Inverse of delete is insert; the deleted chars (read from
+                // the source text — Etherpad canonical form has no bank
+                // entries for deletes) become the inverse insert's bank.
                 push_op(
                     &mut inv_ops,
                     Op {
@@ -307,7 +309,6 @@ pub fn inverse(cs: &Changeset, text: &str) -> Result<Changeset> {
                     inv_bank.push(*c);
                 }
                 text_cursor += n;
-                bank_cursor += n;
             }
         }
     }
