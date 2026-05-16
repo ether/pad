@@ -215,23 +215,35 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
     // counts and a-delete interleaving. The trivial-typing batch handles the
     // 80% case (typing without newlines) without touching the complicated
     // compose paths.
-    // Etherpad's web client uses commitDelay = 500ms — it sends at most
-    // one USER_CHANGES per 500ms even when keystrokes are arriving faster.
-    // We mirror that here so the rate of NEW_CHANGES that downstream
-    // browsers must apply matches what they'd see from a peer browser,
-    // not 2-3x higher (which trips a known DOM-render scramble in
-    // Etherpad's web client under rapid remote NEW_CHANGES — verified out
-    // of band via Node-side `applyToAText` watcher).
-    let commit_delay = std::time::Duration::from_millis(500);
+    // Idle-based commit batching (Etherpad-web-client style). The receiver
+    // browser's DOM render path scrambles successive lines=0 inserts
+    // appending to the same content line — verified via Playwright. We
+    // need to batch a whole single-line typing burst into ONE wire
+    // message so the receiver does ONE DOM splice.
+    //
+    // Strategy:
+    //   - `idle_ms`: after each outbound enqueue, set the next-send
+    //     deadline to `now + idle_ms`. While the user keeps typing the
+    //     deadline keeps deferring → no send. When the user pauses for
+    //     `idle_ms`, the deadline arm fires and we ship the merged
+    //     batch.
+    //   - `max_wait_ms`: cap the wait so a relentlessly-typing user
+    //     still sees their edits propagate. The deadline is the MIN of
+    //     `last_edit + idle_ms` and `oldest_queued + max_wait_ms`.
+    let idle_ms = std::time::Duration::from_millis(350);
+    let max_wait_ms = std::time::Duration::from_millis(2000);
 
     let task = tokio::spawn(async move {
         let mut session = session;
         let mut queue: VecDeque<(Changeset, usize)> = VecDeque::new();
         let mut in_flight_count: usize = 0;
         let mut awaiting_ack = false;
-        // Earliest moment we're allowed to start the next send.
-        // `tokio::time::Instant::now()` initially so the first cs ships
-        // immediately; bumped to `now + commit_delay` after each send.
+        // When the oldest cs in the queue first arrived. Used to cap the
+        // idle-flush deadline so continuous typing still propagates.
+        let mut oldest_queued_at: Option<tokio::time::Instant> = None;
+        // Earliest moment we're allowed to start the next send. Defers
+        // forward on each new outbound (idle batching) but is capped at
+        // `oldest_queued_at + max_wait_ms`.
         let mut next_send_allowed = tokio::time::Instant::now();
         loop {
             // Fold the queue first so the deadline-arm sees a single
@@ -280,17 +292,30 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                     if !merged {
                         queue.push_back((cs, 1));
                     }
-                    // Note: we deliberately DO NOT send eagerly here. The
-                    // next-send-allowed deadline gates dispatch so chars
-                    // typed within `commit_delay` of the previous send get
-                    // a chance to merge into the same wire message.
+                    // Idle-flush bookkeeping: stamp oldest_queued_at on
+                    // first enqueue, defer the deadline to now+idle_ms,
+                    // and cap at oldest+max_wait_ms so heavy typists
+                    // still propagate within bounded time.
+                    let now = tokio::time::Instant::now();
+                    if oldest_queued_at.is_none() {
+                        oldest_queued_at = Some(now);
+                    }
+                    let idle_target = now + idle_ms;
+                    let cap = oldest_queued_at.unwrap() + max_wait_ms;
+                    next_send_allowed = idle_target.min(cap);
                 }
                 _ = tokio::time::sleep_until(deadline), if ready_to_send => {
                     if let Some((next, count)) = queue.pop_front() {
                         if session.send_changeset(&next).await.is_err() { break; }
                         in_flight_count = count;
                         awaiting_ack = true;
-                        next_send_allowed = tokio::time::Instant::now() + commit_delay;
+                        // Reset for next batch: clear oldest_queued_at
+                        // (will be re-set when next outbound arrives)
+                        // and set next_send_allowed to "now" so as soon
+                        // as the ACK clears and a new edit arrives, the
+                        // deadline pattern resumes.
+                        oldest_queued_at = None;
+                        next_send_allowed = tokio::time::Instant::now();
                     }
                 }
                 pumped = session.pump_once_event() => {
