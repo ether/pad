@@ -27,7 +27,21 @@ pad https://pad.example.com/p/standup     # join a remote pad
 - The Etherpad web client's DOM-render path has an upstream bug under rapid remote `NEW_CHANGES`: bursts of small inserts on a single content line can scramble in the live view (the underlying `baseAText` is correct; refresh restores order). We work around this by batching outbound changesets with a fixed-cadence 1800ms commit window so receivers never see more than ~0.6 NEW_CHANGES/sec from us. Tradeoff: collaborators see your edits up to ~1.8s later than they would from a peer browser. Tracked at [ether/etherpad#7773](https://github.com/ether/etherpad/pull/7773) and a follow-up PR.
 - A second related bug — server-side `_handleUserChanges` accepting changesets that strand the trailing `\n` — is patched in the same upstream PR. Until that lands and you're running a patched Etherpad, the pad's `setDocAText` reconcile path may disconnect a browser if a non-JS client misbehaves. `pad` itself is defensive enough not to trigger this.
 
-## Building
+## Install
+
+One-liner (requires `cargo` — installs Rust first if you don't have it; see [rustup.rs](https://rustup.rs)):
+
+```
+curl -fsSL https://raw.githubusercontent.com/ether/pad/main/install.sh | sh
+```
+
+That runs `cargo install --locked --git https://github.com/ether/pad pad` under the hood and tells you where the binary landed. The same command works if you'd rather skip the script:
+
+```
+cargo install --locked --git https://github.com/ether/pad pad
+```
+
+## Building from source
 
 ```
 cargo build --release -p pad
