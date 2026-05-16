@@ -62,7 +62,15 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
         },
         (KeyCode::Char(c), false, false) => KeyAction::InsertChar(c),
         (KeyCode::Enter, _, _) => KeyAction::InsertChar('\n'),
-        (KeyCode::Tab, _, _) => KeyAction::InsertChar('\t'),
+        // Tab inserts 4 spaces rather than a literal '\t'. Etherpad has no
+        // sensible rendering for raw tabs (its browser uses a `list:indent`
+        // line attribute for indent and falls back to visible-marker glyphs
+        // for stray '\t' chars — which surfaces as '*'-looking bullets on
+        // each indented line). Four spaces matches Etherpad's own
+        // THE_TAB = '    ' constant in ace2_inner.ts. Local file editing
+        // keeps spaces-not-tabs as a side effect, which matches common
+        // editor defaults.
+        (KeyCode::Tab, _, _) => KeyAction::InsertText("    ".to_string()),
         (KeyCode::Backspace, _, _) => KeyAction::Backspace,
         (KeyCode::Delete, _, _) => KeyAction::DeleteForward,
         (KeyCode::Left, _, _) => KeyAction::Left,
