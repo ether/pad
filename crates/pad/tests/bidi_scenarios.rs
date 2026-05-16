@@ -748,11 +748,20 @@ async fn rapid_typing_with_mixed_enters_propagates() {
     }
     watcher_handle.abort();
 
+    // Bursts must appear in TYPING ORDER on the server side. User-reported
+    // failure mode: "boo" + scrambled-burst-2 + "hello world" all on one
+    // line — i.e. later bursts get spliced in BEFORE earlier ones. The
+    // per-burst contains() check passes the broken case; a forward-scan
+    // for start-index of each burst catches order inversion.
+    let mut last_idx: usize = 0;
     for burst in &bursts {
-        assert!(
-            watcher_rep.contains(burst),
-            "burst {burst:?} missing from watcher rep: {watcher_rep:?}"
-        );
+        let idx = watcher_rep[last_idx..]
+            .find(burst)
+            .map(|i| i + last_idx)
+            .unwrap_or_else(|| panic!(
+                "burst {burst:?} missing or out of order in watcher rep: {watcher_rep:?}"
+            ));
+        last_idx = idx + burst.len();
     }
     assert!(
         watcher_rep.ends_with('\n'),
