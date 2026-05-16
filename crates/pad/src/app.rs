@@ -518,6 +518,28 @@ impl App {
         if seed_buffer_from_remote {
             self.buffer.replace_all_text(&handles.initial_text);
             self.buffer.mark_clean();
+            // Position cursor at end of MEANINGFUL content. Etherpad's pad
+            // text always ends with a trailing '\n' (the "empty last line").
+            // The cursor MUST sit BEFORE that trailing '\n' — otherwise every
+            // insert lands past it and Etherpad's auto-trailing-newline check
+            // fires repeatedly, smearing '\n's through the inserted text
+            // (user-reported: typing "T7" appeared as "T\n7" in the browser).
+            let pos = if handles.initial_text.ends_with('\n')
+                && self.buffer.line_count() >= 2
+            {
+                let line = self.buffer.line_count() - 2;
+                crate::buffer::CursorPos {
+                    line,
+                    col: self.buffer.line(line).chars().count(),
+                }
+            } else {
+                let line = self.buffer.line_count().saturating_sub(1);
+                crate::buffer::CursorPos {
+                    line,
+                    col: self.buffer.line(line).chars().count(),
+                }
+            };
+            self.buffer.move_cursor_to(pos);
         }
 
         let mut outbound = crate::share::outbound::OutboundQueue::new(handles.outbound_tx);

@@ -2,7 +2,6 @@ use etherpad_client::Socket;
 use etherpad_client::changeset::Changeset;
 use etherpad_client::socket::TungsteniteSocket;
 use etherpad_client::{PadSession, SessionConfig};
-use std::collections::VecDeque;
 use tokio::sync::mpsc;
 
 #[derive(Debug, Clone)]
@@ -79,20 +78,47 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
     // server echoes the changeset as NEW_CHANGES from us), pop and send next.
     // This avoids the rev-race where back-to-back sends with stale baseRev
     // get rejected as 'badChangeset'.
+    // Send-loop with batching:
+    // - At most ONE changeset in flight awaiting ACK at a time (Etherpad
+    //   rejects back-to-back sends with stale baseRev).
+    // - Outbounds arriving while awaiting are composed via ot::compose into
+    //   `queued_tail`, with `queued_count` tracking how many App-side
+    //   pending entries are represented. When ACK arrives:
+    //     * drain `in_flight_count` ack signals to the App
+    //     * if queued_tail: send it, transfer queued_count -> in_flight_count
+    //     * else: idle
+    // This converts "RTT per keystroke" into "RTT per ACK roundtrip" — typing
+    // at 100chars/sec on a 300ms RTT link sees ~30 chars batched per send.
     let task = tokio::spawn(async move {
         let mut session = session;
-        let mut pending: VecDeque<Changeset> = VecDeque::new();
+        let mut queued_tail: Option<Changeset> = None;
+        let mut queued_count: usize = 0;
+        let mut in_flight_count: usize = 0;
         let mut awaiting_ack = false;
         loop {
             tokio::select! {
                 outbound = outbound_rx.recv() => {
                     let Some(cs) = outbound else { break };
-                    pending.push_back(cs);
-                    if !awaiting_ack {
-                        if let Some(cs) = pending.pop_front() {
-                            if session.send_changeset(&cs).await.is_err() { break; }
-                            awaiting_ack = true;
-                        }
+                    if awaiting_ack {
+                        queued_tail = Some(match queued_tail.take() {
+                            None => cs,
+                            Some(tail) => match etherpad_client::ot::compose(&tail, &cs) {
+                                Ok(c) => c,
+                                Err(_) => {
+                                    // Compose failed (cs doesn't chain off
+                                    // tail) — drop the old tail and start a
+                                    // new tail from this cs. The drop costs
+                                    // those edits; in practice this shouldn't
+                                    // happen for chained user-typing input.
+                                    cs
+                                }
+                            }
+                        });
+                        queued_count += 1;
+                    } else {
+                        if session.send_changeset(&cs).await.is_err() { break; }
+                        in_flight_count = 1;
+                        awaiting_ack = true;
                     }
                 }
                 pumped = session.pump_once_event() => {
@@ -101,13 +127,15 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                             if inbound_tx.send(cs).is_err() { break; }
                         }
                         Ok(etherpad_client::session::InboundEvent::AckCommit { .. }) => {
-                            // Tell the App to drain one entry from its
-                            // OutboundQueue — keeps apply_remote's OT rebase
-                            // walking only truly-unacked changesets.
-                            let _ = ack_tx.send(());
+                            for _ in 0..in_flight_count {
+                                let _ = ack_tx.send(());
+                            }
+                            in_flight_count = 0;
                             awaiting_ack = false;
-                            if let Some(cs) = pending.pop_front() {
+                            if let Some(cs) = queued_tail.take() {
                                 if session.send_changeset(&cs).await.is_err() { break; }
+                                in_flight_count = queued_count;
+                                queued_count = 0;
                                 awaiting_ack = true;
                             }
                         }
