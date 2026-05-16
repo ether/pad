@@ -87,7 +87,10 @@ async fn second_client_clear_propagates_to_first() {
         // Etherpad canonical form: Delete consumes from source text, NOT bank.
         char_bank: String::new(),
     };
-    sess_b.send_changeset(&cs_clear).await.expect("B send clear");
+    sess_b
+        .send_changeset(&cs_clear)
+        .await
+        .expect("B send clear");
     eprintln!("B sent clear");
 
     // Pump B for a moment to see if server ACKed or disconnected us. This
@@ -130,8 +133,7 @@ async fn second_client_clear_propagates_to_first() {
                     cs.ops.len(),
                     cs.char_bank.len()
                 );
-                if cs.net_delta < 0 && cs.ops.iter().any(|o| matches!(o.opcode, OpCode::Delete))
-                {
+                if cs.net_delta < 0 && cs.ops.iter().any(|o| matches!(o.opcode, OpCode::Delete)) {
                     got_clear = true;
                     break;
                 }

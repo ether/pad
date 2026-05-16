@@ -64,7 +64,8 @@ async fn fresh_pad_bidir_sync() {
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_micros() % 1000
+            .as_micros()
+            % 1000
     );
     let typing_start = Instant::now();
     for c in marker_term.chars() {
@@ -133,7 +134,8 @@ async fn fresh_pad_bidir_sync() {
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_micros() % 1000
+            .as_micros()
+            % 1000
     );
     let pad_now_len = phase1_text.chars().count() as u32;
     let kept_lines = phase1_text.chars().filter(|c| *c == '\n').count() as u32;
@@ -157,7 +159,10 @@ async fn fresh_pad_bidir_sync() {
         ],
         char_bank: marker_browser.clone(),
     };
-    browser.send_changeset(&cs_browser).await.expect("browser send");
+    browser
+        .send_changeset(&cs_browser)
+        .await
+        .expect("browser send");
     let browser_ack_start = Instant::now();
     let deadline = Instant::now() + Duration::from_secs(5);
     let mut browser_acked = false;
@@ -176,7 +181,10 @@ async fn fresh_pad_bidir_sync() {
     }
     let browser_rt_ms = browser_ack_start.elapsed().as_millis();
     eprintln!("browser send → ack: {browser_rt_ms} ms");
-    assert!(browser_acked, "browser edit was NOT acked — likely a corruption");
+    assert!(
+        browser_acked,
+        "browser edit was NOT acked — likely a corruption"
+    );
 
     // Exit binary cleanly.
     p.send([0x18u8].as_slice()).expect("send ^X");
@@ -203,10 +211,7 @@ async fn fresh_pad_bidir_sync() {
     let final_text = final_sess.initial_text().to_string();
     final_sess.disconnect().await.ok();
     eprintln!("final pad text: {final_text:?}");
-    assert!(
-        final_text.contains(&marker_term),
-        "terminal marker missing"
-    );
+    assert!(final_text.contains(&marker_term), "terminal marker missing");
     assert!(
         final_text.contains(marker_browser.trim_end()),
         "browser marker {:?} missing from final pad text:\n{final_text}",

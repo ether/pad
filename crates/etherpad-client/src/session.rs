@@ -162,7 +162,11 @@ impl PadSession {
         });
         if let Ok(p) = std::env::var("PAD_DIAG_LOG") {
             use std::io::Write;
-            if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&p) {
+            if let Ok(mut f) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&p)
+            {
                 let _ = writeln!(
                     f,
                     "[{:?}] send_changeset baseRev={} wire={} (old_len={} net_delta={})",
@@ -237,8 +241,17 @@ impl PadSession {
             .ok_or_else(|| ClientError::Protocol("socket closed".into()))?;
         if let Ok(p) = std::env::var("PAD_DIAG_LOG") {
             use std::io::Write;
-            if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&p) {
-                let _ = writeln!(f, "[{:?}] inbound msg = {}", std::time::SystemTime::now(), msg);
+            if let Ok(mut f) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&p)
+            {
+                let _ = writeln!(
+                    f,
+                    "[{:?}] inbound msg = {}",
+                    std::time::SystemTime::now(),
+                    msg
+                );
             }
         }
         // Server-initiated disconnect (e.g. {disconnect: "badChangeset"}).
@@ -268,7 +281,9 @@ impl PadSession {
                 "ACCEPT_COMMIT" => {
                     if let Some(rev) = inner["newRev"].as_u64() {
                         self.rev = rev as u32;
-                        return Ok(InboundEvent::AckCommit { new_rev: rev as u32 });
+                        return Ok(InboundEvent::AckCommit {
+                            new_rev: rev as u32,
+                        });
                     }
                 }
                 "USER_NEWINFO" => {

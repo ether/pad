@@ -131,7 +131,9 @@ async fn poll_until_contains(base: &str, pad_id: &str, marker: &str, timeout: Du
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn typing_single_chars_lands_in_order() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("single");
     let url = format!("{base}/p/{pad_id}");
 
@@ -157,7 +159,9 @@ async fn typing_single_chars_lands_in_order() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn enter_then_type_on_new_line() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("enter");
     let url = format!("{base}/p/{pad_id}");
 
@@ -194,7 +198,9 @@ async fn enter_then_type_on_new_line() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rapid_typing_batches_correctly() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("rapid");
     let url = format!("{base}/p/{pad_id}");
 
@@ -219,7 +225,9 @@ async fn rapid_typing_batches_correctly() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn backspace_propagates() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("bksp");
     let url = format!("{base}/p/{pad_id}");
 
@@ -258,7 +266,9 @@ async fn backspace_propagates() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn browser_sim_insert_propagates_to_terminal_session() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("recv");
 
     // Open session A (the "terminal" side, library-driven for assertion).
@@ -300,7 +310,10 @@ async fn browser_sim_insert_propagates_to_terminal_session() {
         }
     }
     a.disconnect().await.ok();
-    assert!(got_it, "session A did not receive B's insert via NEW_CHANGES");
+    assert!(
+        got_it,
+        "session A did not receive B's insert via NEW_CHANGES"
+    );
 }
 
 // ===========================================================================
@@ -309,7 +322,9 @@ async fn browser_sim_insert_propagates_to_terminal_session() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn browser_clear_while_terminal_idle() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("clear");
 
     // Pre-seed with content from session A.
@@ -342,7 +357,11 @@ async fn browser_clear_while_terminal_idle() {
         ops: vec![Op {
             opcode: OpCode::Delete,
             chars: pad_len - 1,
-            lines: pad_now.chars().take((pad_len - 1) as usize).filter(|c| *c == '\n').count() as u32,
+            lines: pad_now
+                .chars()
+                .take((pad_len - 1) as usize)
+                .filter(|c| *c == '\n')
+                .count() as u32,
             attribs: vec![],
         }],
         char_bank: String::new(),
@@ -370,7 +389,9 @@ async fn browser_clear_while_terminal_idle() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn bracketed_paste_lands() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("paste");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -396,7 +417,9 @@ async fn bracketed_paste_lands() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn human_pace_typing_preserves_order() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("hpace");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -422,12 +445,17 @@ async fn human_pace_typing_preserves_order() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn jittered_typing_preserves_order() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("jitter");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
     let marker = "interesting view change";
-    let intervals: [u64; 23] = [10, 250, 30, 300, 80, 50, 200, 40, 60, 350, 20, 100, 180, 25, 70, 280, 15, 120, 220, 45, 90, 160, 35];
+    let intervals: [u64; 23] = [
+        10, 250, 30, 300, 80, 50, 200, 40, 60, 350, 20, 100, 180, 25, 70, 280, 15, 120, 220, 45,
+        90, 160, 35,
+    ];
     for (c, ms) in marker.chars().zip(intervals.iter()) {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(*ms));
@@ -448,7 +476,9 @@ async fn jittered_typing_preserves_order() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn ctrl_k_cut_line_propagates() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("cutk");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -486,7 +516,9 @@ async fn ctrl_k_cut_line_propagates() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn type_then_ctrl_k_leaves_pad_with_trailing_newline() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("typecut");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -516,7 +548,9 @@ async fn type_then_ctrl_k_leaves_pad_with_trailing_newline() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rapid_backspace_preserves_trailing_newline() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("bksp-all");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -552,7 +586,9 @@ async fn rapid_backspace_preserves_trailing_newline() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn type_while_awaiting_ack() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("type-ack");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -577,7 +613,9 @@ async fn type_while_awaiting_ack() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn enter_enter_type() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("ee");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -603,7 +641,9 @@ async fn enter_enter_type() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn paste_then_cut() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("paste-cut");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -635,7 +675,9 @@ async fn paste_then_cut() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn ctrl_k_then_ctrl_u_round_trips() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("kuround");
     let url = format!("{base}/p/{pad_id}");
     // Pre-seed the pad with two lines, so the cut target isn't "the only
@@ -689,13 +731,16 @@ async fn ctrl_k_then_ctrl_u_round_trips() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rapid_typing_with_mixed_enters_propagates() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("rapidmix");
     let url = format!("{base}/p/{pad_id}");
 
     let mut watcher = fresh_session(&base, &pad_id, "t.rapidmix-W").await;
     let mut watcher_rep = watcher.initial_text().to_string();
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
     let watcher_handle = tokio::spawn(async move {
         loop {
             match watcher.pump_once_event().await {
@@ -733,9 +778,7 @@ async fn rapid_typing_with_mixed_enters_propagates() {
     std::thread::sleep(Duration::from_millis(6000));
     exit_pad(&mut p);
 
-    while let Ok(Some(cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         let cur_len = watcher_rep.chars().count() as u32;
         assert_eq!(
             cs.old_len, cur_len,
@@ -743,8 +786,8 @@ async fn rapid_typing_with_mixed_enters_propagates() {
              cs.old_len={} watcher_rep.len={} cs={:?}",
             cs.old_len, cur_len, cs
         );
-        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
-            .expect("apply cs to watcher rep");
+        watcher_rep =
+            etherpad_client::ot::apply(&cs, &watcher_rep).expect("apply cs to watcher rep");
     }
     watcher_handle.abort();
 
@@ -758,9 +801,9 @@ async fn rapid_typing_with_mixed_enters_propagates() {
         let idx = watcher_rep[last_idx..]
             .find(burst)
             .map(|i| i + last_idx)
-            .unwrap_or_else(|| panic!(
-                "burst {burst:?} missing or out of order in watcher rep: {watcher_rep:?}"
-            ));
+            .unwrap_or_else(|| {
+                panic!("burst {burst:?} missing or out of order in watcher rep: {watcher_rep:?}")
+            });
         last_idx = idx + burst.len();
     }
     assert!(
@@ -778,13 +821,16 @@ async fn rapid_typing_with_mixed_enters_propagates() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn backspace_cannot_strand_trailing_newline() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("bksp-nl");
     let url = format!("{base}/p/{pad_id}");
 
     let mut watcher = fresh_session(&base, &pad_id, "t.bksp-nl-W").await;
     let mut watcher_rep = watcher.initial_text().to_string();
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
     let watcher_handle = tokio::spawn(async move {
         loop {
             match watcher.pump_once_event().await {
@@ -815,17 +861,15 @@ async fn backspace_cannot_strand_trailing_newline() {
     std::thread::sleep(Duration::from_millis(4000));
     exit_pad(&mut p);
 
-    while let Ok(Some(cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         let cur_len = watcher_rep.chars().count() as u32;
         assert_eq!(
             cs.old_len, cur_len,
             "browser-view length mismatch: cs.old_len={} watcher_rep.len={}",
             cs.old_len, cur_len
         );
-        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
-            .expect("apply cs to watcher rep");
+        watcher_rep =
+            etherpad_client::ot::apply(&cs, &watcher_rep).expect("apply cs to watcher rep");
     }
     watcher_handle.abort();
 
@@ -845,13 +889,16 @@ async fn backspace_cannot_strand_trailing_newline() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn many_enters_then_type_preserves_trailing_newline() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("manyenter");
     let url = format!("{base}/p/{pad_id}");
 
     let mut watcher = fresh_session(&base, &pad_id, "t.manyenter-W").await;
     let mut watcher_rep = watcher.initial_text().to_string();
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
     let watcher_handle = tokio::spawn(async move {
         loop {
             match watcher.pump_once_event().await {
@@ -884,17 +931,15 @@ async fn many_enters_then_type_preserves_trailing_newline() {
     std::thread::sleep(Duration::from_millis(4000));
     exit_pad(&mut p);
 
-    while let Ok(Some(cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         let cur_len = watcher_rep.chars().count() as u32;
         assert_eq!(
             cs.old_len, cur_len,
             "browser-view length mismatch: cs.old_len={} watcher_rep.len={}",
             cs.old_len, cur_len
         );
-        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
-            .expect("apply cs to watcher rep");
+        watcher_rep =
+            etherpad_client::ot::apply(&cs, &watcher_rep).expect("apply cs to watcher rep");
     }
     watcher_handle.abort();
 
@@ -918,12 +963,15 @@ async fn many_enters_then_type_preserves_trailing_newline() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn browser_sees_rapid_cut_uncut() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("brrapid");
     let url = format!("{base}/p/{pad_id}");
     let mut watcher = fresh_session(&base, &pad_id, "t.brrapid-W").await;
     let mut watcher_rep = watcher.initial_text().to_string();
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
     let watcher_handle = tokio::spawn(async move {
         loop {
             match watcher.pump_once_event().await {
@@ -950,9 +998,7 @@ async fn browser_sees_rapid_cut_uncut() {
     p.send([0x15u8].as_slice()).expect("^U");
     std::thread::sleep(Duration::from_millis(5000));
     exit_pad(&mut p);
-    while let Ok(Some(cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         let cur_len = watcher_rep.chars().count() as u32;
         assert_eq!(
             cs.old_len, cur_len,
@@ -960,8 +1006,8 @@ async fn browser_sees_rapid_cut_uncut() {
              (cs={:?} cur={:?})",
             cs.old_len, cur_len, cs, watcher_rep
         );
-        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
-            .expect("apply cs to watcher rep");
+        watcher_rep =
+            etherpad_client::ot::apply(&cs, &watcher_rep).expect("apply cs to watcher rep");
     }
     watcher_handle.abort();
     assert!(
@@ -977,7 +1023,9 @@ async fn browser_sees_rapid_cut_uncut() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn browser_sees_cut_uncut_consistently() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("brkucons");
     let url = format!("{base}/p/{pad_id}");
 
@@ -989,7 +1037,8 @@ async fn browser_sees_cut_uncut_consistently() {
 
     // Pump task — runs the watcher's recv loop into a channel of (changeset,
     // newRev) the test thread can drain.
-    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
     let watcher_handle = tokio::spawn(async move {
         loop {
             match watcher.pump_once_event().await {
@@ -1022,9 +1071,7 @@ async fn browser_sees_cut_uncut_consistently() {
     // Apply every received NEW_CHANGES to our watcher's running rep, the way
     // the browser's doRepApplyChangeset would. A length mismatch here is
     // the same failure surface as the user-reported error.
-    while let Ok(Some(cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         let cur_len = watcher_rep.chars().count() as u32;
         assert_eq!(
             cs.old_len, cur_len,
@@ -1032,8 +1079,8 @@ async fn browser_sees_cut_uncut_consistently() {
              (cs={:?} cur={:?})",
             cs.old_len, cur_len, cs, watcher_rep
         );
-        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
-            .expect("apply cs to watcher rep");
+        watcher_rep =
+            etherpad_client::ot::apply(&cs, &watcher_rep).expect("apply cs to watcher rep");
     }
     watcher_handle.abort();
 
@@ -1049,7 +1096,9 @@ async fn browser_sees_cut_uncut_consistently() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn type_then_ctrl_k_then_ctrl_u() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("tkuround");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -1082,7 +1131,9 @@ async fn type_then_ctrl_k_then_ctrl_u() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn multiline_paste_lands() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("mlpaste");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -1110,7 +1161,9 @@ async fn multiline_paste_lands() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn concurrent_terminal_typing_and_browser_writes() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("concur");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -1172,7 +1225,9 @@ async fn concurrent_terminal_typing_and_browser_writes() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn terminal_change_observable_within_5s() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("poll");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
@@ -1196,7 +1251,9 @@ async fn terminal_change_observable_within_5s() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn search_moves_cursor_without_sending_changesets() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("search");
     let url = format!("{base}/p/{pad_id}");
 
@@ -1250,9 +1307,7 @@ async fn search_moves_cursor_without_sending_changesets() {
     exit_pad(&mut p);
 
     let mut saw_changeset = false;
-    while let Ok(Some(_cs)) =
-        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-    {
+    while let Ok(Some(_cs)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await {
         saw_changeset = true;
     }
     watcher_handle.abort();
@@ -1270,7 +1325,9 @@ async fn search_moves_cursor_without_sending_changesets() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn replace_propagates_to_server() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("replace");
     let url = format!("{base}/p/{pad_id}");
 
@@ -1329,7 +1386,9 @@ async fn replace_propagates_to_server() {
 // ===========================================================================
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn replace_with_missing_needle_is_noop() {
-    let Some(base) = skip_if_no_remote() else { return };
+    let Some(base) = skip_if_no_remote() else {
+        return;
+    };
     let pad_id = fresh_pad_id("replace-miss");
     let url = format!("{base}/p/{pad_id}");
 
@@ -1367,8 +1426,5 @@ async fn replace_with_missing_needle_is_noop() {
     exit_pad(&mut p);
 
     let after = pad_text(&base, &pad_id).await;
-    assert_eq!(
-        baseline, after,
-        "no-op replace must not change pad text"
-    );
+    assert_eq!(baseline, after, "no-op replace must not change pad text");
 }

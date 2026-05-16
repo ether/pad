@@ -85,7 +85,10 @@ fn consistent_chain_pending_rebases_cleanly() {
     let queue = queue_with(vec![cs1, cs2]);
     let remote = insert_at_end("abc", "X"); // peer inserts X at end of original "abc"
     let r = apply_remote(&mut buf, &remote, &queue);
-    assert!(r.is_ok(), "consistent pending chain should rebase cleanly, got {r:?}");
+    assert!(
+        r.is_ok(),
+        "consistent pending chain should rebase cleanly, got {r:?}"
+    );
     // Result should contain X somewhere appropriate. Exact position depends on
     // tiebreaker, but the text must contain all four characters.
     let final_text = buf.text();

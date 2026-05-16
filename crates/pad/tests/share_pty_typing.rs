@@ -42,7 +42,8 @@ async fn typing_chars_lands_forward_not_reversed() {
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_micros() % 100000
+            .as_micros()
+            % 100000
     );
     for c in marker.chars() {
         p.send([c as u8].as_slice()).expect("send char");

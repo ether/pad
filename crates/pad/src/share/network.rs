@@ -250,8 +250,12 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
             // entry and the outbound-arm's tail-merge has the chance to
             // catch every chain.
             while queue.len() >= 2 {
-                let Some((a, ac)) = queue.pop_front() else { break };
-                let Some((b, bc)) = queue.pop_front() else { break };
+                let Some((a, ac)) = queue.pop_front() else {
+                    break;
+                };
+                let Some((b, bc)) = queue.pop_front() else {
+                    break;
+                };
                 match concat_inserts(&a, &b) {
                     Some(merged) => {
                         queue.push_front((merged, ac + bc));
@@ -467,7 +471,20 @@ mod concat_tests {
     #[test]
     fn refuses_to_merge_when_b_contains_delete() {
         let a = cs(29, 1, vec![keep(28, 0), insert(1, 0)], "h");
-        let b = cs(30, -1, vec![keep(29, 0), Op { opcode: OpCode::Delete, chars: 1, lines: 0, attribs: vec![] }], "");
+        let b = cs(
+            30,
+            -1,
+            vec![
+                keep(29, 0),
+                Op {
+                    opcode: OpCode::Delete,
+                    chars: 1,
+                    lines: 0,
+                    attribs: vec![],
+                },
+            ],
+            "",
+        );
         assert!(concat_inserts(&a, &b).is_none());
     }
 }

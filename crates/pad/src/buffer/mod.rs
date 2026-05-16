@@ -238,10 +238,8 @@ impl Buffer {
     pub fn insert_char(&mut self, c: char) -> (u32, String) {
         let char_idx = self.cursor_char_idx();
         let total = self.rope.len_chars();
-        let on_trailing_empty = c != '\n'
-            && total > 0
-            && char_idx == total
-            && self.rope.char(total - 1) == '\n';
+        let on_trailing_empty =
+            c != '\n' && total > 0 && char_idx == total && self.rope.char(total - 1) == '\n';
         if on_trailing_empty {
             // Synthesize the missing line terminator so the new content
             // becomes a proper line. The user typed `c`; we durably insert
@@ -313,9 +311,7 @@ impl Buffer {
         // strangely under sustained inserts). Doing one rope.insert
         // with one synth-\n keeps the rope and the returned text
         // byte-identical.
-        let on_trailing_empty = total > 0
-            && char_idx == total
-            && self.rope.char(total - 1) == '\n';
+        let on_trailing_empty = total > 0 && char_idx == total && self.rope.char(total - 1) == '\n';
         let needs_synth_nl = on_trailing_empty && !s.ends_with('\n');
         let actual_text: String = if needs_synth_nl {
             let mut owned = String::with_capacity(s.len() + 1);
@@ -361,9 +357,8 @@ impl Buffer {
         }
         let prev = self.rope.char(char_idx - 1);
         let total = self.rope.len_chars();
-        let would_strand_trailing_nl = prev == '\n'
-            && char_idx == total
-            && (total < 2 || self.rope.char(total - 2) != '\n');
+        let would_strand_trailing_nl =
+            prev == '\n' && char_idx == total && (total < 2 || self.rope.char(total - 2) != '\n');
         if would_strand_trailing_nl {
             return None;
         }

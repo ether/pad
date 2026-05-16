@@ -108,7 +108,7 @@ async fn push_then_read_back() {
     );
 
     assert!(
-        sess_b.initial_text().contains(&marker.trim_end()),
+        sess_b.initial_text().contains(marker.trim_end()),
         "expected marker {:?} in B's initial text, got {:?}",
         marker,
         sess_b.initial_text()

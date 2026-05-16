@@ -85,7 +85,10 @@ async fn paste_url_lands_on_remote() {
     let pad_text = sess.initial_text().to_string();
     sess.disconnect().await.ok();
 
-    eprintln!("pad text after PTY paste ({} chars):\n{pad_text}", pad_text.len());
+    eprintln!(
+        "pad text after PTY paste ({} chars):\n{pad_text}",
+        pad_text.len()
+    );
     assert!(
         pad_text.contains(marker.trim_end()),
         "expected paste marker {:?} in pad text after PTY-driven session, got:\n{pad_text}",

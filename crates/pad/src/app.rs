@@ -291,10 +291,8 @@ impl App {
                 self.buffer.snapshot_for_undo();
                 let pre_text = self.share.as_ref().map(|_| self.buffer.text());
                 if let Some((offset, deleted)) = self.buffer.backspace() {
-                    self.pending_log.append(&PendingEntry::Delete {
-                        offset,
-                        len: 1,
-                    })?;
+                    self.pending_log
+                        .append(&PendingEntry::Delete { offset, len: 1 })?;
                     if let Some(share) = self.share.as_mut() {
                         let cs = crate::share::bridge::changeset_for_delete(
                             &pre_text.unwrap(),
@@ -309,10 +307,8 @@ impl App {
                 self.buffer.snapshot_for_undo();
                 let pre_text = self.share.as_ref().map(|_| self.buffer.text());
                 if let Some((offset, deleted)) = self.buffer.delete_char_forward() {
-                    self.pending_log.append(&PendingEntry::Delete {
-                        offset,
-                        len: 1,
-                    })?;
+                    self.pending_log
+                        .append(&PendingEntry::Delete { offset, len: 1 })?;
                     if let Some(share) = self.share.as_mut() {
                         let cs = crate::share::bridge::changeset_for_delete(
                             &pre_text.unwrap(),
@@ -360,9 +356,8 @@ impl App {
                     && let Some(share) = self.share.as_mut()
                 {
                     let pre_text = pre_text.unwrap();
-                    let cs = crate::share::bridge::changeset_for_delete(
-                        &pre_text, cut_start, cut_text,
-                    );
+                    let cs =
+                        crate::share::bridge::changeset_for_delete(&pre_text, cut_start, cut_text);
                     share.outbound.send(cs)?;
                 }
             }
@@ -565,9 +560,7 @@ impl App {
             // insert lands past it and Etherpad's auto-trailing-newline check
             // fires repeatedly, smearing '\n's through the inserted text
             // (user-reported: typing "T7" appeared as "T\n7" in the browser).
-            let pos = if handles.initial_text.ends_with('\n')
-                && self.buffer.line_count() >= 2
-            {
+            let pos = if handles.initial_text.ends_with('\n') && self.buffer.line_count() >= 2 {
                 let line = self.buffer.line_count() - 2;
                 crate::buffer::CursorPos {
                     line,
@@ -730,10 +723,8 @@ impl App {
                 // shared pads ended up with stale server text and the
                 // browser-side display diverged from what the user typed.
                 let saved_cursor = self.buffer.cursor();
-                self.buffer.move_cursor_to(crate::buffer::CursorPos {
-                    line: 0,
-                    col: 0,
-                });
+                self.buffer
+                    .move_cursor_to(crate::buffer::CursorPos { line: 0, col: 0 });
                 loop {
                     let pre_text = self.share.as_ref().map(|_| self.buffer.text());
                     let Some(start) = self.buffer.replace_one(&from, &to) else {
@@ -745,9 +736,7 @@ impl App {
                         continue;
                     };
                     let pre = pre_text.expect("captured when shared");
-                    let cs = crate::share::bridge::changeset_for_replace(
-                        &pre, start, &from, &to,
-                    );
+                    let cs = crate::share::bridge::changeset_for_replace(&pre, start, &from, &to);
                     share.outbound.send(cs)?;
                 }
                 self.buffer.move_cursor_to(saved_cursor);

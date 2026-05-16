@@ -57,9 +57,7 @@ async fn ten_sequential_changesets_all_land() {
     let mut awaiting = false;
     let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
     while !pending.is_empty() || awaiting {
-        if !awaiting
-            && let Some(cs) = pending.pop_front()
-        {
+        if !awaiting && let Some(cs) = pending.pop_front() {
             sess_a.send_changeset(&cs).await.expect("send");
             awaiting = true;
             continue;
