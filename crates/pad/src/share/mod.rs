@@ -23,6 +23,10 @@ pub struct ShareState {
     pub ack_rx: mpsc::UnboundedReceiver<()>,
     pub net_task: JoinHandle<()>,
     pub authors: std::collections::HashSet<String>,
+    /// Set to true once we've surfaced the "network task died" FlashMessage
+    /// for the current session — drain runs every tick and we don't want to
+    /// keep spamming the message ribbon.
+    pub disconnected_notified: bool,
 }
 
 impl ShareState {

@@ -241,6 +241,17 @@ impl PadSession {
                 let _ = writeln!(f, "[{:?}] inbound msg = {}", std::time::SystemTime::now(), msg);
             }
         }
+        // Server-initiated disconnect (e.g. {disconnect: "badChangeset"}).
+        // Previously this was swallowed as `InboundEvent::Other`; the network
+        // task then kept queueing outbound changesets forever without ever
+        // getting an ACK because no future emit will be accepted. Surface
+        // these as a hard protocol error so the upper layer can stop and
+        // tell the user what happened.
+        if let Some(reason) = msg["disconnect"].as_str() {
+            return Err(ClientError::Protocol(format!(
+                "server disconnected the session: {reason}"
+            )));
+        }
         let kind = msg["type"].as_str().unwrap_or("");
         if kind == "COLLABROOM" {
             let inner = &msg["data"];

@@ -166,6 +166,21 @@ impl App {
         let Some(mut share) = self.share.take() else {
             return Ok(());
         };
+        // Detect a network-task death (server-side disconnect, socket close,
+        // serializer panic, etc.) before draining channels. Without this,
+        // the task can die in the background and the editor keeps appearing
+        // to work locally — typing fills the rope, every outbound send sees
+        // the channel as closed but the user has no idea their edits aren't
+        // reaching the server. Surface a flash so the failure mode is at
+        // least visible.
+        if share.net_task.is_finished() && !share.disconnected_notified {
+            share.disconnected_notified = true;
+            self.state = AppState::FlashMessage(
+                "Disconnected from pad — server closed the session. \
+                 Edits stay local until you reconnect."
+                    .into(),
+            );
+        }
         // Drain ACK signals FIRST — these pop oldest entries off the local
         // OutboundQueue so the subsequent apply_remote OT-rebase only walks
         // changesets that the server hasn't accepted yet. Without this drain,
@@ -567,6 +582,7 @@ impl App {
             ack_rx: handles.ack_rx,
             net_task: handles.task,
             authors,
+            disconnected_notified: false,
         });
         // When joining a URL the user already has the URL — don't slam a
         // full-screen QR at them. M-Q (Alt-Q) reshows it on demand.

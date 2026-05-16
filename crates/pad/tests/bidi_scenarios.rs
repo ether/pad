@@ -680,6 +680,86 @@ async fn ctrl_k_then_ctrl_u_round_trips() {
 }
 
 // ===========================================================================
+// 15i. RAPID TYPING WITH MIXED ENTERS — user-reported: typed
+//      "Proudly sponsored by vpsdimeey ttell me more about this business
+//       \nslkdjflksjdlfkjslkdfjlskdjf\nsadfsdfsdf" fast in the terminal; the
+//      pad text never reached the browser. Captures the wire trace via a
+//      watcher session and asserts every NEW_CHANGES applies cleanly so
+//      we catch silent disconnects + length drift in CI.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn rapid_typing_with_mixed_enters_propagates() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("rapidmix");
+    let url = format!("{base}/p/{pad_id}");
+
+    let mut watcher = fresh_session(&base, &pad_id, "t.rapidmix-W").await;
+    let mut watcher_rep = watcher.initial_text().to_string();
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+
+    let mut p = spawn_pad(&url);
+    // Mirror the user's rough cadence: rapid burst, two enters, rapid
+    // burst, two enters, rapid burst. No per-char sleep — hammers the
+    // outbound batching and the trailing-'\n' interaction in the rope.
+    let bursts: [&str; 3] = [
+        "ey ttell me more about this business",
+        "slkdjflksjdlfkjslkdfjlskdjf",
+        "sadfsdfsdf",
+    ];
+    for (i, burst) in bursts.iter().enumerate() {
+        for c in burst.chars() {
+            p.send([c as u8].as_slice()).expect("send");
+        }
+        if i + 1 < bursts.len() {
+            p.send([b'\r']).expect("enter1");
+            std::thread::sleep(Duration::from_millis(20));
+            p.send([b'\r']).expect("enter2");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+    }
+    std::thread::sleep(Duration::from_millis(6000));
+    exit_pad(&mut p);
+
+    while let Ok(Some(cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        let cur_len = watcher_rep.chars().count() as u32;
+        assert_eq!(
+            cs.old_len, cur_len,
+            "browser-view length mismatch during rapid typing: \
+             cs.old_len={} watcher_rep.len={} cs={:?}",
+            cs.old_len, cur_len, cs
+        );
+        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
+            .expect("apply cs to watcher rep");
+    }
+    watcher_handle.abort();
+
+    for burst in &bursts {
+        assert!(
+            watcher_rep.contains(burst),
+            "burst {burst:?} missing from watcher rep: {watcher_rep:?}"
+        );
+    }
+    assert!(
+        watcher_rep.ends_with('\n'),
+        "pad text must end with \\n; got {watcher_rep:?}"
+    );
+}
+
 // 15h. BACKSPACE-THE-ONLY-NEWLINE — user-reported: "deleting the line break
 //      after the last char on the first line (so no line breaks left in the
 //      pad) breaks the browser." Backspacing from line 1 col 0 of "abc\n"
