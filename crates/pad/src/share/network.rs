@@ -134,6 +134,18 @@ fn concat_inserts(a: &Changeset, b: &Changeset) -> Option<Changeset> {
     let merged_bank = format!("{}{}", a.char_bank, b.char_bank);
     let merged_chars = merged_bank.chars().count() as u32;
     let merged_lines = merged_bank.matches('\n').count() as u32;
+    // Refuse to produce a multi-Insert-op changeset. Etherpad's web client
+    // never emits that shape (its compose() flushes at line boundaries);
+    // observed live: the receiving browser scrambles content in the live
+    // DOM when it sees Keep + Insert(lines>0) + Insert(lines=0) in one
+    // changeset, even though `applyToAText` produces the correct rep.
+    // Keep is fine; multi-Insert is what trips the render path. So when a
+    // merge would require splitting into prefix-with-\n + mid-line tail,
+    // we DON'T merge — leave the two cs's separate, one wire message
+    // each.
+    if merged_lines > 0 && !merged_bank.ends_with('\n') {
+        return None;
+    }
     let mut new_ops = Vec::new();
     if a_keep_chars > 0 {
         new_ops.push(etherpad_client::changeset::Op {
@@ -143,34 +155,12 @@ fn concat_inserts(a: &Changeset, b: &Changeset) -> Option<Changeset> {
             attribs: vec![],
         });
     }
-    if merged_lines > 0 && !merged_bank.ends_with('\n') {
-        // Multi-line tail without a trailing '\n' — Etherpad rejects that as
-        // a single Insert. Split into [prefix-with-final-\n, mid-line tail].
-        let last_nl_byte = merged_bank.rfind('\n').expect("has \\n");
-        let prefix = &merged_bank[..last_nl_byte + 1];
-        let suffix = &merged_bank[last_nl_byte + 1..];
-        let prefix_chars = prefix.chars().count() as u32;
-        let suffix_chars = suffix.chars().count() as u32;
-        new_ops.push(etherpad_client::changeset::Op {
-            opcode: OpCode::Insert,
-            chars: prefix_chars,
-            lines: merged_lines,
-            attribs: vec![],
-        });
-        new_ops.push(etherpad_client::changeset::Op {
-            opcode: OpCode::Insert,
-            chars: suffix_chars,
-            lines: 0,
-            attribs: vec![],
-        });
-    } else {
-        new_ops.push(etherpad_client::changeset::Op {
-            opcode: OpCode::Insert,
-            chars: merged_chars,
-            lines: merged_lines,
-            attribs: vec![],
-        });
-    }
+    new_ops.push(etherpad_client::changeset::Op {
+        opcode: OpCode::Insert,
+        chars: merged_chars,
+        lines: merged_lines,
+        attribs: vec![],
+    });
     Some(Changeset {
         old_len: a.old_len,
         net_delta: a.net_delta + b.net_delta,
@@ -409,38 +399,32 @@ mod concat_tests {
     }
 
     #[test]
-    fn merges_enter_then_typing_splits_into_two_inserts() {
+    fn refuses_to_merge_enter_then_mid_line_typing() {
         // "\n" then "t" → merged bank "\nt" is multi-line but doesn't end
-        // with \n. Etherpad rejects a single multi-line Insert without a
-        // trailing \n, so concat_inserts splits into prefix-with-\n +
-        // single-line-tail. Both ops live in ONE changeset so the wire
-        // still carries one NEW_CHANGES.
+        // with '\n'. Producing that as a single Insert violates Etherpad's
+        // checkRep, and producing it as two Insert ops in one changeset
+        // triggers a DOM-render scramble in Etherpad's web client (lives
+        // in performDocumentApplyChangeset → DOM splice). Match the
+        // browser's commit shape instead — leave the two cs's separate.
         let a = cs(29, 1, vec![keep(28, 0), insert(1, 1)], "\n");
         let b = cs(30, 1, vec![keep(29, 0), insert(1, 0)], "t");
-        let m = concat_inserts(&a, &b).expect("should merge");
-        assert_eq!(m.char_bank, "\nt");
-        assert_eq!(m.ops.len(), 3); // Keep + Insert(prefix) + Insert(tail)
-        assert!(matches!(m.ops[1].opcode, OpCode::Insert));
-        assert_eq!(m.ops[1].chars, 1);
-        assert_eq!(m.ops[1].lines, 1);
-        assert!(matches!(m.ops[2].opcode, OpCode::Insert));
-        assert_eq!(m.ops[2].chars, 1);
-        assert_eq!(m.ops[2].lines, 0);
+        assert!(concat_inserts(&a, &b).is_none());
     }
 
     #[test]
-    fn merges_multi_op_a_with_single_op_b() {
-        // Iteratively merging "\n" + "t" + "e" — after the first merge, a
-        // has [Keep, Insert{1,1,"\n"}, Insert{1,0,"t"}]. Merging that with
-        // "e" must still chain and produce a valid combined cs.
-        let step1_a = cs(29, 1, vec![keep(28, 0), insert(1, 1)], "\n");
-        let step1_b = cs(30, 1, vec![keep(29, 0), insert(1, 0)], "t");
-        let step1 = concat_inserts(&step1_a, &step1_b).expect("merge 1");
-        let step2_b = cs(31, 1, vec![keep(30, 0), insert(1, 0)], "e");
-        let step2 = concat_inserts(&step1, &step2_b).expect("merge 2");
-        assert_eq!(step2.char_bank, "\nte");
-        assert_eq!(step2.old_len, 29);
-        assert_eq!(step2.net_delta, 3);
+    fn merges_typing_then_enter_into_single_multiline_insert() {
+        // "hello" + "\n" → merged bank "hello\n" ends with '\n' → one
+        // Insert op (lines=1) — this is the shape Etherpad's web client
+        // also produces for a typing→Enter burst, and rendering handles
+        // it correctly.
+        let a = cs(29, 5, vec![keep(28, 0), insert(5, 0)], "hello");
+        let b = cs(34, 1, vec![keep(33, 0), insert(1, 1)], "\n");
+        let m = concat_inserts(&a, &b).expect("should merge");
+        assert_eq!(m.char_bank, "hello\n");
+        assert_eq!(m.ops.len(), 2); // Keep + single Insert
+        assert!(matches!(m.ops[1].opcode, OpCode::Insert));
+        assert_eq!(m.ops[1].chars, 6);
+        assert_eq!(m.ops[1].lines, 1);
     }
 
     #[test]
