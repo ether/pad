@@ -1,6 +1,6 @@
 [package]
 name = "etherpad-client"
-version = "0.1.0-dev"
+version = "0.1.0"
 description = "Reusable Rust client for the Etherpad socket.io + changeset protocol."
 edition.workspace = true
 rust-version.workspace = true

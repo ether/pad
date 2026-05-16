@@ -10,7 +10,7 @@ members = [
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"
-repository = "https://github.com/ether/etherpad-pad"
+repository = "https://github.com/ether/pad"
 authors = ["John McLear <john@mclear.co.uk>"]
 
 [workspace.dependencies]

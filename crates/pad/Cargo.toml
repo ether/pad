@@ -1,6 +1,6 @@
 [package]
 name = "pad"
-version = "0.1.0-dev"
+version = "0.1.0"
 description = "Nano-class terminal text editor with optional real-time collaboration backed by Etherpad."
 edition.workspace = true
 rust-version.workspace = true
