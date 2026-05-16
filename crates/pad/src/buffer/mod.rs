@@ -152,8 +152,37 @@ impl Buffer {
         self.cursor.col = self.pref_col.min(line_len);
     }
 
-    pub fn insert_char(&mut self, c: char) {
+    /// Insert a single char at the cursor and advance. Returns
+    /// `(rope_offset_of_insert, text_actually_inserted)` so callers building
+    /// outbound changesets can use the SAME bytes that landed in the rope —
+    /// not the user's raw keystroke. Most of the time `text_actually_inserted`
+    /// equals `c.to_string()`, but on the trailing-empty line we insert
+    /// `c` followed by `\n` to preserve Etherpad's "doc always ends with \n"
+    /// invariant (without that extra `\n`, the typed char strands the
+    /// existing trailing `\n` mid-document and the browser's line assembler
+    /// asserts "line assembler not finished").
+    pub fn insert_char(&mut self, c: char) -> (u32, String) {
         let char_idx = self.cursor_char_idx();
+        let total = self.rope.len_chars();
+        let on_trailing_empty = c != '\n'
+            && total > 0
+            && char_idx == total
+            && self.rope.char(total - 1) == '\n';
+        if on_trailing_empty {
+            // Synthesize the missing line terminator so the new content
+            // becomes a proper line. The user typed `c`; we durably insert
+            // `c\n` so the line carrying `c` ends with a newline AND a fresh
+            // trailing-empty line still exists past it.
+            self.rope.insert_char(char_idx, c);
+            self.rope.insert_char(char_idx + 1, '\n');
+            self.dirty = true;
+            self.cursor.col = 1;
+            self.pref_col = 1;
+            let mut text = String::with_capacity(2);
+            text.push(c);
+            text.push('\n');
+            return (char_idx as u32, text);
+        }
         self.rope.insert_char(char_idx, c);
         self.dirty = true;
         if c == '\n' {
@@ -163,12 +192,27 @@ impl Buffer {
             self.cursor.col += 1;
         }
         self.pref_col = self.cursor.col;
+        (char_idx as u32, c.to_string())
     }
 
-    pub fn insert_str(&mut self, s: &str) {
-        for c in s.chars() {
-            self.insert_char(c);
+    /// Insert `s` at the cursor in one shot. Returns
+    /// `(rope_offset_of_insert, text_actually_inserted)` — see
+    /// [`insert_char`] for why the inserted text can differ from `s`.
+    pub fn insert_str(&mut self, s: &str) -> (u32, String) {
+        if s.is_empty() {
+            return (self.cursor_char_idx() as u32, String::new());
         }
+        let mut first_pos: Option<u32> = None;
+        let mut acc = String::with_capacity(s.len() + 1);
+        for c in s.chars() {
+            let (pos, inserted) = self.insert_char(c);
+            first_pos.get_or_insert(pos);
+            acc.push_str(&inserted);
+        }
+        (
+            first_pos.unwrap_or_else(|| self.cursor_char_idx() as u32),
+            acc,
+        )
     }
 
     pub fn backspace(&mut self) {

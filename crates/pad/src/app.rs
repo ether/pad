@@ -231,21 +231,18 @@ impl App {
         match action {
             KeyAction::InsertChar(c) => {
                 self.buffer.snapshot_for_undo();
-                let pre_offset = self.buffer.cursor_offset();
-                // Capture old text only if we'll need it (when shared) — cheap
-                // for plan-2 doc sizes, optimize later for huge files.
                 let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                let (actual_pos, actual_text) = self.buffer.insert_char(c);
                 self.pending_log.append(&PendingEntry::Insert {
-                    offset: pre_offset,
-                    text: c.to_string(),
+                    offset: actual_pos,
+                    text: actual_text.clone(),
                 })?;
-                self.buffer.insert_char(c);
                 if let Some(share) = self.share.as_mut() {
                     let pre_text = pre_text.unwrap();
                     let cs = crate::share::bridge::changeset_for_insert(
                         &pre_text,
-                        pre_offset,
-                        &c.to_string(),
+                        actual_pos,
+                        &actual_text,
                     );
                     share.outbound.send(cs)?;
                 }
@@ -258,17 +255,18 @@ impl App {
                     return Ok(());
                 }
                 self.buffer.snapshot_for_undo();
-                let pre_offset = self.buffer.cursor_offset();
                 let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                let (actual_pos, actual_text) = self.buffer.insert_str(&s);
                 self.pending_log.append(&PendingEntry::Insert {
-                    offset: pre_offset,
-                    text: s.clone(),
+                    offset: actual_pos,
+                    text: actual_text.clone(),
                 })?;
-                self.buffer.insert_str(&s);
                 if let Some(share) = self.share.as_mut() {
                     let pre_text = pre_text.unwrap();
                     let cs = crate::share::bridge::changeset_for_insert(
-                        &pre_text, pre_offset, &s,
+                        &pre_text,
+                        actual_pos,
+                        &actual_text,
                     );
                     share.outbound.send(cs)?;
                 }

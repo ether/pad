@@ -149,16 +149,31 @@ impl PadSession {
         } else {
             json!({ "numToAttrib": {}, "nextNum": 0 })
         };
+        let wire = serialize_changeset(&decorated);
         let payload = json!({
             "component": "pad",
             "type": "COLLABROOM",
             "data": {
                 "type": "USER_CHANGES",
                 "baseRev": self.rev,
-                "changeset": serialize_changeset(&decorated),
+                "changeset": wire.clone(),
                 "apool": apool,
             }
         });
+        if let Ok(p) = std::env::var("PAD_DIAG_LOG") {
+            use std::io::Write;
+            if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&p) {
+                let _ = writeln!(
+                    f,
+                    "[{:?}] send_changeset baseRev={} wire={} (old_len={} net_delta={})",
+                    std::time::SystemTime::now(),
+                    self.rev,
+                    wire,
+                    decorated.old_len,
+                    decorated.net_delta,
+                );
+            }
+        }
         self.socket.emit("message", payload).await
     }
 
@@ -220,6 +235,12 @@ impl PadSession {
             .recv()
             .await
             .ok_or_else(|| ClientError::Protocol("socket closed".into()))?;
+        if let Ok(p) = std::env::var("PAD_DIAG_LOG") {
+            use std::io::Write;
+            if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(&p) {
+                let _ = writeln!(f, "[{:?}] inbound msg = {}", std::time::SystemTime::now(), msg);
+            }
+        }
         let kind = msg["type"].as_str().unwrap_or("");
         if kind == "COLLABROOM" {
             let inner = &msg["data"];

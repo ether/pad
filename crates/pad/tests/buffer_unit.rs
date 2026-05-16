@@ -22,8 +22,13 @@ fn insert_newline_moves_to_next_line() {
     let mut b = Buffer::empty();
     b.insert_char('a');
     b.insert_char('\n');
+    // After 'a' + '\n' the rope is "a\n" with the cursor on the trailing
+    // empty line. Typing 'b' there auto-appends a fresh trailing '\n' so the
+    // doc keeps ending with '\n' — Etherpad's pad invariant. Without that
+    // auto-append, the 'b' would be inserted past the existing '\n' and the
+    // browser-side line assembler aborts ("line assembler not finished").
     b.insert_char('b');
-    assert_eq!(b.text(), "a\nb");
+    assert_eq!(b.text(), "a\nb\n");
     assert_eq!(b.cursor(), CursorPos { line: 1, col: 1 });
 }
 

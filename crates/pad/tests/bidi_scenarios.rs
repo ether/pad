@@ -680,6 +680,83 @@ async fn ctrl_k_then_ctrl_u_round_trips() {
 }
 
 // ===========================================================================
+// 15g. ENTER MANY THEN TYPE — user-reported: "wrote ..., a bunch of empty
+//      lines, then 'hello'" produced wire `Z:1h>6|g=1h*0+6$hello ` (insert
+//      past the trailing \n) and the browser asserted "line assembler not
+//      finished". Caused by cursor reaching the implicit trailing-empty line
+//      via repeated Enter / Down arrow; insert at rope.len_chars() appended
+//      after the trailing \n and broke Etherpad's "doc ends with \n"
+//      invariant. The buffer fix synthesizes the missing trailing \n.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn many_enters_then_type_preserves_trailing_newline() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("manyenter");
+    let url = format!("{base}/p/{pad_id}");
+
+    let mut watcher = fresh_session(&base, &pad_id, "t.manyenter-W").await;
+    let mut watcher_rep = watcher.initial_text().to_string();
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+
+    let mut p = spawn_pad(&url);
+    for c in "preamble".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(30));
+    }
+    // 8 Enters to reach deep into the trailing-empty region.
+    for _ in 0..8 {
+        p.send([b'\r']).expect("enter");
+        std::thread::sleep(Duration::from_millis(80));
+    }
+    // Now type "hello" — pre-fix this would land past the trailing \n.
+    for c in "hello".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(40));
+    }
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    while let Ok(Some(cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        let cur_len = watcher_rep.chars().count() as u32;
+        assert_eq!(
+            cs.old_len, cur_len,
+            "browser-view length mismatch: cs.old_len={} watcher_rep.len={}",
+            cs.old_len, cur_len
+        );
+        watcher_rep = etherpad_client::ot::apply(&cs, &watcher_rep)
+            .expect("apply cs to watcher rep");
+    }
+    watcher_handle.abort();
+
+    assert!(
+        watcher_rep.ends_with('\n'),
+        "pad text must end with \\n; got {watcher_rep:?}"
+    );
+    assert!(
+        watcher_rep.contains("preamble"),
+        "preamble missing: {watcher_rep:?}"
+    );
+    assert!(
+        watcher_rep.contains("hello"),
+        "hello missing: {watcher_rep:?}"
+    );
+}
+
 // 15f. RAPID CUT+UNCUT — same as 15e but back-to-back with no delay between
 //      ^K and ^U, so the cut may still be in flight when uncut is queued.
 //      This was the user's actual interaction speed.
