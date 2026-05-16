@@ -694,8 +694,40 @@ impl App {
         match action {
             KeyAction::InsertChar('\n') => {
                 let (from, to) = (from.clone(), to.clone());
+                if from.is_empty() {
+                    self.state = AppState::Editing;
+                    return Ok(());
+                }
                 self.buffer.snapshot_for_undo();
-                let _n = self.buffer.replace_all(&from, &to);
+                // Drive the loop ourselves rather than calling
+                // self.buffer.replace_all — for each replacement we need to
+                // capture pre-mutation text and emit an outbound changeset
+                // so the server stays in sync with our local view. Earlier
+                // bug: handle_replace_to invoked replace_all silently, so
+                // shared pads ended up with stale server text and the
+                // browser-side display diverged from what the user typed.
+                let saved_cursor = self.buffer.cursor();
+                self.buffer.move_cursor_to(crate::buffer::CursorPos {
+                    line: 0,
+                    col: 0,
+                });
+                loop {
+                    let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                    let Some(start) = self.buffer.replace_one(&from, &to) else {
+                        break;
+                    };
+                    let Some(share) = self.share.as_mut() else {
+                        // Local-only mode: replace_one already mutated the
+                        // rope; nothing to send.
+                        continue;
+                    };
+                    let pre = pre_text.expect("captured when shared");
+                    let cs = crate::share::bridge::changeset_for_replace(
+                        &pre, start, &from, &to,
+                    );
+                    share.outbound.send(cs)?;
+                }
+                self.buffer.move_cursor_to(saved_cursor);
                 self.state = AppState::Editing;
             }
             KeyAction::InsertChar(c) => to.push(c),
@@ -744,9 +776,31 @@ impl App {
                 if let Ok(bytes) = std::fs::read(&path)
                     && let Ok(text) = std::str::from_utf8(&bytes)
                 {
-                    self.buffer.snapshot_for_undo();
                     let normalized = text.replace("\r\n", "\n").replace('\r', "\n");
-                    self.buffer.insert_str(&normalized);
+                    if normalized.is_empty() {
+                        return Ok(());
+                    }
+                    self.buffer.snapshot_for_undo();
+                    // Same shape as the InsertText (paste) path: capture pre-
+                    // text BEFORE mutating, mutate via insert_str (which
+                    // returns the offset + bytes that actually landed in the
+                    // rope — may differ from `normalized` if we're on the
+                    // trailing-empty line and need a synthesised '\n'), then
+                    // emit a single changeset for the inserted bytes.
+                    // Previous code mutated the rope but never sent anything,
+                    // so on a shared pad the server-side text diverged
+                    // silently.
+                    let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                    let (actual_pos, actual_text) = self.buffer.insert_str(&normalized);
+                    if let Some(share) = self.share.as_mut() {
+                        let pre = pre_text.expect("captured when shared");
+                        let cs = crate::share::bridge::changeset_for_insert(
+                            &pre,
+                            actual_pos,
+                            &actual_text,
+                        );
+                        share.outbound.send(cs)?;
+                    }
                 }
             }
             KeyAction::InsertChar(c) => input.push(c),

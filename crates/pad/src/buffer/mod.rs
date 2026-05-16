@@ -402,18 +402,35 @@ impl Buffer {
         search::search_forward(&self.rope, needle, start)
     }
 
-    pub fn replace_one(&mut self, needle: &str, replacement: &str) -> bool {
-        let Some(pos) = self.search_forward(needle) else {
-            return false;
-        };
+    /// Replace the first occurrence of `needle` at-or-after the cursor with
+    /// `replacement`. Returns `Some(rope_offset_where_needle_started)` on
+    /// success — the caller needs this offset to construct an outbound
+    /// changeset when shared. Returns `None` if `needle` isn't found.
+    /// Also advances the cursor to just after the replacement so a
+    /// follow-up `replace_one` makes forward progress (without this, a
+    /// replacement that contains the needle — e.g. replace "a" → "aa" —
+    /// would loop on the same position forever).
+    pub fn replace_one(&mut self, needle: &str, replacement: &str) -> Option<u32> {
+        let pos = self.search_forward(needle)?;
         let start_char = self.rope.line_to_char(pos.line) + pos.col;
         let needle_chars = needle.chars().count();
         self.rope.remove(start_char..start_char + needle_chars);
         self.rope.insert(start_char, replacement);
         self.dirty = true;
-        true
+        // Advance cursor past the replacement so the next search starts
+        // beyond it.
+        let after = start_char + replacement.chars().count();
+        self.cursor = self.clamp_offset_to_cursor_pos(after);
+        self.pref_col = self.cursor.col;
+        Some(start_char as u32)
     }
 
+    /// Bulk replace — finds every occurrence of `needle` from the start of
+    /// the document and replaces it with `replacement`. Returns the count
+    /// of replacements made. Callers that need to emit changesets per
+    /// replacement (e.g. the shared-pad replace path in app.rs) MUST drive
+    /// the loop themselves with `replace_one` so they can capture the
+    /// pre-mutation text for each step.
     pub fn replace_all(&mut self, needle: &str, replacement: &str) -> usize {
         if needle.is_empty() {
             return 0;
@@ -421,11 +438,22 @@ impl Buffer {
         let saved = self.cursor;
         self.move_cursor_to(CursorPos { line: 0, col: 0 });
         let mut count = 0;
-        while self.replace_one(needle, replacement) {
+        while self.replace_one(needle, replacement).is_some() {
             count += 1;
         }
         self.move_cursor_to(saved);
         count
+    }
+
+    fn clamp_offset_to_cursor_pos(&self, offset: usize) -> CursorPos {
+        let total = self.rope.len_chars();
+        let off = offset.min(total);
+        let line = self.rope.char_to_line(off);
+        let line_start = self.rope.line_to_char(line);
+        CursorPos {
+            line,
+            col: off - line_start,
+        }
     }
 
     pub fn snapshot_for_undo(&mut self) {

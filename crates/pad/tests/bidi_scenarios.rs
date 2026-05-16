@@ -1188,3 +1188,187 @@ async fn terminal_change_observable_within_5s() {
         "{marker:?} not observed within 5s: {final_text:?}"
     );
 }
+
+// ===========================================================================
+// 17. SEARCH (^W) — finding text moves the cursor LOCALLY and emits no
+//     outbound changesets. Pure read-side feature; must not pollute the
+//     wire with phantom edits.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn search_moves_cursor_without_sending_changesets() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("search");
+    let url = format!("{base}/p/{pad_id}");
+
+    // Seed pad with content the search can find.
+    let mut a = fresh_session(&base, &pad_id, "t.search-A").await;
+    let init = a.initial_text().to_string();
+    let seed = "line one\nline two\nNEEDLE-HERE\nline four\n";
+    let cs = cs_insert_at_end(&init, seed);
+    a.send_changeset(&cs).await.unwrap();
+    let _ = tokio::time::timeout(Duration::from_secs(5), async {
+        while let Ok(e) = a.pump_once_event().await {
+            if matches!(e, InboundEvent::AckCommit { .. }) {
+                return;
+            }
+        }
+    })
+    .await;
+    a.disconnect().await.ok();
+
+    // Watcher session — captures every NEW_CHANGES the server emits while
+    // the terminal pad is interacting. A correctly-implemented search emits
+    // zero changesets.
+    let mut watcher = fresh_session(&base, &pad_id, "t.search-W").await;
+    let (tx, mut rx) =
+        tokio::sync::mpsc::unbounded_channel::<etherpad_client::changeset::Changeset>();
+    let watcher_handle = tokio::spawn(async move {
+        loop {
+            match watcher.pump_once_event().await {
+                Ok(InboundEvent::Changeset(cs)) => {
+                    if tx.send(cs).is_err() {
+                        break;
+                    }
+                }
+                Ok(_) => continue,
+                Err(_) => break,
+            }
+        }
+    });
+
+    let mut p = spawn_pad(&url);
+    // ^W (0x17) opens search prompt, type needle, Enter, then exit. Cursor
+    // should now sit at "NEEDLE-HERE" but the wire must be empty.
+    p.send([0x17u8].as_slice()).expect("^W");
+    std::thread::sleep(Duration::from_millis(100));
+    for c in "NEEDLE-HERE".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    p.send([b'\r']).expect("enter");
+    std::thread::sleep(Duration::from_millis(2000));
+    exit_pad(&mut p);
+
+    let mut saw_changeset = false;
+    while let Ok(Some(_cs)) =
+        tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
+    {
+        saw_changeset = true;
+    }
+    watcher_handle.abort();
+    assert!(
+        !saw_changeset,
+        "search must not emit any outbound changeset"
+    );
+}
+
+// ===========================================================================
+// 18. REPLACE (M-R) — replacing text in a shared pad must propagate to the
+//     server. Earlier bug: handle_replace_to mutated the local buffer via
+//     replace_all but never emitted a changeset, so the browser saw stale
+//     text and refresh didn't help (server actually had stale text too).
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn replace_propagates_to_server() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("replace");
+    let url = format!("{base}/p/{pad_id}");
+
+    // Seed pad with "hello world\nhello there\n".
+    let mut a = fresh_session(&base, &pad_id, "t.replace-A").await;
+    let init = a.initial_text().to_string();
+    let seed = "hello world\nhello there\n";
+    let cs = cs_insert_at_end(&init, seed);
+    a.send_changeset(&cs).await.unwrap();
+    let _ = tokio::time::timeout(Duration::from_secs(5), async {
+        while let Ok(e) = a.pump_once_event().await {
+            if matches!(e, InboundEvent::AckCommit { .. }) {
+                return;
+            }
+        }
+    })
+    .await;
+    a.disconnect().await.ok();
+
+    let mut p = spawn_pad(&url);
+    // M-R = ESC + 'r' (Alt-R). Then type "hello", Enter, "goodbye", Enter.
+    p.send([0x1b, b'r'].as_slice()).expect("M-R");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "hello".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    p.send([b'\r']).expect("enter1");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "goodbye".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    p.send([b'\r']).expect("enter2");
+    std::thread::sleep(Duration::from_millis(4000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains("goodbye world"),
+        "first replacement missing on server: {final_text:?}"
+    );
+    assert!(
+        final_text.contains("goodbye there"),
+        "second replacement missing on server: {final_text:?}"
+    );
+    assert!(
+        !final_text.contains("hello"),
+        "old text still present on server: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 19. REPLACE — when the needle isn't found, nothing should be sent and
+//     the pad should stay untouched.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn replace_with_missing_needle_is_noop() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("replace-miss");
+    let url = format!("{base}/p/{pad_id}");
+
+    let mut a = fresh_session(&base, &pad_id, "t.replace-miss-A").await;
+    let init = a.initial_text().to_string();
+    let seed = "stable line\n";
+    let cs = cs_insert_at_end(&init, seed);
+    a.send_changeset(&cs).await.unwrap();
+    let _ = tokio::time::timeout(Duration::from_secs(5), async {
+        while let Ok(e) = a.pump_once_event().await {
+            if matches!(e, InboundEvent::AckCommit { .. }) {
+                return;
+            }
+        }
+    })
+    .await;
+    a.disconnect().await.ok();
+    let baseline = pad_text(&base, &pad_id).await;
+
+    let mut p = spawn_pad(&url);
+    p.send([0x1b, b'r'].as_slice()).expect("M-R");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "nonexistent".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    p.send([b'\r']).expect("enter1");
+    std::thread::sleep(Duration::from_millis(150));
+    for c in "anything".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    p.send([b'\r']).expect("enter2");
+    std::thread::sleep(Duration::from_millis(2000));
+    exit_pad(&mut p);
+
+    let after = pad_text(&base, &pad_id).await;
+    assert_eq!(
+        baseline, after,
+        "no-op replace must not change pad text"
+    );
+}

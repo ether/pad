@@ -76,6 +76,78 @@ pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
     }
 }
 
+/// Build a Changeset that replaces `deleted_text` at offset `pos` in
+/// `old_text` with `inserted_text` — a single-changeset form for the
+/// Replace path so the server applies and broadcasts the substitution as
+/// one atomic step. Same multi-line-insert constraint as
+/// [`changeset_for_insert`]: an insert op with `lines > 0` must end its
+/// char_bank slice with `\n` (Etherpad's `checkRep`), so a mid-line tail
+/// gets split into prefix (lines=N) + suffix (lines=0).
+pub fn changeset_for_replace(
+    old_text: &str,
+    pos: u32,
+    deleted_text: &str,
+    inserted_text: &str,
+) -> Changeset {
+    let old_len = old_text.chars().count() as u32;
+    let deleted_chars = deleted_text.chars().count() as u32;
+    let deleted_lines = deleted_text.matches('\n').count() as u32;
+    let inserted_chars = inserted_text.chars().count() as u32;
+    let inserted_lines = inserted_text.matches('\n').count() as u32;
+    let mut ops = Vec::new();
+    if pos > 0 {
+        let lines = count_newlines_in_chars(old_text, pos);
+        ops.push(Op {
+            opcode: OpCode::Keep,
+            chars: pos,
+            lines,
+            attribs: vec![],
+        });
+    }
+    if deleted_chars > 0 {
+        ops.push(Op {
+            opcode: OpCode::Delete,
+            chars: deleted_chars,
+            lines: deleted_lines,
+            attribs: vec![],
+        });
+    }
+    if inserted_chars > 0 {
+        if inserted_lines > 0 && !inserted_text.ends_with('\n') {
+            let last_nl_byte = inserted_text.rfind('\n').expect("has \\n");
+            let prefix = &inserted_text[..last_nl_byte + 1];
+            let suffix = &inserted_text[last_nl_byte + 1..];
+            let prefix_chars = prefix.chars().count() as u32;
+            let suffix_chars = suffix.chars().count() as u32;
+            ops.push(Op {
+                opcode: OpCode::Insert,
+                chars: prefix_chars,
+                lines: inserted_lines,
+                attribs: vec![],
+            });
+            ops.push(Op {
+                opcode: OpCode::Insert,
+                chars: suffix_chars,
+                lines: 0,
+                attribs: vec![],
+            });
+        } else {
+            ops.push(Op {
+                opcode: OpCode::Insert,
+                chars: inserted_chars,
+                lines: inserted_lines,
+                attribs: vec![],
+            });
+        }
+    }
+    Changeset {
+        old_len,
+        net_delta: inserted_chars as i64 - deleted_chars as i64,
+        ops,
+        char_bank: inserted_text.to_string(),
+    }
+}
+
 /// Build a Changeset that deletes `deleted_text` (which lives at offset `pos`
 /// in the document `old_text`).
 ///
