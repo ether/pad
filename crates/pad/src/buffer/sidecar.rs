@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
@@ -146,23 +146,32 @@ pub struct PendingLog {
 impl PendingLog {
     pub fn open(sc: &SidecarHandle) -> anyhow::Result<Self> {
         let path = sc.pending_log_path();
-        // `.write(true)` alongside `.append(true)` is redundant on Unix
-        // (and clippy's `ineffective_open_options` flags it), but on
-        // Windows the difference is load-bearing: append-only handles
-        // grant FILE_APPEND_DATA only, so `SetEndOfFile` — what
-        // `set_len(0)` in `truncate()` below lowers to — fails with
-        // "Access is denied (os error 5)". Adding `write` ORs in
-        // FILE_WRITE_DATA so the truncate path works.
-        #[allow(clippy::ineffective_open_options)]
-        let file = OpenOptions::new()
+        // We deliberately do NOT use `.append(true)` here even though
+        // this is an append-only log. On Windows, Rust's OpenOptions
+        // strips FILE_WRITE_DATA from the access mask whenever append
+        // is set, which makes `SetEndOfFile` (the syscall under
+        // `set_len(0)` in `truncate()` below) fail with "Access is
+        // denied (os error 5)". Instead we open plain `write` and seek
+        // to EOF before each append — there's only one writer per
+        // sidecar (one pad process owns one buffer), so the lack of
+        // atomic O_APPEND semantics doesn't matter.
+        // `.truncate(false)` makes clippy's `suspicious_open_options`
+        // happy and codifies intent: existing log content survives the
+        // open (we only zero it explicitly via `truncate()` below).
+        let mut file = OpenOptions::new()
             .create(true)
             .write(true)
-            .append(true)
+            .truncate(false)
             .open(path)?;
+        file.seek(SeekFrom::End(0))?;
         Ok(Self { file })
     }
 
     pub fn append(&mut self, entry: &PendingEntry) -> anyhow::Result<()> {
+        // Seek to end every time so a prior `truncate()` (which leaves
+        // the cursor where it was, beyond the new len) doesn't write
+        // into the middle of a now-shorter file.
+        self.file.seek(SeekFrom::End(0))?;
         let mut line = serde_json::to_string(entry)?;
         line.push('\n');
         self.file.write_all(line.as_bytes())?;
