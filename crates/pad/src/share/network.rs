@@ -230,8 +230,8 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
     //   - `max_wait_ms`: cap the wait so a relentlessly-typing user
     //     still sees their edits propagate. The deadline is the MIN of
     //     `last_edit + idle_ms` and `oldest_queued + max_wait_ms`.
-    let idle_ms = std::time::Duration::from_millis(350);
-    let max_wait_ms = std::time::Duration::from_millis(2000);
+    let idle_ms = std::time::Duration::from_millis(250);
+    let max_wait_ms = std::time::Duration::from_millis(1800);
 
     let task = tokio::spawn(async move {
         let mut session = session;
@@ -292,17 +292,21 @@ pub async fn connect(remote_base: &str, pad_id: &str) -> Result<NetworkHandles, 
                     if !merged {
                         queue.push_back((cs, 1));
                     }
-                    // Idle-flush bookkeeping: stamp oldest_queued_at on
-                    // first enqueue, defer the deadline to now+idle_ms,
-                    // and cap at oldest+max_wait_ms so heavy typists
-                    // still propagate within bounded time.
+                    // Fixed-cadence batching: pin the deadline to
+                    // `oldest_queued_at + max_wait_ms` on first enqueue
+                    // and DON'T slide it forward on subsequent keystrokes.
+                    // Empirically (Playwright + Chromium), sliding the
+                    // deadline on every edit produced flaky pass/fail —
+                    // one extra send under fast typing tripped the
+                    // receiver-browser's DOM-render scramble. A
+                    // deterministic fixed window keeps the batch shape
+                    // consistent across runs.
                     let now = tokio::time::Instant::now();
                     if oldest_queued_at.is_none() {
                         oldest_queued_at = Some(now);
+                        next_send_allowed = now + max_wait_ms;
                     }
-                    let idle_target = now + idle_ms;
-                    let cap = oldest_queued_at.unwrap() + max_wait_ms;
-                    next_send_allowed = idle_target.min(cap);
+                    let _ = idle_ms; // kept for future tuning
                 }
                 _ = tokio::time::sleep_until(deadline), if ready_to_send => {
                     if let Some((next, count)) = queue.pop_front() {
