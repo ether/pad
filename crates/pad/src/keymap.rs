@@ -20,6 +20,10 @@ pub enum KeyAction {
     DocumentStart,
     /// M-/ or M-> or Ctrl-End — end of document content.
     DocumentEnd,
+    /// PageUp / ^Y — scroll viewport up one screen-ish (~half page).
+    PageUp,
+    /// PageDown / ^V — scroll viewport down one screen-ish (~half page).
+    PageDown,
     WriteOut,      // ^O
     Exit,          // ^X
     InsertFile,    // ^R
@@ -74,6 +78,9 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
             'n' => KeyAction::Down,
             'd' => KeyAction::DeleteForward,
             'h' => KeyAction::Backspace,
+            // Nano's canonical paging: ^Y = previous, ^V = next.
+            'y' => KeyAction::PageUp,
+            'v' => KeyAction::PageDown,
             _ => KeyAction::Unbound,
         },
         (KeyCode::Char(c), _, true) => match c.to_ascii_lowercase() {
@@ -113,6 +120,8 @@ pub fn key_to_action(ev: KeyEvent) -> KeyAction {
         (KeyCode::Home, _, _) => KeyAction::LineStart,
         (KeyCode::End, true, _) => KeyAction::DocumentEnd,
         (KeyCode::End, _, _) => KeyAction::LineEnd,
+        (KeyCode::PageUp, _, _) => KeyAction::PageUp,
+        (KeyCode::PageDown, _, _) => KeyAction::PageDown,
         _ => KeyAction::Unbound,
     }
 }

@@ -330,6 +330,13 @@ impl App {
             KeyAction::LineEnd => self.buffer.move_to_line_end(),
             KeyAction::DocumentStart => self.buffer.move_to_document_start(),
             KeyAction::DocumentEnd => self.buffer.move_to_document_end(),
+            // App doesn't directly know the viewport row count — Tui owns
+            // that. Until we wire the actual area height through, use a
+            // sensible fixed-page (20 lines, ~80% of a typical terminal).
+            // The editor_view auto-scroll keeps the cursor visible after
+            // these moves regardless of viewport size.
+            KeyAction::PageUp => self.buffer.page_up(20),
+            KeyAction::PageDown => self.buffer.page_down(20),
             KeyAction::WriteOut => {
                 if let Some(p) = self.file_path.clone() {
                     self.buffer.save_to_file(&p)?;

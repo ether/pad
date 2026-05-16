@@ -7,7 +7,9 @@ pub mod softwrap;
 pub mod status_bar;
 
 use crate::buffer::Buffer;
-use crossterm::event::{DisableBracketedPaste, EnableBracketedPaste};
+use crossterm::event::{
+    DisableBracketedPaste, DisableMouseCapture, EnableBracketedPaste, EnableMouseCapture,
+};
 use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, SetTitle, disable_raw_mode, enable_raw_mode,
@@ -19,6 +21,11 @@ use std::io::Stdout;
 
 pub struct Tui {
     terminal: Terminal<CrosstermBackend<Stdout>>,
+    /// Top visual row currently shown in the editor pane. Auto-adjusted by
+    /// `editor_view::render` to keep the cursor in view. Persists across
+    /// frames so PgUp/PgDn / scroll-wheel handlers in App can move it
+    /// explicitly without each draw resetting to zero.
+    pub editor_scroll: u16,
 }
 
 pub struct DrawInputs<'a> {
@@ -35,10 +42,23 @@ impl Tui {
     pub fn enter() -> anyhow::Result<Self> {
         enable_raw_mode()?;
         let mut stdout = std::io::stdout();
-        execute!(stdout, EnterAlternateScreen, EnableBracketedPaste)?;
+        // EnableMouseCapture lets us see scroll-wheel events (we bind
+        // them to Up/Down in input.rs so the caret follows the wheel).
+        // Side effect: terminal-level text selection now requires
+        // holding Shift while dragging — that's the conventional
+        // tradeoff editors like vim/htop already enforce.
+        execute!(
+            stdout,
+            EnterAlternateScreen,
+            EnableBracketedPaste,
+            EnableMouseCapture,
+        )?;
         let backend = CrosstermBackend::new(std::io::stdout());
         let terminal = Terminal::new(backend)?;
-        Ok(Self { terminal })
+        Ok(Self {
+            terminal,
+            editor_scroll: 0,
+        })
     }
 
     /// Set the host terminal's window title via OSC 2. Most terminals honour
@@ -76,6 +96,12 @@ impl Tui {
             share_overlay,
             authors,
         } = inputs;
+        // Split-borrow workaround: `self.terminal.draw(...)` would conflict
+        // with capturing `&mut self.editor_scroll` inside the closure.
+        // Take a mutable reference to the scroll field BEFORE the draw call
+        // so the closure captures it via `&mut u16` rather than going
+        // through self.
+        let scroll = &mut self.editor_scroll;
         self.terminal.draw(|frame| {
             let area = frame.area();
             let constraints: Vec<Constraint> = if prompt.is_some() {
@@ -88,7 +114,7 @@ impl Tui {
                 vec![Constraint::Min(1), Constraint::Length(1)]
             };
             let chunks = Layout::vertical(constraints).split(area);
-            editor_view::render(frame, chunks[0], buffer);
+            editor_view::render(frame, chunks[0], buffer, scroll);
             if show_help {
                 help::render(frame, chunks[0]);
             }
@@ -113,6 +139,11 @@ impl Drop for Tui {
     fn drop(&mut self) {
         let _ = disable_raw_mode();
         let mut stdout = std::io::stdout();
-        let _ = execute!(stdout, DisableBracketedPaste, LeaveAlternateScreen);
+        let _ = execute!(
+            stdout,
+            DisableMouseCapture,
+            DisableBracketedPaste,
+            LeaveAlternateScreen,
+        );
     }
 }

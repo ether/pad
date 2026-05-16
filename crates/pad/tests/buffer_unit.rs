@@ -124,6 +124,37 @@ fn move_to_document_start_and_end() {
 }
 
 #[test]
+fn page_down_moves_n_lines() {
+    let mut b = Buffer::from_text("a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n");
+    b.move_to_document_start();
+    b.page_down(3);
+    assert_eq!(b.cursor(), CursorPos { line: 3, col: 0 });
+    b.page_down(3);
+    assert_eq!(b.cursor(), CursorPos { line: 6, col: 0 });
+}
+
+#[test]
+fn page_down_clamps_to_last_meaningful_line() {
+    // Doc ends with '\n' → cursor mustn't land on the trailing-empty
+    // line, or subsequent typing would trip the trailing-\n synthesis
+    // path. page_down clamps to line_count - 2 in that case.
+    let mut b = Buffer::from_text("a\nb\nc\n");
+    b.move_to_document_start();
+    b.page_down(100);
+    assert_eq!(b.cursor(), CursorPos { line: 2, col: 0 });
+}
+
+#[test]
+fn page_up_clamps_to_zero() {
+    let mut b = Buffer::from_text("a\nb\nc\nd\ne\n");
+    b.move_cursor_to(CursorPos { line: 4, col: 0 });
+    b.page_up(2);
+    assert_eq!(b.cursor(), CursorPos { line: 2, col: 0 });
+    b.page_up(100);
+    assert_eq!(b.cursor(), CursorPos { line: 0, col: 0 });
+}
+
+#[test]
 fn move_to_document_end_no_trailing_newline() {
     let mut b = Buffer::from_text("a\nb");
     b.move_to_document_end();

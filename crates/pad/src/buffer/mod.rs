@@ -173,6 +173,33 @@ impl Buffer {
         self.pref_col = 0;
     }
 
+    /// PageDown — move cursor down by `n` lines, clamped so it stays off
+    /// the trailing-empty line of a doc that ends with '\n'. The caller
+    /// (typically the TUI handler) picks `n` based on the editor pane's
+    /// visible row count; the viewport then auto-scrolls in
+    /// `editor_view::render` so the cursor stays visible.
+    pub fn page_down(&mut self, n: usize) {
+        let total = self.rope.len_chars();
+        let last_is_nl = total > 0 && self.rope.char(total - 1) == '\n';
+        let max_line = if last_is_nl && self.line_count() >= 2 {
+            self.line_count() - 2
+        } else {
+            self.line_count() - 1
+        };
+        let target = (self.cursor.line + n).min(max_line);
+        self.cursor.line = target;
+        let line_len = self.line(target).chars().count();
+        self.cursor.col = self.pref_col.min(line_len);
+    }
+
+    /// PageUp — move cursor up by `n` lines, clamped at line 0.
+    pub fn page_up(&mut self, n: usize) {
+        let target = self.cursor.line.saturating_sub(n);
+        self.cursor.line = target;
+        let line_len = self.line(target).chars().count();
+        self.cursor.col = self.pref_col.min(line_len);
+    }
+
     /// Nano's M-/ or M-> — jump to end of meaningful content. For docs that
     /// end with '\n' (Etherpad's invariant when shared) this is the end of
     /// the last NON-EMPTY line, not the trailing-empty line — typing there
