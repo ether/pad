@@ -255,10 +255,13 @@ impl Buffer {
         self.dirty = true;
     }
 
-    pub fn cut_line(&mut self) {
+    /// Cut the line under the cursor. Returns `(char_offset_of_cut_start,
+    /// cut_text)` so the caller can emit a matching outbound Changeset when
+    /// shared. Returns None if there was nothing to cut.
+    pub fn cut_line(&mut self) -> Option<(u32, String)> {
         let line_idx = self.cursor.line;
         if line_idx >= self.rope.len_lines() {
-            return;
+            return None;
         }
         let line_start = self.rope.line_to_char(line_idx);
         let line_end = if line_idx + 1 < self.rope.len_lines() {
@@ -267,10 +270,10 @@ impl Buffer {
             self.rope.len_chars()
         };
         if line_start == line_end {
-            return;
+            return None;
         }
         let cut: String = self.rope.slice(line_start..line_end).into();
-        self.clipboard.last_cut = Some(cut);
+        self.clipboard.last_cut = Some(cut.clone());
         self.rope.remove(line_start..line_end);
         self.dirty = true;
         if self.cursor.line >= self.line_count() && self.cursor.line > 0 {
@@ -278,12 +281,15 @@ impl Buffer {
         }
         self.cursor.col = 0;
         self.pref_col = 0;
+        Some((line_start as u32, cut))
     }
 
-    pub fn uncut(&mut self) {
-        let Some(text) = self.clipboard.last_cut.clone() else {
-            return;
-        };
+    /// Paste the most recent cut at the start of the current line. Returns
+    /// `(char_offset_of_paste_start, pasted_text)` so the caller can emit a
+    /// matching outbound Changeset when shared. Returns None if nothing to
+    /// paste.
+    pub fn uncut(&mut self) -> Option<(u32, String)> {
+        let text = self.clipboard.last_cut.clone()?;
         let line_start = self.rope.line_to_char(self.cursor.line);
         self.rope.insert(line_start, &text);
         self.dirty = true;
@@ -295,6 +301,7 @@ impl Buffer {
             self.cursor.col = text.chars().count();
         }
         self.pref_col = self.cursor.col;
+        Some((line_start as u32, text))
     }
 
     pub fn search_forward(&self, needle: &str) -> Option<CursorPos> {

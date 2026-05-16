@@ -343,13 +343,31 @@ impl App {
             }
             KeyAction::Cut => {
                 self.buffer.snapshot_for_undo();
-                // Local-only change for now — cut spans a whole line; share
-                // wire-up for multi-char deletes lands in a polish pass.
-                self.buffer.cut_line();
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                if let Some((cut_start, cut_text)) = self.buffer.cut_line()
+                    && let Some(share) = self.share.as_mut()
+                {
+                    let pre_text = pre_text.unwrap();
+                    let cs = crate::share::bridge::changeset_for_delete(
+                        &pre_text, cut_start, cut_text,
+                    );
+                    share.outbound.send(cs)?;
+                }
             }
             KeyAction::Uncut => {
                 self.buffer.snapshot_for_undo();
-                self.buffer.uncut();
+                let pre_text = self.share.as_ref().map(|_| self.buffer.text());
+                if let Some((paste_start, paste_text)) = self.buffer.uncut()
+                    && let Some(share) = self.share.as_mut()
+                {
+                    let pre_text = pre_text.unwrap();
+                    let cs = crate::share::bridge::changeset_for_insert(
+                        &pre_text,
+                        paste_start,
+                        &paste_text,
+                    );
+                    share.outbound.send(cs)?;
+                }
             }
             KeyAction::WhereIs => self.state = AppState::SearchPrompt(String::new()),
             KeyAction::Replace => self.state = AppState::ReplaceFromPrompt(String::new()),

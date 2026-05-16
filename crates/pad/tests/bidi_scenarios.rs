@@ -388,6 +388,69 @@ async fn bracketed_paste_lands() {
 }
 
 // ===========================================================================
+// 9. HUMAN-PACE TYPING — chars sent at ~100ms intervals (RTT-comparable) so
+//    batches form and break naturally between strokes. Regression for the
+//    user-reported scramble: typing 'interesting view change' arrived as
+//    'e changew  viestingnteri' in the browser. If batching has a re-order
+//    bug, this catches it.
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn human_pace_typing_preserves_order() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("hpace");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    let marker = "interesting view change";
+    for c in marker.chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(120));
+    }
+    std::thread::sleep(Duration::from_millis(5000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        final_text.contains(marker),
+        "expected forward marker {marker:?} in pad text, got: {final_text:?}"
+    );
+}
+
+// ===========================================================================
+// 10. CTRL-K (Cut Line) — should both clear the local buffer line AND
+//    propagate to the server (user-reported: clears in pad, not in browser)
+// ===========================================================================
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn ctrl_k_cut_line_propagates() {
+    let Some(base) = skip_if_no_remote() else { return };
+    let pad_id = fresh_pad_id("cutk");
+    let url = format!("{base}/p/{pad_id}");
+    let mut p = spawn_pad(&url);
+    // Type a unique marker on its own line.
+    for c in "CUT-LINE-MARKER".chars() {
+        p.send([c as u8].as_slice()).expect("send");
+        std::thread::sleep(Duration::from_millis(60));
+    }
+    // Hit Enter then ^K to cut the line we just typed... actually nano's
+    // ^K cuts the CURRENT line. Since cursor's at end of typed text, ^K
+    // cuts the line containing our marker. Wait for typed batch to land,
+    // then ^K.
+    std::thread::sleep(Duration::from_millis(2000));
+    // Move cursor to start of the line so ^K cuts the marker not just
+    // the trailing empty span. Home key (HOME = \x1b[H or ^A is more
+    // common but pad uses arrow-left to move; simpler: just Ctrl-K from
+    // wherever — nano cuts from cursor to end-of-line.
+    p.send([0x0Bu8].as_slice()).expect("send ^K");
+    std::thread::sleep(Duration::from_millis(3000));
+    exit_pad(&mut p);
+
+    let final_text = pad_text(&base, &pad_id).await;
+    assert!(
+        !final_text.contains("CUT-LINE-MARKER"),
+        "^K cut did not propagate to server — marker still present: {final_text:?}"
+    );
+}
+
+// ===========================================================================
 // 8. POLL HELPER — terminal change should be observable by simulator
 //    within reasonable time (catches network task hangs)
 // ===========================================================================
