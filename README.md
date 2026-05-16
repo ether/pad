@@ -29,13 +29,50 @@ pad https://pad.example.com/p/standup     # join a remote pad
 
 ## Install
 
-One-liner (requires `cargo` — installs Rust first if you don't have it; see [rustup.rs](https://rustup.rs)):
+### Pre-built binaries (recommended)
+
+Every tagged release ships pre-built binaries for Linux (x64 / arm64, gnu and musl), macOS (x64 / arm64), and Windows (x64 / arm64). Pick whichever's easiest:
+
+**Linux / macOS — one-liner**
+
+```
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ether/pad/releases/latest/download/pad-installer.sh | sh
+```
+
+**Windows — PowerShell one-liner**
+
+```
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/ether/pad/releases/latest/download/pad-installer.ps1 | iex"
+```
+
+**Windows — MSI installer**
+
+Download `pad-x86_64-pc-windows-msvc.msi` (or the `aarch64` variant) from the [latest release](https://github.com/ether/pad/releases/latest) and double-click.
+
+**Debian / Ubuntu — .deb**
+
+```
+curl -LO https://github.com/ether/pad/releases/latest/download/pad-amd64.deb
+sudo dpkg -i pad-amd64.deb
+```
+
+**Homebrew (macOS / Linux)**
+
+```
+brew install ether/pad/pad
+```
+
+**Direct archive download**
+
+The [releases page](https://github.com/ether/pad/releases/latest) hosts `.tar.xz` (Unix) and `.zip` (Windows) archives for each platform if you'd rather extract by hand. All artifacts ship `.sha256` sidecars and a `sha256.sum` aggregate.
+
+### From source (requires `cargo`)
 
 ```
 curl -fsSL https://raw.githubusercontent.com/ether/pad/main/install.sh | sh
 ```
 
-That runs `cargo install --locked --git https://github.com/ether/pad pad` under the hood and tells you where the binary landed. The same command works if you'd rather skip the script:
+That runs `cargo install --locked --git https://github.com/ether/pad pad` and tells you where the binary landed. The same command works if you'd rather skip the script:
 
 ```
 cargo install --locked --git https://github.com/ether/pad pad

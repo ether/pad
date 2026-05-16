@@ -2,12 +2,41 @@
 name = "pad"
 version = "0.1.0"
 description = "Nano-class terminal text editor with optional real-time collaboration backed by Etherpad."
+homepage = "https://github.com/ether/pad"
+readme = "../../README.md"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
 default-run = "pad"
+
+[package.metadata.wix]
+upgrade-guid = "0D8120F6-048C-4F4C-B279-75E9AB7C025B"
+path-guid = "0651EB34-3453-4003-93C8-770ABAD6186E"
+license = false
+eula = false
+
+# `cargo deb` builds the Debian/Ubuntu .deb package consumed by the
+# release-deb.yml workflow. cargo-dist itself doesn't produce .deb —
+# this metadata + the workflow layer it on top so `apt`-style users
+# get a native install path. Architecture is set per-job to amd64 (we
+# don't ship arm64 .deb yet; the aarch64 tar.xz covers ARM users).
+[package.metadata.deb]
+maintainer = "John McLear <john@mclear.co.uk>"
+section = "editors"
+priority = "optional"
+extended-description = """
+pad is a nano-class terminal text editor with optional real-time
+collaboration backed by Etherpad. Edit local files like nano, or
+join any Etherpad pad over the network and see other people's edits
+land in your terminal as they type.
+"""
+assets = [
+    ["target/release/pad", "usr/bin/", "755"],
+    ["../../README.md", "usr/share/doc/pad/", "644"],
+    ["../../LICENSE", "usr/share/doc/pad/", "644"],
+]
 
 [lib]
 name = "pad"

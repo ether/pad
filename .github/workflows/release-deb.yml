@@ -1,0 +1,39 @@
+name: release-deb
+
+# cargo-dist doesn't produce .deb packages natively; this workflow
+# layers one on top of every GitHub Release the main release.yml
+# creates. It fires after `release.published` so the Release is
+# guaranteed to exist by the time we try to upload to it.
+#
+# Currently amd64 only — ARM users get the aarch64-unknown-linux-gnu
+# tar.xz from the main release workflow.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  deb-amd64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: install cargo-deb
+        run: cargo install cargo-deb --locked
+      - name: build pad in release mode
+        run: cargo build --release -p pad
+      - name: package .deb
+        run: cargo deb -p pad --no-build --output target/debian/pad-amd64.deb
+      - name: upload to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            target/debian/pad-amd64.deb \
+            --clobber
