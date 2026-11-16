@@ -175,7 +175,7 @@ async fn enter_then_type_on_new_line() {
         std::thread::sleep(Duration::from_millis(80));
     }
     // Hit Enter, then type on new line.
-    p.send([b'\r']).expect("send enter");
+    p.send(*b"\r").expect("send enter");
     std::thread::sleep(Duration::from_millis(150));
     for c in "second".chars() {
         p.send([c as u8].as_slice()).expect("send");
@@ -247,7 +247,7 @@ async fn backspace_propagates() {
     p.send([0x7Fu8].as_slice()).expect("send bksp");
     std::thread::sleep(Duration::from_millis(150));
     // Now type A+something to mark.
-    p.send([b'Z']).expect("send Z");
+    p.send(*b"Z").expect("send Z");
     std::thread::sleep(Duration::from_millis(3000));
     exit_pad(&mut p);
 
@@ -622,9 +622,9 @@ async fn enter_enter_type() {
     let pad_id = fresh_pad_id("ee");
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(150));
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(150));
     for c in "MULTILINE-CONTENT".chars() {
         p.send([c as u8].as_slice()).expect("send");
@@ -772,9 +772,9 @@ async fn rapid_typing_with_mixed_enters_propagates() {
             p.send([c as u8].as_slice()).expect("send");
         }
         if i + 1 < bursts.len() {
-            p.send([b'\r']).expect("enter1");
+            p.send(*b"\r").expect("enter1");
             std::thread::sleep(Duration::from_millis(20));
-            p.send([b'\r']).expect("enter2");
+            p.send(*b"\r").expect("enter2");
             std::thread::sleep(Duration::from_millis(20));
         }
     }
@@ -923,7 +923,7 @@ async fn many_enters_then_type_preserves_trailing_newline() {
     }
     // 8 Enters to reach deep into the trailing-empty region.
     for _ in 0..8 {
-        p.send([b'\r']).expect("enter");
+        p.send(*b"\r").expect("enter");
         std::thread::sleep(Duration::from_millis(80));
     }
     // Now type "hello" — pre-fix this would land past the trailing \n.
@@ -989,7 +989,7 @@ async fn browser_sees_rapid_cut_uncut() {
         }
     });
     let mut p = spawn_pad(&url);
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(150));
     for c in "RAPID-MARKER-XYZ".chars() {
         p.send([c as u8].as_slice()).expect("send");
@@ -1058,7 +1058,7 @@ async fn browser_sees_cut_uncut_consistently() {
 
     // Drive the terminal: type a marker, then ^K, then ^U.
     let mut p = spawn_pad(&url);
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(150));
     for c in "ROUNDTRIP-MARKER-ABC".chars() {
         p.send([c as u8].as_slice()).expect("send");
@@ -1106,7 +1106,7 @@ async fn type_then_ctrl_k_then_ctrl_u() {
     let url = format!("{base}/p/{pad_id}");
     let mut p = spawn_pad(&url);
     // Type some content on a fresh line.
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(150));
     for c in "TYPED-CONTENT-BEFORE-CUT".chars() {
         p.send([c as u8].as_slice()).expect("send");
@@ -1305,7 +1305,7 @@ async fn search_moves_cursor_without_sending_changesets() {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(20));
     }
-    p.send([b'\r']).expect("enter");
+    p.send(*b"\r").expect("enter");
     std::thread::sleep(Duration::from_millis(2000));
     exit_pad(&mut p);
 
@@ -1358,13 +1358,13 @@ async fn replace_propagates_to_server() {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(20));
     }
-    p.send([b'\r']).expect("enter1");
+    p.send(*b"\r").expect("enter1");
     std::thread::sleep(Duration::from_millis(150));
     for c in "goodbye".chars() {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(20));
     }
-    p.send([b'\r']).expect("enter2");
+    p.send(*b"\r").expect("enter2");
     std::thread::sleep(Duration::from_millis(4000));
     exit_pad(&mut p);
 
@@ -1418,13 +1418,13 @@ async fn replace_with_missing_needle_is_noop() {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(20));
     }
-    p.send([b'\r']).expect("enter1");
+    p.send(*b"\r").expect("enter1");
     std::thread::sleep(Duration::from_millis(150));
     for c in "anything".chars() {
         p.send([c as u8].as_slice()).expect("send");
         std::thread::sleep(Duration::from_millis(20));
     }
-    p.send([b'\r']).expect("enter2");
+    p.send(*b"\r").expect("enter2");
     std::thread::sleep(Duration::from_millis(2000));
     exit_pad(&mut p);
 

@@ -1,71 +1,65 @@
 use etherpad_client::changeset::{Changeset, Op, OpCode};
 
-/// Etherpad's canonical form requires `|<lines>` to prefix any op (`=`/`+`/`-`)
-/// whose run contains a newline AND that newline must end the run. The trailing-
-/// keep "implicit" rule omits a final all-keep but doesn't relax this.
+/// Push the op(s) covering `run` (the exact chars a keep/delete/insert spans)
+/// onto `ops`, in Etherpad's canonical form.
 ///
-/// `count_newlines_in_chars(s, char_count)` returns the number of `\n` in the
-/// first `char_count` characters of `s`.
-fn count_newlines_in_chars(s: &str, char_count: u32) -> u32 {
-    s.chars()
-        .take(char_count as usize)
-        .filter(|c| *c == '\n')
-        .count() as u32
-}
-
-/// Build a Changeset that inserts `text` at char offset `pos` in the document
-/// `old_text`. Counts newlines in the surrounding keep regions for canonical
-/// `|<lines>=<count>` encoding.
-pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
-    let old_len = old_text.chars().count() as u32;
-    let inserted = text.chars().count() as u32;
-    let inserted_lines = text.matches('\n').count() as u32;
-    let mut ops = Vec::new();
-    // Leading keep: chars 0..pos of old_text.
-    if pos > 0 {
-        let lines = count_newlines_in_chars(old_text, pos);
+/// Etherpad's `checkRep` requires any op with `|<lines>` (lines > 0) to end its
+/// run on a `\n`. Browsers apply changesets line-by-line (`mutateTextLines`),
+/// so a multi-line op that ends mid-line makes them drop or misplace chars.
+/// When `run` has newlines but doesn't end with one, split it at the last
+/// `\n` into `|N<op><chars through last \n>` followed by `<op><rest>` with
+/// lines 0. E.g. a keep over `"ab\ncd\nef"` becomes `|2=6=2`, not `|2=8`.
+///
+/// Attributes are left empty; callers add authorship downstream
+/// (see `PadSession::send_changeset`).
+fn push_run(ops: &mut Vec<Op>, opcode: OpCode, run: &str) {
+    let chars = run.chars().count() as u32;
+    if chars == 0 {
+        return;
+    }
+    let lines = run.matches('\n').count() as u32;
+    if lines > 0 && !run.ends_with('\n') {
+        let last_nl_byte = run.rfind('\n').expect("has \\n");
+        let prefix_chars = run[..last_nl_byte + 1].chars().count() as u32;
         ops.push(Op {
-            opcode: OpCode::Keep,
-            chars: pos,
+            opcode,
+            chars: prefix_chars,
             lines,
             attribs: vec![],
         });
-    }
-    // Etherpad's checkRep enforces: an insert op with `|N` (lines > 0) MUST
-    // have its char_bank slice end with `\n` (Changeset.ts checkRep:
-    // "multiline insert op does not end with a newline"). When the inserted
-    // text has newlines but its tail is mid-line (e.g. paste of
-    // "A\nB\nC"), split into:
-    //   - Insert lines=N covering A\nB\n
-    //   - Insert lines=0 covering C
-    // both with the same author attribute (added downstream in
-    // PadSession::send_changeset).
-    if inserted_lines > 0 && !text.ends_with('\n') {
-        let last_nl_byte = text.rfind('\n').expect("has \\n");
-        let prefix = &text[..last_nl_byte + 1];
-        let suffix = &text[last_nl_byte + 1..];
-        let prefix_chars = prefix.chars().count() as u32;
-        let suffix_chars = suffix.chars().count() as u32;
         ops.push(Op {
-            opcode: OpCode::Insert,
-            chars: prefix_chars,
-            lines: inserted_lines,
-            attribs: vec![],
-        });
-        ops.push(Op {
-            opcode: OpCode::Insert,
-            chars: suffix_chars,
+            opcode,
+            chars: chars - prefix_chars,
             lines: 0,
             attribs: vec![],
         });
     } else {
         ops.push(Op {
-            opcode: OpCode::Insert,
-            chars: inserted,
-            lines: inserted_lines,
+            opcode,
+            chars,
+            lines,
             attribs: vec![],
         });
     }
+}
+
+/// The first `char_count` characters of `s`.
+fn char_prefix(s: &str, char_count: u32) -> &str {
+    match s.char_indices().nth(char_count as usize) {
+        Some((byte, _)) => &s[..byte],
+        None => s,
+    }
+}
+
+/// Build a Changeset that inserts `text` at char offset `pos` in the document
+/// `old_text`. The leading keep and the insert are both split at line
+/// boundaries as needed (see [`push_run`]).
+pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
+    let old_len = old_text.chars().count() as u32;
+    let inserted = text.chars().count() as u32;
+    let mut ops = Vec::new();
+    push_run(&mut ops, OpCode::Keep, char_prefix(old_text, pos));
+    push_run(&mut ops, OpCode::Insert, text);
     // Trailing keep is implicit in canonical form (final Keep covering rest
     // of doc is omitted).
     Changeset {
@@ -79,10 +73,8 @@ pub fn changeset_for_insert(old_text: &str, pos: u32, text: &str) -> Changeset {
 /// Build a Changeset that replaces `deleted_text` at offset `pos` in
 /// `old_text` with `inserted_text` — a single-changeset form for the
 /// Replace path so the server applies and broadcasts the substitution as
-/// one atomic step. Same multi-line-insert constraint as
-/// [`changeset_for_insert`]: an insert op with `lines > 0` must end its
-/// char_bank slice with `\n` (Etherpad's `checkRep`), so a mid-line tail
-/// gets split into prefix (lines=N) + suffix (lines=0).
+/// one atomic step. Keep, delete and insert runs are each split at line
+/// boundaries as needed (see [`push_run`]).
 pub fn changeset_for_replace(
     old_text: &str,
     pos: u32,
@@ -91,55 +83,11 @@ pub fn changeset_for_replace(
 ) -> Changeset {
     let old_len = old_text.chars().count() as u32;
     let deleted_chars = deleted_text.chars().count() as u32;
-    let deleted_lines = deleted_text.matches('\n').count() as u32;
     let inserted_chars = inserted_text.chars().count() as u32;
-    let inserted_lines = inserted_text.matches('\n').count() as u32;
     let mut ops = Vec::new();
-    if pos > 0 {
-        let lines = count_newlines_in_chars(old_text, pos);
-        ops.push(Op {
-            opcode: OpCode::Keep,
-            chars: pos,
-            lines,
-            attribs: vec![],
-        });
-    }
-    if deleted_chars > 0 {
-        ops.push(Op {
-            opcode: OpCode::Delete,
-            chars: deleted_chars,
-            lines: deleted_lines,
-            attribs: vec![],
-        });
-    }
-    if inserted_chars > 0 {
-        if inserted_lines > 0 && !inserted_text.ends_with('\n') {
-            let last_nl_byte = inserted_text.rfind('\n').expect("has \\n");
-            let prefix = &inserted_text[..last_nl_byte + 1];
-            let suffix = &inserted_text[last_nl_byte + 1..];
-            let prefix_chars = prefix.chars().count() as u32;
-            let suffix_chars = suffix.chars().count() as u32;
-            ops.push(Op {
-                opcode: OpCode::Insert,
-                chars: prefix_chars,
-                lines: inserted_lines,
-                attribs: vec![],
-            });
-            ops.push(Op {
-                opcode: OpCode::Insert,
-                chars: suffix_chars,
-                lines: 0,
-                attribs: vec![],
-            });
-        } else {
-            ops.push(Op {
-                opcode: OpCode::Insert,
-                chars: inserted_chars,
-                lines: inserted_lines,
-                attribs: vec![],
-            });
-        }
-    }
+    push_run(&mut ops, OpCode::Keep, char_prefix(old_text, pos));
+    push_run(&mut ops, OpCode::Delete, deleted_text);
+    push_run(&mut ops, OpCode::Insert, inserted_text);
     Changeset {
         old_len,
         net_delta: inserted_chars as i64 - deleted_chars as i64,
@@ -159,23 +107,9 @@ pub fn changeset_for_replace(
 pub fn changeset_for_delete(old_text: &str, pos: u32, deleted_text: String) -> Changeset {
     let old_len = old_text.chars().count() as u32;
     let deleted_chars = deleted_text.chars().count() as u32;
-    let deleted_lines = deleted_text.matches('\n').count() as u32;
     let mut ops = Vec::new();
-    if pos > 0 {
-        let lines = count_newlines_in_chars(old_text, pos);
-        ops.push(Op {
-            opcode: OpCode::Keep,
-            chars: pos,
-            lines,
-            attribs: vec![],
-        });
-    }
-    ops.push(Op {
-        opcode: OpCode::Delete,
-        chars: deleted_chars,
-        lines: deleted_lines,
-        attribs: vec![],
-    });
+    push_run(&mut ops, OpCode::Keep, char_prefix(old_text, pos));
+    push_run(&mut ops, OpCode::Delete, &deleted_text);
     // Trailing keep is implicit — omit even when non-zero.
     Changeset {
         old_len,
