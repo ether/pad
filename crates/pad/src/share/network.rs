@@ -110,12 +110,6 @@ fn concat_inserts(a: &Changeset, b: &Changeset) -> Option<Changeset> {
         .filter(|o| matches!(o.opcode, OpCode::Keep))
         .map(|o| o.chars)
         .sum();
-    let a_keep_lines: u32 = a
-        .ops
-        .iter()
-        .filter(|o| matches!(o.opcode, OpCode::Keep))
-        .map(|o| o.lines)
-        .sum();
     let a_insert_chars: u32 = a
         .ops
         .iter()
@@ -146,15 +140,16 @@ fn concat_inserts(a: &Changeset, b: &Changeset) -> Option<Changeset> {
     if merged_lines > 0 && !merged_bank.ends_with('\n') {
         return None;
     }
-    let mut new_ops = Vec::new();
-    if a_keep_chars > 0 {
-        new_ops.push(etherpad_client::changeset::Op {
-            opcode: OpCode::Keep,
-            chars: a_keep_chars,
-            lines: a_keep_lines,
-            attribs: vec![],
-        });
-    }
+    // Carry `a`'s Keep ops over as-is rather than summing them into one op:
+    // the bridge splits a multi-line keep that ends mid-line into
+    // `|N=<through last \n>` + `=<rest>` (ether/pad#3), and collapsing them
+    // would re-create the non-canonical `|N=<mid-line>` form.
+    let mut new_ops: Vec<_> = a
+        .ops
+        .iter()
+        .filter(|o| matches!(o.opcode, OpCode::Keep))
+        .cloned()
+        .collect();
     new_ops.push(etherpad_client::changeset::Op {
         opcode: OpCode::Insert,
         chars: merged_chars,
@@ -458,6 +453,24 @@ mod concat_tests {
         assert!(matches!(m.ops[1].opcode, OpCode::Insert));
         assert_eq!(m.ops[1].chars, 6);
         assert_eq!(m.ops[1].lines, 1);
+    }
+
+    #[test]
+    fn merge_preserves_split_leading_keep() {
+        // ether/pad#3: "x" at offset 4 of "ab\ncd\n" has a split keep
+        // (`|1=3=1`); a following "\n" merges into "x\n", which must not
+        // collapse the keep back into `|1=4`.
+        let a = crate::share::bridge::changeset_for_insert("ab\ncd\n", 4, "x");
+        let b = crate::share::bridge::changeset_for_insert("ab\ncxd\n", 5, "\n");
+        let m = concat_inserts(&a, &b).expect("should merge");
+        assert_eq!(
+            etherpad_client::changeset::serializer::serialize(&m),
+            "Z:6>2|1=3=1|1+2$x\n"
+        );
+        assert_eq!(
+            etherpad_client::ot::apply(&m, "ab\ncd\n").unwrap(),
+            "ab\ncx\nd\n"
+        );
     }
 
     #[test]
